@@ -29,6 +29,7 @@ import org.auraframework.impl.css.token.TokenCacheImpl;
 import org.auraframework.impl.css.token.TokenValueProviderImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.Provider;
+import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -283,7 +284,9 @@ public class TokenValueProviderImplTest extends StyleTestCase {
     }
 
     private TokenValueProvider setup(DefDescriptor<StyleDef> def) throws QuickFixException {
-        return new TokenValueProviderImpl(styleAdapter.getNamespaceDefaultDescriptor(def), null, ResolveStrategy.RESOLVE_NORMAL, false);
+        MockConfigAdapter configAdapter = getMockConfigAdapter();
+        configAdapter.setIsCssVarTransformEnabled(false);
+        return new TokenValueProviderImpl(styleAdapter.getNamespaceDefaultDescriptor(def), null, ResolveStrategy.RESOLVE_NORMAL, configAdapter);
     }
 
     private TokenValueProvider setupOverride(DefDescriptor<TokensDef> override) throws QuickFixException {
@@ -301,6 +304,8 @@ public class TokenValueProviderImplTest extends StyleTestCase {
 
     private TokenValueProvider setupOverride(DefDescriptor<TokensDef> namespace, List<DefDescriptor<TokensDef>> overrides)
             throws QuickFixException {
-        return new TokenValueProviderImpl(namespace, new TokenCacheImpl(definitionService, overrides), ResolveStrategy.RESOLVE_NORMAL, false);
+        MockConfigAdapter configAdapter = getMockConfigAdapter();
+        configAdapter.setIsCssVarTransformEnabled(false);
+        return new TokenValueProviderImpl(namespace, new TokenCacheImpl(definitionService, overrides), ResolveStrategy.RESOLVE_NORMAL, configAdapter);
     }
 }

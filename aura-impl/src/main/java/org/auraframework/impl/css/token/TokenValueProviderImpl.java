@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.css.ResolveStrategy;
 import org.auraframework.css.TokenCache;
 import org.auraframework.css.TokenValueProvider;
@@ -52,10 +53,28 @@ public final class TokenValueProviderImpl implements TokenValueProvider {
     private final TokenCache overrides;
     private final DefDescriptor<TokensDef> namespaceDefault;
     private final ResolveStrategy strategy;
-    private final boolean isCssVarTransformEnabled;
+    private final ConfigAdapter configAdapter;
+    private boolean isCssVarTransformEnabled;
 
     /**
      * Creates a new {@link TokenValueProvider}.
+     *
+     * @param style Provide tokens for this {@link BaseStyleDef}.
+     * @param overrides The tokens that override the default token values. Null is ok.
+     * @param strategy The indication of how token resolution is being handled (if in doubt about this, use
+     *            {@link ResolveStrategy#RESOLVE_NORMAL}).
+     * @param configAdapter Used to determine if the app allows CSS variable transformation mode.
+     */
+    public TokenValueProviderImpl(DefDescriptor<TokensDef> namespaceDefault, TokenCache overrides, ResolveStrategy strategy, ConfigAdapter configAdapter) {
+        checkNotNull(namespaceDefault, "namespaceDefault cannot be null");
+        this.overrides = overrides;
+        this.namespaceDefault = namespaceDefault;
+        this.strategy = strategy;
+        this.configAdapter = configAdapter;
+    }
+
+    /**
+     * Creates a new {@link TokenValueProvider} with an override to enable CSS transform without a config adapter. 
      *
      * @param style Provide tokens for this {@link BaseStyleDef}.
      * @param overrides The tokens that override the default token values. Null is ok.
@@ -69,6 +88,7 @@ public final class TokenValueProviderImpl implements TokenValueProvider {
         this.namespaceDefault = namespaceDefault;
         this.strategy = strategy;
         this.isCssVarTransformEnabled = isCssVarTransformEnabled;
+        this.configAdapter = null;
     }
 
     /**
@@ -120,7 +140,7 @@ public final class TokenValueProviderImpl implements TokenValueProvider {
     public Object getValue(String reference, Location location, boolean injectCssVarSyntax) throws QuickFixException {
         Expression exp = getExpression(reference, location);
         // Scan expression for token references. 
-        if(isCssVarTransformEnabled && injectCssVarSyntax) {
+        if(isCssVarTransformEnabled() && injectCssVarSyntax) {
             CssVariableHelper helper = new CssVariableHelper(location);
             exp = helper.rewriteExpression(exp);
         }
@@ -210,6 +230,10 @@ public final class TokenValueProviderImpl implements TokenValueProvider {
     @Override
     public ResolveStrategy getResolveStrategy() {
         return strategy;
+    }
+    
+    private boolean isCssVarTransformEnabled() {
+        return configAdapter != null ? configAdapter.isCssVarTransformEnabled() : isCssVarTransformEnabled;
     }
     
 }

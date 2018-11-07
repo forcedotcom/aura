@@ -71,7 +71,7 @@ public class StyleAdapterImpl implements StyleAdapter {
     @Override
     public TokenValueProvider getTokenValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy,
             TokenCache overrides) {
-        return new TokenValueProviderImpl(getNamespaceDefaultDescriptor(style), overrides, strategy, configAdapter.isCssVarTransformEnabled());
+        return new TokenValueProviderImpl(getNamespaceDefaultDescriptor(style), overrides, strategy, configAdapter);
     }
 
     @Override

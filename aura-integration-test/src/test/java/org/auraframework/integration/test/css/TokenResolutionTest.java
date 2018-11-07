@@ -598,4 +598,26 @@ public class TokenResolutionTest extends StyleTestCase {
         String src = ".THIS {margin: token('calc(' + 0 + ' + ' + small + ')')}";
         assertStyle(addStyleDef(src), ".THIS {margin:calc(0 + var(--lwc-small,100px))}");
     }
+    
+    @Test
+    public void testCssVarsInterfacePresent() throws Exception {
+        StringBuilder builder = new StringBuilder();
+        builder.append("<aura:application implements=\"aura:enableCssVariableTransform\">");
+        builder.append("</aura:application>");
+        addContextApp(builder.toString());
+        addNsTokens(tokens().token("small", "100px"));
+        String src = ".THIS {margin: token('calc(' + 0 + ' + ' + small + ')')}";
+        assertStyle(addStyleDef(src), ".THIS {margin:calc(0 + var(--lwc-small,100px))}");
+    }
+
+    @Test
+    public void testCssVarsInterfaceMissing() throws Exception {
+        StringBuilder builder = new StringBuilder();
+        builder.append("<aura:application>");
+        builder.append("</aura:application>");
+        addContextApp(builder.toString());
+        addNsTokens(tokens().token("small", "100px"));
+        String src = ".THIS {margin: token('calc(' + 0 + ' + ' + small + ')')}";
+        assertStyle(addStyleDef(src), ".THIS {margin:calc(0 + 100px)}");
+    }
 }

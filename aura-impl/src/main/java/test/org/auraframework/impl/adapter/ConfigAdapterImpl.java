@@ -45,6 +45,7 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContentSecurityPolicy;
 import org.auraframework.adapter.DefaultContentSecurityPolicy;
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DescriptorFilter;
@@ -54,6 +55,7 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.http.CSPReporterServlet;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.source.AuraResourcesHashingGroup;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.impl.util.BrowserInfo;
 import org.auraframework.instance.BaseComponent;
@@ -108,6 +110,9 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private final Set<String> CACHEABLE_PREFIXES = ImmutableSet.of("aura", "java", "compound");
 
     private final Map<String, String> moduleNamespaceAliases = Maps.newConcurrentMap();
+
+    @SuppressWarnings("unchecked")
+    private final DefDescriptor<InterfaceDef> CSS_TRANSFORM_MARKER_INTERFACE = new DefDescriptorImpl("markup", "aura", "enableCssVariableTransform", InterfaceDef.class);
 
     protected final Set<Mode> allModes = EnumSet.allOf(Mode.class);
     private JavascriptGroup jsGroup;
@@ -883,6 +888,14 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public boolean isCssVarTransformEnabled() { 
-        return false; 
+        DefDescriptor appDesc = contextService.getCurrentContext().getApplicationDescriptor();
+        boolean isEnabled = false;
+        try {
+            isEnabled = appDesc != null && 
+                        definitionService.hasInterface(appDesc, CSS_TRANSFORM_MARKER_INTERFACE);
+        } catch (QuickFixException err) {
+            // ignore
+        }
+        return isEnabled;
     }
 }

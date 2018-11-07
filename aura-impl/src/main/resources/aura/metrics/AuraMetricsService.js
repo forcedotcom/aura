@@ -747,20 +747,25 @@ Aura.Services.MetricsService.prototype.markEnd = function (ns, name, context) {
 Aura.Services.MetricsService.prototype.createMarkNode = function (ns, name, eventType, options) {
     var context = options ? (options["context"] || options) : null;
     var logPerfMarks = ns !== Aura.Services.MetricsService.DEFAULT;
+    var shouldLogOwner = logPerfMarks && !this.pluginInstances[ns];
     if (logPerfMarks) {
         var id = ns + ":" + name + "|" + eventType;
         this.performance.mark(id);
         this.performance.clearMarks(id);
     }
-
-    return {
+    var mark = {
         "ns"      : ns,
         "name"    : name,
         "phase"   : eventType,
         "ts"      : Aura.Services.MetricsService.TIMER(),
-        "context" : context,
-        "owner"   : !this.pluginInstances[ns] && $A.clientService.currentAccess ? $A.clientService.currentAccess.type : null
+        "context" : context
     };
+
+    if(shouldLogOwner && $A.clientService.currentAccess){
+       mark["owner"] = $A.clientService.currentAccess.type;
+    }
+
+    return mark;
 };
 
 /**

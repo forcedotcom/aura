@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function lib(scrollUtil) { //eslint-disable-line no-unused-vars
+function lib(scrollUtil, focusUtil) { //eslint-disable-line no-unused-vars
     'use strict';
 
     function createTransitionEvent(cmp, isEndEvent) {
@@ -514,26 +514,11 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
         },
 
         /**
-         * determines the element is visible or not
-         * @private
-         */
-        isVisible: function(el) {
-            while (el && el.style) {
-                var computedStyle = window.getComputedStyle(el) || el.style;
-                if (computedStyle.display === 'none' || computedStyle.visibility === 'hidden') {
-                    return false;
-                }
-                el = el.parentNode;
-            }
-            return true;
-        },
-
-        /**
          * determines the element is focusable or not
          * @private
          */
         focusAllowed: function(el) {
-            return el && !el.disabled && !/hidden/i.test(el.type) && this.isVisible(el) && el.getAttribute("tabindex") !== "-1";
+            return el && !el.disabled && !/hidden/i.test(el.type) && !focusUtil.isElementHidden(el) && el.getAttribute("tabindex") !== "-1";
         },
 
         /**

@@ -28,13 +28,13 @@ public class TagsElementHandler implements ModuleMetadataXMLHandler {
 
     @Override
     public String handledElement() {
-        return "tags";
+        return "targets";
     }
 
     @Override
     public void process(XMLStreamReader reader, Builder moduleBuilder, TextSource<?> source) throws XMLStreamException, QuickFixException {
-        if (moduleBuilder.getTags() != null && moduleBuilder.getTags().size() > 0) {
-            throw new InvalidDefinitionException("<tags> section is specified twice.", null);
+        if (moduleBuilder.getTargets() != null && moduleBuilder.getTargets().size() > 0) {
+            throw new InvalidDefinitionException("<targets> section is specified twice.", null);
         }
 
         while (reader.hasNext()) {
@@ -42,8 +42,8 @@ public class TagsElementHandler implements ModuleMetadataXMLHandler {
             switch (eventType) {
                 case XMLStreamConstants.START_ELEMENT:
                     String elementName = reader.getLocalName();
-                    if (elementName.equals("tag")) {
-                        moduleBuilder.addTag(ModuleMetadataXMLParserUtil.readCharacters(reader));
+                    if (elementName.equals("target")) {
+                        moduleBuilder.addTarget(ModuleMetadataXMLParserUtil.readCharacters(reader));
                     } else {
                         throw new XMLStreamException("Unexpected element: " + elementName);
                     }

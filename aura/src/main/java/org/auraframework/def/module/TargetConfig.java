@@ -19,28 +19,28 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Represents the configuration specified for a tag. A ModuleDesignConfig is a collection of
+ * Represents the configuration specified for a target. A ModuleDesignConfig is a collection of
  * root level design elements which make the design file.
  *
  */
-public interface TagConfig extends DesignElementDef {
+public interface TargetConfig extends DesignElementDef {
     /**
-     * Returns map with elementName/tagName as the key with list of all elements of that type. 
-     * @return Map 
+     * Returns map with elementName/targetName as the key with list of all elements of that type.
+     * @return Map
      */
     Map<String, List<DesignElementDef>> getDesignElements();
 
     /**
-     * Get list of designElements by element tag name.
-     * 
+     * Get list of designElements by element target name.
+     *
      * @param elementName String elementName of element
-     * @return list of design elements of the tag
+     * @return list of design elements of the target
      */
     List<DesignElementDef> getDesignElement(String elementName);
 
     /**
      * Get list of designElements by element class type.
-     * 
+     *
      * @param defClass designElement class type
      * @return list of design elements of the class type
      */

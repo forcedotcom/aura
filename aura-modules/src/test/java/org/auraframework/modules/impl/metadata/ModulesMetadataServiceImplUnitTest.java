@@ -50,11 +50,11 @@ public class ModulesMetadataServiceImplUnitTest {
                     "  <minApiVersion>  41.0</minApiVersion>" +
                     "  <requireLocker>true</requireLocker>  \n" +
                     "  <support>gA</support>  \n" +
-                    "  <tags>" +
-                    "      <tag>random__tag  </tag>" +
-                    "      <tag>  bob__tag  </tag> " +
-                    "      <tag>  home__tag</tag>\n" +
-                    "  </tags>" +
+                    "  <targets>" +
+                    "      <target>random__tag  </target>" +
+                    "      <target>  bob__tag  </target> " +
+                    "      <target>  home__tag</target>\n" +
+                    "  </targets>" +
                 "</LightningComponentBundle>";
 
         FileSource xmlSource = mock(FileSource.class);
@@ -77,8 +77,8 @@ public class ModulesMetadataServiceImplUnitTest {
         assertEquals("apiVersion should be 42.0", "42.0", moduleDef.getAPIVersion());
         assertEquals("minVersion should be 41.0", new Double(41.0), moduleDef.getMinVersion());
         assertTrue("should require locker", moduleDef.getRequireLocker());
-        assertEquals("should have 3 tags", 3, moduleDef.getTags().size());
-        assertTrue("should contain home__tag", moduleDef.getTags().contains("home__tag"));
+        assertEquals("should have 3 targets", 3, moduleDef.getTargets().size());
+        assertTrue("should contain home__tag", moduleDef.getTargets().contains("home__tag"));
         assertEquals("should be SupportLevel GA", SupportLevel.GA, moduleDef.getSupport());
     }
 
@@ -89,11 +89,11 @@ public class ModulesMetadataServiceImplUnitTest {
                     "<isExposed>   true</isExposed>" +
                     "<minApiVersion>41.0</minApiVersion>\n" +
                     "<requireLocker>true</requireLocker>\n" +
-                    "<tags>\n" +
-                    "   <tag>random__tag</tag>\n" +
-                    "   <tag>bob__tag<tag>\n" +
-                    "   <tag>home__tag</tag>\n" +
-                    "</tags>\n" +
+                    "<targets>\n" +
+                    "   <target>random__tag</target>\n" +
+                    "   <target>bob__tag<target>\n" +
+                    "   <target>home__tag</target>\n" +
+                    "</targets>\n" +
                 "</LightningComponentBundle>";
 
         FileSource xmlSource = mock(FileSource.class);
@@ -120,14 +120,14 @@ public class ModulesMetadataServiceImplUnitTest {
     public void processMoreBadXML() throws Exception {
         String xml =
                 "<LightningComponentBundle> " +
-                        "  <isExposed> <abc>true</abc> <tags> <tag> availableForRecordHome</tag> </tags> </isExposed>\n" +
+                        "  <isExposed> <abc>true</abc> <targets> <target> availableForRecordHome</target> </targets> </isExposed>\n" +
                         "  <minApiVersion>41.0  </minApiVersion>\n" +
                         "    <requireLocker>true  </requireLocker>\n" +
-                        "<tags>\n" +
-                        "   <tag>random__tag</tag>\n" +
-                        "   <tag>bob__tag</tag>" +
-                        "   <tag>home__tag</tag>\n" +
-                        "</tags>" +
+                        "<targets>\n" +
+                        "   <target>random__tag</target>\n" +
+                        "   <target>bob__tag</target>" +
+                        "   <target>home__tag</target>\n" +
+                        "</targets>" +
                 "</LightningComponentBundle>";
 
         FileSource xmlSource = mock(FileSource.class);
@@ -157,12 +157,12 @@ public class ModulesMetadataServiceImplUnitTest {
                         "  <isExposed>true</isExposed>\n" +
                         "  <minApiVersion>41.0  </minApiVersion>\n" +
                         "    <requireLocker>true  </requireLocker>\n" +
-                        "<tags>\n" +
+                        "<targets>\n" +
                         "   <nottag>random__tag</nottag>\n" +
-                        "   <tag>random__tag</tag>\n" +
-                        "   <tag>bob__tag</tag>" +
-                        "   <tag>home__tag</tag>\n" +
-                        "</tags>" +
+                        "   <target>random__tag</target>\n" +
+                        "   <target>bob__tag</target>" +
+                        "   <target>home__tag</target>\n" +
+                        "</targets>" +
                         "</LightningComponentBundle>";
 
         FileSource xmlSource = mock(FileSource.class);
@@ -192,12 +192,12 @@ public class ModulesMetadataServiceImplUnitTest {
                         "  <isExposed>true</isExposed>\n" +
                         "  <minApiVersion>41.0  </minApiVersion>\n" +
                         "    <requireLocker>true  </requireLocker>\n" +
-                        "<tags>\n" +
-                        "   <tag>random__tag</tag>\n" +
-                        "   <tag>bob__tag</tag>" +
+                        "<targets>\n" +
+                        "   <target>random__tag</target>\n" +
+                        "   <target>bob__tag</target>" +
                         "  \n blah \n random \n" +
-                        "   <tag>home__tag</tag>\n" +
-                        "</tags>" +
+                        "   <target>home__tag</target>\n" +
+                        "</targets>" +
                         "</LightningComponentBundle>";
 
         FileSource xmlSource = mock(FileSource.class);
@@ -228,11 +228,11 @@ public class ModulesMetadataServiceImplUnitTest {
                         "  <isExposed>true</isExposed>\n" +
                         "  <minApiVersion>41.0  </minApiVersion>\n" +
                         "    <requireLocker>true  </requireLocker>\n" +
-                        "<tags>\n" +
-                        "   <tag>random__tag</tag>\n" +
-                        "   <tag>bob__tag</tag>" +
-                        "   <tag>home__tag</tag>\n" +
-                        "</tags> \n  \n something random here \n\n\n" +
+                        "<targets>\n" +
+                        "   <target>random__tag</target>\n" +
+                        "   <target>bob__tag</target>" +
+                        "   <target>home__tag</target>\n" +
+                        "</targets> \n  \n something random here \n\n\n" +
                         "</LightningComponentBundle>";
 
         FileSource xmlSource = mock(FileSource.class);
@@ -255,15 +255,15 @@ public class ModulesMetadataServiceImplUnitTest {
         }
     }
 
-	private List<ModuleMetadataXMLHandler> getXmlHandlers() {
-		List<ModuleMetadataXMLHandler> xmlHandlers = new ArrayList<>();
+        private List<ModuleMetadataXMLHandler> getXmlHandlers() {
+                List<ModuleMetadataXMLHandler> xmlHandlers = new ArrayList<>();
         xmlHandlers.add(new TagsElementHandler());
         xmlHandlers.add(new ExposeElementHandler());
         xmlHandlers.add(new ApiVersionElementHandler());
         xmlHandlers.add(new MinApiVersionElementHandler());
         xmlHandlers.add(new RequireLockerElementHandler());
         xmlHandlers.add(new SupportElementHandler());
-		return xmlHandlers;
-	}
+                return xmlHandlers;
+        }
 
 }

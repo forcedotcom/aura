@@ -268,7 +268,7 @@ public class BundleAwareDefRegistry implements DefRegistry {
         return registry.values().stream().filter(h ->
                 h.def != null
                 && h.def instanceof PlatformDef
-                && !Collections.disjoint(((PlatformDef)h.def).getTags(), tags))
+                && !Collections.disjoint(((PlatformDef)h.def).getTargets(), tags))
             .map(h -> h.descriptor).collect(Collectors.toSet());
     }
 

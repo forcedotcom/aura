@@ -43,8 +43,8 @@ public interface ModulesMetadataService {
     void processMetadata(TextSource source, ModuleDefImpl.Builder moduleBuilder) throws QuickFixException;
 
     /**
-     * Valid tags
-     * @return set of valid tags
+     * Valid targets
+     * @return set of valid targets
      */
-    Set<String> getValidTags();
+    Set<String> getValidTargets();
 }

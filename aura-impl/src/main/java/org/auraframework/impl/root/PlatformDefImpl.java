@@ -35,7 +35,7 @@ public abstract class PlatformDefImpl<T extends PlatformDef> extends BundleDefIm
     private static final long serialVersionUID = -5903259567383044872L;
     protected final Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs;
     protected final Double minVersion;
-    protected Set<String> tags;
+    protected Set<String> targets;
     private final SupportLevel support;
 
     protected PlatformDefImpl(Builder<T> builder) {
@@ -47,7 +47,7 @@ public abstract class PlatformDefImpl<T extends PlatformDef> extends BundleDefIm
             this.attributeDefs = Collections.unmodifiableMap(builder.attributeDefs);
         }
         this.minVersion = builder.minVersion;
-        this.tags = Collections.unmodifiableSet(builder.tags);
+        this.targets = Collections.unmodifiableSet(builder.targets);
     }
 
     @Override
@@ -68,8 +68,8 @@ public abstract class PlatformDefImpl<T extends PlatformDef> extends BundleDefIm
     }
 
     @Override
-    public Set<String> getTags() {
-        return this.tags;
+    public Set<String> getTargets() {
+        return this.targets;
     }
 
     @Override
@@ -81,7 +81,7 @@ public abstract class PlatformDefImpl<T extends PlatformDef> extends BundleDefIm
 
         public Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs = Maps.newLinkedHashMap();
         public Double minVersion;
-        public Set<String> tags = Collections.emptySet();
+        public Set<String> targets = Collections.emptySet();
         private SupportLevel support = SupportLevel.PROTO;
 
         public Builder(Class<T> defClass) {
@@ -104,15 +104,15 @@ public abstract class PlatformDefImpl<T extends PlatformDef> extends BundleDefIm
             this.attributeDefs.put(defDescriptor, attributeDef);
         }
 
-        public void setTags(Set<String> tags) {
-            this.tags = tags;
+        public void setTargets(Set<String> targets) {
+            this.targets = targets;
         }
 
-        public void addTag(String tag) {
-            if (tags.isEmpty()) {
-                tags = Sets.newHashSet();
+        public void addTarget(String target) {
+            if (targets.isEmpty()) {
+                targets = Sets.newHashSet();
             }
-            this.tags.add(tag);
+            this.targets.add(target);
         }
 
         public void setMinVersion(Double minVersion) {

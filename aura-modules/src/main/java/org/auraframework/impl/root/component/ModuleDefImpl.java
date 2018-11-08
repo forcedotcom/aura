@@ -76,7 +76,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     private final List<Reference> metadataReferences;
     private final Boolean requireLocker;
     private final ModuleDesignDef moduleDesignDef;
-    private final Set<String> validTags;
+    private final Set<String> validTargets;
     private final DocumentationDef documentationDef;
     private final DocumentationDef auraDocumentationDef;
     private final SVGDef svgDef;
@@ -96,7 +96,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         this.minVersion = builder.minVersion;
         this.requireLocker = builder.requireLocker;
         this.moduleDesignDef = builder.moduleDesignDef;
-        this.validTags = AuraUtil.immutableSet(builder.validTags);
+        this.validTargets = AuraUtil.immutableSet(builder.validTargets);
         this.sourceReferences = AuraUtil.immutableList(builder.sourceReferences);
         this.metadataReferences = AuraUtil.immutableList(builder.metadataReferences);
         this.documentationDef = builder.documentationDef;
@@ -301,20 +301,20 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         super.validateReferences(validationContext);
         validateLabels();
-        validateTags();
+        validateTargets();
     }
 
     /**
-     * Validates whether tags are valid
+     * Validates whether targets are valid
      * @throws QuickFixException invalid definition
      */
-    private void validateTags() throws QuickFixException {
-        Set<String> tags = this.getTags();
-        if (!tags.isEmpty()) {
-            if (!this.validTags.isEmpty()) {
-                for (String tag : tags) {
-                    if (!this.validTags.contains(tag)) {
-                        throw new InvalidDefinitionException(tag + " is not a valid tag", getLocation());
+    private void validateTargets() throws QuickFixException {
+        Set<String> targets = this.getTargets();
+        if (!targets.isEmpty()) {
+            if (!this.validTargets.isEmpty()) {
+                for (String target : targets) {
+                    if (!this.validTargets.contains(target)) {
+                        throw new InvalidDefinitionException(target + " is not a valid target", getLocation());
                     }
                 }
             }
@@ -362,7 +362,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         private List<Reference> metadataReferences = Collections.emptyList();
         private Boolean requireLocker = false;
         private ModuleDesignDef moduleDesignDef = null;
-        private Set<String> validTags = Collections.emptySet();
+        private Set<String> validTargets = Collections.emptySet();
         private ModuleDesignDefImpl.Builder designBuilder;
         private DocumentationDef documentationDef;
         private DocumentationDef auraDocumentationDef;
@@ -411,15 +411,15 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         }
 
         public String getCustomElementName() {
-        	return this.customElementName;
+               return this.customElementName;
         }
 
         public void setRequireLocker(Boolean requireLocker) {
             this.requireLocker = requireLocker;
         }
 
-        public void setValidTags(Set<String> validTags) {
-            this.validTags = validTags;
+        public void setValidTargets(Set<String> validTargets) {
+            this.validTargets = validTargets;
         }
 
         public void setModuleDesignDef(ModuleDesignDef moduleDesignDef){
@@ -430,8 +430,8 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
             return this.moduleDesignDef;
         }
 
-        public Set<String> getTags(){
-            return this.tags;
+        public Set<String> getTargets(){
+            return this.targets;
         }
 
         public ModuleDesignDefImpl.Builder getDesignBuilder() {

@@ -159,11 +159,11 @@ public class BundleModuleDefFactoryUnitTest {
                     "<isExposed>true</isExposed>\n" +
                     "<minApiVersion>12.3</minApiVersion>\n" +
                     "<requireLocker>true</requireLocker>\n" +
-                    "<tags>\n" +
-                    "   <tag>random__tag</tag>\n" +
-                    "   <tag>bob__tag</tag>\n" +
-                    "   <tag>home__tag</tag>\n" +
-                    "</tags>\n" +
+                    "<targets>\n" +
+                    "   <target>random__tag</target>\n" +
+                    "   <target>bob__tag</target>\n" +
+                    "   <target>home__tag</target>\n" +
+                    "</targets>\n" +
                 "</LightningComponentBundle>";
         FileSource<?> xmlMetadataFileSource = mockFile(basePath, "moduleCmp.js-meta.xml", xml);
 
@@ -271,11 +271,11 @@ public class BundleModuleDefFactoryUnitTest {
                     "<isExposed>true</isExposed>\n" +
                     "<minApiVersion>12.3</minApiVersion>\n" +
                     "<requireLocker>true</requireLocker>\n" +
-                    "<tags>\n" +
-                    "   <tag>random__tag</tag>\n" +
-                    "   <tag>bob__tag</tag>\n" +
-                    "   <tag>home__tag</tag>\n" +
-                    "</tags>\n" +
+                    "<targets>\n" +
+                    "   <target>random__tag</target>\n" +
+                    "   <target>bob__tag</target>\n" +
+                    "   <target>home__tag</target>\n" +
+                    "</targets>\n" +
                 "</LightningComponentBundle>";
         FileSource<?> xmlMetadataFileSource = mockFile(basePath, "module-cmp.js-meta.xml", xml);
 

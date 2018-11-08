@@ -132,11 +132,11 @@ public class ModulesMetadataServiceImpl implements ModulesMetadataService {
     }
 
     /**
-     * Currently no valid tags.
+     * Currently no valid targets.
      * @return empty set
      */
     @Override
-    public Set<String> getValidTags() {
+    public Set<String> getValidTargets() {
         return Collections.emptySet();
     }
 

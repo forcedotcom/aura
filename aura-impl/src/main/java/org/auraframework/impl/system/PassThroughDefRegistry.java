@@ -97,7 +97,7 @@ public class PassThroughDefRegistry implements DefRegistry {
             .filter(def ->
                 def != null
                 && def instanceof PlatformDef
-                && !Collections.disjoint(((PlatformDef)def).getTags(), tags))
+                && !Collections.disjoint(((PlatformDef)def).getTargets(), tags))
             .map(def -> def.getDescriptor())
             .collect(Collectors.toSet());
     }

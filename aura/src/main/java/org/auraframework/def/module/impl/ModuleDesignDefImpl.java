@@ -16,7 +16,7 @@
 package org.auraframework.def.module.impl;
 
 import org.auraframework.def.module.ModuleDesignDef;
-import org.auraframework.def.module.TagConfigs;
+import org.auraframework.def.module.TargetConfigs;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.springframework.util.StringUtils;
 
@@ -25,20 +25,20 @@ import org.springframework.util.StringUtils;
  * LWC component specified in -meta.xml 
  */
 public class ModuleDesignDefImpl implements ModuleDesignDef {
-	private static final long serialVersionUID = -9187646383220697438L;
-	private String label;
+        private static final long serialVersionUID = -9187646383220697438L;
+        private String label;
     private String description;
-    private TagConfigs tagConfigs;
+    private TargetConfigs targetConfigs;
 
     ModuleDesignDefImpl(ModuleDesignDefImpl.Builder builder) {
         label = builder.getLabel();
         description = builder.getDescription();
-        tagConfigs = builder.getTagConfigs();
+        targetConfigs = builder.getTargetConfigs();
     }
 
     @Override
-    public TagConfigs configs() {
-       return tagConfigs;
+    public TargetConfigs configs() {
+       return targetConfigs;
     }
 
     @Override
@@ -54,7 +54,7 @@ public class ModuleDesignDefImpl implements ModuleDesignDef {
     public static final class Builder {
         private String label;
         private String description;
-        private TagConfigs tagConfigs;
+        private TargetConfigs targetConfigs;
 
         public Builder setLabel(String label) throws InvalidDefinitionException {
             if (this.label != null) {
@@ -80,13 +80,13 @@ public class ModuleDesignDefImpl implements ModuleDesignDef {
             return this;
         }
         
-        public Builder setTagConfigs(TagConfigs tagConfigs) {
-            this.tagConfigs = tagConfigs;
+        public Builder setTargetConfigs(TargetConfigs targetConfigs) {
+            this.targetConfigs = targetConfigs;
             return this;
         }
 
-        public TagConfigs getTagConfigs() {
-            return this.tagConfigs;
+        public TargetConfigs getTargetConfigs() {
+            return this.targetConfigs;
         }
         
         String getLabel() {

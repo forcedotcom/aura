@@ -37,8 +37,8 @@ public interface ModuleDesignDef extends Serializable {
     public String getDescription();
 
     /**
-     * Returns all the design configurations with in <tagConfigs></tagConfigs>in the -meta.xml
-     * @return TagConfigs {@link TagConfigs}
+     * Returns all the design configurations with in <targetConfigs></targetConfigs>in the -meta.xml
+     * @return TargetConfigs {@link TargetConfigs}
      */
-    public TagConfigs configs();
+    public TargetConfigs configs();
 }

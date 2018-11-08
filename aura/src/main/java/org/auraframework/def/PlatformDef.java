@@ -44,9 +44,9 @@ public interface PlatformDef extends BundleDef {
     AttributeDef getAttributeDef(String name) throws QuickFixException;
 
     /**
-     * Get the set of tags for this def.
+     * Get the set of targets for this def.
      */
-    default Set<String> getTags() { return Collections.emptySet(); }
+    default Set<String> getTargets() { return Collections.emptySet(); }
 
     /**
      * Supported minimum version

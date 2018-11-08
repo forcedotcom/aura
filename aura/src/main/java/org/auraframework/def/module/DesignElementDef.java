@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Java representation of an XML Tag present in the design section of a -meta.xml file (<tagConfigs> and all tags that can be present in tagConfigs).
+ * Java representation of an XML Tag present in the design section of a -meta.xml file (<targetConfigs> and all tags that can be present in targetConfigs).
  * Every object representing a tag within the design section of Meta xml will be a subclass of this interface.
  *
  * @author a.bhargava

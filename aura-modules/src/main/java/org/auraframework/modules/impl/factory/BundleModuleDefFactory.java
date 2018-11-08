@@ -97,7 +97,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
     private ModulesCompilerService modulesCompilerService;
     private ModulesMetadataService modulesMetadataService;
     private CompilerService compilerService;
-    private Set<String> validTags = Collections.emptySet();
+    private Set<String> validTargets = Collections.emptySet();
 
     @Override
     public Class<?> getSourceInterface() {
@@ -196,7 +196,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         builder.setModuleDependencies(compilerData.bundleDependencies);
         builder.setLabels(compilerData.labels);
         builder.setOwnHash(calculateOwnHash(descriptor, codes));
-        builder.setValidTags(this.validTags);
+        builder.setValidTargets(this.validTargets);
         builder.setSourceReferences(compilerData.compilerReport.metadata.references);
 
         builder.setWireDecorations(compilerData.wireDecorations);
@@ -370,8 +370,8 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
             
             if(examples.containsKey(exampleName)) {
                 throw new RuntimeException(
-                		String.format("The example '%s' was duplicated for module '%s'.", exampleName, documentation.getClassDescription()));
-            	
+                               String.format("The example '%s' was duplicated for module '%s'.", exampleName, documentation.getClassDescription()));
+                
             }
             
             ExampleMetadata exampleMetadata = new ExampleMetadata();
@@ -455,7 +455,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
                     return entry.getValue() instanceof TextSource;
                 }).
                 map(entry -> {
-                		Source<?> source = entry.getValue();
+                               Source<?> source = entry.getValue();
                     String contents = ((TextSource<?>) source).getContents();
                     DefDescriptor<?> desc = ((TextSource<?>) source).getDescriptor();
                     return new ModuleExampleFileImpl(desc.getName(), contents);
@@ -599,8 +599,8 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
     @Inject
     public void setModulesMetadataService(ModulesMetadataService modulesMetadataService) {
         this.modulesMetadataService = modulesMetadataService;
-        // set valid tags once.
-        this.validTags = Collections.unmodifiableSet(this.modulesMetadataService.getValidTags());
+        // set valid targets once.
+        this.validTargets = Collections.unmodifiableSet(this.modulesMetadataService.getValidTargets());
     }
 
     @Inject

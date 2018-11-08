@@ -19,22 +19,22 @@ import java.util.Map;
 
 /**
  * ModuleDesignDef is java representation of the
- * design configuration specified in <tagConfigs> </tagConfigs> tags
+ * design configuration specified in <targetConfigs> </targetConfigs> tags
  * in -meta.xml file of raptor component bundle.
  */
-public interface TagConfigs extends DesignElementDef {
-	/**
+public interface TargetConfigs extends DesignElementDef {
+    /**
      * Returns all the design configurations in the -meta.xml
-     * @return Map of configuration with tagName/elementName as the key and ModuleDesignConfig {@link TagConfig} as the value.
+     * @return Map of configuration with targetName/elementName as the key and ModuleDesignConfig {@link TargetConfig} as the value.
      * The map can be empty when no configurations are available.
      * @return Map
      */
-    public Map<String, TagConfig> all();
+    public Map<String, TargetConfig> all();
 
-	/**
-    * Gets design configuration for given tag specified in <tagConfig> </tagConfig>
-    * @param tagName String - represents a tag , ex - lightning__recordHome
+    /**
+    * Gets design configuration for given tag specified in <targetConfig> </targetConfig>
+    * @param targetName String - represents a target , ex - lightning__recordHome
     * @return config for the given tag if present , null otherwise.
     */
-    public TagConfig get(String tagName);
+    public TargetConfig get(String targetName);
 }

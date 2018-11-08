@@ -99,7 +99,7 @@ public class StaticDefRegistryImpl extends DefRegistryImpl {
     public Set<DefDescriptor<?>> findByTags(@Nonnull Set<String> tags) {
         return defs.entrySet().stream().filter(m ->
                 m.getValue() instanceof PlatformDef
-                && !Collections.disjoint(((PlatformDef)m.getValue()).getTags(), tags))
+                && !Collections.disjoint(((PlatformDef)m.getValue()).getTargets(), tags))
             .map(m -> m.getKey()).collect(Collectors.toSet());
     }
 

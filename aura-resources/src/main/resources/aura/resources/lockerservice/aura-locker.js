@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-10-30
- * Version: 0.5.26
+ * Generated: 2018-11-08
+ * Version: 0.5.28
  */
 
 (function (exports) {
@@ -496,7 +496,10 @@ function sanitize(input, cfg) {
   floating.innerHTML = asString$1(input);
   cfg = cfg || RETURN_STRING_ALL;
   const sanitizer = getSanitizerForConfig(cfg);
-  return sanitizer.sanitize(floating.content);
+  // IE11 recognizes template elements as HTMLUnknownELement
+  // the property content will not be available on ie11
+  // fallback to using innerHTML since we just need the string
+  return sanitizer.sanitize(floating.content || floating.innerHTML);
 }
 
 /**
@@ -785,10 +788,6 @@ const secureProxy = new WeakSet();
 const filteringProxy = new WeakSet();
 const secureFunction = new WeakSet();
 
-const secureBlobTypes = new WeakMap();
-const secureFilesTypes = new WeakMap();
-const secureMediaSource = new WeakMap();
-
 function getKey(thing) {
   return keychain.get(thing);
 }
@@ -906,34 +905,6 @@ function registerSecureFunction(st) {
 
 function isSecureFunction(st) {
   return secureFunction.has(st);
-}
-
-function registerSecureBlob(st, type) {
-  secureBlobTypes.set(st, type);
-}
-
-function isSecureBlob(st) {
-  return secureBlobTypes.has(st);
-}
-
-
-
-function registerSecureFile(st, type) {
-  secureFilesTypes.set(st, type);
-}
-
-
-
-function isSecureFile(st) {
-  return secureFilesTypes.has(st);
-}
-
-function registerSecureMediaSource(st) {
-  secureMediaSource.set(st, true);
-}
-
-function isSecureMediaSource(st) {
-  return secureMediaSource.has(st);
 }
 
 function unwrap$1(from, st) {
@@ -2645,11 +2616,21 @@ function customElementHook$1(el, prototype, tagNameSpecificConfig) {
     const elComponentProps = lwcGetComponentDef(elComponentConstructor).props;
     if (elComponentProps) {
       ObjectKeys(elComponentProps).forEach(prop => {
-        tagNameSpecificConfig[prop] = createFilteredPropertyStateless(
-          prop,
-          prototype,
-          methodOptions
-        );
+        tagNameSpecificConfig[prop] = {
+          enumerable: true,
+          get() {
+            // When the secure parent is accessing a value on the child element
+            const raw = getRawThis(this);
+            const value = raw[prop];
+            return filter(getKey(this), value);
+          },
+          set(newValue) {
+            // When the secure parent is setting a value on the child component
+            const raw = getRawThis(this);
+            // Deep unfilter the value and let the setHook() filter the value at the destination
+            raw[prop] = deepUnfilter(getKey(this), [], [newValue])[0];
+          }
+        };
       });
     }
   }
@@ -7295,10 +7276,12 @@ function addUnfilteredPropertyIfSupported(st, raw, name) {
 function deepUnfilterMethodArguments(st, baseObject, members) {
   let value;
   let rawValue;
+  // The locker key of the secure thing from where the members originated
+  const fromKey = getKey(st);
   for (const property in members) {
     value = members[property];
     if (deepUnfilteringTypeHook$1) {
-      rawValue = deepUnfilteringTypeHook$1(st, value);
+      rawValue = deepUnfilteringTypeHook$1(fromKey, value);
     }
     // If the hooks failed to unfilter the value, do the deep copy, unwrapping one item at a time
     if (rawValue === value) {
@@ -7319,7 +7302,7 @@ function deepUnfilterMethodArguments(st, baseObject, members) {
         }
       } else {
         // For everything else we are not sure how to provide raw access, filter the value
-        rawValue = filterEverything(st, value, { defaultKey: getKey(st) });
+        rawValue = filterEverything(st, value, { defaultKey: fromKey });
       }
     }
     baseObject[property] = rawValue;
@@ -8172,6 +8155,38 @@ function SecureStorage(storage, type, key) {
   registerProxy(o);
 
   return o;
+}
+
+const secureBlobTypes = new WeakMap();
+const secureFilesTypes = new WeakMap();
+const secureMediaSource = new WeakMap();
+
+function registerSecureBlob(st, type) {
+  secureBlobTypes.set(st, type);
+}
+
+function isSecureBlob(st) {
+  return secureBlobTypes.has(st);
+}
+
+
+
+function registerSecureFile(st, type) {
+  secureFilesTypes.set(st, type);
+}
+
+
+
+function isSecureFile(st) {
+  return secureFilesTypes.has(st);
+}
+
+function registerSecureMediaSource(st) {
+  secureMediaSource.set(st, true);
+}
+
+function isSecureMediaSource(st) {
+  return secureMediaSource.has(st);
 }
 
 // For URL, we only need to tame one static method. That method is on the
@@ -9534,7 +9549,7 @@ function unwrapValue(st, value) {
   if (isArray(value) || isPlainObject(value)) {
     // If an object or array is nested inside a data proxy, they will need to be rewrapped
     // FilteringProxy and ArrayProxy is covered by this check
-    unfilteredValue = getUnfilteringDataProxy(st, value);
+    unfilteredValue = getUnfilteringDataProxy(getKey(st), value);
   } else if (typeof value === 'function') {
     // Functions from sandbox cannot be handed over to system, they will be converted to a SecureFunction
     const secureFunction = filterEverything(st, value);
@@ -9553,8 +9568,9 @@ function unwrapValue(st, value) {
     // If value is a wrapped object, use st's key to unwrap the value.
     unfilteredValue = unwrap$1(st, value);
   } else {
-    // Protect anything else that we don't know about
-    unfilteredValue = filterEverything(st, value);
+    // Protect anything else that we don't know about.
+    // Call lwcUnwrap to catch things like SecureWindow that can be wrapped in a data proxy
+    unfilteredValue = filterEverything(st, lwcUnwrap(value));
   }
   return unfilteredValue;
 }
@@ -9796,15 +9812,14 @@ function getDataProxy(proxy) {
 /**
  * Provide a unfiltering proxy for a value that can be used in system mode
  * The value originates from a sandbox owned by the secure thing
- * @param {*} st secure thing that wants to send value to system mode
+ * @param {*} fromKey locker key of the secure thing that wants to send value to system mode
  * @param {*} value value being unwrapped
  */
-function getUnfilteringDataProxy(st, value) {
+function getUnfilteringDataProxy(fromKey, value) {
   if (!value) {
     return value;
   }
-  const key = getKey(st);
-  assert$1.invariant(key, 'Trying to unfilter a value without a secure owner');
+  assert$1.invariant(fromKey, 'Trying to unfilter a value without a key');
 
   // Handle only plain objects or arrays that were created by the secure thing
   if (!isArray(value) && !isPlainObject(value)) {
@@ -9821,7 +9836,7 @@ function getUnfilteringDataProxy(st, value) {
 
   if (!getKey(value)) {
     // If value has not already been keyed, propagate the key to the value
-    setKey(value, key);
+    setKey(value, fromKey);
   }
 
   // Use a shadow target to avoid breaking proxy invariants
@@ -9834,7 +9849,7 @@ function getUnfilteringDataProxy(st, value) {
       : new UnfilteringProxyHandlerForObject(value)
   );
   // Key the unfilteringProxy to the secure thing's namespace
-  setKey(unfilteringProxy, key);
+  setKey(unfilteringProxy, fromKey);
   cachedUnfilteringProxy.set(value, unfilteringProxy);
   registerUnfilteringDataProxy(unfilteringProxy, value);
   return unfilteringProxy;
@@ -9873,7 +9888,7 @@ function getUnwrappedValue(cmp, filteredValue) {
         // Unwrap the filtering proxy
         return unwrap$1(cmp, filteredValue);
       }
-      return getUnfilteringDataProxy(cmp, filteredValue);
+      return getUnfilteringDataProxy(getKey(cmp), filteredValue);
     } else if (isArray(filteredValue)) {
       // If the value is a plain array that belongs to this locker
       return deepUnfilterMethodArguments(cmp, [], filteredValue);
@@ -10864,10 +10879,10 @@ function filterTypeHook(raw, key, belongsToLocker) {
 
 /**
  * Custom unfiltering logic for values that need special handling to be usable in system mode
- * @param {*} st Secure thing that owns the value
+ * @param {*} fromKey locker key for the secure thing that from where the value originated
  * @param {*} value value being unfiltered for system mode access
  */
-function deepUnfilteringTypeHook(st, value) {
+function deepUnfilteringTypeHook(fromKey, value) {
   if (!value) {
     return value;
   }
@@ -10875,10 +10890,10 @@ function deepUnfilteringTypeHook(st, value) {
     // If value is a wrapper over unfiltering data proxy, unwrap it
     if (isProxy(value)) {
       // If value is a wrapped object, use st's key to unwrap the value.
-      return unwrap$1(st, value);
+      return getRef(value, fromKey);
     }
     // preserve the proxy behavior, wrap with an unfiltering proxy
-    return getUnfilteringDataProxy(st, value);
+    return getUnfilteringDataProxy(fromKey, value);
   }
   return value;
 }

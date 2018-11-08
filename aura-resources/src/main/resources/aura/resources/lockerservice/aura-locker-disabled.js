@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-10-30
- * Version: 0.5.26
+ * Generated: 2018-11-08
+ * Version: 0.5.28
  */
 
 (function (exports) {
@@ -356,7 +356,10 @@ function sanitize(input, cfg) {
   floating.innerHTML = asString(input);
   cfg = cfg || RETURN_STRING_ALL;
   var sanitizer = getSanitizerForConfig(cfg);
-  return sanitizer.sanitize(floating.content);
+  // IE11 recognizes template elements as HTMLUnknownELement
+  // the property content will not be available on ie11
+  // fallback to using innerHTML since we just need the string
+  return sanitizer.sanitize(floating.content || floating.innerHTML);
 }
 
 /**

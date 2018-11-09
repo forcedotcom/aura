@@ -1,13 +1,20 @@
 import { LightningElement, api, track } from 'lwc';
 import * as testUtil from 'securemoduletest/testUtil';
-
+const NAMESPACE = 'lockerlwc';
 export default class TrackedProperty extends LightningElement {
     @track title = 'Literal title';
     @track state = {
         title: 'Object key title',
         headings: {
             item1: 'Nested title'
-        }
+        },
+        win: window,
+        doc: document,
+        body: document.body,
+        string: 'foobar',
+        number: 1,
+        boolean: true,
+        domElement: document.createElement('div')
     }
     dirty = false;
     @api
@@ -38,6 +45,13 @@ export default class TrackedProperty extends LightningElement {
             objectProp: 'Object key title',
             nestedObjectProp: 'Nested title'
         });
+        assertIsSecureElement(this.state.domElement);
+        assertIsSecureWindow(this.state.win);
+        assertIsSecureDocument(this.state.doc);
+        assertIsSecureBody(this.state.body);
+        testUtil.assertEquals('foobar', this.state.string);
+        testUtil.assertEquals(1, this.state.number);
+        testUtil.assertEquals(true, this.state.boolean);
     }
 
     @api
@@ -82,6 +96,7 @@ export default class TrackedProperty extends LightningElement {
     verifyDataSetOnChildPropertyIsReadOnly(childId) {
         const child = this.template.querySelector(childId);
         child.valueFromParent = this.state;
+        child.childVerifyPublicPropertyDataTypes();
         child.verifyPublicPropertyDataIsReadOnly();
     }
 
@@ -145,6 +160,11 @@ export default class TrackedProperty extends LightningElement {
                 objectProp: '[Updated by child]Object key title',
                 nestedObjectProp: '[Updated by child]Nested title'
             });
+            // Verify that secure things did not leak across namespaces
+            assertIsSecureObject(this.state.fromChild.domElement);
+            assertIsSecureWindow(this.state.fromChild.win);
+            assertIsSecureDocument(this.state.fromChild.doc);
+            assertIsSecureBody(this.state.fromChild.body);
         });
         return promise;
     }
@@ -177,4 +197,42 @@ export default class TrackedProperty extends LightningElement {
     renderedCallback() {
         this.dirty = false;
     }
+}
+function assertIsSecureObject(el) {
+    testUtil.assertEquals(
+        true,
+        `${el}`.startsWith('SecureObject:'),
+        'Expected a SecureObject when accessing cross namespace dom elements'
+    );
+}
+function assertIsSecureElement(el) {
+    testUtil.assertEquals(
+        true,
+        `${el}`.startsWith('SecureElement:'),
+        'Expected a SecureElement object in Lockerized LWC component'
+    );
+}
+
+function assertIsSecureWindow(window) {
+    testUtil.assertEquals(
+        `SecureWindow: [object Window]{ key: {"namespace":"${NAMESPACE}"} }`,
+        `${window}`,
+        'Expected window to be a SecureWindow'
+    );
+}
+
+function assertIsSecureDocument(doc) {
+    testUtil.assertEquals(
+        `SecureDocument: [object HTMLDocument]{ key: {"namespace":"${NAMESPACE}"} }`,
+        `${doc}`,
+        'Expected document to be a SecureDocument'
+    );
+}
+
+function assertIsSecureBody(body) {
+    testUtil.assertEquals(
+        `SecureElement: [object HTMLBodyElement]{ key: {"namespace":"${NAMESPACE}"} }`,
+        `${body}`,
+        'Expected body to be a SecureElement: [object HTMLBodyElement]'
+    );
 }

@@ -15,7 +15,7 @@
  *
  * Bundle from LockerService-Core
  * Generated: 2018-11-08
- * Version: 0.5.28
+ * Version: 0.5.29
  */
 
 (function (exports) {
@@ -359,7 +359,7 @@ function uponSanitizeAttribute(node, data) {
 // eslint-disable-next-line
 const root = typeof window !== 'undefined' ? window : jsdom.window;
 
-// floating element used for purification of strings
+// floating element used for purification of strings in Locker
 // create a dummy floating element that stores text if document is not found
 const floating = root.document.createElement('template');
 
@@ -479,7 +479,8 @@ function sanitizeElement(node) {
 }
 
 /**
- * Sanitize a string with strict SVG rules
+ * Sanitize a string with strict SVG rules. Uses internal SVG configuration
+ * For compatibility reasons this method acts as a passthrough to DOMPurify
  * @param {String} input
  */
 
@@ -488,18 +489,25 @@ function sanitizeElement(node) {
  * Will sanitize a string.
  * If passed a configuration object it will use that to cache the new DOMPurify instance
  * Defaults to internal generic configuration otherwise
- *
+ * For compatibility reasons this method acts as a passthrough to DOMPurify
  * @param {String} input
  * @param {Object} cfg - DOMPurify compatible configuration object
  */
 function sanitize(input, cfg) {
-  floating.innerHTML = asString$1(input);
   cfg = cfg || RETURN_STRING_ALL;
   const sanitizer = getSanitizerForConfig(cfg);
-  // IE11 recognizes template elements as HTMLUnknownELement
-  // the property content will not be available on ie11
-  // fallback to using innerHTML since we just need the string
-  return sanitizer.sanitize(floating.content || floating.innerHTML);
+  return sanitizer.sanitize(input);
+}
+
+/**
+ * Will sanitize a string. Uses internal Locker configuration
+ * Uses a template floating element to avoid https://github.com/cure53/DOMPurify/issues/190
+ * @param {String} input
+ */
+function sanitizeDefault(input) {
+  floating.innerHTML = asString$1(input);
+  const sanitizer = getSanitizerForConfig(RETURN_STRING_ALL);
+  return sanitizer.sanitize(floating.content);
 }
 
 /**
@@ -4311,7 +4319,7 @@ function SecureElement(el, key) {
               `SecureElement.innerHTML cannot be used with ${raw.tagName} elements!`
             );
           }
-          raw.innerHTML = sanitize(value);
+          raw.innerHTML = sanitizeDefault(value);
           trustChildNodes(this, raw);
         }
       };
@@ -4384,7 +4392,7 @@ function SecureElement(el, key) {
           // It returns no handle to trust the new elements. Here we create the
           // elements in a fragment then insert them in their proper location.
           const template = document.createElement('template');
-          template.innerHTML = sanitize(value);
+          template.innerHTML = sanitizeDefault(value);
           const content = template.content;
           trustChildNodes(this, content);
           while (content.childNodes.length > 0) {
@@ -4656,7 +4664,7 @@ SecureElement.addStandardElementMethodAndPropertyOverrides = function(
           );
         }
 
-        raw.insertAdjacentHTML(position, sanitize(text));
+        raw.insertAdjacentHTML(position, sanitizeDefault(text));
 
         trustChildNodes(this, parent || raw);
       }

@@ -15,7 +15,7 @@
  *
  * Bundle from LockerService-Core
  * Generated: 2018-11-08
- * Version: 0.5.28
+ * Version: 0.5.29
  */
 
 (function (exports) {
@@ -219,7 +219,7 @@ function uponSanitizeAttribute(node, data) {
 // eslint-disable-next-line
 var root = typeof window !== 'undefined' ? window : jsdom.window;
 
-// floating element used for purification of strings
+// floating element used for purification of strings in Locker
 // create a dummy floating element that stores text if document is not found
 var floating = root.document.createElement('template');
 
@@ -339,7 +339,8 @@ function sanitizeElement(node) {
 }
 
 /**
- * Sanitize a string with strict SVG rules
+ * Sanitize a string with strict SVG rules. Uses internal SVG configuration
+ * For compatibility reasons this method acts as a passthrough to DOMPurify
  * @param {String} input
  */
 
@@ -348,19 +349,22 @@ function sanitizeElement(node) {
  * Will sanitize a string.
  * If passed a configuration object it will use that to cache the new DOMPurify instance
  * Defaults to internal generic configuration otherwise
- *
+ * For compatibility reasons this method acts as a passthrough to DOMPurify
  * @param {String} input
  * @param {Object} cfg - DOMPurify compatible configuration object
  */
 function sanitize(input, cfg) {
-  floating.innerHTML = asString(input);
   cfg = cfg || RETURN_STRING_ALL;
   var sanitizer = getSanitizerForConfig(cfg);
-  // IE11 recognizes template elements as HTMLUnknownELement
-  // the property content will not be available on ie11
-  // fallback to using innerHTML since we just need the string
-  return sanitizer.sanitize(floating.content || floating.innerHTML);
+  return sanitizer.sanitize(input);
 }
+
+/**
+ * Will sanitize a string. Uses internal Locker configuration
+ * Uses a template floating element to avoid https://github.com/cure53/DOMPurify/issues/190
+ * @param {String} input
+ */
+
 
 /**
  * Utility to validate if an SVG tag is whitelisted

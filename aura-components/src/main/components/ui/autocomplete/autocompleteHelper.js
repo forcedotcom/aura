@@ -74,6 +74,7 @@
                 descriptor: "markup://ui:autocompleteList",
                 localId: "list",
                 valueProvider: component,
+                skipCreationPath: true,
                 attributes: {
                     'class' : component.getReference("v.autocompleteListClass"),
                     'dataProvider' : component.getReference("v.dataProvider"),

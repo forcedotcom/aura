@@ -1,0 +1,6 @@
+<aura:component implements="aura:requireLocker">
+	<aura:attribute name="testUtils" type="Object"/>
+    <secureModuleTest:secureComponent aura:id="secureComponent"/>
+    <aura:method name="testApiPropertiesAccessedViaModule"/>
+    <aura:method name="testApiMethodsAccessedViaModule"/>
+</aura:component>

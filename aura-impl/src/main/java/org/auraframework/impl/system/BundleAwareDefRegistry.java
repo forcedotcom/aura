@@ -27,7 +27,10 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
 import org.auraframework.def.BundleDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -167,10 +170,7 @@ public class BundleAwareDefRegistry implements DefRegistry {
         }
     }
 
-    @Override
-    public <T extends Definition> T getDef(DefDescriptor<T> descriptor) throws QuickFixException {
-        DefHolder holder = getHolder(descriptor);
-
+    private <T extends Definition> T getDefWithHolder(DefDescriptor<T> descriptor, DefHolder holder) throws QuickFixException {
         if (holder == null) {
             return null;
         }
@@ -206,6 +206,11 @@ public class BundleAwareDefRegistry implements DefRegistry {
             return def;
         }
         return holder.def.getBundledDefinition(descriptor);
+    }
+    
+    @Override
+    public <T extends Definition> T getDef(DefDescriptor<T> descriptor) throws QuickFixException {
+        return getDefWithHolder(descriptor, getHolder(descriptor));
     }
 
     @Override
@@ -264,14 +269,27 @@ public class BundleAwareDefRegistry implements DefRegistry {
 
     @Override
     public Set<DefDescriptor<?>> findByTags(@Nonnull Set<String> tags) {
-        registry.values().stream().forEach(h -> { try { getDef(h.descriptor); } catch (QuickFixException qfe) {}});
-        return registry.values().stream().filter(h ->
+    		Collection<DefHolder> defHolders;
+    		if(cacheable) {
+    			defHolders = registry.values();
+    		} else {
+    			defHolders = Lists.newArrayList();
+            Set<DefDescriptor<?>> descriptors = sourceLoader.find(new DescriptorFilter("*://*:*", Sets.newHashSet(DefType.COMPONENT, DefType.MODULE)));
+            if(descriptors != null) {
+            		descriptors.stream().forEach(descriptor -> { 
+            			@SuppressWarnings("unchecked") 
+            			DefDescriptor<BundleDef> rootDescriptor = (DefDescriptor<BundleDef>) descriptor; 
+            			defHolders.add(new DefHolder(rootDescriptor)); 
+            			});
+            }
+    		}
+        defHolders.stream().forEach(h -> { try { getDefWithHolder(h.descriptor, h); } catch (QuickFixException qfe) {}});
+        return defHolders.stream().filter(h ->
                 h.def != null
                 && h.def instanceof PlatformDef
                 && !Collections.disjoint(((PlatformDef)h.def).getTargets(), tags))
             .map(h -> h.descriptor).collect(Collectors.toSet());
     }
-
 
     @Override
     public <T extends Definition> boolean exists(DefDescriptor<T> descriptor) {

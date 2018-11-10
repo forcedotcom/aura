@@ -214,7 +214,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
                     // Locker only needs to know the namespaced id and the type of reference
                     for (Reference reference : sourceReferences) {
                         // First preference is for namespacedId, else use the id
-                        json.writeMapEntry(reference.namespacedId == null? reference.namespacedId : reference.id, reference.type);
+                        json.writeMapEntry(reference.namespacedId != null ? reference.namespacedId : reference.id, reference.type);
                     }
                     json.writeMapEnd();                    
                 }

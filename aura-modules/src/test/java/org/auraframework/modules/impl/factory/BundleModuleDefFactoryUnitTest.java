@@ -183,7 +183,7 @@ public class BundleModuleDefFactoryUnitTest {
 
         Map<CodeType, String> mockCodeMap = mockCodeMap();
 
-        CompilerReport mockReport = new CompilerReport(mock(Boolean.class), mock(String.class), mock(List.class), mock(List.class), mock(ReportMetadata.class), null);
+        CompilerReport mockReport = new CompilerReport(true, "version", new ArrayList<>(), new ArrayList<>(), new ReportMetadata(), null);
 
         ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
 
@@ -294,7 +294,7 @@ public class BundleModuleDefFactoryUnitTest {
         when(mockBundleSource.getBundledParts()).thenReturn(mockBundledParts);
 
         Map<CodeType, String> mockCodeMap = mockCodeMap();
-        CompilerReport mockReport = new CompilerReport(mock(Boolean.class), mock(String.class), mock(List.class), mock(List.class), mock(ReportMetadata.class), null);
+        CompilerReport mockReport = new CompilerReport(true, "version", new ArrayList<>(), new ArrayList<>(), new ReportMetadata(), null);
 
         ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
         ModulesCompilerData compilerData = new ModulesCompilerData(mockCodeMap,
@@ -386,7 +386,7 @@ public class BundleModuleDefFactoryUnitTest {
 
         ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
 
-        CompilerReport mockReport = new CompilerReport(mock(Boolean.class), mock(String.class), mock(List.class), mock(List.class), mock(ReportMetadata.class), null);
+        CompilerReport mockReport = new CompilerReport(true, "version", new ArrayList<>(), new ArrayList<>(), new ReportMetadata(), null);
         ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), mockReport);
         when(mockCompiler.compile(anyString(), anyMap(), any(BundleType.class), anyMap())).thenReturn(compilerData);
 

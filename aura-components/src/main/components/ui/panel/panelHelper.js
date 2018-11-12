@@ -642,7 +642,8 @@
             }
 
             // Test the next parent
-            el = el.parentNode;
+            var parent = el.parentNode;            
+            el = parent && parent.nodeType === 11 ? parent.host : parent;
         }
 
         // Stop the bouncing -- no parents are scrollable

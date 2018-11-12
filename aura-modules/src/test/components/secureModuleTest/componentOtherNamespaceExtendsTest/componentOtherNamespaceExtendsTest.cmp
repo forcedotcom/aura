@@ -1,0 +1,19 @@
+<aura:component implements="aura:requireLocker">
+
+    <aura:method name="testComponentLockerizedInOtherNamespaceExtendsComponentLockerized">
+        <aura:attribute name="testCase" type="String"/>
+    </aura:method>
+    <aura:method name="testComponentLockerizedInOtherNamespaceExtendsComponentNonLockerized">
+        <aura:attribute name="testCase" type="String"/>
+    </aura:method>
+    <aura:method name="testComponentNonLockerizedInOtherNamespaceExtendsComponentLockerized">
+        <aura:attribute name="testCase" type="String"/>
+    </aura:method>
+
+    <secureModuleTest:componentLockerizedInOtherNamespaceExtendsComponentLockerized aura:id="componentLockerizedInOtherNamespaceExtendsComponentLockerized">
+    </secureModuleTest:componentLockerizedInOtherNamespaceExtendsComponentLockerized>
+    <secureModuleTest:componentLockerizedInOtherNamespaceExtendsComponentNonLockerized aura:id="componentLockerizedInOtherNamespaceExtendsComponentNonLockerized">
+    </secureModuleTest:componentLockerizedInOtherNamespaceExtendsComponentNonLockerized>
+    <secureModuleTest:componentNonLockerizedInOtherNamespaceExtendsComponentLockerized aura:id="componentNonLockerizedInOtherNamespaceExtendsComponentLockerized">
+    </secureModuleTest:componentNonLockerizedInOtherNamespaceExtendsComponentLockerized>
+</aura:component>

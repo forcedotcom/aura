@@ -30,13 +30,12 @@ x-foo${shadowSelector} {color: black;}
       };
     }
 
-    class Test extends lwc.LightningElement {
-      render() {
-        return _tmpl;
-      }
+    class Test extends lwc.LightningElement {}
 
-    }
+    var nsmoduletest = lwc.registerComponent(Test, {
+      tmpl: _tmpl
+    });
 
-    return Test;
+    return nsmoduletest;
 
 });

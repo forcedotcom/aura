@@ -22,26 +22,29 @@ define('modules/moduletest', ['x/test', 'lwc'], function (_xTest, lwc) {
         this.VALID_NAME_RE = /^([a-zA-Z]\w*):([a-zA-Z]\w*)$/;
       }
 
-      render() {
-        return _tmpl;
-      }
-
     }
-    Test.publicProps = {
-      stringQuote: {
-        config: 0
-      },
-      stringDoubleQuote: {
-        config: 0
-      },
-      stringBacktick: {
-        config: 0
-      },
-      VALID_NAME_RE: {
-        config: 0
-      }
-    };
 
-    return Test;
+    lwc.registerDecorators(Test, {
+      publicProps: {
+        stringQuote: {
+          config: 0
+        },
+        stringDoubleQuote: {
+          config: 0
+        },
+        stringBacktick: {
+          config: 0
+        },
+        VALID_NAME_RE: {
+          config: 0
+        }
+      }
+    });
+
+    var moduletest = lwc.registerComponent(Test, {
+      tmpl: _tmpl
+    });
+
+    return moduletest;
 
 });

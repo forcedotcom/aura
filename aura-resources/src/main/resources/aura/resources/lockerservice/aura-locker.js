@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-11-08
- * Version: 0.5.29
+ * Generated: 2018-11-12
+ * Version: 0.5.31
  */
 
 (function (exports) {
@@ -1154,6 +1154,17 @@ function createShadowTarget(raw) {
   }
 }
 
+function lockShadow(shadow, raw, fromKey, toKey) {
+  const props = ownKeys(shadow);
+  props.forEach(prop => {
+    if (!has(shadow, prop)) {
+      const desc = getOwnPropertyDescriptor(raw, prop);
+      const wrapped = convertDescriptor(desc, fromKey, toKey);
+      defineProperty(shadow, prop, wrapped);
+    }
+  });
+}
+
 /**
  * A generic handler with support for:
  * - filtered function invocation
@@ -1275,8 +1286,8 @@ class SecureFunctionHandler {
     }
     const extensible = isExtensible(this.raw);
     if (!extensible) {
-      // TODO copy properties
       // Proxy invariant: to report non-extensibility, target must be non-extensibile.
+      lockShadow(shadow, this.raw, this.fromKey, this.toKey);
       preventExtensions(shadow);
     }
     return extensible;
@@ -1292,12 +1303,15 @@ class SecureFunctionHandler {
     return ArrayMerge(ownKeys(this.raw), ownKeys(shadow));
   }
 
-  preventExtensions(_shadow) {
-    // Never freeze of change the extensibility of raw objects.
-    // Proxy invariant: can't report non-extensibility of extensible target.
-    // Making shadow non-extensible would prevent the addition of any
-    // non-configurable property of raw which would appear at a later stage.
-    throw new TypeError(`Cannot prevents extensions of ${this.raw}`);
+  preventExtensions(shadow) {
+    if (isExtensible(shadow)) {
+      // Never freeze or change the extensibility of raw objects.
+      // Proxy invariant: can't report non-extensibility of extensible target.
+      // Making shadow non-extensible prevents the addition of any
+      // non-configurable property of raw which appears at a later stage.
+      lockShadow(shadow, this.raw, this.fromKey, this.toKey);
+    }
+    return preventExtensions(shadow);
   }
 
   set(shadow, prop, value, receiver) {
@@ -10031,6 +10045,7 @@ const lwcElementProtoPropNames = [
   'removeAttributeNS',
   'removeAttribute',
   'removeEventListener',
+  'render',
   // 'root', (Deprecated, previous name for template)
   'setAttribute',
   'setAttributeNS',
@@ -10195,13 +10210,30 @@ function SecureLWC(lwc, key) {
       enumerable: true,
       value: obj => lwc['readonly'](obj)
     },
-    // *** EXCEPTION: 'registerTemplate' is not a secure method and cannot be exposed to the user.
-    //                By extension, SecureLWC also cannot be exposed to the user.
+    // *** start EXCEPTION: 'registerTemplate', 'registerComponent', 'registerDecorators' are not secure
+    // methods and cannot be exposed to the user. By extension, SecureLWC also cannot be exposed to the user.
     registerTemplate: {
       enumerable: true,
       value: lwc['registerTemplate']
+    },
+    /**
+     * registerComponent() accepts a Component class and returns the same back.
+     * It is important for the engine to register the Component class without distortions
+     * (identity of what the user provided component class has to be the same as what engine gets)
+     */
+    registerComponent: {
+      enumerable: true,
+      value: lwc['registerComponent']
+    },
+    /**
+     * registerDecorators() accepts a Component class and its decorator metadata.
+     * The method processes the component metadata and decorates the class to handle the decorator properties
+     */
+    registerDecorators: {
+      enumerable: true,
+      value: lwc['registerDecorators']
     }
-    // ***
+    // *** end EXCEPTION
   });
   freeze(o);
 
@@ -10209,6 +10241,48 @@ function SecureLWC(lwc, key) {
   addToCache(lwc, o, key);
 
   return o;
+}
+
+function doFreeze(obj) {
+  if (!isPrimitive(obj)) {
+    freeze(obj);
+  }
+}
+
+/**
+ * Shallow freeze to prevent tampering of [value, get, set] objects!
+ */
+function shallowFreeze(obj) {
+  if (isPrimitive(obj)) {
+    return;
+  }
+
+  doFreeze(obj);
+
+  const descs = getOwnPropertyDescriptors(obj);
+  for (const key in descs) {
+    const desc = getOwnPropertyDescriptor(obj, key);
+    if ('value' in desc) {
+      doFreeze(desc.value);
+    } else {
+      const { get: get$$1, set: set$$1 } = desc;
+      if (get$$1) doFreeze(get$$1);
+      if (set$$1) doFreeze(set$$1);
+    }
+  }
+
+  // NOTE: Using the descriptor to evade invoking any accessor named 'prototype'
+  const prototype = descs.prototype && descs.prototype.value;
+  for (const key in prototype) {
+    const desc = getOwnPropertyDescriptor(prototype, key);
+    if ('value' in desc) {
+      doFreeze(desc.value);
+    } else {
+      const { get: get$$1, set: set$$1 } = desc;
+      if (get$$1) doFreeze(get$$1);
+      if (set$$1) doFreeze(set$$1);
+    }
+  }
 }
 
 // This is a whitelist from Kevin V, this has to be updated if any new wire adapters are introduced
@@ -10224,6 +10298,8 @@ function isWhitelistedLib(libDesc) {
   return internalLibs.includes(libDesc);
 }
 
+const frozenLibRegistry = new WeakSet();
+
 /**
  * Create a wrapped library
  * @param {Object} lib Library being imported
@@ -10231,7 +10307,15 @@ function isWhitelistedLib(libDesc) {
  * @param {Boolean} requireLocker Should the library being imported be lockeried
  */
 function SecureLib(lib, key, requireLocker, desc) {
-  if (isPrimitive(lib) || isWhitelistedLib(desc)) {
+  if (isPrimitive(lib)) {
+    return lib;
+  }
+
+  if (isWhitelistedLib(desc)) {
+    if (!frozenLibRegistry.has(lib)) {
+      shallowFreeze(lib);
+      frozenLibRegistry.add(lib);
+    }
     return lib;
   }
 

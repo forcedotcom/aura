@@ -817,11 +817,12 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
             desc = name;
             // process aliased ns
             var names = name.split('/');
-            var ns = names.shift();
+            var ns = names[0];
+            var descName = names[1];
             var aliased = namespaceAliases[ns];
             if (aliased) {
                 // module name with aliased namespace
-                var aliasedDesc = aliased + "/" + names.join("/");
+                var aliasedDesc = "markup://" + aliased + ":" + descName;
                 var aliasedDep = this.moduleDefRegistry[aliasedDesc];
                 if (aliasedDep) {
                     // set references to aliased module if it exists
@@ -884,17 +885,18 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
                 
                 // If the reference is a module and it is not the lwc/engine module, then we need to wrap it
                 if (sourceReferencesInfo && sourceReferencesInfo[depName] === "module" && depName !== "engine" && depName !== "lwc") {
-                    var depDefDescriptor = new DefDescriptor(this.moduleNameToDescriptorLookup[depName]);
+                    var resolved = this.moduleNameToDescriptorLookup[depName];
+                    var depDefDescriptor = new DefDescriptor(resolved);
                     var depNamespace = depDefDescriptor.getNamespace();
                     // Indicate if the dependency is lockerized or not.
-                    var isLockerizedDep = this.moduleDefRegistry[depName][Json.ApplicationKey.REQUIRELOCKER];
+                    var depRequiresLocker = this.moduleDefRegistry[resolved][Json.ApplicationKey.REQUIRELOCKER];
                     // If dependency is from same namespace and the dependency is lockerized, wrapping is not required
-                    var skipWrapping = (depNamespace === namespace) && isLockerizedDep;
+                    var skipWrapping = (depNamespace === namespace) && depRequiresLocker;
                     if (!skipWrapping) {
                         var wrappedDep = $A.lockerService.wrapLib(
                             deps[i],
                             $A.lockerService.getKeyForNamespace(namespace),
-                            isLockerizedDep,
+                            depRequiresLocker,
                             entry.dependencies[i]
                         );
                         deps.splice(i, 1, wrappedDep);

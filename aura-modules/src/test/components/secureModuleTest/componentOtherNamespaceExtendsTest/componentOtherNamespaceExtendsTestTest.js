@@ -27,7 +27,8 @@
         }
     },
 
-    testComponentLockerizedInOtherNamespaceExtendsComponentLockerizedCreatedObjects: {
+    // TODO:JF Support Other namespace mix non-lockerized and lockerized
+    _testComponentLockerizedInOtherNamespaceExtendsComponentLockerizedCreatedObjects: {
         test: function(cmp) {
             cmp.testComponentLockerizedInOtherNamespaceExtendsComponentLockerized("testCreatedObjects");
         }

@@ -21,8 +21,14 @@
         } else {
             var cfg = {
                 FORBID_TAGS: ["style", "meta", "script", "link"],
-                ADD_TAGS: ["iframe"]
+                ADD_TAGS: ["iframe"],
+                ADD_ATTR: ["allowfullscreen","allow","referrerpolicy","sandbox","target"]
             };
+            if ($A.get("$Global")["srcdoc"]) {
+                // only if the current gvp is set to allow srcdoc
+                // otherwise this should be scrubbed
+                cfg.ADD_ATTR.push("srcdoc");
+            }
             value = $A.util.sanitizeDOM(value, cfg);
         }
         var elements=$A.util.createElementsFromMarkup(value);

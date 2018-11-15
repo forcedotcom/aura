@@ -15,16 +15,23 @@
  */
 package org.auraframework.http;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.auraframework.AuraConfiguration;
@@ -32,9 +39,12 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.AuraValueProviderType;
+import org.auraframework.instance.InstanceStack;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
@@ -44,13 +54,16 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.system.Message;
+import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.AuraHandledException;
 import org.auraframework.throwable.AuraRequestInputException;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonStreamReader.JsonParseException;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Ignore;
@@ -769,7 +782,7 @@ public class AuraServletTest extends UnitTestCase {
     }
     
     @Test
-    public void testReadMessageInvalidDefinitionFormat() throws QuickFixException {
+    public void testReadMessageInvalidActionDefinitionFormat() throws QuickFixException {
 
         // Arrange
         final AuraRuntimeException are = new AuraRuntimeException("Do not pass go. Do not collect $200.");
@@ -782,6 +795,27 @@ public class AuraServletTest extends UnitTestCase {
         } catch(final AuraRequestInputException arie) {
             // Assert
             assertThat("Message does not match", arie.getMessage(), equalTo("[AuraClientInputException from server] Unexpected request input. Expected input format: \"Action descriptor must be in a valid component format.\"."));
+            assertThat("InvalidInput does not match", arie.getInvalidInput(), equalTo("aura://ComponentController   /ACTION$getComponent"));
+            assertThat("Cause does not match", arie.getCause(), sameInstance(are));
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testReadMessageInvalidComponentDefinitionFormat() throws QuickFixException {
+
+        // Arrange
+        final AuraRuntimeException are = new AuraRuntimeException("Do not pass go. Do not collect $200.");
+        Mockito.when(definitionService.getDefDescriptor(Matchers.anyString(), Matchers.eq(ComponentDef.class))).thenThrow(are);
+        Mockito.when(instanceService.getInstance(Matchers.any(ActionDef.class), Matchers.anyMap())).thenReturn(Mockito.mock(Action.class));
+        
+        try {
+            // Act
+            originalServlet.readMessage("{\"actions\":[{\"id\":\"2;a\",\"descriptor\":\"aura://ComponentController   /ACTION$getComponent\",\"callingDescriptor\":\"UNKNOWN_UNKNOWNS\",\"params\":{\"name\":\"markup://test:runnerContainer\",\"attributes\":{}}}]}");
+            fail("Expected an AuraRequestInputException.");
+        } catch(final AuraRequestInputException arie) {
+            // Assert
+            assertThat("Message does not match", arie.getMessage(), equalTo("[AuraClientInputException from server] Unexpected request input. Expected input format: \"Component descriptor must be in a valid component format.\"."));
             assertThat("InvalidInput does not match", arie.getInvalidInput(), equalTo("aura://ComponentController   /ACTION$getComponent"));
             assertThat("Cause does not match", arie.getCause(), sameInstance(are));
         }
@@ -915,6 +949,241 @@ public class AuraServletTest extends UnitTestCase {
             assertThat("Message does not match", arie.getMessage(), equalTo("[AuraClientInputException from server] Unexpected request input. Expected input format: \"Action version must be in a String format.\"."));
             assertThat("InvalidInput does not match", arie.getInvalidInput(), equalTo("1"));
             assertThat("Cause does not match", arie.getCause(), instanceOf(ClassCastException.class));
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testReadMessageValidComponentDefinitionFormat() throws QuickFixException {
+
+        // Arrange
+        final DefDescriptor<ComponentDef> mockDefDescriptor = Mockito.mock(DefDescriptor.class);
+        final MockAction expectedAction = new MockAction();
+        expectedAction.setId("2;a");
+        expectedAction.setCallingDescriptor(mockDefDescriptor);
+        Mockito.when(definitionService.getDefDescriptor(Matchers.anyString(), Matchers.eq(ComponentDef.class))).thenReturn(mockDefDescriptor);
+        Mockito.when(instanceService.getInstance(Matchers.any(ActionDef.class), Matchers.anyMap())).thenReturn(new MockAction());
+        
+        // Act
+        final Message actualMessage = originalServlet.readMessage("{\"actions\":[{\"id\":\"2;a\",\"descriptor\":\"aura://ComponentController   /ACTION$getComponent\",\"callingDescriptor\":\"UNKNOWN_UNKNOWNS\",\"params\":{\"name\":\"markup://test:runnerContainer\",\"attributes\":{}}}]}");
+        
+        // Assert
+        assertThat("Message does not match", actualMessage, hasProperty("actions", contains(equalTo(expectedAction))));
+    }
+    
+    private final class MockAction implements Action {
+        
+        private String callerVersion;
+        private String id;
+        private List<Action> actions = new ArrayList<>();
+        private boolean storable = false;
+        private boolean offlineAction = false;
+        private DefDescriptor<? extends BaseComponentDef> callingDescriptor;
+        private BaseComponentDef callingDefinition;
+
+        @Override
+        public DefDescriptor<ActionDef> getDescriptor() {
+            throw new NotImplementedException("This method has not been implemented yet");
+        }
+
+        @Override
+        public String getPath() {
+            throw new NotImplementedException("This method has not been implemented yet");
+        }
+
+        @Override
+        public void serialize(Json json) throws IOException {
+            throw new NotImplementedException("This method has not been implemented yet");
+        }
+
+        @Override
+        public String getId() {
+            return id;
+        }
+
+        @Override
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        @Override
+        public void run() throws AuraExecutionException {
+          //No-op
+        }
+
+        @Override
+        public void setup() {
+          //No-op
+        }
+
+        @Override
+        public void cleanup() {
+            //No-op
+        }
+
+        @Override
+        public void add(List<Action> actions) {
+            this.actions.addAll(actions);
+        }
+
+        @Override
+        public List<Action> getActions() {
+            return actions;
+        }
+
+        @Override
+        public Object getReturnValue() {
+            throw new NotImplementedException("This method has not been implemented yet");
+        }
+
+        @Override
+        public State getState() {
+            throw new NotImplementedException("This method has not been implemented yet");
+        }
+
+        @Override
+        public List<Object> getErrors() {
+            throw new NotImplementedException("This method has not been implemented yet");
+        }
+
+        @Override
+        public void logParams(KeyValueLogger logger) {
+            throw new NotImplementedException("This method has not been implemented yet");
+        }
+
+        @Override
+        public boolean isStorable() {
+            return storable;
+        }
+
+        @Override
+        public void setStorable() {
+            this.storable = true;
+        }
+
+        @Override
+        public boolean isOfflineAction() {
+            return offlineAction;
+        }
+
+        @Override
+        public void markOfflineAction() {
+            this.offlineAction = true;
+        }
+
+        @Override
+        public Map<String, Object> getParams() {
+            throw new NotImplementedException("This method has not been implemented yet");
+        }
+
+        @Override
+        public InstanceStack getInstanceStack() {
+            throw new NotImplementedException("This method has not been implemented yet");
+        }
+
+        @Override
+        public DefDescriptor<? extends BaseComponentDef> getCallingDescriptor() {
+            return callingDescriptor;
+        }
+
+        @Override
+        public void setCallingDescriptor(DefDescriptor<? extends BaseComponentDef> def) {
+            this.callingDescriptor = def;
+        }
+
+        @Override
+        public BaseComponentDef getCallingDefinition() {
+            return callingDefinition;
+        }
+
+        @Override
+        public void setCallingDefinition(BaseComponentDef def) {
+            this.callingDefinition = def;
+        }
+
+        @Override
+        public String getCallerVersion() {
+            return callerVersion;
+        }
+
+        @Override
+        public void setCallerVersion(String callerVersion) {
+            this.callerVersion = callerVersion;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((actions == null) ? 0 : actions.hashCode());
+            result = prime * result + ((callerVersion == null) ? 0 : callerVersion.hashCode());
+            result = prime * result + ((callingDefinition == null) ? 0 : callingDefinition.hashCode());
+            result = prime * result + ((callingDescriptor == null) ? 0 : callingDescriptor.hashCode());
+            result = prime * result + ((id == null) ? 0 : id.hashCode());
+            result = prime * result + (offlineAction ? 1231 : 1237);
+            result = prime * result + (storable ? 1231 : 1237);
+            return result;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            MockAction other = (MockAction) obj;
+            if (actions == null) {
+                if (other.actions != null) {
+                    return false;
+                }
+            } else if (!actions.equals(other.actions)) {
+                return false;
+            }
+            if (callerVersion == null) {
+                if (other.callerVersion != null) {
+                    return false;
+                }
+            } else if (!callerVersion.equals(other.callerVersion)) {
+                return false;
+            }
+            if (callingDefinition == null) {
+                if (other.callingDefinition != null) {
+                    return false;
+                }
+            } else if (!callingDefinition.equals(other.callingDefinition)) {
+                return false;
+            }
+            if (callingDescriptor == null) {
+                if (other.callingDescriptor != null) {
+                    return false;
+                }
+            } else if (!callingDescriptor.equals(other.callingDescriptor)) {
+                return false;
+            }
+            if (id == null) {
+                if (other.id != null) {
+                    return false;
+                }
+            } else if (!id.equals(other.id)) {
+                return false;
+            }
+            if (offlineAction != other.offlineAction) {
+                return false;
+            }
+            if (storable != other.storable) {
+                return false;
+            }
+            return true;
+        }
+        
+        @Override
+        public String toString() {
+            return ReflectionToStringBuilder.toString(this);
         }
     }
 }

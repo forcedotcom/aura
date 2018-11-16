@@ -62,7 +62,7 @@ import java.util.Set;
  */
 public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleDef {
 
-    private static final long serialVersionUID = -7133749123070388999L;
+    private static final long serialVersionUID = -7244750123070388889L;
 
     private final String path;
     private final Set<String> moduleDependencies;

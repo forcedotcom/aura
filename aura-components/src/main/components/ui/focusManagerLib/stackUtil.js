@@ -33,6 +33,13 @@ function lib(focusUtil) { //eslint-disable-line no-unused-vars
         return STACK.pop();
     }
 
+    function _getRealActiveElement() {
+        var active = document.activeElement;
+        while (active.shadowRoot) {
+            active = active.shadowRoot.activeElement;
+        }
+        return active;
+    }
     /**
      * Returns the current activeElement, if document's activeElement can be accessed.
      * @returns {Element | null}
@@ -41,7 +48,7 @@ function lib(focusUtil) { //eslint-disable-line no-unused-vars
         // Edge/IE11 throws an Unspecified Error for document.activeElement when accessed from an iframe.
         try {
             // IE11 use lastActive if it's specified.
-            return (cmp && cmp.lastActive) || document.activeElement;
+            return (cmp && cmp.lastActive) || _getRealActiveElement();
         } catch(e) {
             return null;
         }
@@ -187,7 +194,8 @@ function lib(focusUtil) { //eslint-disable-line no-unused-vars
     return {
         stackFocus   : stackFocus,
         unstackFocus : unstackFocus,
-        popFocus : popFocus
+        popFocus : popFocus,
+        getRealActiveElement: _getRealActiveElement
     };
 
 }

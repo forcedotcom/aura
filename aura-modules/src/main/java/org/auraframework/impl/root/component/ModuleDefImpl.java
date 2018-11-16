@@ -206,18 +206,6 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
             if ((!configAdapter.isInternalNamespace(getDescriptor().getNamespace()) || this.requireLocker)) {
                 // Set flag on def to send information to client
                 json.writeMapEntry(ApplicationKey.REQUIRELOCKER, true);
-                List<Reference> sourceReferences = this.getSourceReferences();
-                // Send additional information about source references if there are any
-                if (!sourceReferences.isEmpty()) {
-                    json.writeMapKey(ApplicationKey.LOCKER_REFERENCE_INFO);
-                    json.writeMapBegin();
-                    // Locker only needs to know the namespaced id and the type of reference
-                    for (Reference reference : sourceReferences) {
-                        // First preference is for namespacedId, else use the id
-                        json.writeMapEntry(reference.namespacedId != null ? reference.namespacedId : reference.id, reference.type);
-                    }
-                    json.writeMapEnd();                    
-                }
             }
             Collection<AttributeDef> attributeDefs = this.getAttributeDefs().values();
             if (!attributeDefs.isEmpty()) {

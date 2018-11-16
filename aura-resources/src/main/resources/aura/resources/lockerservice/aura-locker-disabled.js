@@ -15,7 +15,7 @@
  *
  * Bundle from LockerService-Core
  * Generated: 2018-11-16
- * Version: 0.5.32
+ * Version: 0.5.33
  */
 
 (function (exports) {
@@ -478,12 +478,8 @@ function wrapComponentEvent(component, event) {
   return event;
 }
 
-function wrapLWC(lwc, key) {
-  return lwc;
-}
-
-function wrapLib(lib, key, requireLocker, desc) {
-  return lib;
+function wrap(thing, metaFrom, metaTo) {
+  return thing;
 }
 
 exports.create = create;
@@ -502,8 +498,7 @@ exports.trust = trust;
 exports.unwrap = unwrap;
 exports.wrapComponent = wrapComponent;
 exports.wrapComponentEvent = wrapComponentEvent;
-exports.wrapLWC = wrapLWC;
-exports.wrapLib = wrapLib;
+exports.wrap = wrap;
 exports.sanitize = sanitize;
 exports.isAllowedSvgTag = isAllowedSvgTag;
 exports.sanitizeSvgElement = sanitizeSvgElement;

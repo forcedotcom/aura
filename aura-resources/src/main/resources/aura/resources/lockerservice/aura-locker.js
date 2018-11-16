@@ -15,7 +15,7 @@
  *
  * Bundle from LockerService-Core
  * Generated: 2018-11-16
- * Version: 0.5.32
+ * Version: 0.5.33
  */
 
 (function (exports) {
@@ -10277,90 +10277,6 @@ function shallowFreeze(obj) {
   }
 }
 
-// This is a whitelist from Kevin V, this has to be updated if any new wire adapters are introduced
-const internalLibs = [
-  'lightning/navigation',
-  'lightning/uiActionsApi',
-  'lightning/uiListApi',
-  'lightning/uiLookupsApi',
-  'lightning/uiObjectInfoApi',
-  'lightning/uiRecordApi'
-];
-function isWhitelistedLib(libDesc) {
-  return internalLibs.includes(libDesc);
-}
-
-const frozenLibRegistry = new WeakSet();
-
-/**
- * Create a wrapped library
- * @param {Object} lib Library being imported
- * @param {Object} key Locker key of the module importing the library
- * @param {Boolean} requireLocker Should the library being imported be lockeried
- */
-function SecureLib(lib, key, requireLocker, desc) {
-  if (isPrimitive(lib)) {
-    return lib;
-  }
-
-  if (isWhitelistedLib(desc)) {
-    if (!frozenLibRegistry.has(lib)) {
-      shallowFreeze(lib);
-      frozenLibRegistry.add(lib);
-    }
-    return lib;
-  }
-
-  let o = getFromCache(lib, key);
-  if (o) {
-    return o;
-  }
-
-  if (typeof lib === 'function') {
-    return lib;
-  }
-
-  assert$1.invariant(isPlainObject(lib), 'Expect lib to be a plain object');
-  o = create$1(null, {
-    toString: {
-      value: function() {
-        return `SecureLib: ${lib}{ key: ${JSON.stringify(key)} }`;
-      }
-    }
-  });
-
-  ObjectEntries(lib).forEach(([property, item]) => {
-    if (isPrimitive(item)) {
-      o[property] = item;
-    } else if (typeof item === 'function') {
-      if (item.prototype instanceof Event) {
-        // only Platform events created in non-lockerized libs will be caught by this condition
-        // TODO: add support for importing lockerized libs that expose events
-        const secureEventCtorDescriptor = createFilteredConstructor(
-          o,
-          lib,
-          property,
-          SecureCustomEventFactory,
-          key
-        );
-        defineProperty(o, property, secureEventCtorDescriptor);
-      } else {
-        o[property] = SecureFunction(item, requireLocker ? defaultKey : systemKey, key);
-      }
-    } else if (typeof item === 'object') {
-      o[property] = SecureFunction(item, requireLocker ? defaultKey : systemKey, key);
-    } else {
-      addPropertyIfSupported(o, lib, property);
-    }
-  });
-
-  setRef(o, lib, key);
-  addToCache(lib, o, key);
-  registerProxy(o);
-
-  return seal(o);
-}
-
 function SecureAura(AuraInstance, key) {
   let o = getFromCache(AuraInstance, key);
   if (o) {
@@ -10929,11 +10845,76 @@ function registerAuraTypes(types) {
   }
 }
 
+/**
+ * Create a wrapped library
+ * @param {Object} lib Library being imported
+ * @param {Object} key Locker key of the module importing the library
+ * @param {Boolean} requireLocker Should the library being imported be lockeried
+ */
+function SecureLib(lib, fromKey, toKey) {
+  if (isPrimitive(lib)) {
+    return lib;
+  }
+
+  let o = getFromCache(lib, toKey);
+  if (o) {
+    return o;
+  }
+
+  o = create$1(null, {
+    toString: {
+      value: function() {
+        return `SecureLib: ${lib}{ key: ${JSON.stringify(toKey)} }`;
+      }
+    }
+  });
+
+  ObjectEntries(lib).forEach(([property, item]) => {
+    if (isPrimitive(item)) {
+      o[property] = item;
+    } else if (typeof item === 'function') {
+      if (item.prototype instanceof Event) {
+        // only Platform events created in non-lockerized libs will be caught by this condition
+        // TODO: add support for importing lockerized libs that expose events
+        const secureEventCtorDescriptor = createFilteredConstructor(
+          o,
+          lib,
+          property,
+          SecureCustomEventFactory,
+          toKey
+        );
+        defineProperty(o, property, secureEventCtorDescriptor);
+      } else {
+        o[property] = SecureFunction(item, fromKey, toKey);
+      }
+    } else if (typeof item === 'object') {
+      o[property] = SecureFunction(item, fromKey, toKey);
+    } else {
+      addPropertyIfSupported(o, lib, property);
+    }
+  });
+
+  setRef(o, lib, toKey);
+  addToCache(lib, o, toKey);
+  registerProxy(o);
+
+  return seal(o);
+}
+
 // AuraLocker is a facade for Locker. Its role is to:
 // - implement methods not present on Locker (extends API).
 // - decouple the Locker API from the Aura API.
 let isLockerInitialized = false;
-
+const frozenLibRegistry = new WeakSet();
+const internalLibs = [
+  'lightning/navigation',
+  'lightning/uiActionsApi',
+  'lightning/uiListApi',
+  'lightning/uiLookupsApi',
+  'lightning/uiObjectInfoApi',
+  'lightning/uiRecordApi',
+  'securemoduletest/testUtil'
+];
 const namespaceToKey = new Map();
 
 /**
@@ -11201,12 +11182,62 @@ function wrapComponentEvent(component, event) {
   return event instanceof AuraEvent ? SecureAuraEvent(event, key) : SecureDOMEvent(event, key);
 }
 
-function wrapLWC(lwc, key) {
-  return SecureLWC(lwc, key);
-}
+function wrap(thing, metaFrom, metaTo) {
+  let toKey = getKeyForNamespace(metaTo.getNamespace());
 
-function wrapLib(lib, key, requireLocker$$1, desc) {
-  return SecureLib(lib, key, requireLocker$$1, desc);
+  // immediately wrap the recognized lwc object to its secured counterpart
+  if (['lwc', 'engine'].includes(metaFrom.getName())) {
+    return SecureLWC(thing, toKey);
+  }
+
+  // check against internalLibs that are whitelisted
+  // they just need to be frozen
+  const lwcModuleName = `${metaFrom.getNamespace().toLowerCase()}/${metaFrom.getName()}`;
+  if (internalLibs.includes(lwcModuleName)) {
+    if (!frozenLibRegistry.has(thing)) {
+      shallowFreeze(thing);
+      frozenLibRegistry.add(thing);
+    }
+    return thing;
+  }
+  // keys are based on namespaces
+  // but unsecured modules have the same namespace as secured ones
+  // we need reset the key of unsecured modules to systemKey
+  // this helps for comparison further down the stream
+  // situations we want to understand:
+  //        --- should I do a deepUnfilter and filter between modules?
+  //        --- or should I just do a deepUnfilter
+  const fromKey = metaFrom.requireLocker
+    ? getKeyForNamespace(metaFrom.getNamespace())
+    : systemKey;
+  toKey = metaTo.requireLocker ? toKey : systemKey;
+
+  if (fromKey !== toKey) {
+    // temporarily intercept cross namespace usage
+    // system -> Locker or Locker -> system is considered cross namespace
+    warn(
+      `Attempting cross-namespace import 
+       from: ${metaFrom.getNamespace()} - ${metaFrom.getName()}
+       to:   ${metaTo.getNamespace()} - ${metaTo.getName()}
+      `
+    );
+  }
+  // class imports
+  if (typeof thing === 'function') {
+    return thing;
+  }
+
+  // begin wrapping module imports
+  // there is no point in wrapping modules with same key and same security level
+  // wrapping only occurs in these scenarios:
+  //   -- Locker --> system
+  //   -- system --> Locker
+  //   -- Locker A --> Locker B (must be temporarily disabled)
+  if (fromKey === toKey) {
+    return thing;
+  }
+
+  return SecureLib(thing, fromKey, toKey);
 }
 
 exports.create = create$$1;
@@ -11225,8 +11256,7 @@ exports.trust = trust$$1;
 exports.unwrap = unwrap$$1;
 exports.wrapComponent = wrapComponent;
 exports.wrapComponentEvent = wrapComponentEvent;
-exports.wrapLWC = wrapLWC;
-exports.wrapLib = wrapLib;
+exports.wrap = wrap;
 exports.sanitize = sanitize;
 exports.isAllowedSvgTag = isAllowedSvgTag;
 exports.sanitizeSvgElement = sanitizeSvgElement;

@@ -41,7 +41,6 @@ function AuraComponentService() {
     this.componentDefLoader     = new Aura.Component.ComponentDefLoader();
     this.componentDefStorage    = new Aura.Component.ComponentDefStorage();
     this.actionStorage          = new Aura.Controller.ActionStorage();
-    this.moduleNameToDescriptorLookup = {};
     this.descriptorCasingMap    = {};
 
     // holds ComponentDef configs to be created
@@ -734,7 +733,7 @@ AuraComponentService.prototype.initModuleDefs = function(modules) {
     var requireLocker = Json.ApplicationKey.REQUIRELOCKER;
     var attributeDefs = Json.ApplicationKey.ATTRIBUTEDEFS;
     var customElement = Json.ApplicationKey.CUSTOMELEMENT;
-    var lockerReferenceInfo = Json.ApplicationKey.LOCKER_REFERENCE_INFO;
+    var descriptor = Json.ApplicationKey.DESCRIPTOR;
 
     modules.forEach(function (module) {
         // don't override existing entries
@@ -743,10 +742,10 @@ AuraComponentService.prototype.initModuleDefs = function(modules) {
             exporter[minVersion] = module[minVersion];
             exporter[access] = module[access];
             exporter[requireLocker] = module[requireLocker];
-            exporter[lockerReferenceInfo] = module[lockerReferenceInfo];
             exporter[attributeDefs] = module[attributeDefs];
             exporter[customElement] = module[customElement];
-            moduleDefRegistry[module[Json.ApplicationKey.DESCRIPTOR]] = moduleDefRegistry[module[Json.ApplicationKey.NAME]] = exporter;
+            exporter[descriptor] = module[descriptor];
+            moduleDefRegistry[module[descriptor]] = moduleDefRegistry[module[Json.ApplicationKey.NAME]] = exporter;
         }
     });
 };
@@ -760,7 +759,6 @@ AuraComponentService.prototype.initModuleDefs = function(modules) {
  * @export
  */
 AuraComponentService.prototype.addModule = function(descriptor, name, dependencies, exporterClass, nsexports) {
-    this.moduleNameToDescriptorLookup[name] = descriptor;
     if (exporterClass === undefined) {
         // amd define does not include dependencies param if no dependencies.
         return this.addModule(descriptor, name, [], dependencies);
@@ -781,7 +779,10 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
     var exportns;
     var url;
 
-    $A.assert(entry, "Failed to find definition for dependency: " + descriptor);
+    var DESCRIPTOR = Json.ApplicationKey.DESCRIPTOR;
+    var REQUIRELOCKER = Json.ApplicationKey.REQUIRELOCKER;
+    
+    $A.assert(entry, "Failed to find definition for dependency: " + descriptor);    
 
     // If we have resolved already the exports (libraries case), return them
     if (entry.ns) {
@@ -805,6 +806,8 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
         var desc;
         var depEntry;
         var isScopedImport = name[0] === '@';
+        var target;
+        var origin;
 
         if (isScopedImport) {
             var moduleScope = name.substr(1).split('/')[0];
@@ -828,7 +831,6 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
                     // set references to aliased module if it exists
                     depEntry = aliasedDep;
                     desc = aliasedDesc;
-                    this.moduleNameToDescriptorLookup[name] = desc;
                 }
             }
         }
@@ -838,12 +840,29 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
         }
 
         if (depEntry && depEntry.dependencies) {
-            var dep = this.moduleDefRegistry[desc];
+            var dep = this.moduleDefRegistry[desc];            
+            
             if (dep.ns) {
+                // TODO: find a better way to pass down additional descriptor info
+                if (entry[REQUIRELOCKER] || depEntry[REQUIRELOCKER]) {
+                    target = new DefDescriptor(entry[DESCRIPTOR] || entry.descriptor);
+                    target['requireLocker'] = entry[REQUIRELOCKER];
+                    origin = new DefDescriptor(dep[DESCRIPTOR] || dep.descriptor);
+                    origin['requireLocker'] = dep[REQUIRELOCKER];
+                    return $A.lockerService.wrap(dep.ns, origin, target);
+                }
                 return dep.ns;
             } else {
                 // recursive/circular references
                 var tmp = function tmp() {
+                    // TODO: find a better way to pass down additional descriptor info
+                    if (entry[REQUIRELOCKER] || depEntry[REQUIRELOCKER]) {
+                        target = new DefDescriptor(entry[DESCRIPTOR] || entry.descriptor);
+                        target['requireLocker'] = entry[REQUIRELOCKER];
+                        origin = new DefDescriptor(dep[DESCRIPTOR] || dep.descriptor);
+                        origin['requireLocker'] = dep[REQUIRELOCKER];
+                        return $A.lockerService.wrap(dep.ns, origin, target);
+                    }
                     return dep.ns;
                 };
                 tmp["__circular__"] = true;
@@ -851,58 +870,22 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
             }
         }
 
-        return this.evaluateModuleDef(desc);
+        var resolved = this.evaluateModuleDef(desc);        
+        if (entry[REQUIRELOCKER]) {
+            // TODO: find a better way to pass down additional descriptor info
+            target = new DefDescriptor(entry[DESCRIPTOR] || entry.descriptor);
+            target['requireLocker'] = entry[REQUIRELOCKER];
+            origin = new DefDescriptor(depEntry[DESCRIPTOR] || depEntry.descriptor);
+            origin['requireLocker'] = depEntry[REQUIRELOCKER];
+            return $A.lockerService.wrap(resolved, origin, target);
+        }
+        return resolved;
     }, this);
 
-    var Ctor;
-    var defDescriptor;
-    if (descriptor.indexOf("markup://") !== -1) {
-        defDescriptor = new DefDescriptor(descriptor);
-    } else {
-        defDescriptor = new DefDescriptor(this.moduleNameToDescriptorLookup[descriptor]);
-    }
-    var namespace = defDescriptor.getNamespace();
+    var Ctor;    
     if (entry.definition && $A.util.isFunction(entry.definition)) {
-        // If the current module needs to be lockerized
-        if (entry[Json.ApplicationKey.REQUIRELOCKER]) {
-            // Eval the definition in a restricted scope
-            entry.definition = $A.lockerService.createForModule(entry.definition.toString(), defDescriptor);
-
-            // Provide SecureEngine as a dependency if "engine" or "lwc" was imported by the module
-            var index = entry.dependencies.indexOf("lwc");
-            if (index === -1) { index = entry.dependencies.indexOf("engine"); }
-            if (index !== -1) {
-                deps.splice(
-                    index,
-                    1,
-                    $A.lockerService.wrapLWC(deps[index], $A.lockerService.getKeyForNamespace(defDescriptor.getNamespace())));
-            }
-            // A map with all references of external resources referenced by the current component
-            var sourceReferencesInfo = entry[Json.ApplicationKey.LOCKER_REFERENCE_INFO];
-            // Inspect dependencies and decide which library modules to wrap
-            for (var i = 0; i < deps.length; i++) {
-                var depName = entry.dependencies[i];
-                
-                // If the reference is a module and it is not the lwc/engine module, then we need to wrap it
-                if (sourceReferencesInfo && sourceReferencesInfo[depName] === "module" && depName !== "engine" && depName !== "lwc") {
-                    var resolved = this.moduleNameToDescriptorLookup[depName];
-                    var depDefDescriptor = new DefDescriptor(resolved);
-                    var depNamespace = depDefDescriptor.getNamespace();
-                    // Indicate if the dependency is lockerized or not.
-                    var depRequiresLocker = this.moduleDefRegistry[resolved][Json.ApplicationKey.REQUIRELOCKER];
-                    // If dependency is from same namespace and the dependency is lockerized, wrapping is not required
-                    var skipWrapping = (depNamespace === namespace) && depRequiresLocker;
-                    if (!skipWrapping) {
-                        var wrappedDep = $A.lockerService.wrapLib(
-                            deps[i],
-                            $A.lockerService.getKeyForNamespace(namespace),
-                            depRequiresLocker,
-                            entry.dependencies[i]
-                        );
-                        deps.splice(i, 1, wrappedDep);
-                    }
-                }
-            }
+        if (entry[REQUIRELOCKER]) {
+            entry.definition = $A.lockerService.createForModule(entry.definition.toString(), new DefDescriptor(entry[DESCRIPTOR] || entry.descriptor));
         }
         Ctor = entry.definition.apply(undefined, deps);
     }

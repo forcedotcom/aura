@@ -40,8 +40,7 @@ function LockerService() {
         service.unwrap                = lib["unwrap"];
         service.wrapComponent         = lib["wrapComponent"];
         service.wrapComponentEvent    = lib["wrapComponentEvent"];
-        service.wrapLWC               = lib["wrapLWC"];
-        service.wrapLib               = lib["wrapLib"];
+        service.wrap                  = lib["wrap"];
         service.sanitize              = lib["sanitize"];
         service.isAllowedSvgTag       = lib["isAllowedSvgTag"];
         service.sanitizeSvgElement    = lib["sanitizeSvgElement"];

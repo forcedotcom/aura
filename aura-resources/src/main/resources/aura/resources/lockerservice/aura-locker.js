@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-11-12
- * Version: 0.5.31
+ * Generated: 2018-11-16
+ * Version: 0.5.32
  */
 
 (function (exports) {
@@ -1028,6 +1028,10 @@ const systemKey = {
   namespace: 'system'
 };
 
+const convertOptions = {
+  useNewSecureFunction: true
+};
+
 /**
  * Ensure a value from the source graph is converted to the
  * destination graph.
@@ -1056,7 +1060,7 @@ function convert(value, fromKey, toKey) {
     // 1b. Create (or reuse) a secure proxy in the destination graph.
     return toKey === systemKey
       ? deepUnfilter(fromKey, [], [value])[0]
-      : filter(toKey, value, { useNewSecureFunction: true });
+      : filter(toKey, value, convertOptions);
   }
 
   // 2. The value is not a proxy.
@@ -1070,7 +1074,7 @@ function convert(value, fromKey, toKey) {
   // 2b. Create a secure proxy in the destination graph.
   return toKey === systemKey
     ? deepUnfilter(fromKey, [], [value])[0]
-    : filter(toKey, value, { useNewSecureFunction: true });
+    : filter(toKey, value, convertOptions);
 }
 
 /**
@@ -5874,118 +5878,106 @@ function createFilteringProxy(raw, key) {
   return swallowed;
 }
 
-// We cache 1 array like thing proxy per key
-const KEY_TO_ARRAY_LIKE_THING_HANDLER = typeof Map !== 'undefined' ? new Map() : undefined;
-
-function getFilteredArrayLikeThings(raw, key) {
-  const filtered = [];
-
-  for (let n = 0; n < raw.length; n++) {
-    const value = raw[n];
-    if (getKey(value) === key || isSharedElement(value)) {
-      filtered.push(value);
-    }
+/**
+ * Proxy handler for NodeList and HTMLCollection
+ */
+class ArrayLikeThingProxyHandler {
+  constructor(target, key) {
+    this.target = target;
+    this.key = key;
   }
-  return filtered;
-}
+  get(shadowTarget, property) {
+    const raw = this.target;
+    const key = this.key;
 
-function getArrayLikeThingProxyHandler(key) {
-  function getFromFiltered(so, filtered, index) {
-    // Numeric indexing into array
-    const value = filtered[index];
-    return value ? filterEverything(so, value) : value;
-  }
+    const filtered = ArrayLikeThingProxyHandler.getFilteredArrayLikeThings(raw, key);
+    let ret;
 
-  let handler = KEY_TO_ARRAY_LIKE_THING_HANDLER.get(key);
-  if (!handler) {
-    handler = {
-      get: function(target, property) {
-        const raw = getRef(target, key);
+    property = convertSymbol(property);
+    if (Number.isNaN(Number(property))) {
+      switch (property) {
+        case 'length':
+          ret = filtered.length;
+          break;
 
-        const filtered = getFilteredArrayLikeThings(raw, key);
-        let ret;
+        case 'item':
+          ret = function(index) {
+            return ArrayLikeThingProxyHandler.getFromFilteredArrayLikeThings(key, filtered, index);
+          };
+          break;
 
-        property = convertSymbol(property);
-        if (Number.isNaN(Number(property))) {
-          switch (property) {
-            case 'length':
-              ret = filtered.length;
-              break;
+        case 'namedItem':
+          ret = function(name) {
+            const value = raw.namedItem(name);
+            return value ? filter(key, value) : value;
+          };
+          break;
 
-            case 'item':
-              ret = function(index) {
-                return getFromFiltered(handler, filtered, index);
-              };
-              break;
+        case 'toString':
+          ret = function() {
+            return raw.toString();
+          };
+          break;
 
-            case 'namedItem':
-              ret = function(name) {
-                const value = raw.namedItem(name);
-                return value ? filterEverything(handler, value) : value;
-              };
-              break;
-
-            case 'toString':
-              ret = function() {
-                return raw.toString();
-              };
-              break;
-
-            case 'toJSON':
-              ret = function() {
-                return JSON.stringify(filtered);
-              };
-              break;
-            case 'Symbol(Symbol.iterator)':
-              ret = function() {
-                let nextIndex = 0;
-                return {
-                  next: function() {
-                    if (nextIndex < filtered.length) {
-                      const value = filtered[nextIndex];
-                      nextIndex++;
-                      return {
-                        value: value ? filterEverything(handler, value) : value,
-                        done: false
-                      };
-                    }
-                    return { done: true };
-                  }
-                };
-              };
-              break;
-            default:
-              warn(`Unsupported ${raw} method: ${property}. Returning undefined`);
-              return undefined;
-          }
-        } else {
-          ret = getFromFiltered(handler, filtered, property);
-        }
-
-        return ret;
-      },
-      has: function(target, property) {
-        const raw = getRef(target, key);
-        const filtered = getFilteredArrayLikeThings(raw, key);
-        return property in filtered;
+        case 'toJSON':
+          ret = function() {
+            return JSON.stringify(filtered);
+          };
+          break;
+        case 'Symbol(Symbol.iterator)':
+          ret = function() {
+            let nextIndex = 0;
+            return {
+              next: function() {
+                if (nextIndex < filtered.length) {
+                  const value = filtered[nextIndex];
+                  nextIndex++;
+                  return {
+                    value: value ? filter(key, value) : value,
+                    done: false
+                  };
+                }
+                return { done: true };
+              }
+            };
+          };
+          break;
+        default:
+          warn(`Unsupported ${raw} method: ${property}. Returning undefined`);
+          return undefined;
       }
-    };
-
-    setKey(handler, key);
-
-    KEY_TO_ARRAY_LIKE_THING_HANDLER.set(key, handler);
-
-    freeze(handler);
+    } else {
+      return ArrayLikeThingProxyHandler.getFromFilteredArrayLikeThings(key, filtered, property);
+    }
+    return ret;
   }
-
-  return handler;
+  has(shadowTarget, property) {
+    const raw = this.target;
+    const filtered = this.getFilteredArrayLikeThings(raw, this.key);
+    return property in filtered;
+  }
+  static getFromFilteredArrayLikeThings(key, filtered, index) {
+    const value = filtered[index];
+    return value ? filter(key, value) : value;
+  }
+  static getFilteredArrayLikeThings(raw, key) {
+    const filtered = [];
+    const { isAccessibleLWCNode } = lwcHelpers;
+    for (let n = 0; n < raw.length; n++) {
+      const value = raw[n];
+      if (getKey(value) === key || isSharedElement(value) || isAccessibleLWCNode(key, value)) {
+        filtered.push(value);
+      }
+    }
+    return filtered;
+  }
 }
 
 function createProxyForArrayLikeObjects(raw, key) {
   const surrogate = create$1(getPrototypeOf(raw));
   setRef(surrogate, raw, key);
 
-  const proxy = new Proxy(surrogate, getArrayLikeThingProxyHandler(key));
+  const proxy = new Proxy(surrogate, new ArrayLikeThingProxyHandler(raw, key));
   setKey(proxy, key);
   registerProxy(proxy);
 
@@ -9199,7 +9191,7 @@ function SecureWindow(sandbox, key) {
       if (confirmLocationChange(win.location.href, href)) {
         const filteredArgs = filterArguments(o, [href, ...args]);
         const res = win.open(...filteredArgs);
-        return filterEverything(o, res);
+        return filter(key, res);
       }
       // window.open spec expects a null return value if the operation fails
       return null;
@@ -10438,9 +10430,9 @@ function SecureAura(AuraInstance, key) {
         const fnReturnedValue = AuraInstance.createComponent(
           type,
           filteredArgs,
-          filterEverything(o, callback)
+          filter(o, callback)
         );
-        return filterEverything(o, fnReturnedValue);
+        return filter(key, fnReturnedValue);
       }
     },
 
@@ -10463,9 +10455,9 @@ function SecureAura(AuraInstance, key) {
         }
         const fnReturnedValue = AuraInstance.createComponents(
           filteredComponents,
-          filterEverything(o, callback)
+          filter(key, callback)
         );
-        return filterEverything(o, fnReturnedValue);
+        return filter(key, fnReturnedValue);
       }
     }
   });
@@ -10632,7 +10624,7 @@ function SecureAuraEvent(event, key) {
           value = deepUnfilterMethodArguments$$1({}, value);
         }
       } else {
-        value = filterEverything(o, value, { defaultKey: key });
+        value = filter(key, value, { defaultKey: key });
       }
       baseObject[property] = value;
     }
@@ -10723,7 +10715,7 @@ function SecureAuraComponent(component, key) {
         if (path[0] === 'c') {
           return SecureAuraAction(value, key);
         }
-        return filterEverything(o, value);
+        return filter(key, value);
       }
     },
     getEvent: {
@@ -10836,7 +10828,7 @@ function SecureAuraComponentRef(component, key) {
           throw new SyntaxError(`Invalid key ${name}`);
         }
 
-        return filterEverything(o, component['get'](name));
+        return filter(key, component['get'](name));
       }
     }
   });
@@ -10866,7 +10858,7 @@ function SecureAuraComponentRef(component, key) {
           value = deepUnfilterMethodArguments$$1({}, value);
         }
       } else {
-        value = filterEverything(o, value, { defaultKey: key });
+        value = filter(key, value, { defaultKey: key });
       }
       baseObject[property] = value;
     }

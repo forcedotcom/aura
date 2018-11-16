@@ -192,6 +192,8 @@
 
         cmp.set('v.visible', true);
 
+        cmp._showing =  true;
+
         var self = this;
 
         var conf = {
@@ -199,6 +201,7 @@
             animationName: 'movefrom' + cmp.get('v.animation'),
             autoFocus: false,
             onFinish: function() {
+                cmp._showing =  false;
                 var keyHandler = self._getKeyHandler(cmp);
                 if ($A.util.isFunction(keyHandler)) {
                     $A.util.on(panelEl, 'keydown', keyHandler);
@@ -253,7 +256,7 @@
         }
 
     },
-
+    
     _showPanel: function(cmp, panel, conf) {
         panel.style.opacity = '1';
         this.lib.panelLibCore.show(cmp, conf);
@@ -271,6 +274,11 @@
     },
 
     hide: function (cmp, callback) {
+        if (cmp.showing) {
+            // show is requested, can't hide.
+            callback && callback(false);
+            return;
+        }
         if (!cmp._closing) {
             // panel.show() will trigger "beforeShow" event, which always push returnFocusElement to STACK(stackUtil).
             // so panel.hide() should force to pop it when hide panel, since in panel hide/close case, hasFocus always return false,
@@ -282,7 +290,7 @@
         var panelEl = cmp.getElement();
         panelEl.style.opacity = 0;
         var self = this;
-        this.lib.panelLibCore.hide(cmp, {
+        var conf = {
             useTransition: cmp.get('v.useTransition'),
             animationName: 'moveto' + cmp.get('v.animation'),
             onFinish: function() {
@@ -304,14 +312,15 @@
                         $A.util.removeOn(document, 'click', mouseHandler);
                     }
                     cmp.set('v.visible', false);
-                    callback && callback();
+                    callback && callback(true);
                 } else {
                     // The panel has already been destroyed,
                     // possibly by someobody else. Call the callback.
-                    callback && callback();
+                    callback && callback(true);
                 }
             }
-        });
+        };
+        this.lib.panelLibCore.hide(cmp, conf);
     },
 
     close: function (cmp, callback, shouldReturnFocus) {

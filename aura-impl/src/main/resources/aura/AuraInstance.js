@@ -89,7 +89,7 @@ function AuraInstance () {
     this.metricsService       = new Aura.Services.MetricsService();
     this.lockerService        = new Aura.Services.LockerService();
 
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
     this.devToolService = new AuraDevToolService();
     //#end
 
@@ -317,7 +317,7 @@ function AuraInstance () {
     this["popCreationPath"] = this.popCreationPath;
     this["setCreationPathIndex"] = this.setCreationPathIndex;
 
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
     this["devToolService"] = this.devToolService;
     this["getQueryStatement"] = this.devToolService.newStatement;
     //#end
@@ -345,7 +345,7 @@ function AuraInstance () {
     this["newCmp"] = this.newCmp;
     this["newCmpDeprecated"] = this.newCmpDeprecated;
     this["newCmpAsync"] = this.newCmpAsync;
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
     this["qhelp"] = function() { return this.devToolService.help();};
     //#end
 
@@ -727,7 +727,7 @@ AuraInstance.prototype.showErrors = function(toggle){
  * @private
  */
 AuraInstance.prototype.handleError = function(message, e) {
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
     $A.logger.devDebugConsoleLog("ERROR", message, e);
     //#end
     var dispMsg = message;
@@ -919,7 +919,7 @@ AuraInstance.prototype.message = function(msg, error, showReload) {
     message.innerHTML = "";
     message.appendChild(document.createTextNode(msg));
 
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
     if (error && error.stackTrace) {
         var auraErrorStack = $A.util.getElement("auraErrorStack");
         auraErrorStack.innerHTML = "";
@@ -1358,7 +1358,7 @@ AuraInstance.prototype.deprecated = function(message, workaround, reportSignatur
     //#end
 
 
-    //#if {modes: ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    //#if {modes: ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
     // skip reporting, if there's no reporting signature.
     if (reportSignature) {
         var reporting = false;

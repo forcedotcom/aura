@@ -1469,7 +1469,7 @@ AuraEventService.prototype.getRegisteredEvents = function() {
     return Object.keys(this.eventDefRegistry);
 };
 
-//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
 /**
  * Whether there are pending events
  * Available in DEV mode only.

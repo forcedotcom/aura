@@ -1393,7 +1393,7 @@ Component.prototype.set = function(key, value, ignoreChanges) {
 
         var oldValue = valueProvider.get(subPath, this);
 
-        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
         // Check if the previous value contains only components
         if ($A.util.isArray(oldValue) && oldValue.length) {
             var containsOnlyComponents = true;
@@ -1425,7 +1425,7 @@ Component.prototype.set = function(key, value, ignoreChanges) {
     }
 };
 
-//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
 /**
  * Add a warning in the console if a list of components is not rendered by the end
  * of the current event loop. This pattern usually lead to memory leaks.
@@ -1840,7 +1840,7 @@ Component.prototype.toString = function() {
     }
     var attributesOutput = [];
     // Debug Info
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
     var attributeSet = this.attributeSet;
     if(attributeSet){
         for(var key in attributeSet.values) {

@@ -34,7 +34,7 @@ function AttributeSet(attributeDefSet) {
 
 	//this.initialize(attributes);
 
-	// #if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+	// #if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
 	this["values"] = this.values;
 	// #end
 }

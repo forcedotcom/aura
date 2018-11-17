@@ -59,6 +59,7 @@ public enum JavascriptGeneratorMode {
     PTEST("ptest", false, JavascriptWriter.CLOSURE_AURA_PROD, true),
 
     PRODUCTIONDEBUG("proddebug", false, JavascriptWriter.CLOSURE_AURA_DEBUG, true),
+    PERFORMANCEDEBUG("perfdebug", false, JavascriptWriter.CLOSURE_AURA_DEBUG, true),
 
     /**
      * mode used for documentation (jsdoc), note that the mode is also used by xUnit.

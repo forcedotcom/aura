@@ -116,7 +116,7 @@ DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, root) 
 
         $A.metricsService.transaction("aura", "interaction", { "context": context });
     } 
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
     else if (event.type === "click") {
         this.logUnInstrumentedClick(parent, root);
     }
@@ -124,7 +124,7 @@ DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, root) 
 
 };
 
-//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
 DomHandlersPlugin.prototype.logUnInstrumentedClick = function (parent, root) {
     var es = $A.expressionService;
     var grandparent = es.getContainer(parent).getConcreteComponent();

@@ -111,7 +111,7 @@ public class JsonSerializerAdapterImpl implements JsonSerializerAdapter {
                 json.writeMapEntry("message", value.getMessage());
                 if (contextService.isEstablished()) {
                     Mode mode = contextService.getCurrentContext().getMode();
-                    if (mode != Mode.PROD && mode != Mode.PRODDEBUG) {
+                    if (mode != Mode.PROD && mode != Mode.PRODDEBUG && mode != Mode.PERFDEBUG) {
                         json.writeMapEntry("stack", AuraExceptionUtil.getStackTrace(value));
                     }
                 }

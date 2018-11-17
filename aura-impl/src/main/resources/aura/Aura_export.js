@@ -57,7 +57,7 @@ AuraInstance.prototype["uninstallOverride"] = AuraInstance.prototype.uninstallOv
 
 // //#end
 
-//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
 AuraInstance.prototype["devToolService"] = AuraInstance.prototype.devToolService;
 AuraInstance.prototype["getQueryStatement"] = AuraInstance.prototype.getQueryStatement;
 AuraInstance.prototype["qhelp"] = AuraInstance.prototype.qhelp;

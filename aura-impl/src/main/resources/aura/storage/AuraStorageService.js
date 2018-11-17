@@ -183,7 +183,7 @@ AuraStorageService.prototype.getAdapterConfig = function(adapter) {
  * @param {Boolean} secure Set to true if the adapter must be secure.
  * @return {String} The name of the selected adapter.
  * @memberOf AuraStorageService
- //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+ //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
 	@export
  //#end
  */
@@ -276,7 +276,7 @@ AuraStorageService.prototype.setIsolation = function(isolationKey) {
     // ensure string
     this.isolationKey = "" + (isolationKey || "");
 
-    //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
     delete AuraStorageService.prototype.setIsolation;
     delete AuraStorageService.prototype["setIsolation"];
     //#end
@@ -299,7 +299,7 @@ AuraStorageService.prototype.setPartition = function(partitionName) {
     // ensure string
     this.partitionName = "" + (partitionName || "");
 
-    //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
     delete AuraStorageService.prototype.setPartitionName;
     delete AuraStorageService.prototype["setPartitionName"];
     //#end

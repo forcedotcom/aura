@@ -241,7 +241,7 @@ function noop() {}
 // #include aura.modules.AuraExportsMetricsService
 
 // -- Mode injection ---------------------------------------------------------
-// #include {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"], "path" : "aura.AuraDevToolService"}
+// #include {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"], "path" : "aura.AuraDevToolService"}
 
 //-- LockerService -----------------------------------------------------------
 //#include aura.lockerservice.LockerService

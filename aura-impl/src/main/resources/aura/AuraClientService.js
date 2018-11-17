@@ -491,10 +491,10 @@ AuraClientService.prototype.decode = function(response, timedOut) {
         // instead of JSON. There is no real hope of dealing with it,
         // so just flag an error, and carry on.
         //
-        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
         ret["message"] = "Communication error, invalid JSON: " + text;
         // #end
-        // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+        // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
         ret["message"] = "Communication error, please retry or reload the page";
         // #end
         ret["status"] = "ERROR";
@@ -519,10 +519,10 @@ AuraClientService.prototype.decode = function(response, timedOut) {
 
         // if the error on the server is meant to trigger a client-side event...
         if ($A.util.isUndefinedOrNull(resp)) {
-            //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+            //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
             ret["message"] = "Communication error, invalid JSON: " + text;
             // #end
-            // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+            // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
             ret["message"] = "Communication error, please retry or reload the page";
             // #end
             ret["status"] = "ERROR";
@@ -581,14 +581,14 @@ AuraClientService.prototype.decode = function(response, timedOut) {
             // there the error message will be meaningless. This code thu does much the same
             // thing, but in a different way so that we get a real error message.
             // !!!!!!!!!!HACK ALERT!!!!!!!!!!
-            //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+            //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
             if (resp["message"] && resp["stack"]) {
                 ret["message"] = resp["message"] + "\n" + resp["stack"];
             } else {
                 ret["message"] = "Communication error, invalid JSON: " + text;
             }
             // #end
-            // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+            // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
             if (resp["message"]) {
                 ret["message"] = resp["message"];
             } else {
@@ -602,10 +602,10 @@ AuraClientService.prototype.decode = function(response, timedOut) {
 
     var responseMessage = $A.util.json.decode(text);
     if ($A.util.isUndefinedOrNull(responseMessage)) {
-        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
         ret["message"] = "Communication error, invalid JSON: " + text;
         // #end
-        // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+        // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
         ret["message"] = "Communication error, please retry or reload the page";
         // #end
         ret["status"] = "ERROR";
@@ -1609,7 +1609,7 @@ AuraClientService.prototype.setConnected = function(isConnected) {
 AuraClientService.prototype.initHost = function(host) {
     this._host = host || "";
 
-    //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
     delete AuraClientService.prototype.initHost;
     delete AuraClientService.prototype["initHost"];
     //#end
@@ -4412,7 +4412,7 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
             }
             // JBUCH: HACK: THIS DELIGHTFUL BLOCK IS BECAUSE OF LEGACY UNAUTHENTICATED/AUTHENTICATED ABUSE OF ACCESS ATTRIBUTE. COOL.
             return (definition.isInstanceOf && definition.isInstanceOf("aura:application")) ||
-            // #if {"excludeModes" : ["PRODUCTION","PRODUCTIONDEBUG"]}
+            // #if {"excludeModes" : ["PRODUCTION","PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
             // JBUCH: HACK: REMOVE WHEN WE NO LONGER LOAD COMPONENTS DIRECTTLY FOR DEV/TEST
             (!$A.getRoot() || !$A.getRoot().isInstanceOf('aura:application')) && !this.currentAccess ||
             // #end

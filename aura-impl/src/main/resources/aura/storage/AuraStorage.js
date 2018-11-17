@@ -103,7 +103,7 @@ AuraStorage.prototype.adapterAntiObfuscation = function(adapter) {
     adapter.getSize = adapter.getSize || adapter["getSize"];
     adapter.deleteStorage = adapter.deleteStorage || adapter["deleteStorage"];
 
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
     // for storage adapter testing
     this["adapter"] = adapter;
     adapter["getItems"] = adapter.getItems;

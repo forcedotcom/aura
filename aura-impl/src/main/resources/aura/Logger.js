@@ -445,7 +445,7 @@ Logger.prototype.hasSubscriptions = function(level) {
     return this.isValidLevel(level) && this.subscriptions[level] > 0;
 };
 
-//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
 /**
  * Prints log to the console (if available).
  * @private

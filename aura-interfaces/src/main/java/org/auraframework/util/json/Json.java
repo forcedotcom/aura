@@ -123,6 +123,7 @@ public interface Json {
         LOCALID("localId","lid"),
         LOCATIONCHANGEEVENTDEF("locationChangeEventDef","lc"),
         LOCATORDEFS("locaterDefs","ld"),
+        LOCKER_REFERENCE_INFO("lockerReferenceInfo", "lri"),
         MEMBERS("members","mm"),
         MINVERSION("minVersion", "mv"),
         MODEL("model","m"),

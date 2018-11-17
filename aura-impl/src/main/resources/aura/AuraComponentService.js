@@ -734,6 +734,7 @@ AuraComponentService.prototype.initModuleDefs = function(modules) {
     var attributeDefs = Json.ApplicationKey.ATTRIBUTEDEFS;
     var customElement = Json.ApplicationKey.CUSTOMELEMENT;
     var descriptor = Json.ApplicationKey.DESCRIPTOR;
+    var lockerReferenceInfo = Json.ApplicationKey.LOCKER_REFERENCE_INFO;
 
     modules.forEach(function (module) {
         // don't override existing entries
@@ -744,6 +745,7 @@ AuraComponentService.prototype.initModuleDefs = function(modules) {
             exporter[requireLocker] = module[requireLocker];
             exporter[attributeDefs] = module[attributeDefs];
             exporter[customElement] = module[customElement];
+            exporter[lockerReferenceInfo] = module[lockerReferenceInfo];
             exporter[descriptor] = module[descriptor];
             moduleDefRegistry[module[descriptor]] = moduleDefRegistry[module[Json.ApplicationKey.NAME]] = exporter;
         }
@@ -778,10 +780,10 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
     var factory;
     var exportns;
     var url;
-
-    var DESCRIPTOR = Json.ApplicationKey.DESCRIPTOR;
     var REQUIRELOCKER = Json.ApplicationKey.REQUIRELOCKER;
-    
+    var createLockerDescriptor = $A.lockerService.createDescriptor;
+    var lockerWrap = $A.lockerService.wrap;
+
     $A.assert(entry, "Failed to find definition for dependency: " + descriptor);    
 
     // If we have resolved already the exports (libraries case), return them
@@ -806,8 +808,6 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
         var desc;
         var depEntry;
         var isScopedImport = name[0] === '@';
-        var target;
-        var origin;
 
         if (isScopedImport) {
             var moduleScope = name.substr(1).split('/')[0];
@@ -843,25 +843,15 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
             var dep = this.moduleDefRegistry[desc];            
             
             if (dep.ns) {
-                // TODO: find a better way to pass down additional descriptor info
                 if (entry[REQUIRELOCKER] || depEntry[REQUIRELOCKER]) {
-                    target = new DefDescriptor(entry[DESCRIPTOR] || entry.descriptor);
-                    target['requireLocker'] = entry[REQUIRELOCKER];
-                    origin = new DefDescriptor(dep[DESCRIPTOR] || dep.descriptor);
-                    origin['requireLocker'] = dep[REQUIRELOCKER];
-                    return $A.lockerService.wrap(dep.ns, origin, target);
+                    return lockerWrap(dep.ns, createLockerDescriptor(dep), createLockerDescriptor(entry));
                 }
                 return dep.ns;
             } else {
                 // recursive/circular references
                 var tmp = function tmp() {
-                    // TODO: find a better way to pass down additional descriptor info
                     if (entry[REQUIRELOCKER] || depEntry[REQUIRELOCKER]) {
-                        target = new DefDescriptor(entry[DESCRIPTOR] || entry.descriptor);
-                        target['requireLocker'] = entry[REQUIRELOCKER];
-                        origin = new DefDescriptor(dep[DESCRIPTOR] || dep.descriptor);
-                        origin['requireLocker'] = dep[REQUIRELOCKER];
-                        return $A.lockerService.wrap(dep.ns, origin, target);
+                        return lockerWrap(dep.ns, createLockerDescriptor(dep), createLockerDescriptor(entry));
                     }
                     return dep.ns;
                 };
@@ -871,13 +861,8 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
         }
 
         var resolved = this.evaluateModuleDef(desc);        
-        if (entry[REQUIRELOCKER]) {
-            // TODO: find a better way to pass down additional descriptor info
-            target = new DefDescriptor(entry[DESCRIPTOR] || entry.descriptor);
-            target['requireLocker'] = entry[REQUIRELOCKER];
-            origin = new DefDescriptor(depEntry[DESCRIPTOR] || depEntry.descriptor);
-            origin['requireLocker'] = depEntry[REQUIRELOCKER];
-            return $A.lockerService.wrap(resolved, origin, target);
+        if (entry[REQUIRELOCKER]) {           
+            return lockerWrap(resolved, createLockerDescriptor(depEntry), createLockerDescriptor(entry));
         }
         return resolved;
     }, this);
@@ -885,7 +870,7 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
     var Ctor;    
     if (entry.definition && $A.util.isFunction(entry.definition)) {
         if (entry[REQUIRELOCKER]) {
-            entry.definition = $A.lockerService.createForModule(entry.definition.toString(), new DefDescriptor(entry[DESCRIPTOR] || entry.descriptor));
+            entry.definition = $A.lockerService.createForModule(entry.definition.toString(), createLockerDescriptor(entry));
         }
         Ctor = entry.definition.apply(undefined, deps);
     }

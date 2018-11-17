@@ -15,7 +15,7 @@
  *
  * Bundle from LockerService-Core
  * Generated: 2018-11-16
- * Version: 0.5.33
+ * Version: 0.5.34
  */
 
 (function (exports) {
@@ -9555,15 +9555,17 @@ function SecureTemplate(template, key) {
  *  c. a SecureFunction is the value represents a function
  *  d. Everything else will be filtered
  */
-function unwrapValue(st, value) {
-  if (!value) {
-    return value;
+function unwrapValue(st, originalValue) {
+  if (!originalValue) {
+    return originalValue;
   }
+  // Call lwcUnwrap() to access the underlying raw value
+  const value = lwcUnwrap(originalValue);
   let unfilteredValue;
   if (isArray(value) || isPlainObject(value)) {
     // If an object or array is nested inside a data proxy, they will need to be rewrapped
     // FilteringProxy and ArrayProxy is covered by this check
-    unfilteredValue = getUnfilteringDataProxy(getKey(st), value);
+    unfilteredValue = getUnfilteringDataProxy(getKey(st), originalValue);
   } else if (typeof value === 'function') {
     // Functions from sandbox cannot be handed over to system, they will be converted to a SecureFunction
     const secureFunction = filterEverything(st, value);
@@ -11212,7 +11214,7 @@ function wrap(thing, metaFrom, metaTo) {
     : systemKey;
   toKey = metaTo.requireLocker ? toKey : systemKey;
 
-  if (fromKey !== toKey) {
+  if (fromKey !== toKey && metaTo.depList && metaTo.depList[lwcModuleName] === 'module') {
     // temporarily intercept cross namespace usage
     // system -> Locker or Locker -> system is considered cross namespace
     warn(

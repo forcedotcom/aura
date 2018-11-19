@@ -1,0 +1,27 @@
+<aura:component implements="aura:requireLocker">
+    <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined"/>
+
+    <aura:method name="documentQuerySelector"/>
+    <aura:method name="documentQuerySelectorAll"/>
+    <aura:method name="nodeQuerySelector"/>
+    <aura:method name="nodeQuerySelectorAll"/>
+    <aura:method name="nodeTraverse_firstChild"/>
+    <aura:method name="nodeTraverse_lastChild"/>
+    <aura:method name="nodeTraverse_childNodes"/>
+    <aura:method name="node_innerText"/>
+    <aura:method name="element_children"/>
+    <aura:method name="element_firstElementChild"/>
+    <aura:method name="element_lastElementChild"/>
+    <aura:method name="element_innerHTML"/>
+    <aura:method name="element_insertAdjacentHTML"/>
+
+    <section class="container-samenamespace-child" id="container-samenamespace-child">
+        <lockerlwc:domAccessRootNode aura:id="sameNamespaceChild" class="sameNamespaceChild" id="sameNamespaceChild"/>
+    </section>
+
+    <section class="container-crossnamespace-child" id="container-crossnamespace-child">
+        <!-- Future test cases -->
+        <!--secureModuleTest:domAccessRootNode aura:id="crossNamespaceChild" class="crossNamespaceChild"/-->
+    </section>
+
+</aura:component>

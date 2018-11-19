@@ -35,6 +35,12 @@ export default class ChildReceivesTrackedData extends LightningElement {
 
     @api
     receiveDataAndMutateValue(data) {
+        // Verify that the data is not leaking secure wrappers in the unsecure child
+        assertIsNotSecureElement(data.domElement);
+        assertIsNotSecureWindow(data.win);
+        assertIsNotSecureDocument(data.doc);
+        assertIsNotSecureBody(data.body);
+
         // Mutate received value in child
         data.title = '[Updated by child]' + data.title;
         data.headings.item1 = '[Updated by child]' + data.headings.item1;
@@ -52,33 +58,33 @@ function assertIsNotSecureElement(el) {
     testUtil.assertEquals(
         false,
         `${el}`.startsWith('SecureElement:'),
-        'Expected a SecureElement object in Lockerized LWC component'
+        'Expected a raw element in unlockerized component'
     );
 }
 
 function assertIsNotSecureWindow(win) {
-    testUtil.assertEquals(window, win);
+    testUtil.assertEquals(window, win, "Expected to see raw window");
     testUtil.assertEquals(
-        -1,
-        `${win}`.indexOf('SecureWindow'),
-        'Expected window to be a SecureWindow'
+        false,
+        `${win}`.startsWith('SecureWindow'),
+        'Expected value to not be a SecureWindow'
     );
 }
 
 function assertIsNotSecureDocument(doc) {
-    testUtil.assertEquals(document, doc);
+    testUtil.assertEquals(document, doc, "Expected to see raw document object");
     testUtil.assertEquals(
-        -1,
-        `${doc}`.indexOf('SecureDocument'),
-        'Expected document to be a SecureDocument'
+        false,
+        `${doc}`.startsWith('SecureDocument'),
+        'Expected document to not be a SecureDocument'
     );
 }
 
 function assertIsNotSecureBody(body) {
-    testUtil.assertEquals(document.body, body);
+    testUtil.assertEquals(document.body, body, "Expected to see raw document.body");
     testUtil.assertEquals(
-        -1,
-        `${body}`.indexOf('SecureElement'),
-        'Expected body to be a SecureElement: [object HTMLBodyElement]'
+        false,
+        `${body}`.startsWith('SecureElement'),
+        'Expected body to not be a SecureElement: [object HTMLBodyElement]'
     );
 }

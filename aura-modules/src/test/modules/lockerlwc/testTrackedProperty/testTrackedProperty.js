@@ -213,11 +213,11 @@ function assertIsSecureElement(el) {
     );
 }
 
-function assertIsSecureWindow(window) {
+function assertIsSecureWindow(win) {
     testUtil.assertEquals(
         `SecureWindow: [object Window]{ key: {"namespace":"${NAMESPACE}"} }`,
-        `${window}`,
-        'Expected window to be a SecureWindow'
+        `${win}`,
+        'Expected value to be a SecureWindow'
     );
 }
 
@@ -225,7 +225,7 @@ function assertIsSecureDocument(doc) {
     testUtil.assertEquals(
         `SecureDocument: [object HTMLDocument]{ key: {"namespace":"${NAMESPACE}"} }`,
         `${doc}`,
-        'Expected document to be a SecureDocument'
+        'Expected value to be a SecureDocument'
     );
 }
 
@@ -233,6 +233,6 @@ function assertIsSecureBody(body) {
     testUtil.assertEquals(
         `SecureElement: [object HTMLBodyElement]{ key: {"namespace":"${NAMESPACE}"} }`,
         `${body}`,
-        'Expected body to be a SecureElement: [object HTMLBodyElement]'
+        'Expected value to be a SecureElement: [object HTMLBodyElement]'
     );
 }

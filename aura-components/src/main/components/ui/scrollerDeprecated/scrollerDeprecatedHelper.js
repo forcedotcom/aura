@@ -430,7 +430,7 @@
 		}
 	},
 
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
 	validateScrollers : function() {
 		// Determine if any scrollers in the component tree are in an invalid
 		// state

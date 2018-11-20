@@ -62,7 +62,7 @@ public class ThrowableHTMLFormatAdapter extends HTMLFormatAdapter<Throwable> {
         boolean writeStack = false;
         if (contextService.isEstablished()) {
             Mode mode = contextService.getCurrentContext().getMode();
-            writeStack = mode != Mode.PROD && mode != Mode.PRODDEBUG;
+            writeStack = mode != Mode.PROD && mode != Mode.PRODDEBUG && mode != Mode.PERFDEBUG;
         }            
         if (writeStack) {
             attribs.put("errorMessage", AuraTextUtil.escapeForHTML(AuraExceptionUtil.getStackTrace(value)));

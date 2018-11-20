@@ -291,7 +291,12 @@ public class AuraServlet extends AuraBaseServlet {
                         throw new AuraRequestInputException(cce, String.valueOf(actionMap.get("callingDescriptor")), "Action callingDescriptor must be in a String format.");
                     }
                     if (cd != null && !"UNKNOWN".equals(cd)) {
-                        DefDescriptor<? extends BaseComponentDef> callingDescriptor = definitionService.getDefDescriptor(cd, ComponentDef.class);
+                        final DefDescriptor<? extends BaseComponentDef> callingDescriptor;
+                        try {
+                            callingDescriptor = definitionService.getDefDescriptor(cd, ComponentDef.class);
+                        } catch(final AuraRuntimeException are) {
+                            throw new AuraRequestInputException(are, qualifiedName, "Component descriptor must be in a valid component format.");
+                        }
                         instance.setCallingDescriptor(callingDescriptor);
                     }
                     final String v;

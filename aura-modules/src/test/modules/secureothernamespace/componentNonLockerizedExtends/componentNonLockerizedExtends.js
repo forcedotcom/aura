@@ -2,7 +2,7 @@ import { LightningElement, api } from 'lwc';
 import * as testUtil from 'securemoduletest/testUtil';
 
 export default class ComponentNonLockerizedExtends extends LightningElement {
-    @api COMPONENT = 'ComponentNonLockerizedExtends { NS: "securemoduletest" }';
+    @api COMPONENT = 'ComponentNonLockerizedExtends { NS: "secureothernamespace" }';
     @api NAME = 'Non-Lockerized! [ParentClass]';
 
     @api BOOLEAN = false;

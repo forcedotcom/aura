@@ -64,7 +64,7 @@ public class AuraJavascriptGroup extends DirectiveBasedJavascriptGroup implement
                 JavascriptGeneratorMode.AUTOTESTING, JavascriptGeneratorMode.TESTINGDEBUG,
                 JavascriptGeneratorMode.AUTOTESTINGDEBUG, JavascriptGeneratorMode.PRODUCTION,
                 JavascriptGeneratorMode.PRODUCTIONDEBUG, JavascriptGeneratorMode.DOC,
-                JavascriptGeneratorMode.PTEST));
+                JavascriptGeneratorMode.PTEST, JavascriptGeneratorMode.PERFORMANCEDEBUG));
     }
 
     @Override

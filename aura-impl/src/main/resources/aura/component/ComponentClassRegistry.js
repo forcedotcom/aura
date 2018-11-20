@@ -192,13 +192,13 @@ ComponentClassRegistry.prototype.buildConstructor = function(componentProperties
     var className = name || componentProperties["meta"]["name"];
     Ctor = Ctor || this.customConstructorMap[className] || Component;
 
-    //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
     componentConstructor = function(config) {
         Ctor.call(this, config);
     };
     //#end
 
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
     var createConstructor = $A.util.globalEval("function(Ctor) {return function " + className + "(config) { Ctor.call(this, config); }}");
     componentConstructor = createConstructor(Ctor);
     //#end

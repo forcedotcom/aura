@@ -278,7 +278,7 @@ public class AuraContextFilterTest extends AuraTestCase {
         filter.doFilter(request, resp, filterChain);
         
         // Assert
-        assertEquals("Expected error to be written to the response", "Invalid parameter value for aura.mode. Allowed values are [DEV, STATS, UTEST, FTEST, JSTEST, AUTOJSTEST, JSTESTDEBUG, AUTOJSTESTDEBUG, PTEST, CADENCE, PRODDEBUG, PROD, SELENIUM, SELENIUMDEBUG, VALIDATION]", resp.getContentAsString());
+        assertEquals("Expected error to be written to the response", "Invalid parameter value for aura.mode. Allowed values are [DEV, STATS, UTEST, FTEST, JSTEST, AUTOJSTEST, JSTESTDEBUG, AUTOJSTESTDEBUG, PTEST, CADENCE, PRODDEBUG, PERFDEBUG, PROD, SELENIUM, SELENIUMDEBUG, VALIDATION]", resp.getContentAsString());
         assertEquals("Unexpected status code", 400, resp.getStatus());
         verify(loggingService).setValue(eq(LoggingService.STATUS), eq("400"));
     }

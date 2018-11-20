@@ -15,7 +15,19 @@
  */
 package test.org.auraframework.impl.adapter;
 
-import java.io.IOException;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.matchesPattern;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -23,6 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
+
 import javax.inject.Inject;
 
 import org.auraframework.adapter.ConfigAdapter;
@@ -43,15 +56,8 @@ import org.auraframework.util.text.Hash;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 /**
- * Tests for ConfigAdapterImpl.
- * 
+ * Tests for {@link ConfigAdapterImpl}.
  * 
  * @since 0.0.245
  */
@@ -73,20 +79,23 @@ public class ConfigAdapterImplTest extends UnitTestCase {
         private static final long serialVersionUID = -8065118313848222864L;
 
         public MockException(String string) {
+            super(string);
         }
-    };
+    }
 
     /**
      * Make sure that version file is available in aura package. If this test fails, then we have a build/packaging
      * issue.
      */
+    @SuppressWarnings("static-method")
     @Test
     public void testVersionPropFile() throws Exception {
         String path = "/version.prop";
-        InputStream stream = ConfigAdapterImpl.class.getResourceAsStream(path);
-        Properties props = new Properties();
-        props.load(stream);
-        stream.close();
+        final Properties props;
+        try (InputStream stream = ConfigAdapterImpl.class.getResourceAsStream(path)) {
+            props = new Properties();
+            props.load(stream);
+        }
         String timestamp = (String) props.get("aura.build.timestamp");
         String timestampFormat = (String) props.get("aura.build.timestamp.format");
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(timestampFormat);
@@ -101,10 +110,10 @@ public class ConfigAdapterImplTest extends UnitTestCase {
     public void testConfigAdapterCtor() {
         String version = configAdapter.getAuraVersion();
         if (!version.equals("development")) {
-            assertTrue("Unexpected version format: " + version,
-                    version.matches("^\\d+(\\.\\d+)+(-SNAPSHOT)?$"));
+            assertThat("Unexpected version format. If it is not in a valid Maven format ( https://maven.apache.org/guides/mini/guide-naming-conventions.html ), check the system which is building the code to see if it is correctly generating it",
+                    version, matchesPattern("^\\d+(\\.\\d+)+(-SNAPSHOT)?$"));
         }
-        assertTrue(configAdapter.getBuildTimestamp() > 0);
+        assertThat(configAdapter, hasProperty("buildTimestamp", greaterThan(Long.valueOf(0L))));
     }
 
     /**
@@ -118,7 +127,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
 
         ConfigAdapterImpl mockAdapter = new ConfigAdapterImpl(IOUtil.newTempDir(getName()), instanceService, contextService, fileMonitor) {
             @Override
-            public AuraJavascriptGroup newAuraJavascriptGroup() throws IOException {
+            public AuraJavascriptGroup newAuraJavascriptGroup() {
                 return mockJsGroup;
             }
 
@@ -139,8 +148,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
             mockAdapter.regenerateAuraJS();
             fail("Compilation failure should have been caught!");
         } catch (AuraRuntimeException e) {
-            assertTrue("expected ARTE caused by MockException, not " + e.getCause().toString(),
-                    e.getCause() instanceof MockException);
+            assertThat("expected ARTE caused by MockException, not " + e.getCause().toString(), e, hasProperty("cause", instanceOf(MockException.class)));
         }
 
         // Try again, without changes; it should still fail.
@@ -149,8 +157,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
             mockAdapter.regenerateAuraJS();
             fail("Second compilation failure should have been caught!");
         } catch (AuraRuntimeException e2) {
-            assertTrue("expected ARTE caused by MockException, not " + e2.getCause().toString(),
-                    e2.getCause() instanceof MockException);
+            assertThat("expected ARTE caused by MockException, not " + e2.getCause().toString(), e2, hasProperty("cause", instanceOf(MockException.class)));
         }
 
         // Third time's the charm, we stop pretending there are errors and it
@@ -187,12 +194,12 @@ public class ConfigAdapterImplTest extends UnitTestCase {
 
         ConfigAdapterImpl configAdapter = new ConfigAdapterImpl(IOUtil.newTempDir(getName()), instanceService, contextService, fileMonitor) {
             @Override
-            protected AuraJavascriptGroup newAuraJavascriptGroup() throws IOException {
+            protected AuraJavascriptGroup newAuraJavascriptGroup() {
                 return jsGroup;
             }
 
             @Override
-            protected FileGroup newAuraResourcesHashingGroup() throws IOException {
+            protected FileGroup newAuraResourcesHashingGroup() {
                 return resourcesGroup;
             }
         };
@@ -206,43 +213,43 @@ public class ConfigAdapterImplTest extends UnitTestCase {
         when(resourcesHash.toString()).thenReturn("resourcesGroup");
 
         String uid = spy.getAuraFrameworkNonce();
-        verify(spy, Mockito.times(1)).makeHash(anyString(), anyString());
-        assertEquals("Framework uid is not correct", "9YifBh-oLwXkDGW3d3qyDQ", uid);
+        verify(spy).makeHash(anyString(), anyString());
+        assertThat("Framework uid is not correct", uid, equalTo("9YifBh-oLwXkDGW3d3qyDQ"));
 
         reset(spy);
         uid = spy.getAuraFrameworkNonce();
         // test that makeHash is not called because jsHash and resourcesHash has not changed
-        verify(spy, Mockito.never()).makeHash(anyString(), anyString());
-        assertEquals("Framework uid is not correct", "9YifBh-oLwXkDGW3d3qyDQ", uid);
+        verify(spy, never()).makeHash(anyString(), anyString());
+        assertThat("Framework uid is not correct", uid, equalTo("9YifBh-oLwXkDGW3d3qyDQ"));
 
         // change js hash, verify changes framework nonce
         when(jsHash.toString()).thenReturn("MocKitYMuCK");
         reset(spy);
         uid = spy.getAuraFrameworkNonce();
-        verify(spy, Mockito.times(1)).makeHash(anyString(), anyString());
-        assertEquals("Framework uid is not correct", "ltz-V8xGPGhXbOiTtfSApQ", uid);
+        verify(spy).makeHash(anyString(), anyString());
+        assertThat("Framework uid is not correct", uid, equalTo("ltz-V8xGPGhXbOiTtfSApQ"));
 
         // change resource hash, verify changes framework nonce
         when(resourcesHash.toString()).thenReturn("MuCkiTyMocK");
         reset(spy);
         uid = spy.getAuraFrameworkNonce();
-        verify(spy, Mockito.times(1)).makeHash(anyString(), anyString());
-        assertEquals("Framework uid is not correct", uid, "BJTaoiCDxoAF4Wbh0iC9lA");
+        verify(spy).makeHash(anyString(), anyString());
+        assertThat("Framework uid is not correct", uid, equalTo("BJTaoiCDxoAF4Wbh0iC9lA"));
 
         reset(spy);
         uid = spy.getAuraFrameworkNonce();
         // test that makeHash is not called because jsHash and resourcesHash has not changed
-        verify(spy, Mockito.never()).makeHash(anyString(), anyString());
-        assertEquals("Framework uid is not correct", uid, "BJTaoiCDxoAF4Wbh0iC9lA");
+        verify(spy, never()).makeHash(anyString(), anyString());
+        assertThat("Framework uid is not correct", uid, equalTo("BJTaoiCDxoAF4Wbh0iC9lA"));
     }
 
     @Test
     public void testIsInternalNamespaceWithBadArguments() {
         ConfigAdapterImpl impl = new ConfigAdapterImpl(IOUtil.newTempDir(getName()), instanceService, contextService, fileMonitor);
-        assertFalse("null should not be an internal namespace", impl.isInternalNamespace(null));
-        assertFalse("Empty string should not be an internal namespace", impl.isInternalNamespace(""));
-        assertFalse("Wild characters should not be an internal namespace", impl.isInternalNamespace("*"));
-        assertFalse(impl.isInternalNamespace("?"));
+        assertThat("null should not be an internal namespace", impl.isInternalNamespace(null), equalTo(Boolean.FALSE));
+        assertThat("Empty string should not be an internal namespace", impl.isInternalNamespace(""), equalTo(Boolean.FALSE));
+        assertThat("Wild characters should not be an internal namespace", impl.isInternalNamespace("*"), equalTo(Boolean.FALSE));
+        assertThat(impl.isInternalNamespace("?"), equalTo(Boolean.FALSE));
     }
 
     @Test
@@ -250,26 +257,26 @@ public class ConfigAdapterImplTest extends UnitTestCase {
         String namespace = this.getName() + System.currentTimeMillis();
         ConfigAdapterImpl impl = new ConfigAdapterImpl(IOUtil.newTempDir(getName()), instanceService, contextService, fileMonitor);
         impl.addInternalNamespace(namespace);
-        assertTrue("Failed to register an internal namespace.", impl.isInternalNamespace(namespace));
-        assertTrue("Internal namespace checks are case sensitive.",
-                impl.isInternalNamespace(namespace.toUpperCase()));
+        assertThat("Failed to register an internal namespace.", impl.isInternalNamespace(namespace), equalTo(Boolean.TRUE));
+        assertThat("Internal namespace checks are case sensitive.",
+                impl.isInternalNamespace(namespace.toUpperCase()), equalTo(Boolean.TRUE));
     }
 
     @Test
     public void testAddInternalNamespacesWithBadArguments() {
         ConfigAdapterImpl impl = new ConfigAdapterImpl(IOUtil.newTempDir(getName()), instanceService, contextService, fileMonitor);
         impl.addInternalNamespace(null);
-        assertFalse(impl.isInternalNamespace(null));
+        assertThat(impl.isInternalNamespace(null), equalTo(Boolean.FALSE));
 
         impl.addInternalNamespace("");
-        assertFalse(impl.isInternalNamespace(""));
+        assertThat(impl.isInternalNamespace(""), equalTo(Boolean.FALSE));
     }
 
     @Test
     public void testGetInternalNamespacesReturnsSortedNamespaces() {
         ConfigAdapterImpl impl = new ConfigAdapterImpl(IOUtil.newTempDir(getName()), instanceService, contextService, fileMonitor);
         impl.getInternalNamespaces().clear();
-        String[] namespaces = new String[] {"c", "a", "d", "b","e"};
+        String[] namespaces = new String[] {"c", "a", "d", "b", "e"};
         for(String namespace : namespaces) {
             impl.addInternalNamespace(namespace);
         }
@@ -279,14 +286,14 @@ public class ConfigAdapterImplTest extends UnitTestCase {
 
         // keep the iterate order of the returned collection from getInternalNamespaces()
         List<String> actual = new ArrayList<>(impl.getInternalNamespaces());
-        assertEquals(expected, actual);
+        assertThat(actual, equalTo(expected));
     }
     
     @Test
     public void testIsCacheableWithNullDescriptor() {//null descriptor
     	ConfigAdapterImpl impl = new ConfigAdapterImpl(IOUtil.newTempDir(getName()), instanceService, contextService, fileMonitor);
         DefRegistry mockReg = mock(DefRegistry.class);
-    	assertFalse(impl.isCacheable(mockReg, null));
+    	assertThat(impl.isCacheable(mockReg, null), equalTo(Boolean.FALSE));
     }
     
     @Test
@@ -300,7 +307,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
     	when(mockDescriptor.getNamespace()).thenReturn(null);
     	when(mockRegistry.isCacheable()).thenReturn(false);
     	
-    	assertFalse(impl.isCacheable(mockRegistry, mockDescriptor));
+    	assertThat(impl.isCacheable(mockRegistry, mockDescriptor), equalTo(Boolean.FALSE));
     }
     
     @Test
@@ -314,7 +321,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
     	when(mockDescriptor.getNamespace()).thenReturn(null);
     	when(mockRegistry.isCacheable()).thenReturn(false);
     	
-    	assertFalse(impl.isCacheable(mockRegistry, mockDescriptor));
+    	assertThat(impl.isCacheable(mockRegistry, mockDescriptor), equalTo(Boolean.FALSE));
     }
     
     @Test
@@ -328,7 +335,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
     	when(mockDescriptor.getNamespace()).thenReturn(null);
     	when(mockRegistry.isCacheable()).thenReturn(true);
     	
-    	assertTrue(impl.isCacheable(mockRegistry, mockDescriptor));
+    	assertThat(impl.isCacheable(mockRegistry, mockDescriptor), equalTo(Boolean.TRUE));
     }
     
     @Test
@@ -343,7 +350,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
     	when(mockRegistry.isCacheable()).thenReturn(true);
     	
     	impl.addInternalNamespace("testNs");
-    	assertTrue(impl.isCacheable(mockRegistry, mockDescriptor));
+    	assertThat(impl.isCacheable(mockRegistry, mockDescriptor), equalTo(Boolean.TRUE));
     }
     
     @Test
@@ -357,6 +364,6 @@ public class ConfigAdapterImplTest extends UnitTestCase {
     	when(mockDescriptor.getQualifiedName()).thenReturn("java://testNs:testName");
     	when(mockRegistry.isCacheable()).thenReturn(true);
     	
-    	assertTrue(impl.isCacheable(mockRegistry, mockDescriptor));
+    	assertThat(impl.isCacheable(mockRegistry, mockDescriptor), equalTo(Boolean.TRUE));
     }
 }

@@ -21,6 +21,17 @@ function LockerService() {
     "use strict";
 
     var isInitialized = false;
+
+    var createDescriptor = function(moduleDefinitionEntry) {
+        var DESCRIPTOR = Json.ApplicationKey.DESCRIPTOR;
+        var REQUIRELOCKER = Json.ApplicationKey.REQUIRELOCKER;
+        var LOCKER_REFERENCE_INFO = Json.ApplicationKey.LOCKER_REFERENCE_INFO;
+        
+        var descriptor = new DefDescriptor(moduleDefinitionEntry[DESCRIPTOR] || moduleDefinitionEntry.descriptor);
+        descriptor['requireLocker'] = moduleDefinitionEntry[REQUIRELOCKER];
+        descriptor['depList'] = moduleDefinitionEntry[LOCKER_REFERENCE_INFO];
+        return descriptor;
+    };
     var service = {};
 
     function selectLib(lib) {
@@ -40,12 +51,12 @@ function LockerService() {
         service.unwrap                = lib["unwrap"];
         service.wrapComponent         = lib["wrapComponent"];
         service.wrapComponentEvent    = lib["wrapComponentEvent"];
-        service.wrapLWC               = lib["wrapLWC"];
-        service.wrapLib               = lib["wrapLib"];
+        service.wrap                  = lib["wrap"];
         service.sanitize              = lib["sanitize"];
         service.isAllowedSvgTag       = lib["isAllowedSvgTag"];
         service.sanitizeSvgElement    = lib["sanitizeSvgElement"];
         service.sanitizeElement       = lib["sanitizeElement"];
+        service.createDescriptor      = createDescriptor;
 
         // API for file-based components (will not be obfuscated by Closure Compiler).
 

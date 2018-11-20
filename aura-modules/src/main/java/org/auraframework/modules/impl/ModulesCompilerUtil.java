@@ -265,7 +265,13 @@ public final class ModulesCompilerUtil {
             if (type.equals("label")) {
                 bundleLabels.add(dep);
             }
-            bundleDependencies.add(dep);
+
+            // filter out gvp resources ( @salesforce/<type> ).
+            // Certain @salesforce resources, such as apex refresh or accessCheck are type 'module', thus ensure
+            //  id does not start with @salesforce prefix
+            if ((type.equals("module") && !dep.startsWith("@salesforce/")) || type.equals("component")) {
+                bundleDependencies.add(dep);
+            }
         }
 
         List<Decorator> decorators = metadata.decorators;

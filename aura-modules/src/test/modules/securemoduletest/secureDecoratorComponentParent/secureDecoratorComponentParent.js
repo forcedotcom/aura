@@ -15,7 +15,7 @@ export default class SecureDecoratorComponentParent extends LightningElement {
     @api
     testTrackPropertiesCannotBeAccessedViaCustomElement() {
         const child = this.template.querySelector('securemoduletest-secure-decorator-component');
-        testUtil.assertEquals(undefined, child.dataObject, 'Expected child @track property to be "undefined"');
+        testUtil.assertEquals(undefined, child.state, 'Expected child @track property to be "undefined"');
         // ERROR: "eslint-lwc" - The '__proto__' property is deprecated.
         // testUtil.assertEquals(undefined, child.__proto__.dataObject, 'Expected child @track property cannot be accessed by climbing up the prototype chain.');
     }
@@ -23,7 +23,7 @@ export default class SecureDecoratorComponentParent extends LightningElement {
     @api
     testWirePropertiesCannotBeAccessedViaCustomElement() {
         const child = this.template.querySelector('securemoduletest-secure-decorator-component');
-        testUtil.assertEquals(undefined, child.state, 'Expected child @wire property to be "undefined"');
+        testUtil.assertEquals(undefined, child.dataObject, 'Expected child @wire property to be "undefined"');
         // ERROR: "eslint-lwc" - The '__proto__' property is deprecated.
         // testUtil.assertEquals(undefined, child.__proto__.state, 'Expected child @wire property cannot be accessed by climbing up the prototype chain.');
     }

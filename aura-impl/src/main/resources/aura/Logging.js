@@ -17,12 +17,12 @@
 /*eslint-disable no-console */
 
 (function(){
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
     $A.logger.subscribe("INFO", $A.logger.devDebugConsoleLog);
     $A.logger.subscribe("WARNING", $A.logger.devDebugConsoleLog);
     //#end
 
-    //#if {"modes" : ["PRODUCTIONDEBUG"]}
+    //#if {"modes" : ["PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
     /**
      * $A.warning() will log to console in proddebug
      */

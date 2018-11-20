@@ -51,6 +51,7 @@ import org.lwc.OutputConfig;
 import org.lwc.bundle.BundleType;
 import org.lwc.decorator.DecoratorParameterValue;
 import org.lwc.metadata.ModuleExport;
+import org.lwc.reference.Reference;
 import org.lwc.template.TemplateModuleDependencies;
 import org.lwc.template.TemplateModuleDependency;
 
@@ -123,6 +124,33 @@ public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
 
         assertEquals(expected.trim(), compilerData.codes.get(CodeType.DEV).trim());
         assertEquals("[lwc, x/test]", compilerData.bundleDependencies.toString());
+    }
+
+    @Test
+    public void testSalesforceBundleDependencies() throws Exception {
+        String entry = "modules/bundledependencies/bundledependencies.js";
+        String sourceTemplate = Files.toString(getResourceFile("/testdata/modules/bundledependencies/bundledependencies.html"),
+                Charsets.UTF_8);
+        String sourceClass = Files.toString(getResourceFile("/testdata/modules/bundledependencies/bundledependencies.js"),
+                Charsets.UTF_8);
+
+        Map<String, String> sources = new HashMap<>();
+        sources.put("modules/bundledependencies/bundledependencies.js", sourceClass);
+        sources.put("modules/bundledependencies/bundledependencies.html", sourceTemplate);
+
+        Map<String, String> namespaceMapping = new HashMap<>();
+        namespaceMapping.put("c", "ns");
+        ModulesCompilerData compilerData = modulesCompilerService.compile(entry, sources, BundleType.internal, namespaceMapping);
+
+        List<Reference> references = compilerData.compilerReport.metadata.references;
+        assertEquals(17, references.size());
+
+        List<String> bundleDeps = new ArrayList(compilerData.bundleDependencies);
+
+        // ensure only component and module dependencies are added to the bundleDependencies list
+        assertEquals(2, bundleDeps.size());
+        assertEquals("external/cmp", bundleDeps.get(0));
+        assertEquals("lwc", bundleDeps.get(1));
     }
 
     @Test

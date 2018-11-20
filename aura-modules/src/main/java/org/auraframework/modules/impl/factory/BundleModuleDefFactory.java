@@ -55,6 +55,7 @@ import org.auraframework.impl.root.component.ModuleDefImpl.Builder;
 import org.auraframework.impl.service.CompilerServiceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.modules.ModulesCompilerData;
+import org.auraframework.modules.impl.ModulesCompilerException;
 import org.auraframework.modules.impl.metadata.ModulesMetadataService;
 import org.auraframework.pojo.Description;
 import org.auraframework.pojo.Meta;
@@ -70,11 +71,14 @@ import org.auraframework.system.Location;
 import org.auraframework.system.Source;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.CompilationFailedException;
+import org.auraframework.throwable.ErrorMessageData;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
 import org.lwc.bundle.BundleType;
 import org.lwc.classmember.ClassMember;
+import org.lwc.diagnostic.Diagnostic;
 import org.lwc.documentation.BundleDocumentation;
 
 import com.google.common.base.CaseFormat;
@@ -186,10 +190,37 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
                 bundleType = BundleType.platform;
             }
             compilerData = modulesCompilerService.compile(componentPath, sources, bundleType, compileOptions.getNamespaceMapping());
-
-        } catch (Exception e) {
+        } catch (ModulesCompilerException mce) {
+            List<Diagnostic> diags = mce.getDiagnostics();
+            if (diags != null && diags.size() > 0) {
+                List<ErrorMessageData> errors = new ArrayList<>();
+                for (Diagnostic diag : diags) {
+                    int line = 0, col = 0;
+                    String file;
+                    if (diag.location.isPresent()) {
+                        org.lwc.Location l = diag.location.get();
+                        line = l.line.intValue();
+                        col = l.column.intValue();
+                    }
+                    if (diag.filename.isPresent()) {
+                        file = diag.filename.get();
+                    } else {
+                        file = baseFilePath;
+                    }
+                    Location loc = new Location(file, line, col, 0L);
+                    ErrorMessageData error = new ErrorMessageData(descriptor, loc, diag.message);
+                    errors.add(error);
+                }
+                throw new CompilationFailedException(errors);
+            }
+            throw mce;
+        } catch(QuickFixException qfe) {
+            throw qfe;
+        }
+        catch (Exception e) {
             throw new InvalidDefinitionException(e.getMessage(), location, e);
         }
+
         Map<CodeType, String> codes = processCodes(descriptor, compilerData.codes, location);
         builder.setCodes(codes);
         
@@ -353,6 +384,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
                             possibleExamples.getClass().toString()));
         }
         // safe cast
+        @SuppressWarnings("unchecked")
         List<Object> exampleList = (List<Object>) possibleExamples;
         Map<String, ExampleMetadata> examples = new LinkedHashMap<>(exampleList.size());
         for(Object exampleListItem : exampleList) {
@@ -361,6 +393,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
                         "Invalid documentation format for a list value of 'examples', expected an object, received %s.",
                         possibleExamples.getClass().toString()));
             }
+            @SuppressWarnings("unchecked")
             Map<String, Object> example = (Map<String, Object>) exampleListItem;
             if (example.get("name") == null) {
                 throw new RuntimeException(

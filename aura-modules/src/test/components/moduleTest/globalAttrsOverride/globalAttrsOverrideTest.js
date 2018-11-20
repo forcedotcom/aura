@@ -28,10 +28,9 @@
         },
         test: [
             function (cmp) {
-                var expected = 'foo';
                 var actual = cmp.getElement().shadowRoot.querySelector('.foo').getAttribute('aria-describedby');
                 var message = '"ariaDescribedBy" attribute value set on interop component should propagate to LWC component as "ariaDescribedBy"';
-                $A.test.assertEquals(expected, actual, message);
+                $A.test.assertTrue(/foo/.test(actual), message);
             }
         ]
     },
@@ -43,10 +42,9 @@
         },
         test: [
             function (cmp) {
-                var expected = 'foo';
                 var actual = cmp.getElement().shadowRoot.querySelector('.foo').getAttribute('aria-labelledby');
                 var message = 'Incorrectly cased "ariaLabelledby" ("ariaLabelledBy" is standards-compliant) attribute value set on interop component should propagate to LWC component as "ariaLabelledby"';
-                $A.test.assertEquals(expected, actual, message);
+                $A.test.assertTrue(/foo/.test(actual), message);
             }
         ]
     }

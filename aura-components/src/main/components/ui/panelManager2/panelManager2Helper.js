@@ -392,12 +392,11 @@
      */
     pushReturnFocusElement: function(panel) {
         var returnFocusElement = panel.get('v.returnFocusElement');
-
+        var util = this.focusLib.stackUtil;
         if ($A.util.isUndefinedOrNull(returnFocusElement)) {
-        	returnFocusElement = document.activeElement;
+        	returnFocusElement = util.getRealActiveElement();
         }
-
-        this.focusLib.stackUtil.stackFocus(returnFocusElement);
+        util.stackFocus(returnFocusElement);
     },
 
     /**

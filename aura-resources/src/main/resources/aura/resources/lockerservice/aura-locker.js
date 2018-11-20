@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-11-12
- * Version: 0.5.31
+ * Generated: 2018-11-20
+ * Version: 0.5.35
  */
 
 (function (exports) {
@@ -1028,6 +1028,10 @@ const systemKey = {
   namespace: 'system'
 };
 
+const convertOptions = {
+  useNewSecureFunction: true
+};
+
 /**
  * Ensure a value from the source graph is converted to the
  * destination graph.
@@ -1056,7 +1060,7 @@ function convert(value, fromKey, toKey) {
     // 1b. Create (or reuse) a secure proxy in the destination graph.
     return toKey === systemKey
       ? deepUnfilter(fromKey, [], [value])[0]
-      : filter(toKey, value, { useNewSecureFunction: true });
+      : filter(toKey, value, convertOptions);
   }
 
   // 2. The value is not a proxy.
@@ -1070,7 +1074,7 @@ function convert(value, fromKey, toKey) {
   // 2b. Create a secure proxy in the destination graph.
   return toKey === systemKey
     ? deepUnfilter(fromKey, [], [value])[0]
-    : filter(toKey, value, { useNewSecureFunction: true });
+    : filter(toKey, value, convertOptions);
 }
 
 /**
@@ -5874,118 +5878,106 @@ function createFilteringProxy(raw, key) {
   return swallowed;
 }
 
-// We cache 1 array like thing proxy per key
-const KEY_TO_ARRAY_LIKE_THING_HANDLER = typeof Map !== 'undefined' ? new Map() : undefined;
-
-function getFilteredArrayLikeThings(raw, key) {
-  const filtered = [];
-
-  for (let n = 0; n < raw.length; n++) {
-    const value = raw[n];
-    if (getKey(value) === key || isSharedElement(value)) {
-      filtered.push(value);
-    }
+/**
+ * Proxy handler for NodeList and HTMLCollection
+ */
+class ArrayLikeThingProxyHandler {
+  constructor(target, key) {
+    this.target = target;
+    this.key = key;
   }
-  return filtered;
-}
+  get(shadowTarget, property) {
+    const raw = this.target;
+    const key = this.key;
 
-function getArrayLikeThingProxyHandler(key) {
-  function getFromFiltered(so, filtered, index) {
-    // Numeric indexing into array
-    const value = filtered[index];
-    return value ? filterEverything(so, value) : value;
-  }
+    const filtered = ArrayLikeThingProxyHandler.getFilteredArrayLikeThings(raw, key);
+    let ret;
 
-  let handler = KEY_TO_ARRAY_LIKE_THING_HANDLER.get(key);
-  if (!handler) {
-    handler = {
-      get: function(target, property) {
-        const raw = getRef(target, key);
+    property = convertSymbol(property);
+    if (Number.isNaN(Number(property))) {
+      switch (property) {
+        case 'length':
+          ret = filtered.length;
+          break;
 
-        const filtered = getFilteredArrayLikeThings(raw, key);
-        let ret;
+        case 'item':
+          ret = function(index) {
+            return ArrayLikeThingProxyHandler.getFromFilteredArrayLikeThings(key, filtered, index);
+          };
+          break;
 
-        property = convertSymbol(property);
-        if (Number.isNaN(Number(property))) {
-          switch (property) {
-            case 'length':
-              ret = filtered.length;
-              break;
+        case 'namedItem':
+          ret = function(name) {
+            const value = raw.namedItem(name);
+            return value ? filter(key, value) : value;
+          };
+          break;
 
-            case 'item':
-              ret = function(index) {
-                return getFromFiltered(handler, filtered, index);
-              };
-              break;
+        case 'toString':
+          ret = function() {
+            return raw.toString();
+          };
+          break;
 
-            case 'namedItem':
-              ret = function(name) {
-                const value = raw.namedItem(name);
-                return value ? filterEverything(handler, value) : value;
-              };
-              break;
-
-            case 'toString':
-              ret = function() {
-                return raw.toString();
-              };
-              break;
-
-            case 'toJSON':
-              ret = function() {
-                return JSON.stringify(filtered);
-              };
-              break;
-            case 'Symbol(Symbol.iterator)':
-              ret = function() {
-                let nextIndex = 0;
-                return {
-                  next: function() {
-                    if (nextIndex < filtered.length) {
-                      const value = filtered[nextIndex];
-                      nextIndex++;
-                      return {
-                        value: value ? filterEverything(handler, value) : value,
-                        done: false
-                      };
-                    }
-                    return { done: true };
-                  }
-                };
-              };
-              break;
-            default:
-              warn(`Unsupported ${raw} method: ${property}. Returning undefined`);
-              return undefined;
-          }
-        } else {
-          ret = getFromFiltered(handler, filtered, property);
-        }
-
-        return ret;
-      },
-      has: function(target, property) {
-        const raw = getRef(target, key);
-        const filtered = getFilteredArrayLikeThings(raw, key);
-        return property in filtered;
+        case 'toJSON':
+          ret = function() {
+            return JSON.stringify(filtered);
+          };
+          break;
+        case 'Symbol(Symbol.iterator)':
+          ret = function() {
+            let nextIndex = 0;
+            return {
+              next: function() {
+                if (nextIndex < filtered.length) {
+                  const value = filtered[nextIndex];
+                  nextIndex++;
+                  return {
+                    value: value ? filter(key, value) : value,
+                    done: false
+                  };
+                }
+                return { done: true };
+              }
+            };
+          };
+          break;
+        default:
+          warn(`Unsupported ${raw} method: ${property}. Returning undefined`);
+          return undefined;
       }
-    };
-
-    setKey(handler, key);
-
-    KEY_TO_ARRAY_LIKE_THING_HANDLER.set(key, handler);
-
-    freeze(handler);
+    } else {
+      return ArrayLikeThingProxyHandler.getFromFilteredArrayLikeThings(key, filtered, property);
+    }
+    return ret;
   }
-
-  return handler;
+  has(shadowTarget, property) {
+    const raw = this.target;
+    const filtered = ArrayLikeThingProxyHandler.getFilteredArrayLikeThings(raw, this.key);
+    return property in filtered;
+  }
+  static getFromFilteredArrayLikeThings(key, filtered, index) {
+    const value = filtered[index];
+    return value ? filter(key, value) : value;
+  }
+  static getFilteredArrayLikeThings(raw, key) {
+    const filtered = [];
+    const { isAccessibleLWCNode } = lwcHelpers;
+    for (let n = 0; n < raw.length; n++) {
+      const value = raw[n];
+      if (getKey(value) === key || isSharedElement(value) || isAccessibleLWCNode(key, value)) {
+        filtered.push(value);
+      }
+    }
+    return filtered;
+  }
 }
 
 function createProxyForArrayLikeObjects(raw, key) {
   const surrogate = create$1(getPrototypeOf(raw));
   setRef(surrogate, raw, key);
 
-  const proxy = new Proxy(surrogate, getArrayLikeThingProxyHandler(key));
+  const proxy = new Proxy(surrogate, new ArrayLikeThingProxyHandler(raw, key));
   setKey(proxy, key);
   registerProxy(proxy);
 
@@ -9199,7 +9191,7 @@ function SecureWindow(sandbox, key) {
       if (confirmLocationChange(win.location.href, href)) {
         const filteredArgs = filterArguments(o, [href, ...args]);
         const res = win.open(...filteredArgs);
-        return filterEverything(o, res);
+        return filter(key, res);
       }
       // window.open spec expects a null return value if the operation fails
       return null;
@@ -9563,15 +9555,17 @@ function SecureTemplate(template, key) {
  *  c. a SecureFunction is the value represents a function
  *  d. Everything else will be filtered
  */
-function unwrapValue(st, value) {
-  if (!value) {
-    return value;
+function unwrapValue(st, originalValue) {
+  if (!originalValue) {
+    return originalValue;
   }
+  // Call lwcUnwrap() to access the underlying raw value
+  const value = lwcUnwrap(originalValue);
   let unfilteredValue;
   if (isArray(value) || isPlainObject(value)) {
     // If an object or array is nested inside a data proxy, they will need to be rewrapped
     // FilteringProxy and ArrayProxy is covered by this check
-    unfilteredValue = getUnfilteringDataProxy(getKey(st), value);
+    unfilteredValue = getUnfilteringDataProxy(getKey(st), originalValue);
   } else if (typeof value === 'function') {
     // Functions from sandbox cannot be handed over to system, they will be converted to a SecureFunction
     const secureFunction = filterEverything(st, value);
@@ -10285,90 +10279,6 @@ function shallowFreeze(obj) {
   }
 }
 
-// This is a whitelist from Kevin V, this has to be updated if any new wire adapters are introduced
-const internalLibs = [
-  'lightning/navigation',
-  'lightning/uiActionsApi',
-  'lightning/uiListApi',
-  'lightning/uiLookupsApi',
-  'lightning/uiObjectInfoApi',
-  'lightning/uiRecordApi'
-];
-function isWhitelistedLib(libDesc) {
-  return internalLibs.includes(libDesc);
-}
-
-const frozenLibRegistry = new WeakSet();
-
-/**
- * Create a wrapped library
- * @param {Object} lib Library being imported
- * @param {Object} key Locker key of the module importing the library
- * @param {Boolean} requireLocker Should the library being imported be lockeried
- */
-function SecureLib(lib, key, requireLocker, desc) {
-  if (isPrimitive(lib)) {
-    return lib;
-  }
-
-  if (isWhitelistedLib(desc)) {
-    if (!frozenLibRegistry.has(lib)) {
-      shallowFreeze(lib);
-      frozenLibRegistry.add(lib);
-    }
-    return lib;
-  }
-
-  let o = getFromCache(lib, key);
-  if (o) {
-    return o;
-  }
-
-  if (typeof lib === 'function') {
-    return lib;
-  }
-
-  assert$1.invariant(isPlainObject(lib), 'Expect lib to be a plain object');
-  o = create$1(null, {
-    toString: {
-      value: function() {
-        return `SecureLib: ${lib}{ key: ${JSON.stringify(key)} }`;
-      }
-    }
-  });
-
-  ObjectEntries(lib).forEach(([property, item]) => {
-    if (isPrimitive(item)) {
-      o[property] = item;
-    } else if (typeof item === 'function') {
-      if (item.prototype instanceof Event) {
-        // only Platform events created in non-lockerized libs will be caught by this condition
-        // TODO: add support for importing lockerized libs that expose events
-        const secureEventCtorDescriptor = createFilteredConstructor(
-          o,
-          lib,
-          property,
-          SecureCustomEventFactory,
-          key
-        );
-        defineProperty(o, property, secureEventCtorDescriptor);
-      } else {
-        o[property] = SecureFunction(item, requireLocker ? defaultKey : systemKey, key);
-      }
-    } else if (typeof item === 'object') {
-      o[property] = SecureFunction(item, requireLocker ? defaultKey : systemKey, key);
-    } else {
-      addPropertyIfSupported(o, lib, property);
-    }
-  });
-
-  setRef(o, lib, key);
-  addToCache(lib, o, key);
-  registerProxy(o);
-
-  return seal(o);
-}
-
 function SecureAura(AuraInstance, key) {
   let o = getFromCache(AuraInstance, key);
   if (o) {
@@ -10438,9 +10348,9 @@ function SecureAura(AuraInstance, key) {
         const fnReturnedValue = AuraInstance.createComponent(
           type,
           filteredArgs,
-          filterEverything(o, callback)
+          filter(o, callback)
         );
-        return filterEverything(o, fnReturnedValue);
+        return filter(key, fnReturnedValue);
       }
     },
 
@@ -10463,9 +10373,9 @@ function SecureAura(AuraInstance, key) {
         }
         const fnReturnedValue = AuraInstance.createComponents(
           filteredComponents,
-          filterEverything(o, callback)
+          filter(key, callback)
         );
-        return filterEverything(o, fnReturnedValue);
+        return filter(key, fnReturnedValue);
       }
     }
   });
@@ -10632,7 +10542,7 @@ function SecureAuraEvent(event, key) {
           value = deepUnfilterMethodArguments$$1({}, value);
         }
       } else {
-        value = filterEverything(o, value, { defaultKey: key });
+        value = filter(key, value, { defaultKey: key });
       }
       baseObject[property] = value;
     }
@@ -10723,7 +10633,7 @@ function SecureAuraComponent(component, key) {
         if (path[0] === 'c') {
           return SecureAuraAction(value, key);
         }
-        return filterEverything(o, value);
+        return filter(key, value);
       }
     },
     getEvent: {
@@ -10836,7 +10746,7 @@ function SecureAuraComponentRef(component, key) {
           throw new SyntaxError(`Invalid key ${name}`);
         }
 
-        return filterEverything(o, component['get'](name));
+        return filter(key, component['get'](name));
       }
     }
   });
@@ -10866,7 +10776,7 @@ function SecureAuraComponentRef(component, key) {
           value = deepUnfilterMethodArguments$$1({}, value);
         }
       } else {
-        value = filterEverything(o, value, { defaultKey: key });
+        value = filter(key, value, { defaultKey: key });
       }
       baseObject[property] = value;
     }
@@ -10937,11 +10847,77 @@ function registerAuraTypes(types) {
   }
 }
 
+/**
+ * Create a wrapped library
+ * @param {Object} lib Library being imported
+ * @param {Object} key Locker key of the module importing the library
+ * @param {Boolean} requireLocker Should the library being imported be lockeried
+ */
+function SecureLib(lib, fromKey, toKey) {
+  if (isPrimitive(lib)) {
+    return lib;
+  }
+
+  let o = getFromCache(lib, toKey);
+  if (o) {
+    return o;
+  }
+
+  o = create$1(null, {
+    toString: {
+      value: function() {
+        return `SecureLib: ${lib}{ key: ${JSON.stringify(toKey)} }`;
+      }
+    }
+  });
+
+  ObjectEntries(lib).forEach(([property, item]) => {
+    if (isPrimitive(item)) {
+      o[property] = item;
+    } else if (typeof item === 'function') {
+      if (item.prototype instanceof Event) {
+        // only Platform events created in non-lockerized libs will be caught by this condition
+        // TODO: add support for importing lockerized libs that expose events
+        const secureEventCtorDescriptor = createFilteredConstructor(
+          o,
+          lib,
+          property,
+          SecureCustomEventFactory,
+          toKey
+        );
+        defineProperty(o, property, secureEventCtorDescriptor);
+      } else {
+        o[property] = SecureFunction(item, fromKey, toKey);
+      }
+    } else if (typeof item === 'object') {
+      o[property] = SecureFunction(item, fromKey, toKey);
+    } else {
+      addPropertyIfSupported(o, lib, property);
+    }
+  });
+
+  setRef(o, lib, toKey);
+  addToCache(lib, o, toKey);
+  registerProxy(o);
+
+  return seal(o);
+}
+
 // AuraLocker is a facade for Locker. Its role is to:
 // - implement methods not present on Locker (extends API).
 // - decouple the Locker API from the Aura API.
 let isLockerInitialized = false;
-
+const frozenLibRegistry = new WeakSet();
+const internalLibs = [
+  'lightning/navigation',
+  'lightning/uiActionsApi',
+  'lightning/uiListApi',
+  'lightning/uiLookupsApi',
+  'lightning/uiObjectInfoApi',
+  'lightning/uiRecordApi',
+  'force/navigation',
+  'securemoduletest/testUtil'
+];
 const namespaceToKey = new Map();
 
 /**
@@ -11209,12 +11185,62 @@ function wrapComponentEvent(component, event) {
   return event instanceof AuraEvent ? SecureAuraEvent(event, key) : SecureDOMEvent(event, key);
 }
 
-function wrapLWC(lwc, key) {
-  return SecureLWC(lwc, key);
-}
+function wrap(thing, metaFrom, metaTo) {
+  let toKey = getKeyForNamespace(metaTo.getNamespace());
 
-function wrapLib(lib, key, requireLocker$$1, desc) {
-  return SecureLib(lib, key, requireLocker$$1, desc);
+  // immediately wrap the recognized lwc object to its secured counterpart
+  if (['lwc', 'engine'].includes(metaFrom.getName())) {
+    return SecureLWC(thing, toKey);
+  }
+
+  // check against internalLibs that are whitelisted
+  // they just need to be frozen
+  const lwcModuleName = `${metaFrom.getNamespace().toLowerCase()}/${metaFrom.getName()}`;
+  if (internalLibs.includes(lwcModuleName)) {
+    if (!frozenLibRegistry.has(thing)) {
+      shallowFreeze(thing);
+      frozenLibRegistry.add(thing);
+    }
+    return thing;
+  }
+  // keys are based on namespaces
+  // but unsecured modules have the same namespace as secured ones
+  // we need reset the key of unsecured modules to systemKey
+  // this helps for comparison further down the stream
+  // situations we want to understand:
+  //        --- should I do a deepUnfilter and filter between modules?
+  //        --- or should I just do a deepUnfilter
+  const fromKey = metaFrom.requireLocker
+    ? getKeyForNamespace(metaFrom.getNamespace())
+    : systemKey;
+  toKey = metaTo.requireLocker ? toKey : systemKey;
+
+  if (fromKey !== toKey && metaTo.depList && metaTo.depList[lwcModuleName] === 'module') {
+    // temporarily intercept cross namespace usage
+    // system -> Locker or Locker -> system is considered cross namespace
+    warn(
+      `Attempting cross-namespace import
+       from: ${metaFrom.getNamespace()} - ${metaFrom.getName()}
+       to:   ${metaTo.getNamespace()} - ${metaTo.getName()}
+      `
+    );
+  }
+  // class imports
+  if (typeof thing === 'function') {
+    return thing;
+  }
+
+  // begin wrapping module imports
+  // there is no point in wrapping modules with same key and same security level
+  // wrapping only occurs in these scenarios:
+  //   -- Locker --> system
+  //   -- system --> Locker
+  //   -- Locker A --> Locker B (must be temporarily disabled)
+  if (fromKey === toKey) {
+    return thing;
+  }
+
+  return SecureLib(thing, fromKey, toKey);
 }
 
 exports.create = create$$1;
@@ -11233,8 +11259,7 @@ exports.trust = trust$$1;
 exports.unwrap = unwrap$$1;
 exports.wrapComponent = wrapComponent;
 exports.wrapComponentEvent = wrapComponentEvent;
-exports.wrapLWC = wrapLWC;
-exports.wrapLib = wrapLib;
+exports.wrap = wrap;
 exports.sanitize = sanitize;
 exports.isAllowedSvgTag = isAllowedSvgTag;
 exports.sanitizeSvgElement = sanitizeSvgElement;

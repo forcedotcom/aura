@@ -42,6 +42,12 @@ export default class ChildReceivesTrackedData extends LightningElement {
 
     @api
     receiveDataAndMutateValue(data) {
+        // Verify that the data values are wrapped in the right locker key
+        assertIsSecureObject(data.domElement);
+        assertIsSecureWindow(data.win);
+        assertIsSecureDocument(data.doc);
+        assertIsSecureBody(data.body);
+
         // Mutate received value in child
         data.title = '[Updated by child]' + data.title;
         data.headings.item1 = '[Updated by child]' + data.headings.item1;
@@ -69,10 +75,10 @@ function assertIsSecureObject(el) {
     );
 }
 
-function assertIsSecureWindow(window) {
+function assertIsSecureWindow(win) {
     testUtil.assertEquals(
         `SecureWindow: [object Window]{ key: {"namespace":"${NAMESPACE}"} }`,
-        `${window}`,
+        `${win}`,
         'Expected window to be a SecureWindow'
     );
 }

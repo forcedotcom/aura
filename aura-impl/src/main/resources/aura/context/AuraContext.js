@@ -471,7 +471,7 @@ Aura.Context.AuraContext.prototype.clearComponentConfigs = function(actionId) {
     }
     if (error.length > 0) {
         var warningMessage = "unused configs for " + actionId;
-        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
         warningMessage = warningMessage + ": " + error;
         //#end
         $A.warning(warningMessage);

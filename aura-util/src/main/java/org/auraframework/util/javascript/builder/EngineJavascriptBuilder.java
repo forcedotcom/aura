@@ -53,7 +53,7 @@ public class EngineJavascriptBuilder extends JavascriptBuilder {
     @Override
     public List<JavascriptResource> build(JavascriptGeneratorMode mode, boolean isCompat, String inputContent, String outputFileName) {
         boolean minified = mode.getJavascriptWriter() == JavascriptWriter.CLOSURE_AURA_PROD;
-        boolean isProdDebug = mode == JavascriptGeneratorMode.PRODUCTIONDEBUG;
+        boolean isProdDebug = ((mode == JavascriptGeneratorMode.PRODUCTIONDEBUG) || (mode == JavascriptGeneratorMode.PERFORMANCEDEBUG));
         List<JavascriptResource> resources = new ArrayList<>();
 
         String output = null;

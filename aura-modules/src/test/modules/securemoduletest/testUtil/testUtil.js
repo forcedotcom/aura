@@ -16,6 +16,10 @@ export function assertDefined(condition, message) {
     assert(condition !== undefined, `Error message: ${message}\nActual: ${condition}`);
 }
 
+export function assertNull(condition, message) {
+    assert(condition === null, `Error message: ${message}\nExpected: null\nActual: ${condition}`);
+}
+
 export function assertNotUndefinedOrNull(condition, message) {
     assert(condition === undefined || condition === null, `Error message: ${message}\nExpected truthy value\nActual: ${condition}`);
 }

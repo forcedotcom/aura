@@ -2577,7 +2577,7 @@ Aura.Utils.Util.prototype.getHashCode = function(value) {
     return hash;
 };
 
-//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
     /**
      * Gets the aura debug tool component whether in an iframe or not.
      * @returns {Object} The debug tool component.

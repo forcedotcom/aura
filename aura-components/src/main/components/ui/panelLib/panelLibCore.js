@@ -165,8 +165,13 @@ function lib(scrollUtil, focusUtil) { //eslint-disable-line no-unused-vars
                 } else if (keyCode === 9) {
                     //close on tab out
                     var shiftPressed = event.shiftKey,
-                        current = document.activeElement,
                         focusables;
+
+                    var focusedElement = document.activeElement;
+                    // Resolve any LWC components down to their primitive focusable elements
+                    while (focusedElement && focusedElement.shadowRoot) {
+                        focusedElement = focusedElement.shadowRoot.activeElement;
+                    }
 
                     el = cmp.getElement();
                     if(el) {
@@ -174,16 +179,16 @@ function lib(scrollUtil, focusUtil) { //eslint-disable-line no-unused-vars
                     }
                         
                     if (focusables && config.trapFocus) {
-                        if (me.isSameTabstop(current, focusables.last) && !shiftPressed) {
+                        if (me.isSameTabstop(focusedElement, focusables.last) && !shiftPressed) {
                             $A.util.squash(event, true);
                             focusables.first.focus();
-                        } else if (me.isSameTabstop(current, focusables.first) && shiftPressed) {
+                        } else if (me.isSameTabstop(focusedElement, focusables.first) && shiftPressed) {
                             $A.util.squash(event, true);
                             focusables.last.focus();
                         }
                     } else if (focusables && config.closeOnTabOut) {
-                        if ((me.isSameTabstop(current, focusables.last) && !shiftPressed)
-                            || ((me.isSameTabstop(current, focusables.first) || current === cmp.getElement()) && shiftPressed)) {
+                        if ((me.isSameTabstop(focusedElement, focusables.last) && !shiftPressed)
+                            || ((me.isSameTabstop(focusedElement, focusables.first) || focusedElement === cmp.getElement()) && shiftPressed)) {
                             $A.util.squash(event, true);
                             cmp.closedBy = "closeOnTabOut";
                             if ($A.util.isFunction(closeAction)) {

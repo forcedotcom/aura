@@ -3686,6 +3686,17 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
     }
 
     actionResponses = responseMessage["actions"];
+    if (actionResponses === undefined) {
+        // We got an event back, but no actions. This means that the event was
+        // catastrophic for the XHR, and we should abort all of them. Note, this
+        // is slightly dangerous, since we don't really know what went wrong.
+        // It may be that we should flag it as an error instead, but that is less
+        // than certain.
+        // FIXME(GO): we should be clearing out the actions here, but I'm not sure
+        // what the correct thing to do is. The problem with unclear APIs
+        // this.processIncompletes(auraXHR);
+        return;
+    }
 
     var actionsToPersist = [];
 

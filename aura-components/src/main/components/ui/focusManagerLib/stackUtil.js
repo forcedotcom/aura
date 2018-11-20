@@ -35,7 +35,7 @@ function lib(focusUtil) { //eslint-disable-line no-unused-vars
 
     function _getRealActiveElement() {
         var active = document.activeElement;
-        while (active.shadowRoot) {
+        while (active && active.shadowRoot) {
             active = active.shadowRoot.activeElement;
         }
         return active;

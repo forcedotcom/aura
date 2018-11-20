@@ -336,9 +336,10 @@ AuraComponentService.prototype.containsComponent = (function() {
  * @private
  */
 AuraComponentService.prototype.newComponentArray = function(config, attributeValueProvider, localCreation, doForce){
-    var ret = [];
-    for (var i = 0; i < config.length; i++) {
-        ret.push(this.newComponentDeprecated(config[i], attributeValueProvider, localCreation, doForce));
+    var l = config.length;
+    var ret = Array(l);
+    for (var i = 0; i < l; i++) {
+        ret[i] = this.newComponentDeprecated(config[i], attributeValueProvider, localCreation, doForce);
     }
     return ret;
 };
@@ -879,9 +880,9 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
             // A map with all references of external resources referenced by the current component
             var sourceReferencesInfo = entry[Json.ApplicationKey.LOCKER_REFERENCE_INFO];
             // Inspect dependencies and decide which library modules to wrap
-            for (var i = 0; i < deps.length; i++) {
+            for (var i = 0, l = deps.length; i < l; i++) {
                 var depName = entry.dependencies[i];
-                
+
                 // If the reference is a module and it is not the lwc/engine module, then we need to wrap it
                 if (sourceReferencesInfo && sourceReferencesInfo[depName] === "module" && depName !== "engine" && depName !== "lwc") {
                     var depDefDescriptor = new DefDescriptor(this.moduleNameToDescriptorLookup[depName]);
@@ -948,7 +949,7 @@ AuraComponentService.prototype.getComponentClass = function(descriptor, def) {
  * @export
  */
 AuraComponentService.prototype.initEventDefs = function(evtConfigs) {
-    for (var i = 0; i < evtConfigs.length; i++) {
+    for (var i = 0, l = evtConfigs.length; i < l; i++) {
         $A.eventService.saveEventConfig(evtConfigs[i]);
     }
 };
@@ -958,7 +959,7 @@ AuraComponentService.prototype.initEventDefs = function(evtConfigs) {
  * @export
  */
 AuraComponentService.prototype.initLibraryDefs = function(libraryConfigs) {
-    for (var i = 0; i < libraryConfigs.length; i++) {
+    for (var i = 0, l = libraryConfigs.length; i < l; i++) {
         $A.componentService.saveLibraryConfig(libraryConfigs[i]);
     }
 };
@@ -968,7 +969,7 @@ AuraComponentService.prototype.initLibraryDefs = function(libraryConfigs) {
  * @export
  */
 AuraComponentService.prototype.initControllerDefs = function(controllerConfigs) {
-    for (var i = 0; i < controllerConfigs.length; i++) {
+    for (var i = 0, l = controllerConfigs.length; i < l; i++) {
         $A.componentService.createControllerDef(controllerConfigs[i]);
     }
 };
@@ -1030,7 +1031,7 @@ AuraComponentService.prototype.newComponentAsync = function(callbackScope, callb
     if ($A.getContext().uriAddressableDefsEnabled) {
         var descriptorMap = {};
 
-        for (var idx=0;idx<config.length;idx++) {
+        for (var idx = 0, len = config.length; idx < len; idx++) {
             if (config[idx]) {
                 var cfg = this.getComponentConfigs(config[idx], attributeValueProvider);
                 var descriptor = cfg["descriptor"]["descriptor"] || cfg["descriptor"];
@@ -1508,14 +1509,22 @@ AuraComponentService.prototype.getDef = function(descriptor) {
 };
 
 /**
- * Add a component to the registry
+ * Add one or more components to the registry.
  * We store them for execution later so we do not load definitions into memory unless they are utilized in getComponent.
- * @param {String} descriptor Uses the pattern of namespace:componentName.
- * @param {Function} exporter A function that when executed will return the component object litteral.
+ * @param {String|Object} descriptor component name, or a map of names & functions.
+ * @param {Function} exporter An optional function, for adding one at a time.
  * @export
  */
 AuraComponentService.prototype.addComponent = function(descriptor, exporter) {
-    this.savedComponentConfigs[descriptor] = exporter;
+    var registry = this.savedComponentConfigs;
+    // Add one at a time.
+    if (typeof descriptor === 'string') {
+        return registry[descriptor] = exporter;
+    }
+    // Or add many, for faster performance.
+    for (var key in descriptor) {
+        registry[key] = descriptor[key]
+    }
 };
 
 
@@ -1696,13 +1705,21 @@ AuraComponentService.prototype.saveLibraryConfig = function(config) {
 };
 
 /**
- * Store a library exporter.
- * @param {String} descriptor name of the include.
- * @param {Function} exporter A function that when executed will return the include object.
+ * Store one or more library exporters.
+ * @param {String|Object} descriptor library name, or a map of names & functions.
+ * @param {Function} exporter An optional function, for adding one at a time.
  * @export
  */
 AuraComponentService.prototype.addLibraryExporter = function(descriptor, exporter) {
-    this.libraryIncludeRegistry.addLibraryExporter(descriptor, exporter);
+    var registry = this.libraryIncludeRegistry.libExporter;
+    // Add one at a time.
+    if (typeof descriptor === 'string') {
+        return registry[descriptor] = exporter;
+    }
+    // Or add many, for faster performance.
+    for (var key in descriptor) {
+        registry[key] = descriptor[key];
+    }
 };
 
 /**
@@ -1755,7 +1772,7 @@ AuraComponentService.prototype.destroy = function(components){
         components = [components];
     }
 
-    for (var i = 0; i < components.length; i++) {
+    for (var i = 0, l = components.length; i < l; i++) {
         var cmp = components[i];
         if (cmp && cmp.destroy) {
             cmp.destroy();
@@ -2120,7 +2137,7 @@ AuraComponentService.prototype.findDependencies = function (key, defConfig, stor
     var i;
 
     if ($A.util.isArray(defConfig)) {
-        for (i = 0; i < defConfig.length; i++) {
+        for (i = 0, l = defConfig.length; i < l; i++) {
             dependencies.push.apply(dependencies, this.findDependencies(key, defConfig[i], storedDeps));
         }
     } else if ($A.util.isObject(defConfig)) {
@@ -2191,7 +2208,7 @@ AuraComponentService.prototype.buildDependencyGraph = function() {
         }
 
         var actionKeys = Object.keys(actionEntries).filter(function (a) {
-            for (var i = 0; i < actionsBlackList.length; i++) {
+            for (var i = 0, l = actionsBlackList.length; i < l; i++) {
                 if (a.key.indexOf(actionsBlackList[i]) === 0) {
                     return false;
                 }
@@ -2341,7 +2358,7 @@ AuraComponentService.prototype.evictDefsFromStorage = function(sortedKeys, graph
                 }
 
                 var promises = [];
-                for (var i = 0; i < actions.length; i++) {
+                for (var i = 0, l = actions.length; i < l; i++) {
                     promises.push(actionStorage.remove(actions[i], true));
                 }
 

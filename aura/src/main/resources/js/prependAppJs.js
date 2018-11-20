@@ -1,17 +1,32 @@
 // This code is hardcoded in AppJs.java.
 // Is here just to make it easier to minify when changed
-typeof Aura === "undefined" && (Aura = {});
-Aura.bootstrap || (Aura.bootstrap = {});
-
-if (!Aura.frameworkJsReady) {
-    Aura.ApplicationDefs = { cmpExporter : {}, libExporter : {} };
-
-    $A = { componentService : {
-        addComponent: function (d, e) { Aura.ApplicationDefs.cmpExporter[d] = e; },
-        addLibraryExporter: function (d, e) { Aura.ApplicationDefs.libExporter[d] = e; },
-        initEventDefs: function (e) { Aura.ApplicationDefs.eventDefs = e; },
-        initLibraryDefs: function (e) { Aura.ApplicationDefs.libraryDefs = e; },
-        initControllerDefs: function (e) { Aura.ApplicationDefs.controllerDefs = e; },
-        initModuleDefs: function (e) { Aura.ApplicationDefs.moduleDefs = e; }
-    }};
+if (!(window.Aura || (Aura = {})).frameworkJsReady) {
+    Aura.ApplicationDefs = {};
+    $A = {
+        fn: function(name) {
+            return function (items) {
+                var defs = Aura.ApplicationDefs;
+                var registry = defs[name];
+                if (registry) {
+                    if (items instanceof Array) {
+                        registry.push.apply(registry, items);
+                    } else {
+                        for (var descriptor in items) {
+                            registry[descriptor] = items[descriptor];
+                        }
+                    }
+                } else {
+                    defs[name] = items;
+                }
+            };
+        }
+    };
+    $A.componentService = {
+        addComponents: $A.fn('cmpExporter'),
+        addLibraryExporters: $A.fn('libExporter'),
+        initEventDefs: $A.fn('eventDefs'),
+        initLibraryDefs: $A.fn('libraryDefs'),
+        initControllerDefs: $A.fn('controllerDefs'),
+        initModuleDefs: $A.fn('moduleDefs')
+    };
 }

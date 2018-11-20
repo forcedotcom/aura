@@ -28,7 +28,7 @@ import org.auraframework.system.AuraContext;
 
 public interface AppJsUtilAdapter {
 
-    static final String APPJS_PREREQ = "\"undefined\"===typeof Aura&&(Aura={});Aura.bootstrap||(Aura.bootstrap={});Aura.frameworkJsReady||(Aura.ApplicationDefs={cmpExporter:{},libExporter:{}},$A={componentService:{addComponent:function(a,b){Aura.ApplicationDefs.cmpExporter[a]=b},addLibraryExporter:function(a,b){Aura.ApplicationDefs.libExporter[a]=b},initEventDefs:function(a){Aura.ApplicationDefs.eventDefs=a},initLibraryDefs:function(a){Aura.ApplicationDefs.libraryDefs=a},initControllerDefs:function(a){Aura.ApplicationDefs.controllerDefs=a},initModuleDefs:function(a){Aura.ApplicationDefs.moduleDefs=a}}});\n";
+    static final String APPJS_PREREQ = "(window.Aura||(Aura={})).frameworkJsReady||(Aura.ApplicationDefs={},$A={fn:function(e){return function(n){var r=Aura.ApplicationDefs,f=r[e];if(f)if(n instanceof Array)f.push.apply(f,n);else for(var i in n)f[i]=n[i];else r[e]=n}}},$A.componentService={addComponents:$A.fn('cmpExporter'),addLibraryExporters:$A.fn('libExporter'),initEventDefs:$A.fn('eventDefs'),initLibraryDefs:$A.fn('libraryDefs'),initControllerDefs:$A.fn('controllerDefs'),initModuleDefs:$A.fn('moduleDefs')});\n";
     static final char   APPJS_APPEND = '\n';
     static final String APPCOREJS_READY = "Aura.appCoreJsReady=true;";
     static final String APPJS_READY = "Aura.appJsReady=true;";

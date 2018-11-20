@@ -1790,16 +1790,8 @@ AuraClientService.prototype.initDefs = function() {
     var i, config = Aura["ApplicationDefs"];
 
     if (config) {
-        var libraryDefs = config["libExporter"];
-        for (i in libraryDefs) {
-            $A.componentService.addLibraryExporter(i, libraryDefs[i]);
-        }
-
-        var cmpExporter = config["cmpExporter"];
-        for (i in cmpExporter) {
-            $A.componentService.addComponent(i, cmpExporter[i]);
-        }
-
+        $A.componentService.addLibraryExporter(config["libExporter"]);
+        $A.componentService.addComponent(config["cmpExporter"]);
         $A.componentService.initEventDefs(config["eventDefs"]);
         $A.componentService.initLibraryDefs(config["libraryDefs"]);
         $A.componentService.initControllerDefs(config["controllerDefs"]);
@@ -2205,7 +2197,7 @@ AuraClientService.prototype.initializeInjectedServices = function(services) {
 
 /**
  * Adds a resolver for a scoped module import.
- * 
+ *
  * Example: ` import foo from "@salesforce/label/MyLabels.Foo" `
  *
  * @param {String} scope The scope of import. For example, the scope of "@salesforce/label/MyLabels.Foo" would be "salesforce"
@@ -2222,7 +2214,7 @@ AuraClientService.prototype.addScopedModuleResolver = function (scope, resolver)
 /**
  * Resolves the import of a scoped module by invoking a resolver for the given
  * scope if a resolver is registered.
- * 
+ *
  * @param {String} fullImport The entire path of the module being imported
  * @param {String} scope The scope of the module import, e.g. "salesforce"
  * @memberOf AuraClientService
@@ -2242,13 +2234,13 @@ AuraClientService.prototype.resolveScopedModuleImport = function (scope, fullImp
  * Default resolver for the @salesforce scoped module import. This allows off-core projects to  still have access to
  * a sub-set of @salesforce imports in their modules, such as labels, and can be overridden by core to provide the full
  * set of @salesforce imports.
- * 
+ *
  * This is registered at the framework level rather than the app level to allow things like component tests that load a
  * cmp file directly in the browser to still function.
- * 
+ *
  * W-5187044: Investigate if we can do this injection in the test runner flow instead and if that is a complete and
  * adequete solution.
- * 
+ *
  * @param {String} fullImport The entire path of the module being imported
  * @memberOf AuraClientService
  * @private
@@ -2260,14 +2252,14 @@ AuraClientService.prototype.defaultSalesforceImportResolver = function(fullImpor
     var key = parts[0];
 
     switch (key) {
-        case 'label': 
+        case 'label':
             return $A.get("$Label." + parts[1]);
         case 'cssvars':
             return function (cssVar, fallback) {
                 return $A.clientService.cssVars[cssVar.slice(2)] || fallback || 'inherit';
             };
 
-        default: 
+        default:
             return undefined;
     }
 };
@@ -2348,7 +2340,7 @@ AuraClientService.prototype.postProcess = function() {
         } finally {
             this.auraStack.pop();
         }
- 
+
     }
 };
 

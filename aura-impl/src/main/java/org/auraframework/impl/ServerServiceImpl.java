@@ -495,21 +495,25 @@ public class ServerServiceImpl implements ServerService {
         Set<String> serverSideDescriptor = new HashSet<>();
 
         // Process Libraries with a lower granularity level, to prevent duplication of external includes.
+        sb.append("$A.componentService.addLibraryExporter({");
         Collection<LibraryDef> libraryDefs = filterAndLoad(LibraryDef.class, dependencies, null);
         for (LibraryDef libraryDef : libraryDefs) {
             List<IncludeDefRef> includeDefs = libraryDef.getIncludes();
             for (IncludeDefRef defRef : includeDefs) {
-                sb.append("$A.componentService.addLibraryExporter(\"" + defRef.getClientDescriptor() + "\", (function (){/*");
+                sb.append("'" + defRef.getClientDescriptor() + "':function(){/*");
 
                 escapedHydrationFunctionStringBuilder.append(defRef.getCode(minify));
 
-                sb.append("*/}));");
+                sb.append("*/},");
 
                 context.setClientClassLoaded(defRef.getDescriptor(), true);
             }
         }
+        int end = sb.length();
+        sb.replace(end, end, "});\n");
 
         // Append component classes.
+        sb.append("$A.componentService.addComponent({");
         Collection<BaseComponentDef> componentDefs = filterAndLoad(BaseComponentDef.class, dependencies, null);
         for (BaseComponentDef def : componentDefs) {
             // templates are not needed in app.js as they are rendered server side and html sent to client
@@ -523,10 +527,9 @@ public class ServerServiceImpl implements ServerService {
                     context.getRestrictedNamespaces().contains(def.getDescriptor().getNamespace());
 
             if (hydrationEnabled) {
-                sb.append("$A.componentService.addComponent(\"")
+                sb.append("'")
                     .append(def.getDescriptor())
-                    .append("\", ")
-                    .append("(function (){/*");
+                    .append("':function(){/*");
 
                 // Mark class as loaded in the client
                 context.setClientClassLoaded(def.getDescriptor(), true);
@@ -537,19 +540,22 @@ public class ServerServiceImpl implements ServerService {
                 // Component definition
                 sb.append("return ");
                 JsonEncoder.serialize(def, escapedHydrationFunctionStringBuilder, context.getJsonSerializationContext());
-                sb.append(";");
 
-                sb.append("*/}));\n");
+                sb.append("*/},");
             } else {
+                end = sb.length() - 1;
+                sb.replace(end, end, "});\n");
                 sb.append(def.getCode(minify));
 
-                sb.append("$A.componentService.addComponent(\"")
+                sb.append("$A.componentService.addComponents({'")
                         .append(def.getDescriptor())
-                        .append("\", ");
+                        .append("':");
                 JsonEncoder.serialize(def, sb, context.getJsonSerializationContext());
-                sb.append(");\n");
+                sb.append(",");
             }
         }
+        end = sb.length() - 1;
+        sb.replace(end, end, "});\n");
 
         // Append event definitions
         writeDefinitionStringToBuilder(EventDef.class, dependencies, null, context, sb, "$A.componentService.initEventDefs(", serverSideDescriptor);

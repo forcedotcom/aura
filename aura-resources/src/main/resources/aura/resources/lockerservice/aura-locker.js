@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-11-16
- * Version: 0.5.34
+ * Generated: 2018-11-20
+ * Version: 0.5.35
  */
 
 (function (exports) {
@@ -5953,7 +5953,7 @@ class ArrayLikeThingProxyHandler {
   }
   has(shadowTarget, property) {
     const raw = this.target;
-    const filtered = this.getFilteredArrayLikeThings(raw, this.key);
+    const filtered = ArrayLikeThingProxyHandler.getFilteredArrayLikeThings(raw, this.key);
     return property in filtered;
   }
   static getFromFilteredArrayLikeThings(key, filtered, index) {
@@ -10915,6 +10915,7 @@ const internalLibs = [
   'lightning/uiLookupsApi',
   'lightning/uiObjectInfoApi',
   'lightning/uiRecordApi',
+  'force/navigation',
   'securemoduletest/testUtil'
 ];
 const namespaceToKey = new Map();
@@ -11218,7 +11219,7 @@ function wrap(thing, metaFrom, metaTo) {
     // temporarily intercept cross namespace usage
     // system -> Locker or Locker -> system is considered cross namespace
     warn(
-      `Attempting cross-namespace import 
+      `Attempting cross-namespace import
        from: ${metaFrom.getNamespace()} - ${metaFrom.getName()}
        to:   ${metaTo.getNamespace()} - ${metaTo.getName()}
       `

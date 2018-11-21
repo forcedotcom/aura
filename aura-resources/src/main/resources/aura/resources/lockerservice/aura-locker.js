@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-11-20
- * Version: 0.6.2
+ * Generated: 2018-11-21
+ * Version: 0.6.3
  */
 
 (function (exports) {
@@ -5424,6 +5424,137 @@ SecureDOMEvent.filterTouchesDescriptor = function(se, event, propName) {
   };
 };
 
+function getFromFilteredByIndex(key, filtered, index) {
+  const value = filtered[index];
+  return value ? filter(key, value) : value;
+}
+function getFiltered(raw, key, nodeIsAccessible) {
+  const filtered = [];
+  for (let n = 0, length = raw.length; n < length; n++) {
+    const value = raw[n];
+    if (nodeIsAccessible(value, key)) {
+      filtered.push(value);
+    }
+  }
+  return filtered;
+}
+function getFilteredCount(raw, key, nodeIsAccessible) {
+  let filteredCount = 0;
+  for (let n = 0, length = raw.length; n < length; n++) {
+    const value = raw[n];
+    if (nodeIsAccessible(value, key)) {
+      filteredCount++;
+    }
+  }
+  return filteredCount;
+}
+
+/**
+ * Proxy handler for NodeList and HTMLCollection
+ */
+class SecureNodeListProxyHandler {
+  constructor(target, key, nodeIsAccessible) {
+    this.target = target;
+    this.key = key;
+    this.nodeIsAccessible = nodeIsAccessible;
+  }
+  get(shadowTarget, property) {
+    const { target: raw, key, nodeIsAccessible } = this;
+
+    property = convertSymbol(property);
+    if (Number.isNaN(Number(property))) {
+      switch (property) {
+        case 'length':
+          return getFilteredCount(raw, key, nodeIsAccessible);
+
+        case 'item':
+          return index => {
+            const filtered = getFiltered(raw, key, nodeIsAccessible);
+            return getFromFilteredByIndex(key, filtered, index);
+          };
+
+        case 'namedItem':
+          return name => {
+            const value = raw.namedItem(name);
+            return value ? filter(key, value) : value;
+          };
+
+        case 'toString':
+          return () => raw.toString();
+
+        case 'toJSON':
+          return () => {
+            const filtered = getFiltered(raw, key, nodeIsAccessible);
+            return JSON.stringify(filtered);
+          };
+
+        case 'Symbol(Symbol.iterator)': {
+          const filtered = getFiltered(raw, key, nodeIsAccessible);
+          return () => {
+            let nextIndex = 0;
+            return {
+              next: function() {
+                if (nextIndex < filtered.length) {
+                  const value = filtered[nextIndex];
+                  nextIndex++;
+                  return {
+                    value: value ? filter(key, value) : value,
+                    done: false
+                  };
+                }
+                return { done: true };
+              }
+            };
+          };
+        }
+
+        default:
+          warn(`Unsupported ${raw} method: ${property}. Returning undefined`);
+          return undefined;
+      }
+    }
+    const filtered = getFiltered(raw, key, nodeIsAccessible);
+    return getFromFilteredByIndex(key, filtered, property);
+  }
+  has(shadowTarget, property) {
+    const filtered = getFiltered(this.target, this.key, this.nodeIsAccessible);
+    return property in filtered;
+  }
+}
+
+/**
+ *  The default access check function for a node
+ */
+const defaultNodeIsAccessible = (node, toKey) =>
+  getKey(node) === toKey || isSharedElement(node) || lwcHelpers.isAccessibleLWCNode(toKey, node);
+
+/**
+ * Create a wrapper for a NodeList
+ * Currently this wrapper handles both NodeList and HTMLCollection.
+ * @param {*} raw nodelist to wrap
+ * @param {*} toKey locker key for the destination trying to access the nodelist
+ * @param {*} options
+ */
+function SecureNodeList(raw, toKey, options) {
+  const shadowTarget = create$1(getPrototypeOf(raw));
+  setRef(shadowTarget, raw, toKey);
+
+  const proxy = new Proxy(
+    shadowTarget,
+    new SecureNodeListProxyHandler(
+      raw,
+      toKey,
+      options && typeof options.nodeIsAccessible === 'function'
+        ? options.nodeIsAccessible
+        : defaultNodeIsAccessible
+    )
+  );
+  setKey(proxy, toKey);
+  registerProxy(proxy);
+
+  return proxy;
+}
+
 /* eslint-disable no-use-before-define */
 
 let filterTypeHook$1;
@@ -5563,7 +5694,7 @@ function filterObject(key, raw, options) {
       mutated = true;
     }
   } else if (isNodeList) {
-    swallowed = createProxyForArrayLikeObjects(raw, key);
+    swallowed = SecureNodeList(raw, key);
     setRef(swallowed, raw, key);
     mutated = true;
   } else {
@@ -5876,112 +6007,6 @@ function createFilteringProxy(raw, key) {
   registerFilteringProxy(swallowed);
 
   return swallowed;
-}
-
-/**
- * Proxy handler for NodeList and HTMLCollection
- */
-class ArrayLikeThingProxyHandler {
-  constructor(target, key) {
-    this.target = target;
-    this.key = key;
-  }
-  get(shadowTarget, property) {
-    const raw = this.target;
-    const key = this.key;
-
-    const filtered = ArrayLikeThingProxyHandler.getFilteredArrayLikeThings(raw, key);
-    let ret;
-
-    property = convertSymbol(property);
-    if (Number.isNaN(Number(property))) {
-      switch (property) {
-        case 'length':
-          ret = filtered.length;
-          break;
-
-        case 'item':
-          ret = function(index) {
-            return ArrayLikeThingProxyHandler.getFromFilteredArrayLikeThings(key, filtered, index);
-          };
-          break;
-
-        case 'namedItem':
-          ret = function(name) {
-            const value = raw.namedItem(name);
-            return value ? filter(key, value) : value;
-          };
-          break;
-
-        case 'toString':
-          ret = function() {
-            return raw.toString();
-          };
-          break;
-
-        case 'toJSON':
-          ret = function() {
-            return JSON.stringify(filtered);
-          };
-          break;
-        case 'Symbol(Symbol.iterator)':
-          ret = function() {
-            let nextIndex = 0;
-            return {
-              next: function() {
-                if (nextIndex < filtered.length) {
-                  const value = filtered[nextIndex];
-                  nextIndex++;
-                  return {
-                    value: value ? filter(key, value) : value,
-                    done: false
-                  };
-                }
-                return { done: true };
-              }
-            };
-          };
-          break;
-        default:
-          warn(`Unsupported ${raw} method: ${property}. Returning undefined`);
-          return undefined;
-      }
-    } else {
-      return ArrayLikeThingProxyHandler.getFromFilteredArrayLikeThings(key, filtered, property);
-    }
-    return ret;
-  }
-  has(shadowTarget, property) {
-    const raw = this.target;
-    const filtered = ArrayLikeThingProxyHandler.getFilteredArrayLikeThings(raw, this.key);
-    return property in filtered;
-  }
-  static getFromFilteredArrayLikeThings(key, filtered, index) {
-    const value = filtered[index];
-    return value ? filter(key, value) : value;
-  }
-  static getFilteredArrayLikeThings(raw, key) {
-    const filtered = [];
-    const { isAccessibleLWCNode } = lwcHelpers;
-    for (let n = 0; n < raw.length; n++) {
-      const value = raw[n];
-      if (getKey(value) === key || isSharedElement(value) || isAccessibleLWCNode(key, value)) {
-        filtered.push(value);
-      }
-    }
-    return filtered;
-  }
-}
-
-function createProxyForArrayLikeObjects(raw, key) {
-  const surrogate = create$1(getPrototypeOf(raw));
-  setRef(surrogate, raw, key);
-
-  const proxy = new Proxy(surrogate, new ArrayLikeThingProxyHandler(raw, key));
-  setKey(proxy, key);
-  registerProxy(proxy);
-
-  return proxy;
 }
 
 // We cache 1 array proxy per key

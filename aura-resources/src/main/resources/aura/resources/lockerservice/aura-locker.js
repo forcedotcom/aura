@@ -15,7 +15,7 @@
  *
  * Bundle from LockerService-Core
  * Generated: 2018-11-20
- * Version: 0.5.35
+ * Version: 0.6.2
  */
 
 (function (exports) {
@@ -2124,7 +2124,7 @@ function registerReportAPI(api) {
 function SecureScriptElement() {}
 
 // TODO: this should be removed once Locker has a proper configuration mechanism in place
-const TRUSTED_DOMAINS = /\.(force|salesforce|visualforce)\.com$/;
+const TRUSTED_DOMAINS = /\.(force|salesforce|visualforce|documentforce)\.com$/;
 
 SecureScriptElement.setOverrides = function(elementOverrides, prototype) {
   function getAttributeName(name) {
@@ -8267,6 +8267,7 @@ const REGEX_VALID_MIME_TYPE = /^[a-z]+\/[a-z+-]+$/;
 const WHITELISTED_MIME_TYPES = [
   'application/octet-stream',
   'application/json',
+  'application/pdf',
   'video/',
   'audio/',
   'image/',
@@ -10909,12 +10910,13 @@ function SecureLib(lib, fromKey, toKey) {
 let isLockerInitialized = false;
 const frozenLibRegistry = new WeakSet();
 const internalLibs = [
-  'lightning/navigation',
-  'lightning/uiActionsApi',
-  'lightning/uiListApi',
-  'lightning/uiLookupsApi',
-  'lightning/uiObjectInfoApi',
-  'lightning/uiRecordApi',
+  'interop/navigation',
+  'interop/uiActionsApi',
+  'interop/uiListApi',
+  'interop/uiLookupsApi',
+  'interop/uiObjectInfoApi',
+  'interop/uiRecordApi',
+  'interop/platformResourceLoader',
   'force/navigation',
   'securemoduletest/testUtil'
 ];

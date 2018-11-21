@@ -15,7 +15,7 @@
  *
  * Bundle from LockerService-Core
  * Generated: 2018-11-20
- * Version: 0.5.35
+ * Version: 0.6.2
  */
 
 (function (exports) {

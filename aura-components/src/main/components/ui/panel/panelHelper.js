@@ -274,7 +274,7 @@
     },
 
     hide: function (cmp, callback) {
-        if (cmp.showing) {
+        if (cmp._showing) {
             // show is requested, can't hide.
             callback && callback(false);
             return;

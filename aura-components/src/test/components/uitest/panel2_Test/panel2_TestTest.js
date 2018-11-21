@@ -1340,6 +1340,7 @@
         attributes : {"testPanelType" : "panel"},
         test: [function(cmp) {
             this.createPanel(cmp);
+            this.waitForPanelDialogOpen();
         }, function(cmp) {
             $A.test.clickOrTouch(cmp.find('hidePanelBtn').getElement());
             this.waitForPanelHidden();
@@ -1436,8 +1437,8 @@
             }, "Number of panels expected is incorrect");
         } else {
             $A.test.addWaitForWithFailureMessage(isOpen, function() {
-                var panel = $A.test.getElementByClass(panelType);
-                return !$A.util.isUndefinedOrNull(panel);
+                var panels = $A.test.getElementByClass(panelType);
+                return !$A.util.isUndefinedOrNull(panels) && panels.length === 1 && !panels[0].classList.contains("transitioning");
             }, "Panel was not " + expectedState);
         }
     },
@@ -1452,6 +1453,4 @@
     getGlobalIdForPanelModal : function(panelNumber){
         return $A.test.getText($A.test.select(".info .idCreated")[panelNumber-1]);
     }
-
-
 })

@@ -313,6 +313,17 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     }
 
     @Override
+    public void validateDefinition() throws QuickFixException {
+        super.validateDefinition();
+
+        for (String dep : this.moduleDependencies) {
+            if (!dep.contains("@") && dep.contains("/") && dep.contains(".")) {
+                throw new InvalidDefinitionException("Invalid import '" + dep + "'. No '.' in module reference or start relative path with ./", getLocation());
+            }
+        }
+    }
+
+    @Override
     public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         super.validateReferences(validationContext);
         validateLabels();

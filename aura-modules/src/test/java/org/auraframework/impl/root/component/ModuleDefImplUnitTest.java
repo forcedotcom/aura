@@ -40,6 +40,8 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.io.ByteArrayOutputStream;
 import java.io.NotSerializableException;
 import java.io.ObjectOutputStream;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -120,7 +122,22 @@ public class ModuleDefImplUnitTest {
         } catch (NotSerializableException e) {
             Assert.fail("ModuleDef should be serializable");
         }
+    }
 
+    @Test
+    public void errorWhenUsingInvalidReferenceWithDot() throws Exception {
+        ModuleDefImpl.Builder moduleDefBuilder = new ModuleDefImpl.Builder();
+        Set<String> bundleDependencies = new HashSet(Arrays.asList("namespace/component", "@salesforce/apex/Controller.method", "bar/foo.js"));
+        moduleDefBuilder.setModuleDependencies(bundleDependencies);
+        moduleDefBuilder.setDescriptor(new DefDescriptorImpl<ModuleDef>(DefDescriptor.MARKUP_PREFIX, "namespace", "yo", ModuleDef.class));
 
+        ModuleDef moduleDef = moduleDefBuilder.build();
+
+        try {
+            moduleDef.validateDefinition();
+            Assert.fail("Should have failed with invalid dot dependency reference");
+        } catch(Exception e) {
+            assertTrue("Should contain correct error message with bar/foo.js", e.getMessage().startsWith("Invalid import 'bar/foo.js'"));
+        }
     }
 }

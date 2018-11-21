@@ -10,7 +10,7 @@
     </thead>
     <tbody>
       <template for:each={content} for:item="row">
-        <tr lwc-deprecated:is="moduletest-test-module-table-row" key={row.id} row={row}></tr>
+        <moduletest-test-module-table-row key={row.id} row={row}></moduletest-test-module-table-row>
       </template>
     </tbody>
   </table>

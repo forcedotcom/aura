@@ -40,6 +40,8 @@ public interface Annotations {
     @Lazy
     @Scope(BeanDefinition.SCOPE_SINGLETON)
     @interface ServiceComponent {
+
+        String value() default "";
     }
 
     @Target({ElementType.TYPE})

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-11-21
- * Version: 0.6.3
+ * Generated: 2018-11-23
+ * Version: 0.6.4
  */
 
 (function (exports) {
@@ -10941,7 +10941,7 @@ const internalLibs = [
   'interop/uiLookupsApi',
   'interop/uiObjectInfoApi',
   'interop/uiRecordApi',
-  'interop/platformResourceLoader',
+  'lightning/platformResourceLoader',
   'force/navigation',
   'securemoduletest/testUtil'
 ];

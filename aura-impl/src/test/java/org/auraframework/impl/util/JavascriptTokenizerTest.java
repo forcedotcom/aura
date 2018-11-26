@@ -15,34 +15,27 @@
  */
 package org.auraframework.impl.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
 import org.auraframework.builder.JavascriptCodeBuilder;
-import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.system.Location;
-import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
-public class JavascriptTokenizerTest extends UnitTestCase {
-    @Mock
-    JavascriptCodeBuilder builder;
-
-    @Mock
-    Location location;
-
-    @Mock
-    DefDescriptor<RootDefinition> parentDescriptor;
+public class JavascriptTokenizerTest {
 
     @Test
     public void testProcessDoesNothingWithSimpleCode() throws Exception {
         String code = "";
+        JavascriptCodeBuilder builder = Mockito.mock(JavascriptCodeBuilder.class);
+        Location location = Mockito.mock(Location.class);
         JavascriptTokenizer tokenizer = new JavascriptTokenizer(code, location);
 
         tokenizer.process(builder);
@@ -52,6 +45,8 @@ public class JavascriptTokenizerTest extends UnitTestCase {
     @Test
     public void testProcessAddsLabelForSingleLabel() throws Exception {
         String code = "({a: function() { $A.get($Label.xxx.yyy); }})";
+        JavascriptCodeBuilder builder = Mockito.mock(JavascriptCodeBuilder.class);
+        Location location = Mockito.mock(Location.class);
         JavascriptTokenizer tokenizer = new JavascriptTokenizer(code, location);
 
         tokenizer.process(builder);
@@ -68,6 +63,8 @@ public class JavascriptTokenizerTest extends UnitTestCase {
     @Test
     public void testProcessAddsLabelForMultipleLabels() throws Exception {
         String code = "({a: function() { $A.get($Label.xxx.yyy); }, b: function() { $A.get($Label.yyy.zzz); }})";
+        JavascriptCodeBuilder builder = Mockito.mock(JavascriptCodeBuilder.class);
+        Location location = Mockito.mock(Location.class);
         JavascriptTokenizer tokenizer = new JavascriptTokenizer(code, location);
 
         tokenizer.process(builder);
@@ -89,6 +86,8 @@ public class JavascriptTokenizerTest extends UnitTestCase {
     @Test
     public void testProcessDoesNothingWithOnePartLabel() throws Exception {
         String code = "({a: function() { $A.get($Label.xxx); }})";
+        JavascriptCodeBuilder builder = Mockito.mock(JavascriptCodeBuilder.class);
+        Location location = Mockito.mock(Location.class);
         JavascriptTokenizer tokenizer = new JavascriptTokenizer(code, location);
 
         tokenizer.process(builder);
@@ -98,6 +97,8 @@ public class JavascriptTokenizerTest extends UnitTestCase {
     @Test
     public void testProcessAddsDependencyForSingleDependency() throws Exception {
         String code = "({a: function() { $A.createComponent(\"markup://ui:outputText\"); }})";
+        JavascriptCodeBuilder builder = Mockito.mock(JavascriptCodeBuilder.class);
+        Location location = Mockito.mock(Location.class);
         JavascriptTokenizer tokenizer = new JavascriptTokenizer(code, location);
 
         tokenizer.process(builder);
@@ -121,6 +122,8 @@ public class JavascriptTokenizerTest extends UnitTestCase {
     public void testProcessAddsDependencyForMultipleDependencies() throws Exception {
         String code = "({a: function() { $A.createComponent(\"markup://ui:outputText\"); }, "
                       +" b: function() { $A.createComponent(\"markup://aura:inputText\"); }})";
+        JavascriptCodeBuilder builder = Mockito.mock(JavascriptCodeBuilder.class);
+        Location location = Mockito.mock(Location.class);
         JavascriptTokenizer tokenizer = new JavascriptTokenizer(code, location);
 
         tokenizer.process(builder);
@@ -156,6 +159,8 @@ public class JavascriptTokenizerTest extends UnitTestCase {
     @Test
     public void testProcessDoesNotAddDependencyForBrokenDescriptor() throws Exception {
         String code = "({a: function() { $A.createComponent(\"markup://ui:\"); }})";
+        JavascriptCodeBuilder builder = Mockito.mock(JavascriptCodeBuilder.class);
+        Location location = Mockito.mock(Location.class);
         JavascriptTokenizer tokenizer = new JavascriptTokenizer(code, location);
 
         tokenizer.process(builder);

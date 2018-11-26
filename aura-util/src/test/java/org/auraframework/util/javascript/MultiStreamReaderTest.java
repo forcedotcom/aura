@@ -15,6 +15,8 @@
  */
 package org.auraframework.util.javascript;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,13 +28,12 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.apache.commons.lang3.StringUtils;
-import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
-public class MultiStreamReaderTest extends UnitTestCase {
+public class MultiStreamReaderTest {
 
     @Test
     public void testConstructNullArray() throws Exception {

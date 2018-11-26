@@ -20,15 +20,18 @@ import java.util.EnumSet;
 
 import org.auraframework.util.javascript.directive.DirectiveBasedJavascriptGroup;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
-import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests for DirectiveImpl {@link DirectiveImpl}. DirectiveImpl Expects to
  * receive the configuration for a directive as a JSON string. This class is to
  * test the basic implementation in DirectiveImpl abstract class.
  */
-public class DirectiveImplTest extends UnitTestCase {
+public class DirectiveImplTest {
     /**
      * 1. Testing basic initialization stuff of DirectiveImpl 2. Tests that
      * content cannot be set for a MultiLine Directive

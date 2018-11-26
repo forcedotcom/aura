@@ -15,14 +15,16 @@
  */
 package org.auraframework.util.json;
 
-import org.auraframework.util.test.util.UnitTestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
 
 /**
  */
-public class JsFunctionTest extends UnitTestCase {
+public class JsFunctionTest {
 
     @Test
     public void testSerialize() throws Exception {

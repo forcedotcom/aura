@@ -18,16 +18,19 @@
  */
 package org.auraframework.util.resource;
 
-import org.junit.Test;
-import org.auraframework.util.test.util.UnitTestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
+import org.junit.Test;
+
 /** Test class for the from-jars-only variation of an AuraJavascriptGroup */
-public class CompiledGroupTest extends UnitTestCase {
+public class CompiledGroupTest {
 
     public static final String GROUP_NAME = "test-group";
     public static final String SAVE_FILE = "test-group.properties";

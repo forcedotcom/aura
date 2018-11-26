@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.controller;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 
@@ -28,7 +29,6 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -38,7 +38,7 @@ import com.google.common.collect.Maps;
 /**
  * Unit tests for ComponentController
  */
-public class ComponentControllerUnitTest extends UnitTestCase {
+public class ComponentControllerUnitTest {
 
     @Test
     public void testGetBaseComponentThrowsInvalidDefinitionExceptionWhenDescriptorIsInvalid() {

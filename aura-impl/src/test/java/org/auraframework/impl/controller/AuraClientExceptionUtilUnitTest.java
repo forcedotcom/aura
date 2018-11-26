@@ -15,6 +15,8 @@
  */
 package org.auraframework.impl.controller;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,12 +30,11 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
-public class AuraClientExceptionUtilUnitTest extends UnitTestCase {
+public class AuraClientExceptionUtilUnitTest {
 
     @Test
     public void testParseCauseDescriptorWithQualifiedNameSetsNamespaceAndName() {

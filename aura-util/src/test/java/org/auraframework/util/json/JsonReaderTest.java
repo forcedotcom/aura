@@ -15,23 +15,25 @@
  */
 package org.auraframework.util.json;
 
-import org.auraframework.util.test.util.UnitTestCase;
-import org.junit.Test;
-import org.mockito.Mockito;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.Writer;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
+import org.mockito.Mockito;
+
 /**
  */
-public class JsonReaderTest extends UnitTestCase {
+public class JsonReaderTest {
     /**
      * This class just uses JsonReader class to parse a JsonString.
      * 
@@ -80,26 +82,19 @@ public class JsonReaderTest extends UnitTestCase {
      */
     @Test
     public void testIOException() throws Exception {
-        File newFileobj = getResourceFile("/testdata/IOExceptionSimulate.txt");
-        newFileobj.getParentFile().mkdirs();
-        Writer writer = null;
-        writer = new FileWriter(newFileobj, false);
-        try {
-            writer.append(new Long(System.currentTimeMillis()).toString());
-            writer.flush();
-        } finally {
-            writer.close();
-        }
+        IOException expected = new IOException();
+        Exception actual = null;
         Reader newFile = Mockito.mock(FileReader.class);
-        Mockito.when(newFile.read()).thenThrow(new IOException());
+        Mockito.when(newFile.read()).thenThrow(expected);
         try {
             new JsonReader().read(newFile);
             fail("When the reader fumbles, the JsonReader should have signaled that");
-        } catch (JsonStreamReader.JsonParseException expected) {
-            // Expected to throw this exception
+        } catch (JsonStreamReader.JsonParseException e) {
+            actual = e;
         } finally {
             newFile.close();
-            newFileobj.delete();
         }
+        assertNotNull("IOException should propagate", actual);
+        assertSame("IOException should be passed up as cause", expected, actual.getCause());
     }
 }

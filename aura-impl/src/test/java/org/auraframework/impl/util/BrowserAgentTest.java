@@ -15,6 +15,9 @@
  */
 package org.auraframework.impl.util;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +28,6 @@ import java.util.StringTokenizer;
 
 import org.auraframework.impl.service.BrowserCompatibilityServiceImpl;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
-import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -33,12 +35,9 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.google.common.collect.Lists;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-
 @UnAdaptableTest
 @RunWith(Parameterized.class)
-public class BrowserAgentTest extends UnitTestCase {
+public class BrowserAgentTest {
 
     @Parameters(name = "testBrowserAgent_{0}")
     public static Collection<Object> generateTestParameters() throws IOException {

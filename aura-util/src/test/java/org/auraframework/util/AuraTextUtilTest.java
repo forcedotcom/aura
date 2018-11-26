@@ -19,10 +19,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.auraframework.util.AuraTextUtil.JSONEscapedFunctionStringBuilder;
-import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class AuraTextUtilTest extends UnitTestCase {
+public class AuraTextUtilTest {
     /**
      * A simple input/expected pair for testing.
      */
@@ -247,6 +250,7 @@ public class AuraTextUtilTest extends UnitTestCase {
             new SplitMatch("a,b,", ",", 2, new String[] { "a", "b", "" }), };
 
     @Test
+    @Deprecated
     public void testSplitSimple2() {
         for (SplitMatch sm : splitTests) {
             sm.checkResult(AuraTextUtil.splitSimple(sm.delimiter, sm.input));
@@ -254,6 +258,7 @@ public class AuraTextUtilTest extends UnitTestCase {
     }
 
     @Test
+    @Deprecated
     public void testSplitSimple3() {
         for (SplitMatch sm : splitTests) {
             sm.checkResult(AuraTextUtil.splitSimple(sm.delimiter, sm.input, sm.expectedSize));
@@ -272,6 +277,7 @@ public class AuraTextUtilTest extends UnitTestCase {
             new SplitMatch("a,b,  ", ",", 2, new String[] { "a", "b", "" }), };
 
     @Test
+    @Deprecated
     public void testSplitSimpleAndTrim() {
         for (SplitMatch sm : splitTrimTests) {
             sm.checkResult(AuraTextUtil.splitSimpleAndTrim(sm.input, sm.delimiter, sm.expectedSize));
@@ -287,6 +293,7 @@ public class AuraTextUtilTest extends UnitTestCase {
             new SplitMatch("a,b,", ",", 10, new String[] { "a", "b", "" }), };
 
     @Test
+    @Deprecated
     public void testSplitSimpleLimit() {
         for (SplitMatch sm : splitLimitTests) {
             sm.checkResult(AuraTextUtil.splitSimpleLimit(sm.input, sm.delimiter, sm.expectedSize));
@@ -304,6 +311,7 @@ public class AuraTextUtilTest extends UnitTestCase {
             new SplitMatch("a,b,   ", ",", 10, new String[] { "a", "b", "" }), };
 
     @Test
+    @Deprecated
     public void testSplitSimpleLimitTrim() {
         for (SplitMatch sm : splitLimitTrimTests) {
             sm.checkResult(AuraTextUtil.splitSimpleLimitAndTrim(sm.input, sm.delimiter, sm.expectedSize));
@@ -311,6 +319,7 @@ public class AuraTextUtilTest extends UnitTestCase {
     }
 
     @Test
+    @Deprecated
     public void testSplitReturnsModifiableCollection() {
         List<String> result = AuraTextUtil.splitSimple(",", "a,b");
         result.remove(result.size() - 1);

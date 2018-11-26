@@ -34,12 +34,12 @@ import static org.auraframework.impl.expression.functions.MultiFunctions.LESS_TH
 import static org.auraframework.impl.expression.functions.MultiFunctions.NOTEQUALS;
 import static org.auraframework.impl.expression.functions.UtilFunctions.EMPTY;
 import static org.auraframework.impl.expression.functions.UtilFunctions.FORMAT;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -49,7 +49,7 @@ import com.google.common.collect.Maps;
  * Basic tests of functions
  *
  */
-public class FunctionsTest extends UnitTestCase {
+public class FunctionsTest {
     private Object evaluate(Function f, Object... args) {
         return f.evaluate(Lists.newArrayList(args));
     }

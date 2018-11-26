@@ -33,8 +33,13 @@ import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.json.JsonStreamReader.JsonParseException;
 import org.auraframework.util.json.JsonStreamReader.JsonStreamParseException;
-import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
+import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
@@ -45,24 +50,10 @@ import com.google.common.collect.Lists;
  * @priority medium
  * @userStorySyncIdOrName a0790000000DQXVAA4
  */
-public class JsonStreamReaderTest extends UnitTestCase {
+public class JsonStreamReaderTest {
     private JsonStreamReader jsonStreamReader;
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        // Keep the reader clean
-        jsonStreamReader = null;
-    }
-
-    @Override
-    public void tearDown() throws Exception {
-        // Close the stream
-        if (jsonStreamReader != null) {
-            jsonStreamReader.close();
-        }
-        super.tearDown();
-    }
+    private final static double DEFAULT_DELTA = 0.001;
 
     @Test(expected = org.auraframework.util.json.JsonStreamReader.JsonParseException.class)
     public void testMaxLength() throws Exception {
@@ -239,11 +230,11 @@ public class JsonStreamReaderTest extends UnitTestCase {
             this.input = input;
             this.count = count;
             if (keys == null) {
-                keys = Lists.newArrayList();
+                this.keys = ImmutableList.of();
             } else {
                 Collections.sort(keys);
+                this.keys = ImmutableList.copyOf(keys);
             }
-            this.keys = ImmutableList.copyOf(keys);
         }
 
         public final String name;
@@ -392,7 +383,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
                     assortedList.get(0), "test1");
             assertTrue(assortedList.get(1) instanceof BigDecimal);
             assertEquals("JsonStreamReader has extracted the wrong element or disordered the elements",
-                    ((BigDecimal) assortedList.get(1)).doubleValue(), 20.0);
+                    ((BigDecimal) assortedList.get(1)).doubleValue(), 20.0, DEFAULT_DELTA);
         } finally {
             jsonStreamReader.close();
         }
@@ -420,9 +411,9 @@ public class JsonStreamReaderTest extends UnitTestCase {
             assertEquals("JsonStreamReader should have extracted only 2 items for the second inner list", 2,
                     numberList.size());
             assertEquals("JsonStreamReader has extracted the wrong element or disordered the elements",
-                    ((BigDecimal) numberList.get(0)).doubleValue(), 20.0);
+                    ((BigDecimal) numberList.get(0)).doubleValue(), 20.0, DEFAULT_DELTA);
             assertEquals("JsonStreamReader has extracted the wrong element or disordered the elements",
-                    ((BigDecimal) numberList.get(1)).doubleValue(), 30.0);
+                    ((BigDecimal) numberList.get(1)).doubleValue(), 30.0, DEFAULT_DELTA);
 
             Object o = nestedList.get(2);
             assertTrue("JsonStreamReader has extracted the wrong element", o.equals(Boolean.TRUE));
@@ -510,7 +501,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
             Map<String, Object> o = jsonStreamReader.getObject();
             assertTrue(o.containsKey("objName"));
             assertTrue(o.get("objName") instanceof BigDecimal);
-            assertEquals(((BigDecimal) o.get("objName")).doubleValue(), 20.0);
+            assertEquals(((BigDecimal) o.get("objName")).doubleValue(), 20.0, DEFAULT_DELTA);
         } finally {
             jsonStreamReader.close();
         }
@@ -538,7 +529,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
             Map<String, Object> o = jsonStreamReader.getObject();
             assertTrue(o.containsKey("objName"));
             assertTrue(o.get("objName") instanceof BigDecimal);
-            assertEquals(((BigDecimal) o.get("objName")).doubleValue(), 20.0);
+            assertEquals(((BigDecimal) o.get("objName")).doubleValue(), 20.0, DEFAULT_DELTA);
         } finally {
             jsonStreamReader.close();
         }
@@ -585,9 +576,9 @@ public class JsonStreamReaderTest extends UnitTestCase {
             assertTrue((Boolean) outerMap.get("spam"));
             assertFalse((Boolean) outerMap.get("ham"));
             assertNull(outerMap.get("eggs"));
-            assertEquals(-12345.6, ((BigDecimal) outerMap.get("num")).doubleValue());
-            assertEquals(1.23456, ((BigDecimal) outerMap.get("otherNum")).doubleValue());
-            assertEquals(12345.6, ((BigDecimal) outerMap.get("otherOtherNum")).doubleValue());
+            assertEquals(-12345.6, ((BigDecimal) outerMap.get("num")).doubleValue(), DEFAULT_DELTA);
+            assertEquals(1.23456, ((BigDecimal) outerMap.get("otherNum")).doubleValue(), DEFAULT_DELTA);
+            assertEquals(12345.6, ((BigDecimal) outerMap.get("otherOtherNum")).doubleValue(), DEFAULT_DELTA);
             assertTrue(outerMap.get("func") instanceof JsFunction);
             
 //            String expected="\""+AuraTextUtil.escapeForJSONString(AuraTextUtil.replaceSimple(func, "/*comment\n\n\n*/", "\n"))+"\"";
@@ -648,7 +639,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
         assertTrue(functionAsListObj1.getArguments().size() == 0);
         assertEquals("var str = \"do Nothing\";", functionAsListObj1.getBody());
         assertTrue(((List<?>) functionAsList).get(1) instanceof BigDecimal);
-        assertEquals(((BigDecimal) ((List<?>) functionAsList).get(1)).doubleValue(), 30.0);
+        assertEquals(((BigDecimal) ((List<?>) functionAsList).get(1)).doubleValue(), 30.0, DEFAULT_DELTA);
 
         Object functionAsStringInList = this.parseAndRetrieve("[\"function () {var str = \\\"do Nothing\\\";}\" , 30]");
         assertTrue(functionAsStringInList instanceof List);
@@ -767,11 +758,11 @@ public class JsonStreamReaderTest extends UnitTestCase {
         assertTrue(o instanceof BigDecimal);
         BigDecimal num = (BigDecimal) o;
         assertEquals(new BigDecimal(1), num);
-        assertEquals(123.456, ((BigDecimal) parseAndRetrieve("123.456")).doubleValue());
-        assertEquals(-123.456, ((BigDecimal) parseAndRetrieve("-123.456")).doubleValue());
-        assertEquals(1.2E21, ((BigDecimal) parseAndRetrieve("1.2E21")).doubleValue());
-        assertEquals(-1.2E-20, ((BigDecimal) parseAndRetrieve("-1.2E-20")).doubleValue());
-        assertEquals(1.2, ((BigDecimal) parseAndRetrieve("+1.2")).doubleValue());
+        assertEquals(123.456, ((BigDecimal) parseAndRetrieve("123.456")).doubleValue(), DEFAULT_DELTA);
+        assertEquals(-123.456, ((BigDecimal) parseAndRetrieve("-123.456")).doubleValue(), DEFAULT_DELTA);
+        assertEquals(1.2E21, ((BigDecimal) parseAndRetrieve("1.2E21")).doubleValue(), DEFAULT_DELTA);
+        assertEquals(-1.2E-20, ((BigDecimal) parseAndRetrieve("-1.2E-20")).doubleValue(), DEFAULT_DELTA);
+        assertEquals(1.2, ((BigDecimal) parseAndRetrieve("+1.2")).doubleValue(), DEFAULT_DELTA);
     }
 
     /**

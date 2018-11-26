@@ -21,7 +21,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.system.Location;
-import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -30,7 +29,7 @@ import com.google.common.collect.Lists;
 /**
  * A visitor class to extract labels from a set of definitions.
  */
-public class GlobalReferenceVisitorTest extends UnitTestCase {
+public class GlobalReferenceVisitorTest {
     @Test
     public void testMatchingEntryInserted() throws Exception {
         @SuppressWarnings("unchecked")

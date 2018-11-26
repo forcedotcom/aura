@@ -15,13 +15,15 @@
  */
 package org.auraframework.util.javascript;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.StringWriter;
 import java.util.List;
 
-import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 
-public class JavascriptWriterTest extends UnitTestCase{
+public class JavascriptWriterTest {
 
     @Test
     public void testLibraryCompressConvertsWildCardForRegExpLiteral() throws Exception {

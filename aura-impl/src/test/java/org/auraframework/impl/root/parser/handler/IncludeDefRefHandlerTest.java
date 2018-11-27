@@ -149,9 +149,9 @@ public class IncludeDefRefHandlerTest extends AuraImplTestCase {
         try {
             handler.getElement();
             fail("Invalid descriptor name for imports not validated");
-        } catch (AuraRuntimeException t) {
-            assertExceptionMessageEndsWith(t, AuraRuntimeException.class,
-                    String.format("Invalid Descriptor Format: null.not a descriptor name[%s]", DefType.INCLUDE));
+        } catch (InvalidDefinitionException t) {
+            assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
+                    "Invalid name in aura:include imports property: not a descriptor name");
         }
     }
 

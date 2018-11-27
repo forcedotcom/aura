@@ -130,10 +130,8 @@ public class RegistrySerializerTest extends UnitTestCase {
             rs.execute();
         } catch (RegistrySerializerException mee) {
             // Whoops.
-            System.out.println(logger.getLogEntries());
-            fail("Got exception "+mee.getMessage());
+            fail("Got exception "+mee.getMessage()+", Logs:\n\t"+logger.getLogEntries());
         }
-        assertEquals("Error logs should be empty", 0, logger.getErrorLogEntries().size());
     }
 
     @Test
@@ -153,8 +151,8 @@ public class RegistrySerializerTest extends UnitTestCase {
         }
         assertNotNull("We should fail to execute with an error", expected);
         assertEquals("one or more errors occurred during compile", expected.getMessage());
-        System.out.println(logger.getErrorLogEntries());
-        assertEquals("There should be one error", 1, logger.getErrorLogEntries().size());
+        assertEquals("There should be one error, got:"+logger.getErrorLogEntries(),
+                1, logger.getErrorLogEntries().size());
     }
 
      @Test
@@ -193,7 +191,11 @@ public class RegistrySerializerTest extends UnitTestCase {
 
         @Override
         public String toString() {
-            return level+":"+message+", Caused by "+cause;
+            String output = level+":"+message;
+            if (cause != null) {
+                output += ", Caused by "+cause;
+            }
+            return output;
         }
     }
 

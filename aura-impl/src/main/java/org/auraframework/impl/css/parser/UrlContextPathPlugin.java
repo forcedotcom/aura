@@ -26,8 +26,10 @@ import org.auraframework.Aura;
 final class UrlContextPathPlugin implements Plugin {
     @Rework
     public void rework(UrlFunctionValue value) {
-        if (value.url().startsWith("/auraFW")) {
-            value.url(Aura.getContextService().getCurrentContext().getContextPath() + value.url());
+        if (Aura.getContextService().getCurrentContext() != null) {
+            if (value.url().startsWith("/auraFW")) {
+                value.url(Aura.getContextService().getCurrentContext().getContextPath() + value.url());
+            }
         }
     }
 }

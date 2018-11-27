@@ -174,7 +174,8 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                 break;
         }
 
-        if (StringUtils.isBlank(prefix)) {
+        if (StringUtils.isBlank(prefix) && contextService != null
+                && contextService.getCurrentContext() != null) {
             prefix = contextService.getCurrentContext().getDefaultPrefix(defType);
             if (prefix != null) {
                 qualifiedName = buildQualifiedName(prefix, namespace, name);
@@ -354,6 +355,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
      * @see DefDescriptor#exists()
      */
     @Override
+    @Deprecated 
     public boolean exists() {
         return Aura.getDefinitionService().exists(this);
     }

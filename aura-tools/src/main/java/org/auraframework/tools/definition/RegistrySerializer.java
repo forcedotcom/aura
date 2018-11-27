@@ -27,6 +27,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -43,13 +49,9 @@ import org.auraframework.impl.source.file.FileSourceLocationImpl;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.RegistryService;
-import org.auraframework.system.AuraContext.Authentication;
-import org.auraframework.system.AuraContext.Format;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.FileSourceLocation;
-import org.auraframework.system.RegistrySet;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
@@ -193,8 +195,9 @@ public class RegistrySerializer {
     @Nonnull
     private final ConfigAdapter configAdapter;
 
-    @Nonnull
-    private final ContextService contextService;
+    private int executorThreadCount = 0;
+
+    private ExecutorService executor;
 
     /**
      * A flag for an error occurring.
@@ -210,15 +213,31 @@ public class RegistrySerializer {
      * @param outputDirectory the output directory where we should write the compiled component '.registry' file.
      * @param excluded a set of excluded namespaces.
      */
+    @Deprecated
     public RegistrySerializer(@Nonnull RegistryService registryService, @Nonnull ConfigAdapter configAdapter,
             @Nonnull List<File> sourceDirectories, @Nonnull File outputDirectory,
             @Nonnull String[] excluded, @CheckForNull RegistrySerializerLogger logger,
             @Nonnull ContextService contextService) {
+        this(registryService, configAdapter, sourceDirectories, outputDirectory, excluded, logger);
+    }
+
+
+    /**
+     * Create a compiler instance.
+     *
+     * This creates a compiler for the component and output directory specified.
+     *
+     * @param componentDirectory the directory that we should use for components.
+     * @param outputDirectory the output directory where we should write the compiled component '.registry' file.
+     * @param excluded a set of excluded namespaces.
+     */
+    public RegistrySerializer(@Nonnull RegistryService registryService, @Nonnull ConfigAdapter configAdapter,
+            @Nonnull List<File> sourceDirectories, @Nonnull File outputDirectory,
+            @Nonnull String[] excluded, @CheckForNull RegistrySerializerLogger logger) {
         this.registryService = registryService;
         this.configAdapter = configAdapter;
         this.sourceDirectories = sourceDirectories;
         this.outputDirectory = outputDirectory;
-        this.contextService = contextService;
         this.excluded = excluded;
         if (logger == null) {
             logger = DEFAULT_LOGGER;
@@ -268,6 +287,41 @@ public class RegistrySerializer {
         }
     }
 
+    private static class DefinitionWithStats {
+        public DefinitionWithStats(Definition definition, long waitTime, long compileTime) {
+            this.definition = definition;
+            this.waitTime = waitTime;
+            this.compileTime = compileTime;
+        }
+        public final Definition definition;
+        public final long waitTime;
+        public final long compileTime;
+    }
+
+    private static class GetDefinitionCallable implements Callable<DefinitionWithStats> {
+        private DefRegistry registry;
+        private DefDescriptor<?> descriptor;
+        private long startTime;
+
+        public GetDefinitionCallable(DefRegistry registry, DefDescriptor<?> descriptor) {
+            this.registry = registry;
+            this.descriptor = descriptor;
+            this.startTime = System.nanoTime();
+        }
+
+        @Override
+        public DefinitionWithStats call() throws QuickFixException {
+            long waitTime;
+            long compileTime;
+
+            waitTime = (System.nanoTime()-startTime)/1000000;
+            startTime = System.nanoTime();
+            Definition def = registry.getDef(descriptor);
+            compileTime = (System.nanoTime()-startTime)/1000000;
+            return new DefinitionWithStats(def, waitTime, compileTime);
+        }
+    }
+
     /**
      * Get a registry for the namespace given.
      *
@@ -299,21 +353,38 @@ public class RegistrySerializer {
         logger.debug("******************************************* "+namespace+" ******************************");
         DescriptorFilter root_nsf = new DescriptorFilter(namespace, Lists.newArrayList(BundleSource.bundleDefTypes));
         descriptors = master.find(root_nsf);
+        Map<DefDescriptor<?>,Future<DefinitionWithStats>> futures = new HashMap<>();
+        for (DefDescriptor<?> desc : descriptors) {
+            FutureTask<DefinitionWithStats> future = new FutureTask<>(new GetDefinitionCallable(master, desc));
+            futures.put(desc, future);
+            if (executor != null) {
+                executor.execute(future);
+            } else {
+                future.run();
+            }
+            types.add(desc.getDefType());
+            prefixes.add(desc.getPrefix());
+        }
         for (DefDescriptor<?> desc : descriptors) {
             try {
-                long startNanos = System.nanoTime();
-                Definition def = master.getDef(desc);
-                logger.debug("ENTRY: " + desc + "@" + desc.getDefType().toString() + " in " + (System.nanoTime() - startNanos)/1000000 + " ms");
-                if (def == null) {
+                Future<DefinitionWithStats> future = futures.get(desc);
+                DefinitionWithStats defStats = null;
+                try {
+                    defStats = future.get();
+                } catch (ExecutionException ee) {
+                    throw ee.getCause();
+                }
+                if (defStats == null) {
                     logger.error("Unable to find " + desc + "@" + desc.getDefType());
                     error = true;
                     continue;
                 }
-                types.add(desc.getDefType());
-                prefixes.add(desc.getPrefix());
-                filtered.put(desc, def);
-                if (def instanceof BundleDef) {
-                    BundleDef rd = (BundleDef) def;
+                logger.debug("ENTRY: " + desc + "@" + desc.getDefType().toString()
+                        + ", compileTime=" + defStats.compileTime
+                        + ", waitTime=" + defStats.waitTime);
+                filtered.put(desc, defStats.definition);
+                if (defStats.definition instanceof BundleDef) {
+                    BundleDef rd = (BundleDef) defStats.definition;
                     Map<DefDescriptor<?>, Definition> bundled = rd.getBundledDefs();
                     if (bundled != null) {
                         for (Map.Entry<DefDescriptor<?>, Definition> entry : bundled.entrySet()) {
@@ -324,8 +395,8 @@ public class RegistrySerializer {
                         }
                     }
                 }
-            } catch (QuickFixException qfe) {
-                logger.error(qfe);
+            } catch (Throwable e) {
+                logger.error(e);
                 error = true;
             }
         }
@@ -389,6 +460,19 @@ public class RegistrySerializer {
         } catch (FileNotFoundException fnfe) {
             throw new RegistrySerializerException("Unable to create " + outputFile, fnfe);
         }
+
+        if (executorThreadCount > 0) {
+            try {
+                executor = Executors.newFixedThreadPool(executorThreadCount);
+            } catch (Throwable t) {
+                try {
+                    out.close();
+                } catch (IOException ioe) {
+                    log.error(ioe);
+                }
+            }
+        }
+
         try {
             // TODO remove once all downstream projects are updated to compile both components and modules together W-5432127 W-5480526
             if (sourceDirectories.size() == 1 && sourceDirectories.get(0).getPath().contains(MODULES_DIR)) {
@@ -404,22 +488,22 @@ public class RegistrySerializer {
             }
 
             DefRegistry master = registryService.getRegistry(sourceLocations);
-            RegistrySet registries = registryService.getRegistrySet(master);
-
-            contextService.startBasicContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED, registries);
-            try {
-                write(out, master);
-            } finally {
-                contextService.endContext();
-            }
+            write(out, master);
             if (error) {
                 throw new RegistrySerializerException("one or more errors occurred during compile");
             }
         } finally {
             try {
-                out.close();
-            } catch (IOException ioe) {
-                log.error(ioe);
+                if (executor != null) {
+                    executor.shutdown();
+                }
+            } finally {
+                executor = null;
+                try {
+                    out.close();
+                } catch (IOException ioe) {
+                    log.error(ioe);
+                }
             }
         }
     }
@@ -450,4 +534,20 @@ public class RegistrySerializer {
     public String[] getExcluded() {
         return this.excluded;
     }
+
+    /**
+     * @return the executorThreadCount
+     */
+    public int getExecutorThreadCount() {
+        return executorThreadCount;
+    }
+
+    /**
+     * @param executorThreadCount the executorThreadCount to set
+     */
+    public RegistrySerializer setExecutorThreadCount(int executorThreadCount) {
+        this.executorThreadCount = executorThreadCount;
+        return this;
+    }
+
 }

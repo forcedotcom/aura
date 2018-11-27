@@ -32,11 +32,13 @@ import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.RequiredVersionDefImpl;
 import org.auraframework.impl.root.event.EventDefImpl;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableSet;
+
 
 public class EventDefHandler extends RootTagHandler<EventDef> {
 
@@ -81,8 +83,8 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
         if (AttributeDefHandler.TAG.equalsIgnoreCase(tag)) {
             AttributeDefImpl attributeDef = new AttributeDefHandler<>(this, xmlReader, source, isInInternalNamespace,
                     definitionService, configAdapter, definitionParserAdapter).getElement();
-            builder.getAttributeDefs().put(definitionService.getDefDescriptor(attributeDef.getName(), AttributeDef.class),
-                    attributeDef);
+            builder.getAttributeDefs().put(new DefDescriptorImpl<>(null, null, attributeDef.getName(),
+                        AttributeDef.class), attributeDef);
         } else if (RequiredVersionDefHandler.TAG.equalsIgnoreCase(tag)) {
             RequiredVersionDefImpl requiredVersionDef = new RequiredVersionDefHandler<>(this,
                     xmlReader, source, isInInternalNamespace, definitionService, configAdapter,

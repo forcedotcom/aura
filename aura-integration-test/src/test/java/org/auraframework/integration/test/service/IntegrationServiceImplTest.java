@@ -15,14 +15,18 @@
  */
 package org.auraframework.integration.test.service;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.inject.Inject;
+
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
-import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.integration.Integration;
+import org.auraframework.integration.test.util.IntegrationTestCase;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.IntegrationService;
 import org.auraframework.system.AuraContext.Authentication;
@@ -35,10 +39,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import javax.inject.Inject;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * Unit tests for IntegrationService. IntegrationService is used to inject aura
@@ -46,7 +48,7 @@ import java.util.regex.Pattern;
  * As part of the Integration, the required aura framework(aura_dev, aura_prod),
  * preload definitions etc.
  */
-public class IntegrationServiceImplTest extends AuraImplTestCase {
+public class IntegrationServiceImplTest extends IntegrationTestCase {
 
     private final String simpleComponentTag = "ui:button";
     private final String arraysComponentTag = "expressionTest:arrays";
@@ -157,8 +159,8 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Map<String, Object> attributes = Maps.newHashMap();
         Appendable out = new StringBuffer();
         Integration integration = createIntegration();
-            integration.injectComponentHtml(cmp1.getDescriptorName(), attributes, "", "", out);
-            integration.injectComponentHtml(cmp2.getDescriptorName(), attributes, "", "", out);
+        integration.injectComponentHtml(cmp1.getDescriptorName(), attributes, "", "", out);
+        integration.injectComponentHtml(cmp2.getDescriptorName(), attributes, "", "", out);
 
         // Verify that the boot strap was written only once
         assertNotNull(out);

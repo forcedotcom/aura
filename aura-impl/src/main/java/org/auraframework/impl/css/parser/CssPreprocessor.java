@@ -204,7 +204,11 @@ public final class CssPreprocessor {
         /** parses the CSS according to the current configuration */
         public ParserResult parse() throws StyleParserException {
             // determine the output compression level based on the aura mode
-            Mode mode = Aura.getContextService().getCurrentContext().getMode();
+            Mode mode = Mode.DEV;
+
+            if (Aura.getContextService().getCurrentContext() != null) {
+                mode = Aura.getContextService().getCurrentContext().getMode();
+            }
             StyleWriter writer = mode.prettyPrint() ? StyleWriter.inline() : StyleWriter.compressed();
 
             if (!runtime) {

@@ -15,7 +15,6 @@
  */
 package org.auraframework.integration.test.serialization;
 
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 

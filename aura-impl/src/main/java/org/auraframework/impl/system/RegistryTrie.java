@@ -141,6 +141,9 @@ public class RegistryTrie implements RegistrySet {
     public <T extends Definition> DefRegistry getRegistryFor(DefDescriptor<T> descriptor) {
         Map<String, PrefixNode> dt = this.root.get(descriptor.getDefType());
         if (dt != null) {
+            if (descriptor.getPrefix() == null) {
+                throw new RuntimeException("Invalid descriptor "+descriptor.toString()+"@"+descriptor.getDefType());
+            }
             PrefixNode pn = dt.get(descriptor.getPrefix().toLowerCase());
             if (pn != null) {
                 return pn.get(descriptor.getNamespace());

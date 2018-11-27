@@ -31,7 +31,7 @@ public class LibraryDefRefTest extends AuraImplTestCase {
     @Test
     public void testNoProperty() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
-                String.format(baseComponentTag, "", "<aura:import library='dummy:dummy'/>"));
+                String.format(baseComponentTag, "", "<aura:import library='dummy'/>"));
         try {
             definitionService.getDefinition(cmpDesc);
             fail("Import tag requires a Property attribute.");
@@ -48,7 +48,7 @@ public class LibraryDefRefTest extends AuraImplTestCase {
     public void testInvalidProperty() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "",
-                        "<aura:import library='dummy:dummy' property='not just anything you want'/>"));
+                        "<aura:import library='dummy' property='not just anything you want'/>"));
         try {
             definitionService.getDefinition(cmpDesc);
             fail("Import tag requires a Property attribute with a valid javascript identifier.");

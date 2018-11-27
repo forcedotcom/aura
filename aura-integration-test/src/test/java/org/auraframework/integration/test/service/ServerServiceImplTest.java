@@ -41,11 +41,11 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.TypeDef;
 import org.auraframework.def.ValueDef;
+import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.AbstractActionImpl;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.ActionDelegate;
 import org.auraframework.instance.Component;
-import org.auraframework.integration.test.util.IntegrationTestCase;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.ServerService;
@@ -73,7 +73,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class ServerServiceImplTest extends IntegrationTestCase {
+public class ServerServiceImplTest extends AuraImplTestCase {
 
     @Inject
     private InstanceService instanceService;

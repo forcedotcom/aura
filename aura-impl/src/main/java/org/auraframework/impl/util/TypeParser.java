@@ -33,8 +33,6 @@ public class TypeParser {
 
     private static final Pattern TAG_PATTERN_STRICT = Pattern.compile("^(?:([\\w*]+)://)?(?:([\\w\\-*]+):)?([\\w*]+)$");
 
-    private static final Pattern TAG_PATTERN_TRIPLE = Pattern.compile("^(?:([\\w*]+):([\\w*]+):)?([\\w\\-*]+)$");
-
     /**
      * Pattern for class descriptors: java://foo.bar.baz Group 0 = QName = java://foo.bar.baz Group 1 = prefix = java
      * Group 2 = namespace = foo.bar Group 3 = name = baz
@@ -65,30 +63,6 @@ public class TypeParser {
     	
     	return type;
     }
-
-    /**
-     * Parses a type that is a tag. See TAG_PATTERN_TRIPLE above
-     * @param qualifiedName
-     * @return a Type instance or null
-     */
-    public static Type parseTagTriple(String qualifiedName) {
-
-        Type type = null;
-        Matcher tagMatcher = TAG_PATTERN_TRIPLE.matcher(qualifiedName);
-        if (tagMatcher.matches()) {
-            String namespace = tagMatcher.group(1);
-            String name = tagMatcher.group(2);
-            String subName = tagMatcher.group(3);
-            if (StringUtils.isBlank(name)) {
-                name = subName;
-                subName = null;
-            }
-            type = new Type(null, namespace, name, null, subName);
-        }
-    	
-        return type;
-    }
-
     /**
      * Parses a type that is a tag. See TAG_PATTERN above
      * @param qualifiedName
@@ -149,38 +123,13 @@ public class TypeParser {
         public final String namespace;
         public final String name;
         public final String nameParameters;
-        public final String subName;
-        
-        Type(String prefix, String namespace, String name, String nameParameters, String subName) {
-            this.prefix = prefix;
-            this.namespace = namespace;
-            this.name = name;
-            this.nameParameters = nameParameters;
-            this.subName = subName;
-        }
         
         Type(String prefix, String namespace, String name, String nameParameters) {
-            this(prefix, namespace, name, nameParameters, null);
+        	this.prefix = prefix;
+        	this.namespace = namespace;
+        	this.name = name;
+        	this.nameParameters = nameParameters;
         }
 
-        public String getPrefix() {
-            return prefix;
-        }
-
-        public String getNamespace() {
-            return namespace;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getNameParameters() {
-            return nameParameters;
-        }
-
-        public String getSubName() {
-            return subName;
-        }
     }
 }

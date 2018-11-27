@@ -102,6 +102,8 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
     private final List<DefinitionReference> body = Lists.newArrayList();
     protected B builder;
 
+    private ContextService contextService;
+
     public BaseComponentDefHandler() {
         super();
     }
@@ -120,6 +122,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
         if (source != null) {
             builder.setOwnHash(source.getHash());
         }
+        this.contextService = contextService;
     }
 
     @Override
@@ -288,6 +291,9 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
     @SuppressWarnings("unchecked")
     @Override
     protected void readAttributes() throws QuickFixException {
+        AuraContext context = contextService.getCurrentContext();
+        context.pushCallingDescriptor(builder.getDescriptor());
+        try {
             super.readAttributes();
 
             //
@@ -403,6 +409,9 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             if (getBooleanAttributeValue(ATTRIBUTE_DYNAMICALLY_FLAVORABLE)) {
                 builder.setDynamicallyFlavorable(true);
             }
+        } finally {
+            context.popCallingDescriptor();
+        }
     }
 
     public void setRender(String val) {

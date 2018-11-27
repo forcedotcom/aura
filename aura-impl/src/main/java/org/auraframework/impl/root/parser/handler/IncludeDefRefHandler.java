@@ -32,8 +32,6 @@ import org.auraframework.def.LibraryDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.library.IncludeDefRefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.impl.util.TypeParser;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.TextSource;
@@ -86,20 +84,19 @@ public class IncludeDefRefHandler extends XMLHandler<IncludeDefRefImpl> {
         if (!StringUtils.isBlank(importNames)) {
             List<DefDescriptor<IncludeDef>> imports = new LinkedList<>();
             for (String importName : Arrays.asList(importNames.trim().split("\\s*\\,\\s*"))) {
-                TypeParser.Type parsed = TypeParser.parseTagTriple(importName);
-                if (parsed == null) {
+                String[] parts = importName.split(":");
+                if (parts.length == 1) { // local import
+                    imports.add(definitionService.getDefDescriptor(
+                            String.format("%s.%s", parentDescriptor.getNamespace(), importName), 
+                            IncludeDef.class, parentDescriptor));
+                } else if (parts.length == 3) { // external import
+                    DefDescriptor<LibraryDef> externalLibrary = definitionService.getDefDescriptor(
+                            String.format("%s:%s", parts[0], parts[1]), LibraryDef.class);
+                    imports.add(definitionService.getDefDescriptor(String.format("%s.%s", parts[0], parts[2]),
+                            IncludeDef.class, externalLibrary));
+                } else { // invalid import name
                     throw new InvalidDefinitionException(String.format(
                             "Invalid name in aura:include imports property: %s", importName), getLocation());
-                }
-                if (parsed.namespace == null) {
-                    // local import
-                    imports.add(new DefDescriptorImpl<>("js", parentDescriptor.getNamespace(), parsed.name,
-                            IncludeDef.class, parentDescriptor));
-                } else { // external import
-                    DefDescriptor<LibraryDef> externalLibrary = new DefDescriptorImpl<>("markup",
-                            parsed.namespace, parsed.name, LibraryDef.class);
-                    imports.add(new DefDescriptorImpl<>("js", parsed.namespace, parsed.subName,
-                            IncludeDef.class, externalLibrary));
                 }
             }
             builder.setImports(imports);

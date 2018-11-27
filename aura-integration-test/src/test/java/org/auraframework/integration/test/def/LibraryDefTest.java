@@ -15,20 +15,17 @@
  */
 package org.auraframework.integration.test.def;
 
-import java.io.ByteArrayOutputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.List;
-import java.util.Set;
-
-import javax.inject.Inject;
-
+import com.google.common.base.Charsets;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
-import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.DefinitionAccessImpl;
+import org.auraframework.impl.def.DefinitionTest;
 import org.auraframework.impl.root.library.LibraryDefImpl;
 import org.auraframework.impl.root.library.LibraryDefImpl.Builder;
 import org.auraframework.service.ServerService;
@@ -42,13 +39,14 @@ import org.auraframework.util.json.JsonEncoder;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
+import javax.inject.Inject;
+import java.io.ByteArrayOutputStream;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.List;
+import java.util.Set;
 
-public class LibraryDefTest extends AuraImplTestCase {
+public class LibraryDefTest extends DefinitionTest<LibraryDef> {
 
     @Inject
     private ServerService serverService;

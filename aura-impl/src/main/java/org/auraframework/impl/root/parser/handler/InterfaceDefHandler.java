@@ -37,6 +37,7 @@ import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.root.intf.InterfaceDefImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -59,8 +60,11 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
 
     private final InterfaceDefImpl.Builder builder = new InterfaceDefImpl.Builder();
 
+    private final ContextService contextService;
+
     public InterfaceDefHandler() {
         super();
+        this.contextService = null;
     }
 
     public InterfaceDefHandler(DefDescriptor<InterfaceDef> descriptor, TextSource<?> source, XMLStreamReader xmlReader,
@@ -75,6 +79,7 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
         }
         builder.extendsDescriptors = new HashSet<>();
         builder.setDescriptor(descriptor);
+        this.contextService = contextService;
     }
 
     @Override
@@ -129,13 +134,19 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
     @Override
     protected void readAttributes() throws QuickFixException {
         super.readAttributes();
-        String extendsNames = getAttributeValue(ATTRIBUTE_EXTENDS);
-        if (extendsNames != null) {
-            for (String extendsName : AuraTextUtil.splitSimple(",", extendsNames)) {
-                builder.extendsDescriptors.add(getDefDescriptor(extendsName.trim(), InterfaceDef.class));
+        AuraContext context = contextService.getCurrentContext();
+        context.pushCallingDescriptor(getDefDescriptor());
+        try {
+            String extendsNames = getAttributeValue(ATTRIBUTE_EXTENDS);
+            if (extendsNames != null) {
+                for (String extendsName : AuraTextUtil.splitSimple(",", extendsNames)) {
+                    builder.extendsDescriptors.add(getDefDescriptor(extendsName.trim(), InterfaceDef.class));
+                }
             }
+            builder.setAccess(readAccessAttribute());
+        } finally {
+            context.popCallingDescriptor();
         }
-        builder.setAccess(readAccessAttribute());
     }
 
     @Override

@@ -27,10 +27,9 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.LibraryDefRef;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.library.LibraryDefRefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.impl.util.TypeParser;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.TextSource;
@@ -76,14 +75,15 @@ public class LibraryDefRefHandler extends XMLHandler<LibraryDefRef> {
         if (StringUtils.isBlank(library)) {
             throw new InvalidDefinitionException(String.format("%s missing library attribute", TAG), getLocation());
         }
-        TypeParser.Type parsedLib = TypeParser.parseTag(library.trim());
-        if (parsedLib == null || parsedLib.namespace == null) {
-            throw new InvalidDefinitionException(String.format("%s invalid library attribute %s", TAG, library),
-                getLocation());
-        }
 
-        DefDescriptor<LibraryDef> descriptor = new DefDescriptorImpl<>("markup", parsedLib.namespace, parsedLib.name, LibraryDef.class);
-        builder.setDescriptor(descriptor);
+        DefDescriptor<ModuleDef> moduleDescriptor = definitionService.getDefDescriptor(library.trim(), ModuleDef.class);
+        boolean moduleExists = definitionService.exists(moduleDescriptor);
+        if (moduleExists) {
+            builder.setModuleDescriptor(moduleDescriptor);
+        } else {
+            DefDescriptor<LibraryDef> descriptor = definitionService.getDefDescriptor(library.trim(), LibraryDef.class);
+            builder.setDescriptor(descriptor);
+        }
 
         String property = getAttributeValue(ATTRIBUTE_PROPERTY);
         if (StringUtils.isBlank(property)) {

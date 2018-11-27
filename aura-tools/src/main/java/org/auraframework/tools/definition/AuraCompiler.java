@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import org.auraframework.AuraConfiguration;
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.service.ContextService;
 import org.auraframework.service.RegistryService;
 import org.auraframework.tools.definition.RegistrySerializer.RegistrySerializerException;
 import org.auraframework.tools.definition.RegistrySerializer.RegistrySerializerLogger;
@@ -174,9 +175,10 @@ public abstract class AuraCompiler {
             }
             RegistryService registryService = applicationContext.getBean(RegistryService.class);
             ConfigAdapter configAdapter = applicationContext.getBean(ConfigAdapter.class);
+            ContextService contextService = applicationContext.getBean(ContextService.class);
             initDeprecated(applicationContext);
             new RegistrySerializer(registryService, configAdapter, sourceDirs, outputDir,
-                    ns.toArray(new String[ns.size()]), cll).setExecutorThreadCount(12).execute();
+                    ns.toArray(new String[ns.size()]), cll, contextService).execute();
         } catch (RegistrySerializerException rse) {
             cll.error(rse.getMessage(), rse.getCause());
             System.exit(1);

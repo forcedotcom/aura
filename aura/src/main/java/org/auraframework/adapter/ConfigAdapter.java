@@ -265,4 +265,10 @@ public interface ConfigAdapter extends AuraAdapter {
      * @return
      */
     boolean isCssVarTransformEnabled();
+
+    /**
+     * Does this user agent support CSS variables.
+     * @return
+     */
+    boolean doesUserAgentSupportCssVars();
 }

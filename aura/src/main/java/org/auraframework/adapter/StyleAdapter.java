@@ -189,4 +189,12 @@ public interface StyleAdapter extends AuraAdapter {
      * @return The of conditions that are true.
      */
     Set<String> getExtraTrueConditions();
+
+    /**
+     * Allows us to override the CSS variable output per request type. In the case of IE11 we do not want to output CSS 
+     * var syntax for app.css. Polyfilling CSS variables in app.css for IE11 has a substantial performance impact.
+     * 
+     * @param skipCssTransform
+     */
+    void setSkipCssTransform(boolean skipCssTransform);
 }

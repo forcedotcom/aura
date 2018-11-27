@@ -121,7 +121,7 @@ public class AuraComponentDefinitionServletTest {
         AuraPrivateAccessor.invoke(auraComponentDefinitionServlet, "doGet", request, response);
 
         // Assert
-        Mockito.verify(response).sendRedirect("https://example.host/auraCmpDef?aura.app=myApp&_ff=null&_l=false&_l10n=&_style=styling&_def=def:qualifiedName&_uid=DIFFERENT_UID");
+        Mockito.verify(response).sendRedirect("https://example.host/auraCmpDef?aura.app=myApp&_ff=null&_l=false&_cssvar=false&_l10n=&_style=styling&_def=def:qualifiedName&_uid=DIFFERENT_UID");
     }
 
     @SuppressWarnings("unchecked")
@@ -202,4 +202,27 @@ public class AuraComponentDefinitionServletTest {
         // Assert
         Mockito.verify(servletUtilAdapter, Mockito.times(1)).setLongCache(response);
     }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testRedirectContainsCssVarParamWhenEnabled() throws Exception {
+        // Arrange
+        setMockRequestParameters("myApp", "true", "", "styling", "def", "UID");
+        DefDescriptor<Definition> defDescriptorMock = Mockito.mock(DefDescriptor.class);
+        Mockito.when(defDescriptorMock.getNamespace()).thenReturn("namespace");
+        Mockito.when(defDescriptorMock.getName()).thenReturn("name");
+        Mockito.when(defDescriptorMock.getQualifiedName()).thenReturn("def:qualifiedName");
+        Mockito.when(definitionService.getDefDescriptor(Matchers.eq("def"), Matchers.any())).thenReturn(defDescriptorMock);
+        Mockito.when(definitionService.getUid(null, defDescriptorMock)).thenReturn("DIFFERENT_UID");
+        Mockito.when(definitionService.exists(defDescriptorMock)).thenReturn(true);
+        Mockito.when(configAdapter.isSecureRequest(request)).thenReturn(true);
+        Mockito.when(configAdapter.isCssVarTransformEnabled()).thenReturn(true);
+        Mockito.when(response.getWriter()).thenReturn(Mockito.mock(PrintWriter.class));
+        Mockito.when(request.getHeader("Host")).thenReturn("example.host");
+        // Act
+        AuraPrivateAccessor.invoke(auraComponentDefinitionServlet, "doGet", request, response);
+        // Assert
+        Mockito.verify(response).sendRedirect("https://example.host/auraCmpDef?aura.app=myApp&_ff=null&_l=false&_cssvar=true&_l10n=&_style=styling&_def=def:qualifiedName&_uid=DIFFERENT_UID");
+
+    } 
 }

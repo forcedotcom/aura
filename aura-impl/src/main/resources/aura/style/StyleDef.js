@@ -23,6 +23,7 @@ function StyleDef(config){
     this.className = config[Json.ApplicationKey.CLASSNAME];
     this.descriptor = new DefDescriptor(config[Json.ApplicationKey.DESCRIPTOR]);
     this.preloaded = $A.util.isUndefinedOrNull(this.code);
+    this.cssVars = $A.clientService.getCssVars() || {};
 }
 
 /**
@@ -32,6 +33,9 @@ StyleDef.prototype.apply = function(){
     var element = this.element;
     var code = this.code;
     if (!element && code) {
+        if(Aura.polyfillCssVars) {
+            code = Aura.polyfillCssVars(code, this.cssVars);
+        }
         element = aura.util.style.apply(code);
         this.element = element;
     }

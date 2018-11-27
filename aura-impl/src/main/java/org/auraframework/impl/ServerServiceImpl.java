@@ -55,7 +55,9 @@ import org.auraframework.http.ManifestUtil;
 import org.auraframework.impl.cache.ApplicationInitializerCache;
 import org.auraframework.impl.css.CssVariableWriter;
 import org.auraframework.impl.css.StyleDefWriter;
+import org.auraframework.impl.util.BrowserUserAgent;
 import org.auraframework.impl.util.TemplateUtil;
+import org.auraframework.impl.util.UserAgent;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.ApplicationInitializer;
 import org.auraframework.instance.BaseComponent;
@@ -328,6 +330,7 @@ public class ServerServiceImpl implements ServerService {
     public void writeAppCss(final Set<DefDescriptor<?>> dependencies, Writer out) throws IOException, QuickFixException {
         AuraContext context = contextService.getCurrentContext();
         boolean minify = context.getMode().minify();
+        boolean enableCssVarOutput = configAdapter.isCssVarTransformEnabled() && configAdapter.doesUserAgentSupportCssVars();
 
         StyleContext styleContext = context.getStyleContext();
 
@@ -362,6 +365,7 @@ public class ServerServiceImpl implements ServerService {
         DefDescriptor<?> appDesc = context.getLoadingApplicationDescriptor();
         final String uid = context.getUid(appDesc);
         keyBuilder.append(uid);
+        keyBuilder.append(enableCssVarOutput);
 
         final String key = keyBuilder.toString();
         context.setPreloading(true);
@@ -370,7 +374,7 @@ public class ServerServiceImpl implements ServerService {
                 new Callable<String>() {
                     @Override
                     public String call() throws Exception {
-                        return getAppCssString(dependencies);
+                        return getAppCssString(dependencies, enableCssVarOutput);
                     }
                 });
 
@@ -382,11 +386,13 @@ public class ServerServiceImpl implements ServerService {
     @Inject
     private StyleAdapter styleAdapter;
 
-    private String getAppCssString(Set<DefDescriptor<?>> dependencies) throws QuickFixException, IOException {
+    private String getAppCssString(Set<DefDescriptor<?>> dependencies, boolean enableCssVarOutput) throws QuickFixException, IOException {
         Collection<BaseStyleDef> orderedStyleDefs = filterAndLoad(BaseStyleDef.class, dependencies, null);
         StringBuffer sb = new StringBuffer();
+        styleAdapter.setSkipCssTransform(!enableCssVarOutput);
         new StyleDefWriter(definitionService, styleAdapter, contextService.getCurrentContext())
             .writeStyleDefs(orderedStyleDefs, sb);
+        styleAdapter.setSkipCssTransform(false);
         return sb.toString();
     }
 

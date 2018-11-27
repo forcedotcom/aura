@@ -77,6 +77,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
     protected final static StringParam localeParam = new StringParam("_l10n", 0, false);
     protected final static StringParam styleParam = new StringParam("_style", 0, false);
     protected final static StringParam defDescriptorParam = new StringParam("_def", 0, false);
+    protected final static StringParam cssVarParam = new StringParam("_cssvar", 0, false);
     protected final static StringParam componentUIDParam = new StringParam("_uid", 0, false);
 
     protected final static List<Class<? extends Definition>> DESCRIPTOR_DEF_TYPES = Arrays.asList(ModuleDef.class, ComponentDef.class, EventDef.class, LibraryDef.class);
@@ -375,6 +376,8 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
         redirectURI.append('&').append(formFactorParam.name).append('=').append(formFactorParam.get(request));
 
         redirectURI.append('&').append(lockerParam.name).append('=').append(configAdapter.isLockerServiceEnabled());
+
+        redirectURI.append('&').append(cssVarParam.name).append('=').append(configAdapter.isCssVarTransformEnabled());
 
         String locale = localeParam.get(request);
         if (locale != null) {

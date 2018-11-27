@@ -46,7 +46,10 @@ import org.auraframework.impl.source.AuraResourcesHashingGroup;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.InstanceService;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.Client;
 import org.auraframework.system.DefRegistry;
+import org.auraframework.test.client.UserAgent;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.FileMonitor;
 import org.auraframework.util.IOUtil;
@@ -366,4 +369,25 @@ public class ConfigAdapterImplTest extends UnitTestCase {
     	
     	assertThat(impl.isCacheable(mockRegistry, mockDescriptor), equalTo(Boolean.TRUE));
     }
+    
+    @Test
+    public void testIe11DoesntSupportCSSVars() {
+        assertFalse(getImpl(new Client(UserAgent.IE11.getUserAgentString())).doesUserAgentSupportCssVars());
+    }
+    
+    @Test
+    public void otherBrowsersSupportCSSVars() {
+        assertTrue(getImpl(new Client(UserAgent.GOOGLE_CHROME.getUserAgentString())).doesUserAgentSupportCssVars());
+        assertTrue(getImpl(new Client(UserAgent.FIREFOX.getUserAgentString())).doesUserAgentSupportCssVars());
+        assertTrue(getImpl(new Client(UserAgent.SAFARI5_MAC.getUserAgentString())).doesUserAgentSupportCssVars());
+    }
+
+    private ConfigAdapterImpl getImpl(Client client) {
+        ContextService contextService = mock(AuraContextServiceImpl.class);
+        AuraContext context = mock(AuraContext.class);
+        when(contextService.getCurrentContext()).thenReturn(context);
+        when(context.getClient()).thenReturn(client);
+        return new ConfigAdapterImpl(IOUtil.newTempDir(getName()), instanceService, contextService, fileMonitor);
+    }
+    
 }

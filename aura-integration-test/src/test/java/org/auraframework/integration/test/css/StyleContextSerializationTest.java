@@ -100,6 +100,27 @@ public class StyleContextSerializationTest extends AuraImplTestCase {
         setupContext("test:fakeTokensWithMapProvider", "test:fakeTokens3");
         goldFileAppCssUrl();
     }
+    
+    @UnAdaptableTest("core add info about if we are on desktop, we don't")
+    /** test that the css url includes CSS variable flag */
+    @Test
+    public void testCssUrlIncludesCssVarFlag() throws Exception {
+        getMockConfigAdapter().setIsCssVarTransformEnabled(true);
+        setupContext("test:fakeTokensWithMapProvider");
+        List<String> cssUrls = getAppCssUrls();
+        String url = null;
+        for (String style : cssUrls) {
+            if (style.contains("varTransform")) {
+                url = style;
+                break;
+            }
+        }
+
+        if (url == null) {
+            fail("expected to find app.css url with css variable param");
+        }
+        
+    }
 
     private AuraContext setupContext(DefDescriptor<ApplicationDef> defdesc) {
         if (contextService.isEstablished()) {
@@ -124,14 +145,19 @@ public class StyleContextSerializationTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
         return setupContext(app);
     }
+    
+    private List<String> getAppCssUrls() throws Exception {
+        AuraContext ctx = contextService.getCurrentContext();
+        // invoke compilation first
+        servletUtilAdapter.getScripts(ctx, true, false, null);
+        return servletUtilAdapter.getStyles(ctx);
+    } 
 
     private void goldFileAppCssUrl() throws Exception {
         AuraContext ctx = contextService.getCurrentContext();
+        List<String> cssUrls = getAppCssUrls();
         String url = null;
-
-        // invoke compilation first
-        servletUtilAdapter.getScripts(ctx, true, false, null);
-        for (String style : servletUtilAdapter.getStyles(ctx)) {
+        for (String style : cssUrls) {
             if (style.endsWith("app.css")) {
                 url = style;
                 break;

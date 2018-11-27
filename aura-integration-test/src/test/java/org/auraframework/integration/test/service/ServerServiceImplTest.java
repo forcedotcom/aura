@@ -54,9 +54,11 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.Client;
 import org.auraframework.system.Location;
 import org.auraframework.system.Message;
 import org.auraframework.system.SubDefDescriptor;
+import org.auraframework.test.client.UserAgent;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -919,5 +921,49 @@ public class ServerServiceImplTest extends IntegrationTestCase {
         // Assert
         String actual = template.getAttributes().getValue("prefetchTags").toString();
         assertThat(actual, CoreMatchers.not(CoreMatchers.containsString("ckeditor.js")));
+    }
+
+    /* Make sure we don't return a cached version of the CSS string when the setting changes */
+    @Test
+    public void testTurningOnCssVarsWritesCorrectCss() throws Exception {
+        getMockConfigAdapter().setIsCssVarTransformEnabled(false);
+        String withoutCssVars = writeCss(false);
+        assertFalse(withoutCssVars.contains("var(--lwc-color,red)"));
+
+        getMockConfigAdapter().setIsCssVarTransformEnabled(true);
+        String withCssVars = writeCss(false);
+        assertTrue(withCssVars.contains("var(--lwc-color,red)"));
+        resetMocks();
+    }
+
+    @Test
+    public void testTurningOnCssVarsWritesCorrectCssForIE11() throws Exception {
+        getMockConfigAdapter().setIsCssVarTransformEnabled(false);
+        String withoutCssVars = writeCss(true);
+        assertFalse(withoutCssVars.contains("var(--lwc-color,red)"));
+
+        getMockConfigAdapter().setIsCssVarTransformEnabled(true);
+        String withCssVars = writeCss(true);
+        assertFalse(withCssVars.contains("var(--lwc-color,red)"));
+        resetMocks();
+    }
+    
+
+    private String writeCss(boolean isIE11) throws Exception {
+        DefDescriptor<ApplicationDef> appDesc = definitionService
+                .getDefDescriptor("preloadTest:test_SimpleApplication", ApplicationDef.class);
+        AuraContext context = contextService
+                .startContext(Mode.DEV, AuraContext.Format.CSS, AuraContext.Authentication.AUTHENTICATED, appDesc);
+        if(isIE11) {
+            context.setClient(new Client(UserAgent.IE11.getUserAgentString()));
+        }
+        final String uid = definitionService.getUid(null, appDesc);
+        context.addLoaded(appDesc, uid);
+
+        Set<DefDescriptor<?>> dependencies = definitionService.getDependencies(uid);
+
+        StringWriter output = new StringWriter();
+        serverService.writeAppCss(dependencies, output);
+        return output.toString();
     }
 }

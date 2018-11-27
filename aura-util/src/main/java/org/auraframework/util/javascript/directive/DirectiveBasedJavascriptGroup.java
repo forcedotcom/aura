@@ -33,13 +33,14 @@ import org.apache.log4j.Logger;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.javascript.CommonJavascriptGroupImpl;
 import org.auraframework.util.javascript.SourcemapWriter;
-import org.auraframework.util.javascript.builder.EngineJavascriptBuilder;
-import org.auraframework.util.javascript.builder.EnvJavascriptBuilder;
-import org.auraframework.util.javascript.builder.ExternalLibJavascriptBuilder;
-import org.auraframework.util.javascript.builder.FrameworkJavascriptBuilder;
 import org.auraframework.util.javascript.builder.JavascriptBuilder;
 import org.auraframework.util.javascript.builder.JavascriptResource;
+import org.auraframework.util.javascript.builder.EnvJavascriptBuilder;
+import org.auraframework.util.javascript.builder.EngineJavascriptBuilder;
 import org.auraframework.util.javascript.builder.LockerJavascriptBuilder;
+import org.auraframework.util.javascript.builder.FrameworkJavascriptBuilder;
+import org.auraframework.util.javascript.builder.FrameworkPolyfillJavascriptBuilder;
+import org.auraframework.util.javascript.builder.ExternalLibJavascriptBuilder;
 import org.auraframework.util.resource.ResourceLoader;
 import org.auraframework.util.text.Hash;
 
@@ -144,13 +145,15 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
          * 2. lwc framework source
          * 3. locker source
          * 4. Aura framework source
-         * 5. External libraries such as moment, DOMPurify,...
+         * 5. Aura Polyfills (CSS variable support for component defs)
+         * 6. External libraries such as moment, DOMPurify,...
          */
         javascriptBuilders = new ArrayList<>();
         javascriptBuilders.add(new EnvJavascriptBuilder());
         javascriptBuilders.add(new EngineJavascriptBuilder(resourceLoader));
         javascriptBuilders.add(new LockerJavascriptBuilder(resourceLoader));
         javascriptBuilders.add(new FrameworkJavascriptBuilder());
+        javascriptBuilders.add(new FrameworkPolyfillJavascriptBuilder(resourceLoader));
         javascriptBuilders.add(new ExternalLibJavascriptBuilder(resourceLoader));
     }
 

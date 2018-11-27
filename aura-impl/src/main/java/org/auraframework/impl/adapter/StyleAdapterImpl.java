@@ -48,6 +48,8 @@ public class StyleAdapterImpl implements StyleAdapter {
 
     @Inject
     private DefinitionService definitionService;
+    
+    private boolean skipCssTransform = false;
 
     @Override
     public TokenValueProvider getTokenValueProvider(DefDescriptor<? extends BaseStyleDef> style) {
@@ -71,6 +73,9 @@ public class StyleAdapterImpl implements StyleAdapter {
     @Override
     public TokenValueProvider getTokenValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy,
             TokenCache overrides) {
+        if(skipCssTransform) {
+            return new TokenValueProviderImpl(getNamespaceDefaultDescriptor(style), overrides, strategy, false);
+        }
         return new TokenValueProviderImpl(getNamespaceDefaultDescriptor(style), overrides, strategy, configAdapter);
     }
 
@@ -115,5 +120,10 @@ public class StyleAdapterImpl implements StyleAdapter {
     @Override
     public Set<String> getExtraTrueConditions() {
         return ImmutableSet.<String>of();
+    }
+
+    @Override
+    public void setSkipCssTransform(boolean skipCssTransform) {
+        this.skipCssTransform = skipCssTransform;
     }
 }

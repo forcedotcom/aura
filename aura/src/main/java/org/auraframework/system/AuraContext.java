@@ -837,4 +837,9 @@ public interface AuraContext {
      */
     void setSerializeDefinitions(boolean serializeDefinitions);
     boolean isSerializingDefinitions();
+
+    /**
+     * Used to determine if CSS variable transformation is enabled
+     */
+    boolean isCssVarTransformEnabled();
 }

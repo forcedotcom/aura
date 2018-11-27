@@ -19,3 +19,8 @@ var stuff = {$i$:"am string", $numeros$:23525, $blah$:function(food) {
 }};
 
 };
+new function() {
+var mock = "css variables compat";
+console.log(mock);
+
+};

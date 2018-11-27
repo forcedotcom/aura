@@ -58,6 +58,8 @@ import org.auraframework.impl.source.AuraResourcesHashingGroup;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.impl.util.BrowserInfo;
+import org.auraframework.impl.util.BrowserUserAgent;
+import org.auraframework.impl.util.UserAgent;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.modules.ModuleNamespaceAlias;
 import org.auraframework.service.CSPInliningService;
@@ -897,5 +899,11 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             // ignore
         }
         return isEnabled;
+    }
+
+    @Override
+    public boolean doesUserAgentSupportCssVars() {
+        final int browser = BrowserUserAgent.parseBrowser(contextService.getCurrentContext().getClient().getUserAgent());
+        return !UserAgent.IE.match(browser, 11);
     }
 }

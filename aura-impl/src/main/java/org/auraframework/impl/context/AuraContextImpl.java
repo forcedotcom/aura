@@ -1123,4 +1123,9 @@ public class AuraContextImpl implements AuraContext {
     public boolean isSerializingDefinitions() {
         return serializeDefinitions;
     }
+
+    @Override
+    public boolean isCssVarTransformEnabled() {
+        return configAdapter.isCssVarTransformEnabled();
+    }
 }

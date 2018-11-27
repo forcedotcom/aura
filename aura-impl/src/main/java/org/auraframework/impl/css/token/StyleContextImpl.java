@@ -49,10 +49,12 @@ public final class StyleContextImpl implements StyleContext {
     private static final String TOKENS = "tokens";
     private static final String TOKENS_UID = "tuid";
     private static final String COMPOSITE_UID = "cuid";
+    private static final String CSS_VAR_FLAG= "varTransform";
 
     private final String client;
     private final Set<String> extraTrueConditions;
     private final TokenCache tokens;
+    private boolean cssVariableFlag;
 
     /**
      * Creates a new instance of {@link StyleContext}. Note that client will be lower-cased for string comparison
@@ -62,7 +64,7 @@ public final class StyleContextImpl implements StyleContext {
      * @param extraTrueConditions Other unnamed true conditions, e.g., "isDesktop".
      * @param tokens The token overrides from the application.
      */
-    private StyleContextImpl(String client, Iterable<String> extraTrueConditions, TokenCache tokens) {
+    private StyleContextImpl(String client, Iterable<String> extraTrueConditions, TokenCache tokens, boolean cssVariableFlag) {
         checkNotNull(client, "client cannot be null");
         this.client = client.toLowerCase();
 
@@ -70,6 +72,7 @@ public final class StyleContextImpl implements StyleContext {
                 ? ImmutableSortedSet.copyOf(extraTrueConditions) : ImmutableSet.<String>of();
 
         this.tokens = tokens != null ? tokens : EmptyTokenCache.INSTANCE;
+        this.cssVariableFlag = cssVariableFlag;
     }
 
     @Override
@@ -130,6 +133,10 @@ public final class StyleContextImpl implements StyleContext {
         } catch (QuickFixException e) {
             throw new AuraRuntimeException("unable to generate tokens uid", e);
         }
+        
+        if(cssVariableFlag) {
+            json.writeMapEntry(CSS_VAR_FLAG, 1);
+        }
 
         json.writeMapEntry(COMPOSITE_UID, key.toString().hashCode());
         json.writeMapEnd();
@@ -170,7 +177,7 @@ public final class StyleContextImpl implements StyleContext {
             // we have to proceed here without app overrides
         }
 
-        return new StyleContextImpl(client, extra, tokens);
+        return new StyleContextImpl(client, extra, tokens, auraContext.isCssVarTransformEnabled());
     }
 
     public static StyleContext build(DefinitionService definitionService, Map<String, Object> config) {
@@ -200,6 +207,6 @@ public final class StyleContextImpl implements StyleContext {
             }
         }
 
-        return new StyleContextImpl(client, extraTrueConditions, tokens);
+        return new StyleContextImpl(client, extraTrueConditions, tokens, false);
     }
 }

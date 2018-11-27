@@ -415,6 +415,10 @@ AuraClientService.prototype.setCssVars = function (cssVars) {
     }
 };
 
+AuraClientService.prototype.getCssVars = function () {
+    return this.cssVars;
+};
+
 /**
  * @private
  */

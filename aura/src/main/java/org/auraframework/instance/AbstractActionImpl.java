@@ -23,6 +23,7 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ControllerDef;
@@ -30,8 +31,33 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 
 public abstract class AbstractActionImpl<T extends ActionDef> implements Action {
+    private final ConfigAdapter configAdapter;
+    private String actionId;
+    @Nonnull private final List<Action> actions;
+    private boolean storable;
+    private boolean offlineAction;
+    private InstanceStack instanceStack;
+
+    @Nonnull protected final Map<String, Object> paramValues;
+    protected final DefDescriptor<ControllerDef> controllerDescriptor;
+    protected final T actionDef;
+    protected State state;
+    protected BaseComponentDef callingDefinition;
+    protected DefDescriptor<? extends BaseComponentDef> callingDescriptor;
+    protected String callerVersion;
+
+    /**
+     * @deprecated use the constructor with the config adapter.
+     */
+    @Deprecated
     public AbstractActionImpl(DefDescriptor<ControllerDef> controllerDescriptor, T actionDef,
             Map<String, Object> paramValues) {
+        this(controllerDescriptor, actionDef, paramValues, org.auraframework.Aura.getConfigAdapter());
+    }
+
+    public AbstractActionImpl(DefDescriptor<ControllerDef> controllerDescriptor, T actionDef,
+            Map<String, Object> paramValues, ConfigAdapter configAdapter) {
+        this.configAdapter = configAdapter;
         this.state = State.NEW;
         this.actionDef = actionDef;
         this.controllerDescriptor = controllerDescriptor;
@@ -129,7 +155,7 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
     @Override
     public InstanceStack getInstanceStack() {
         if (instanceStack == null) {
-            instanceStack = new InstanceStack();
+            instanceStack = new InstanceStack(configAdapter);
         }
         return instanceStack;
     }
@@ -179,18 +205,4 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
     public void cleanup() {
         //by default do nothing
     }
-
-    private String actionId;
-    @Nonnull private final List<Action> actions;
-    private boolean storable;
-    private boolean offlineAction;
-    private InstanceStack instanceStack;
-
-    @Nonnull protected final Map<String, Object> paramValues;
-    protected final DefDescriptor<ControllerDef> controllerDescriptor;
-    protected final T actionDef;
-    protected State state;
-    protected BaseComponentDef callingDefinition;
-    protected DefDescriptor<? extends BaseComponentDef> callingDescriptor;
-    protected String callerVersion;
 }

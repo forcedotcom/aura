@@ -49,7 +49,7 @@ public class InstanceStackTest {
     @Before
     public void setUp() {
         mci = Mockito.mock(ConfigAdapter.class);
-        Mockito.when(mci.isInternalNamespace((String) Matchers.any())).thenReturn(true);
+        Mockito.doReturn(Boolean.TRUE).when(mci).isInternalNamespace((String) Matchers.any());
     }
 
     //
@@ -99,8 +99,7 @@ public class InstanceStackTest {
 
     @Test
     public void testPath() {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         Assert.assertEquals("InstanceStack constructor should set path to base", "/*[0]", iStack.getPath());
 
         Instance<?> ti = new TestInstance();
@@ -130,8 +129,7 @@ public class InstanceStackTest {
 
     @Test
     public void testPopInstanceToTopIncrementsIndex() {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         Assert.assertEquals("InstanceStack constructor should set path to base", "/*[0]", iStack.getPath());
         TestInstance ti = new TestInstance();
         iStack.pushInstance(ti, ti.getDescriptor());
@@ -144,8 +142,7 @@ public class InstanceStackTest {
 
     @Test
     public void testMarkParentNoCurrentInstance() {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         Assert.assertEquals("InstanceStack constructor should set path to base", "/*[0]", iStack.getPath());
         TestInstance parent = new TestInstance("parentBase");
         iStack.markParent(parent);
@@ -156,8 +153,7 @@ public class InstanceStackTest {
 
     @Test
     public void testMarkParentMultipleTimes() {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         Assert.assertEquals("InstanceStack constructor should set path to base", "/*[0]", iStack.getPath());
         TestInstance parent = new TestInstance("parent");
         iStack.markParent(parent);
@@ -173,8 +169,7 @@ public class InstanceStackTest {
     @Test
     public void testErrorWrongParent() {
         // Mark a new parent without clearing the first
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         iStack.markParent(new TestInstance("parent"));
         AuraRuntimeException expected = null;
 
@@ -187,8 +182,7 @@ public class InstanceStackTest {
         Assert.assertEquals("Don't know how to handle setAttribute here", expected.getMessage());
 
         // Clear an instance that hasn't been marked as a parent
-        iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        iStack = new InstanceStack(mci);
         iStack.markParent(new TestInstance("parent"));
         expected = null;
         try {
@@ -203,8 +197,7 @@ public class InstanceStackTest {
 
     @Test
     public void testErrorPushPopDifferentInstances() {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         TestInstance ti = new TestInstance("instance1");
         iStack.pushInstance(ti, ti.getDescriptor());
         AuraRuntimeException expected = null;
@@ -220,8 +213,7 @@ public class InstanceStackTest {
 
     @Test
     public void testErrorSetAttributeNameWithoutClearing() {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         TestInstance ti = new TestInstance("instance");
         iStack.pushInstance(ti, ti.getDescriptor());
         iStack.setAttributeName("first");
@@ -237,8 +229,7 @@ public class InstanceStackTest {
 
     @Test
     public void testErrorSetIndexWithoutAttributeSet() {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         TestInstance ti = new TestInstance("instance");
         AuraRuntimeException expected = null;
         iStack.pushInstance(ti, ti.getDescriptor());
@@ -253,8 +244,7 @@ public class InstanceStackTest {
 
     @Test
     public void testErrorClearIndexWithoutSettingIndex() {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         TestInstance ti = new TestInstance();
         AuraRuntimeException expected = null;
         iStack.pushInstance(ti, ti.getDescriptor());
@@ -270,8 +260,7 @@ public class InstanceStackTest {
 
     @Test
     public void testErrorClearIndexWhileDifferentIndexSet() {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         TestInstance ti = new TestInstance();
         AuraRuntimeException expected = null;
         iStack.pushInstance(ti, ti.getDescriptor());
@@ -288,8 +277,7 @@ public class InstanceStackTest {
 
     @Test
     public void testErrorSetIndexWithoutClearingPreviousIndex() {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         TestInstance ti = new TestInstance();
         AuraRuntimeException expected = null;
         iStack.pushInstance(ti, ti.getDescriptor());
@@ -306,15 +294,14 @@ public class InstanceStackTest {
 
     private BaseComponent<?, ?> getComponentWithPath(final String path) {
         BaseComponent<?, ?> comp = Mockito.mock(BaseComponent.class);
-        Mockito.when(comp.getPath()).thenReturn(path);
-        Mockito.when(comp.hasLocalDependencies()).thenReturn(true);
+        Mockito.doReturn(path).when(comp).getPath();
+        Mockito.doReturn(Boolean.TRUE).when(comp).hasLocalDependencies();
         return comp;
     }
 
     @Test
     public void testComponents() {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         Map<String, BaseComponent<?, ?>> comps = iStack.getComponents();
         Assert.assertNotNull("Components should never be null", comps);
         Assert.assertEquals("Components should empty", 0, comps.size());
@@ -337,8 +324,7 @@ public class InstanceStackTest {
 
     @Test
     public void testNextId() {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         Assert.assertEquals("nextId should be initialized to 1", 1, iStack.getNextId());
         Assert.assertEquals("nextId should increment", 2, iStack.getNextId());
         Assert.assertEquals("nextId should increment again", 3, iStack.getNextId());
@@ -349,8 +335,7 @@ public class InstanceStackTest {
      */
     @Test
     public void testSerializeAsPart() throws Exception {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         JsonEncoder jsonMock = Mockito.mock(JsonEncoder.class);
         BaseComponent<?, ?> a = getComponentWithPath("a");
         BaseComponent<?, ?> b = getComponentWithPath("b");
@@ -373,8 +358,7 @@ public class InstanceStackTest {
      */
     @Test
     public void testSerializeAsPartNoComponents() throws Exception {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         JsonEncoder jsonMock = Mockito.mock(JsonEncoder.class);
         iStack.serializeAsPart(jsonMock);
         Assert.assertEquals("Components should empty when no registered components", 0, iStack.getComponents().size());
@@ -390,11 +374,10 @@ public class InstanceStackTest {
         String name2 = "two";
         String name3 = "three";
         String name4 = "four";
-        Mockito.when(mci.isInternalNamespace(namespace_Internal)).thenReturn(true);
-        Mockito.when(mci.isInternalNamespace(namespace_External)).thenReturn(false);
+        Mockito.doReturn(Boolean.TRUE).when(mci).isInternalNamespace(namespace_Internal);
+        Mockito.doReturn(Boolean.FALSE).when(mci).isInternalNamespace(namespace_External);
         // create empty stack, sanity check
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         Assert.assertFalse("stack should have topExternal=null at the beginning", iStack.isExternal());
         // start pushing
         TestInstance one = new TestInstance(namespace_Internal, name1);
@@ -428,15 +411,13 @@ public class InstanceStackTest {
 
     @Test
     public void testPeekAtEmptyStackReturnsNull() throws Exception {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         Assert.assertEquals("Expecting null at top of empty stack", null, iStack.peek());
     }
 
     @Test
     public void testPeekAtStackWithOneReturnsTop() throws Exception {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         Instance<?> ti = new TestInstance();
         iStack.pushInstance(ti, ti.getDescriptor());
         Assert.assertEquals("Expecting top of stack", ti, iStack.peek());
@@ -444,8 +425,7 @@ public class InstanceStackTest {
 
     @Test
     public void testPeekAtStackWithTwoReturnsTop() throws Exception {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         Instance<?> ti1 = new TestInstance();
         iStack.pushInstance(ti1, ti1.getDescriptor());
 
@@ -457,8 +437,7 @@ public class InstanceStackTest {
 
     @Test
     public void testPeekAtStackAfterPopReturnsTop() throws Exception {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         Instance<?> ti1 = new TestInstance();
         iStack.pushInstance(ti1, ti1.getDescriptor());
 
@@ -472,8 +451,7 @@ public class InstanceStackTest {
 
     @Test
     public void testPeekAtEmptiedStackReturnsNull() throws Exception {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         Instance<?> ti1 = new TestInstance();
         iStack.pushInstance(ti1, ti1.getDescriptor());
 
@@ -488,8 +466,7 @@ public class InstanceStackTest {
 
     @Test
     public void testPushThenPopAccessSuccess() throws Exception {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         Instance<?> ti1 = new TestInstance("path1");
         Instance<?> ti2 = new TestInstance("path2");
         iStack.pushAccess(ti1);
@@ -501,8 +478,7 @@ public class InstanceStackTest {
 
     @Test
     public void testPopAccessWithDifferentInstanceThrowsError() throws Exception {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         Instance<?> ti1 = new TestInstance("path1");
         Instance<?> ti2 = new TestInstance("path2");
         AuraRuntimeException expected = null;
@@ -518,8 +494,7 @@ public class InstanceStackTest {
 
     @Test
     public void testPopAccessPastEmptyThrowsError() throws Exception {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         Instance<?> ti1 = new TestInstance("path1");
         AuraRuntimeException expected = null;
         try {
@@ -535,8 +510,7 @@ public class InstanceStackTest {
 
     @Test
     public void testGetAccessReturnsPushedAccess() throws Exception {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         Instance<?> ti1 = new TestInstance("path1");
         iStack.pushAccess(ti1);
         Assert.assertEquals(ti1, iStack.getAccess());
@@ -544,8 +518,7 @@ public class InstanceStackTest {
 
     @Test
     public void testGetAccessReturnsInstanceWhenNoAccessStack() throws Exception {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         Instance<?> ti1 = new TestInstance("path1");
         iStack.pushInstance(ti1, ti1.getDescriptor());
         Assert.assertEquals(ti1, iStack.getAccess());
@@ -553,8 +526,7 @@ public class InstanceStackTest {
 
     @Test
     public void testGetAccessReturnsTopOfAccessStackWhenInstance() throws Exception {
-        InstanceStack iStack = new InstanceStack();
-        iStack.setConfigAdapter(mci);
+        InstanceStack iStack = new InstanceStack(mci);
         Instance<?> ti1 = new TestInstance("path1");
         Instance<?> ti2 = new TestInstance("path2");
         iStack.pushInstance(ti1, ti1.getDescriptor());

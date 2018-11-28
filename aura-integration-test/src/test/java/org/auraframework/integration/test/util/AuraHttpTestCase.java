@@ -773,7 +773,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             return null;
         }
 
-        private final InstanceStack instanceStack = new InstanceStack();
+        private final InstanceStack instanceStack = new InstanceStack(configAdapter);
 
         @Override
         public InstanceStack getInstanceStack() {

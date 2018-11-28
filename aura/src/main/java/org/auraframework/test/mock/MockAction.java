@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.AbstractActionImpl;
@@ -33,16 +34,25 @@ import com.google.common.collect.Lists;
 
 /**
  * A simple Action used when mocking Controller creations.
+ *
+ * This class is used for the Component Test framework to allow the jstests to specify mock action
+ * returns from the server.
  */
 public class MockAction extends AbstractActionImpl<ActionDef> {
+    /**
+     * FIXME: this is used in core - remove uses then delete.
+     *
+     * @deprecated Use the constructor below with the configadapter.
+     */
+    @Deprecated
     public MockAction(DefDescriptor<ActionDef> descriptor, State state, Object returnValue) {
-        this(descriptor, state, returnValue, null, null, null);
+        this(descriptor, state, returnValue, null, null, null, org.auraframework.Aura.getConfigAdapter());
     }
 
     public MockAction(DefDescriptor<ActionDef> descriptor, State state,
             Object returnValue, List<Action> actions,
-            Map<String, BaseComponent<?, ?>> componentRegistry, List<Object> errors) {
-        super(null, null, null);
+            Map<String, BaseComponent<?, ?>> componentRegistry, List<Object> errors, ConfigAdapter configAdapter) {
+        super(null, null, null, configAdapter);
         this.descriptor = descriptor;
         this.state = (state == null ? State.SUCCESS : state);
         this.returnValue = returnValue;

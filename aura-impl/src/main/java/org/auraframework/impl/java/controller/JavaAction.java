@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -50,7 +51,7 @@ public class JavaAction extends AbstractActionImpl<JavaActionDef> {
     private final LoggingService loggingService;
 
     /**
-     * The constructor for an action.
+     * The constructor for a java action.
      *
      * Note that if the bean parameter is non-null, this action is invoked as an instance
      * method on the bean, otherwise, it must be static.
@@ -59,11 +60,14 @@ public class JavaAction extends AbstractActionImpl<JavaActionDef> {
      * @param actionDef the definition for this action.
      * @param bean The controller bean, if there is one, otherwise null.
      * @param paramValues the parameter values.
+     * @param exceptionAdapter the exception adapter to inject
+     * @param loggingService injected logging Service.
+     * @param configAdapter injected configAdapter.
      */
     public JavaAction(DefDescriptor<ControllerDef> controllerDescriptor, JavaActionDef actionDef,
                       Object bean, Map<String, Object> paramValues, ExceptionAdapter exceptionAdapter,
-                      LoggingService loggingService) {
-        super(controllerDescriptor, actionDef, paramValues);
+                      LoggingService loggingService, ConfigAdapter configAdapter) {
+        super(controllerDescriptor, actionDef, paramValues, configAdapter);
         this.instance = bean;
         this.exceptionAdapter = exceptionAdapter;
         this.loggingService = loggingService;

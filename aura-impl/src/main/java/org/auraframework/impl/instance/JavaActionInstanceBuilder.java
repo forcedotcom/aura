@@ -19,6 +19,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ActionDef;
@@ -38,6 +39,7 @@ import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * Provide an interface for an injectable builder of an instance.
@@ -45,19 +47,28 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 @ServiceComponent
 public class JavaActionInstanceBuilder implements InstanceBuilder<Action, ActionDef> {
     @Inject
+    @Lazy
     private ContextService contextService;
 
     @Inject
+    @Lazy
     private DefinitionService definitionService;
 
     @Inject
+    @Lazy
     private ExceptionAdapter exceptionAdapter;
 
     @Inject
+    @Lazy
     private LoggingService loggingService;
 
     @Inject
+    @Lazy
     private InstanceBuilderProvider instanceBuilderProvider;
+    
+    @Inject
+    @Lazy
+    private ConfigAdapter configAdapter;
 
     /**
      * Get the class that this builder knows how to instantiate.
@@ -90,7 +101,7 @@ public class JavaActionInstanceBuilder implements InstanceBuilder<Action, Action
             }
 
             return new JavaAction(controllerDesc, (JavaActionDef) def, controllerBean, attributes,
-                    exceptionAdapter, loggingService);
+                    exceptionAdapter, loggingService, configAdapter);
         } finally {
             context.popCallingDescriptor();
         }

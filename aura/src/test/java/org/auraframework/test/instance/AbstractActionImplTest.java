@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -52,7 +53,12 @@ public class AbstractActionImplTest {
     private static class MyAction extends AbstractActionImpl<ActionDef> {
         public MyAction(DefDescriptor<ControllerDef> controllerDescriptor, ActionDef actionDef,
                 Map<String, Object> paramValues) {
-            super(controllerDescriptor, actionDef, paramValues);
+            this(Mockito.mock(ConfigAdapter.class), controllerDescriptor, actionDef, paramValues);
+        }
+
+        private MyAction(ConfigAdapter configAdapter, DefDescriptor<ControllerDef> controllerDescriptor,
+                ActionDef actionDef, Map<String, Object> paramValues) {
+            super(controllerDescriptor,  actionDef, paramValues, configAdapter);
         }
 
         @Override
@@ -156,7 +162,7 @@ public class AbstractActionImplTest {
     @Test
     public void testOfflineAction() {
         ActionDef def = Mockito.mock(ActionDef.class);
-        Action test = new MyAction(null, def, null);
+        MyAction test = new MyAction(null, def, null);
 
         Assert.assertEquals("isOfflineAction should be initialized to false", false, test.isOfflineAction());
         test.markOfflineAction();

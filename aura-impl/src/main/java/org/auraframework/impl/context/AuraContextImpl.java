@@ -634,7 +634,7 @@ public class AuraContextImpl implements AuraContext {
             return currentAction.getInstanceStack();
         }
         if (fakeInstanceStack == null) {
-            fakeInstanceStack = new InstanceStack();
+            fakeInstanceStack = new InstanceStack(configAdapter);
         }
         return fakeInstanceStack;
     }

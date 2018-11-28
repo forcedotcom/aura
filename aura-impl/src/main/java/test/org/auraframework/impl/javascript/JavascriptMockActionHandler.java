@@ -198,7 +198,8 @@ public class JavascriptMockActionHandler extends JavascriptMockHandler<Controlle
             if (value != null) {
                 if (error == null) {
                     return new Returns<>((T) new MockAction(
-                            actionDef.getDescriptor(), State.SUCCESS, value));
+                            actionDef.getDescriptor(), State.SUCCESS, value,
+                            null, null, null, org.auraframework.Aura.getConfigAdapter()));
                 }
             } else {
                 if (error != null) {
@@ -207,7 +208,7 @@ public class JavascriptMockActionHandler extends JavascriptMockHandler<Controlle
                     } catch (Throwable e) {
                         return new Returns<>((T) new MockAction(
                                 actionDef.getDescriptor(), State.ERROR, null,
-                                null, null, ImmutableList.<Object> of(e)));
+                                null, null, ImmutableList.<Object> of(e), org.auraframework.Aura.getConfigAdapter()));
                     }
                 }
             }

@@ -23,7 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -44,9 +43,16 @@ import org.auraframework.util.json.Json;
  * our 'parentage', but that is much easier said than done.
  */
 public class InstanceStack {
-    private ConfigAdapter configAdapter = Aura.getConfigAdapter();
+    private final ConfigAdapter configAdapter;
+    private Map<String, BaseComponent<?, ?>> componentRegistry = null;
+    private int nextId = 1;
+    private final StringBuilder path;
+    private final List<Entry> stack;
+    private Entry current;
+    private final String base;
+    private Instance<?> topExternal;
 
-    public InstanceStack() {
+    public InstanceStack(ConfigAdapter configAdapter) {
         this.path = new StringBuilder();
         this.stack = new ArrayList<>();
         this.current = new Entry(null, path.length());
@@ -55,6 +61,7 @@ public class InstanceStack {
         this.current.top = true;
         this.base = path.toString();
         this.topExternal = null;
+        this.configAdapter = configAdapter;
     }
 
     /**
@@ -434,20 +441,5 @@ public class InstanceStack {
         public String toString() {
             return this.instance + " @ " + this.index + accessString();
         }
-    }
-
-    private Map<String, BaseComponent<?, ?>> componentRegistry = null;
-    private int nextId = 1;
-    private StringBuilder path;
-    private List<Entry> stack;
-    private Entry current;
-    private final String base;
-    private Instance<?> topExternal;
-
-    /**
-     * Injection override.
-     */
-    public void setConfigAdapter(ConfigAdapter adapter) {
-        this.configAdapter = adapter;
     }
 }

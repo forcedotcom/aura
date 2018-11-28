@@ -201,12 +201,12 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         private DefinitionService definitionService;
 
         public EmptyAction(StringWriter sw, String name, DefinitionService definitionService) {
-            super(null, new EmptyActionDef(sw, name), null);
+            super(null, new EmptyActionDef(sw, name), null, configAdapter);
             this.definitionService = definitionService;
         }
 
         public EmptyAction(DefinitionService definitionService) {
-            super(null, new EmptyActionDef(null, "simpleaction"), null);
+            super(null, new EmptyActionDef(null, "simpleaction"), null, configAdapter);
             this.definitionService = definitionService;
         }
 

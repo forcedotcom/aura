@@ -104,10 +104,6 @@ PropertyReferenceValue.prototype.addChangeHandler=function(cmp, key, method, reb
         method.key=key;
         var config={"event": "change", "value": expression, "method": method, "cmp": cmp};
         this.valueProvider.addChangeHandler(config);
-
-        // if(this.valueProvider instanceof PassthroughValue) {
-        //     this.valueProvider.addValueHandler({"event": "change", "value": this.expression, "method": method});
-        // }
     }
 };
 
@@ -129,6 +125,16 @@ PropertyReferenceValue.prototype.removeChangeHandler=function(cmp, key){
     while(valueProvider instanceof PassthroughValue){
         expression = valueProvider.getExpression(expression);
         valueProvider=valueProvider.getComponent();
+    }
+    //This is a total hack for aura:iteration
+    //This removes the referenced change handler on the parent iteration component
+    //that references the child PRV
+    var cmpOwner = cmp.getOwner();
+    if(expression !== this.expression && cmp.getType() !== "aura:expression" && cmpOwner) {
+        var changeHandler = cmpOwner.handlers["change"];
+        if(changeHandler[expression]) {
+            changeHandler[expression] = null;
+        }
     }
     if(valueProvider&&valueProvider.removeValueHandler&&(valueProvider!==cmp||this.expression!==key)) {
         valueProvider.removeValueHandler({"event": "change", "value": this.expression, "id":cmp.getGlobalId(),"key":key});

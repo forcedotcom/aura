@@ -16,6 +16,7 @@
 package org.auraframework.http;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
@@ -72,7 +73,7 @@ public class BootstrapUtil {
     }
 
     @SuppressWarnings("static-method")
-    public void serializeApplication(Instance<?> appInstance, AuraContext context, JsonEncoder json) throws IOException {
+    public void serializeApplication(Instance<?> appInstance, Map<String, Object> componentAttributes, AuraContext context, JsonEncoder json) throws IOException {
         if (appInstance != null) {
             json.writeMapEntry("app", appInstance);
         } else {
@@ -81,6 +82,12 @@ public class BootstrapUtil {
             json.writeMapKey("componentDef");
             json.writeMapBegin();
             json.writeMapEntry("descriptor", context.getApplicationDescriptor().getQualifiedName());
+            if (componentAttributes != null) {
+                json.writeMapEnd();
+                json.writeMapKey("attributes");
+                json.writeMapBegin();
+                json.writeMapEntry("values", componentAttributes);
+            }
             json.writeMapEnd();
             json.writeMapEnd();
         }

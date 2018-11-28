@@ -754,7 +754,7 @@ public class ServerServiceImpl implements ServerService {
         return writer.toString();
     }
 
-    private String serializeAppBootstrap(Instance<?> appInstance, AuraContext context) throws IOException {
+    private String serializeAppBootstrap(Instance<?> appInstance, Map<String, Object> componentAttributes, AuraContext context) throws IOException {
         // reduce verbosity of serialization
         context.setPreloading(false);
 
@@ -766,7 +766,7 @@ public class ServerServiceImpl implements ServerService {
         json.writeMapKey("data");
         json.writeMapBegin();
 
-        bootstrapUtil.serializeApplication(appInstance, context, json);
+        bootstrapUtil.serializeApplication(appInstance, componentAttributes, context, json);
 
         json.writeMapEnd();
         json.writeMapEnd();
@@ -847,7 +847,7 @@ public class ServerServiceImpl implements ServerService {
 
                 serializedContext = serializeContext(context);
 
-                String appBootstrap = serializeAppBootstrap(appInstance, context);
+                String appBootstrap = serializeAppBootstrap(appInstance, componentAttributes, context);
                 attributes.put("appBootstrap", appBootstrap);
             }
             catch (Throwable t) {

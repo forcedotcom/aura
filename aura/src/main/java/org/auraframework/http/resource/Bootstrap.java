@@ -103,7 +103,7 @@ public class Bootstrap extends AuraResourceImpl {
             json.writeMapKey("data");
             json.writeMapBegin();
 
-            bootstrapUtil.serializeApplication(appInstance, context, json);
+            bootstrapUtil.serializeApplication(appInstance, null, context, json);
 
             context.getInstanceStack().serializeAsPart(json);
             json.writeMapEnd();

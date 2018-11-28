@@ -612,6 +612,10 @@
         // Get the element that was scrolled upon
         var el = evt.target;
 
+        if (el && el.tagName === "INPUT" && el.type === "range") {
+            evt.preventBounce = false;
+            return;
+        }
         // Check all parent elements for scrollability
         while (el !== document.body) {
             // Get some style properties

@@ -6,7 +6,7 @@ MODE="";
 
 while getopts ":d" opt; do
   case ${opt} in
-    d ) MODE="--inspect --debug-brk"
+    d ) MODE="--inspect-brk"
       ;;
     \? ) echo "Usage: xunit [-d] [file/folder of the test(s) to run]"
       exit;

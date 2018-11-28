@@ -17,7 +17,6 @@ package org.auraframework.service;
 
 import java.util.Map;
 
-import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.GlobalValueProvider;
@@ -31,8 +30,8 @@ import com.google.common.collect.ImmutableMap;
 
 /**
  * <p>
- * Service for creating or interacting with a {@link AuraContext} A AuraContext
- * must be started before working using any other service.
+ * Service for creating or interacting with a {@link AuraContext}. An {@code AuraContext} must be started
+ * before working using any other service.
  * </p>
  */
 public interface ContextService {

@@ -13,24 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.auraframework.util;
 
 import java.nio.file.Path;
 
-
 /**
  * An event fired when a file is changed.
  */
-public class FileChangeEvent
-{
+public class FileChangeEvent {
     /**
      * The path object
      */
     private final Path path;
 
-    public FileChangeEvent(final Path path)
-    {
+    public FileChangeEvent(final Path path) {
         this.path = path;
     }
 
@@ -38,8 +34,7 @@ public class FileChangeEvent
      * Returns the path of the file that changed.
      * @return The Path to the file that was changed.
      */
-    public Path getPath()
-    {
+    public Path getPath() {
         return path;
     }
 }

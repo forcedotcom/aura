@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.auraframework.def;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -42,13 +40,13 @@ import com.google.common.collect.Maps;
 public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         Serializable, Comparable<DefDescriptor<?>> {
 
-    String MARKUP_PREFIX = "markup";
-    String CSS_PREFIX = "css";
-    String TEMPLATE_CSS_PREFIX = "templateCss";
-    String CUSTOM_FLAVOR_PREFIX = "customFlavorCss";
-    String JAVASCRIPT_PREFIX = "js";
-    String COMPOUND_PREFIX = "compound";
-    String JAVA_PREFIX = "java";
+    static final String MARKUP_PREFIX = "markup";
+    static final String CSS_PREFIX = "css";
+    static final String TEMPLATE_CSS_PREFIX = "templateCss";
+    static final String CUSTOM_FLAVOR_PREFIX = "customFlavorCss";
+    static final String JAVASCRIPT_PREFIX = "js";
+    static final String COMPOUND_PREFIX = "compound";
+    static final String JAVA_PREFIX = "java";
 
     /**
      * @return The name of this descriptor

@@ -29,8 +29,6 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.text.GlobMatcher;
 
-import com.google.common.collect.Lists;
-
 /**
  * A filter for descriptors allowing globbing.
  */
@@ -64,7 +62,7 @@ public class DescriptorFilter implements Comparable<DescriptorFilter>, Serializa
         this.namespaceMatch = namespaceMatch;
         this.nameMatch = nameMatch;
         if (defTypes != null) {
-            this.defTypes = Lists.newArrayList(defTypes);
+            this.defTypes = new ArrayList<>(defTypes);
         } else {
             this.defTypes = null;
         }
@@ -93,20 +91,20 @@ public class DescriptorFilter implements Comparable<DescriptorFilter>, Serializa
         try {
             this.prefixMatch = new GlobMatcher(prefix);
         } catch (IllegalArgumentException iae) {
-            throw new IllegalArgumentException("Invalid prefix of " + prefix + " in " + matcher);
+            throw new IllegalArgumentException("Invalid prefix of " + prefix + " in " + matcher, iae);
         }
         try {
             this.namespaceMatch = new GlobMatcher(namespace);
         } catch (IllegalArgumentException iae) {
-            throw new IllegalArgumentException("Invalid namespace of " + namespace + " in " + matcher);
+            throw new IllegalArgumentException("Invalid namespace of " + namespace + " in " + matcher, iae);
         }
         try {
             this.nameMatch = new GlobMatcher(name);
         } catch (IllegalArgumentException iae) {
-            throw new IllegalArgumentException("Invalid name of " + name + " in " + matcher);
+            throw new IllegalArgumentException("Invalid name of " + name + " in " + matcher, iae);
         }
         if (defTypes != null) {
-            this.defTypes = Lists.newArrayList(defTypes);
+            this.defTypes = new ArrayList<>(defTypes);
         } else {
             this.defTypes = null;
         }
@@ -117,7 +115,7 @@ public class DescriptorFilter implements Comparable<DescriptorFilter>, Serializa
      * A constructor with a glob matcher and a single def type.
      */
     public DescriptorFilter(String matcher, DefType defType) {
-        this(matcher, Lists.newArrayList(defType));
+        this(matcher, Collections.singleton(defType));
     }
 
     /**
@@ -134,8 +132,8 @@ public class DescriptorFilter implements Comparable<DescriptorFilter>, Serializa
             for (String t : types) {
                 try {
                     accum.add(DefType.valueOf(t));
-                } catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException("Invalid type: "+t);
+                } catch (IllegalArgumentException iae) {
+                    throw new IllegalArgumentException("Invalid type: " + t, iae);
                 }
             }
             return Collections.unmodifiableList(accum);

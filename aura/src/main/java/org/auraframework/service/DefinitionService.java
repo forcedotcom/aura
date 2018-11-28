@@ -176,7 +176,7 @@ public interface DefinitionService {
      */
     @Nonnull
     @Deprecated
-    default Set<DefDescriptor<?>> findByTags(@Nonnull Set<String> tags) { return findByTags(null, tags);};
+    default Set<DefDescriptor<?>> findByTags(@Nonnull Set<String> tags) { return findByTags(null, tags);}
 
     /**
      * Find the set of components that have a tag.

@@ -15,7 +15,9 @@
  */
 package org.auraframework.instance;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,9 +29,6 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 public abstract class AbstractActionImpl<T extends ActionDef> implements Action {
     public AbstractActionImpl(DefDescriptor<ControllerDef> controllerDescriptor, T actionDef,
             Map<String, Object> paramValues) {
@@ -38,10 +37,10 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
         this.controllerDescriptor = controllerDescriptor;
         if (paramValues == null) {
             // Don't allow params to be null.
-            paramValues = Maps.newHashMap();
+            paramValues = new HashMap<>();
         }
         this.paramValues = paramValues;
-        this.actions = Lists.newArrayList();
+        this.actions = new ArrayList<>();
     }
 
     @Override
@@ -172,12 +171,12 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
     }
 
     @Override
-    public void setup(){
+    public void setup() {
         //by default do nothing
     }
 
     @Override
-    public void cleanup(){
+    public void cleanup() {
         //by default do nothing
     }
 

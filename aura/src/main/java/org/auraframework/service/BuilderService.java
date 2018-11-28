@@ -15,7 +15,6 @@
  */
 package org.auraframework.service;
 
-import org.auraframework.Aura;
 import org.auraframework.builder.ApplicationDefBuilder;
 import org.auraframework.builder.CacheBuilder;
 import org.auraframework.builder.ComponentDefBuilder;

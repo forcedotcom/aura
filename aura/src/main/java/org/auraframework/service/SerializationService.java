@@ -18,7 +18,6 @@ package org.auraframework.service;
 import java.io.IOException;
 import java.util.Map;
 
-import org.auraframework.Aura;
 import org.auraframework.adapter.FormatAdapter;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.system.AuraContext;

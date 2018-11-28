@@ -15,7 +15,6 @@
  */
 package org.auraframework.service;
 
-import org.auraframework.Aura;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;

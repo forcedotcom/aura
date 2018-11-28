@@ -21,12 +21,12 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.springframework.util.StringUtils;
 
 /**
- * ModuleDesignDef holds all the design configuration of a
+ * {@link ModuleDesignDef} holds all the design configuration of a
  * LWC component specified in -meta.xml 
  */
 public class ModuleDesignDefImpl implements ModuleDesignDef {
-        private static final long serialVersionUID = -9187646383220697438L;
-        private String label;
+    private static final long serialVersionUID = -9187646383220697438L;
+    private String label;
     private String description;
     private TargetConfigs targetConfigs;
 

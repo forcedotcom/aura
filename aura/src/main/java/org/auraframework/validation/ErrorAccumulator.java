@@ -35,7 +35,7 @@ public interface ErrorAccumulator {
             this.message = message;
             this.location = location;
         }
-    };
+    }
 
     /**
      * Add an error.
@@ -48,12 +48,12 @@ public interface ErrorAccumulator {
     void addWarning(String message, Location location);
 
     /**
-     * Get the set of errors.
+     * Get the {@link Collection} of errors.
      */
     Collection<QuickFixException> getErrors();
 
     /**
-     * Get the set of warnings.
+     * Get the {@link Collection} of warnings.
      */
     Collection<Warning> getWarnings();
 }

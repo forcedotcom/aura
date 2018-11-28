@@ -51,7 +51,7 @@ public interface ComponentLocationAdapter extends AuraAdapter {
     Set<SourceLoader> getSourceLoaders();
 
     /** Default implementation for ComponentLocationAdapter */
-    class Impl implements ComponentLocationAdapter {
+    static class Impl implements ComponentLocationAdapter {
         private final File componentSourceDir;
         private final String componentSourcePackage;
         private final File moduleSourceDir;
@@ -68,7 +68,7 @@ public interface ComponentLocationAdapter extends AuraAdapter {
 
         @Override
         public File getComponentSourceDir() {
-            return this.componentSourceDir;
+            return componentSourceDir;
         }
 
         @Override

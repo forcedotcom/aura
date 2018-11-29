@@ -674,6 +674,8 @@ AuraLocalizationService.prototype.formatDateTimeUTCInternal = function(date, for
 
     } else {
         date = this.normalizeDateTimeInput(date);
+        // We need to clone the object so we don't change the reference
+        date = new Date(date.valueOf());
         date.setMinutes(date.getMinutes() + date.getTimezoneOffset());
     }
 

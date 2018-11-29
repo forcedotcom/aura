@@ -733,7 +733,7 @@ HtmlComponent.prototype["helper"] = {
                         }
                         // Track any usages for eventual deprecation
                         $A.logger.reportError(new $A.auraError(message), null, "WARNING");
-                    } else if (lowerName === "rel" && value && value.toLowerCase && value.toLowerCase() === "import" && element.tagName === "LINK") {
+                    } else if (lowerName === "rel" && value && value.toLowerCase && value.toLowerCase().trim() === "import" && element.tagName === "LINK") {
                         $A.warning("The '" + name + "' attribute is not supported, and will not be set for " + element + " in " + component);
                     } else {
                         if ($A.util.isUndefinedOrNull(value)) {

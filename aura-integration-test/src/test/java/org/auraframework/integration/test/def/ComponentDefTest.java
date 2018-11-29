@@ -403,10 +403,50 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
     }
 
     @Test
+    public void testLinkTagsCannotHaveImportAttributeWithSpaces() throws Exception {
+        // Arrange
+        String cmpWithImport =
+                "<aura:component><link rel=' import ' href='ohnoes'/></aura:component>";
+        DefDescriptor<ComponentDef> descriptor = addSourceAutoCleanup(ComponentDef.class, cmpWithImport);
+        Throwable exception = null;
+
+        // Act
+        try {
+            definitionService.getDefinition(descriptor);
+        } catch (Throwable t) {
+            exception = t;
+        }
+
+        //assert
+        assertNotNull("An exception was not raised when an import was added to a link", exception);
+        assertExceptionMessageContains(exception, InvalidDefinitionException.class, "import attribute is not allowed in link tags");
+    }
+
+    @Test
     public void testAuraHtmlTagsOfLinkCannotHaveImportAttribute() throws Exception {
         // Arrange
         String cmpWithImport =
                 "<aura:component><aura:html tag='link' rel='import' href='ohnoes'/></aura:component>";
+        DefDescriptor<ComponentDef> descriptor = addSourceAutoCleanup(ComponentDef.class, cmpWithImport);
+        Throwable exception = null;
+
+        // Act
+        try {
+            definitionService.getDefinition(descriptor);
+        } catch (Throwable t) {
+            exception = t;
+        }
+
+        //assert
+        assertNotNull("An exception was not raised when an import was added to a link", exception);
+        assertExceptionMessageContains(exception, InvalidDefinitionException.class, "import attribute is not allowed in link tags");
+    }
+
+    @Test
+    public void testAuraHtmlTagsOfLinkCannotHaveImportAttributeWithSpaces() throws Exception {
+        // Arrange
+        String cmpWithImport =
+                "<aura:component><aura:html tag='link' rel=' import ' href='ohnoes'/></aura:component>";
         DefDescriptor<ComponentDef> descriptor = addSourceAutoCleanup(ComponentDef.class, cmpWithImport);
         Throwable exception = null;
 

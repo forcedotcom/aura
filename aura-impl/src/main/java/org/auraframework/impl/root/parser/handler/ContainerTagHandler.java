@@ -20,6 +20,7 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.ComponentDefRef;
@@ -158,7 +159,7 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
             }
             if ((LINK_TAG.equals(lowerTag) || (AURA_HTML_TAG.equals(lowerTag) &&
                                                LINK_TAG.equalsIgnoreCase(getAttributeValue(ATTRIBUTE_TAG))))
-                  && ATTRIBUTE_REL_IMPORT.equals(getAttributeValue(ATTRIBUTE_REL))){
+                  && ATTRIBUTE_REL_IMPORT.equalsIgnoreCase(StringUtils.trim(getAttributeValue(ATTRIBUTE_REL)))){
                 throw new AuraRuntimeException("import attribute is not allowed in link tags", getLocation());
             }
             return new HTMLComponentDefRefHandler<>(parentHandler, tag, xmlReader, source, isInInternalNamespace,

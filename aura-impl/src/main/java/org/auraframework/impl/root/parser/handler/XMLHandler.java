@@ -83,19 +83,6 @@ public abstract class XMLHandler<T extends Definition> extends BaseXMLElementHan
      */
     public abstract T getElement() throws XMLStreamException, QuickFixException;
 
-    @Override
-    protected String getAttributeValue(String name) {
-        String value = xmlReader.getAttributeValue(null, name);
-        if (StringUtils.isBlank(value)) {
-            for (int i = 0; i < xmlReader.getAttributeCount(); i++) {
-                if (xmlReader.getAttributeLocalName(i).equalsIgnoreCase(name)) {
-                    return xmlReader.getAttributeValue(i);
-                }
-            }
-        }
-        return value;
-    }
-
     /**
      * Gets system attribute by prepending system prefix.
      * 

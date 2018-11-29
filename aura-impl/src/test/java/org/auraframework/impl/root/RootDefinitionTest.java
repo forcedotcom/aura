@@ -15,6 +15,9 @@
  */
 package org.auraframework.impl.root;
 
+import java.lang.reflect.Method;
+import java.util.Map;
+
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -28,9 +31,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.junit.Test;
-
-import java.lang.reflect.Method;
-import java.util.Map;
 
 public abstract class RootDefinitionTest<T extends RootDefinition> extends DefinitionTest<T> {
     protected final Class<T> defClass;

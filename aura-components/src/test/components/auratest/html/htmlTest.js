@@ -247,5 +247,41 @@
             // If the following handler was bound (unexpectedly), it should throw an error when executed
             component.find("hasBadOnClickHandler").getElement().click();
         }
+    },
+
+
+    testLinkImport : {
+        test: [function (component) {
+            $A.createComponent("link", {"rel": " import "}, function (newCmp) {
+                $A.test.assertNotUndefinedOrNull(newCmp, "creating the component should have worked");
+                component.set("v.body", [newCmp]);
+
+                $A.test.addWaitFor(true, function () {
+                    var body = component.get("v.body");
+                    return body.length && body[0].isRendered() && !!body[0].getElement();
+                }, function () {
+                    var result = component.get("v.body")[0].getElement().rel;
+                    $A.test.assertTrue(result.indexOf("import") === -1, "newly created link element should not have had 'import' as the rel attribute, it was: " + result);
+                    component.set("v.body", []);
+                });
+
+            });
+        },
+        function (component) {
+            $A.createComponent("link", {"rel": {"exprType":"FUNCTION", "code":function(){return ' import '}, "args":[]}}, function(newCmp) {
+                $A.test.assertNotUndefinedOrNull(newCmp, "creating the component should have worked");
+                component.set("v.body", [newCmp]);
+
+                $A.test.addWaitFor(true, function(){
+                        var body = component.get("v.body");
+                        return body.length && body[0].isRendered() && !!body[0].getElement();
+                    }, function(){
+                        var result = component.get("v.body")[0].getElement().rel;
+                        $A.test.assertTrue(result.indexOf("import") === -1, "newly created link element should not have had 'import' as the rel attribute, it was: " + result);
+                        component.set("v.body", []);
+                    });
+
+            });
+        }]
     }
 })

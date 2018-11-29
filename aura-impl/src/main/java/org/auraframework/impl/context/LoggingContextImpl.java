@@ -401,16 +401,25 @@ public class LoggingContextImpl implements LoggingContext {
     }
 
     @Override
-    public void logDeprecationUsages(Map<String, List<String>> usages) {
-        if (usages == null) {
-            return;
+    public void logDeprecationUsages(final Map<String, List<String>> usages) {
+        if (usages != null) {
+            for (final Map.Entry<String, List<String>> entry : usages.entrySet()) {
+                final String message = "Aura API Deprecation Usages: api=" + entry.getKey() + ", caller=";
+                for (final String caller : entry.getValue()) {
+                    logger.warn(message + caller);
+                }
+            }
         }
-
-        for (Map.Entry<String, List<String>> entry : usages.entrySet()) {
-            String api = entry.getKey();
-            for (String caller : entry.getValue()) {
-                String message = String.format("Aura API Deprecation Usages: api=%s, caller=%s", api, caller);
-                logger.warn(message);
+    }
+    
+    @Override
+    public void logClientApiUsages(final Map<String, List<String>> usages) {
+        if ((usages != null) && logger.isInfoEnabled()) {
+            for (final Map.Entry<String, List<String>> entry : usages.entrySet()) {
+                final String message = "Aura Client API Usages: api=" + entry.getKey() + ", caller=";
+                for (final String caller : entry.getValue()) {
+                    logger.info(message + caller);
+                }
             }
         }
     }

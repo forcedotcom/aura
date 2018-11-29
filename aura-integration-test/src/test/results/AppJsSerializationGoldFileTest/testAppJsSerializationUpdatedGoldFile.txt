@@ -15517,6 +15517,20 @@ $A.componentService.initControllerDefs([
             "type":"java://java.lang.String"
           }
         ]
+      },
+      {
+        "n":"reportUsages",
+        "descriptor":"aura://ComponentController/ACTION$reportUsages",
+        "at":"SERVER",
+        "rt":"java://void",
+        "ca":true,
+        "ag":"aura",
+        "pa":[
+          {
+            "name":"usages",
+            "type":"java://java.util.Map<java.lang.String,java.util.List<java.lang.String>>"
+          }
+        ]
       }
     ]
   },

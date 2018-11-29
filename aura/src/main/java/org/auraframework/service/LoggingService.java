@@ -170,8 +170,17 @@ public interface LoggingService {
      * Do not use this method outside of framework.
      *
      * @param usages - a map of deprecated API name and a list of its callers
+     * @see LoggingService#logClientApiUsages(Map)
      */
     void logDeprecationUsages(Map<String, List<String>> usages);
+    
+    /**
+     * Log Aura client API usages. This is used to tell which APIs people are using.
+     * 
+     * @param usages a map of JS API name and a list of its callers
+     * @see #logDeprecationUsages(Map)
+     */
+    void logClientApiUsages(final Map<String, List<String>> usages);
 
     /**
      * Logs an informational message, independent of context such as action or

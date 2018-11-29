@@ -192,10 +192,19 @@ public class LoggingServiceImpl implements LoggingService {
     }
 
     @Override
-    public void logDeprecationUsages(Map<String, List<String>> usages) {
+    public void logDeprecationUsages(final Map<String, List<String>> usages) {
         LoggingContext loggingContext = getLoggingContext();
         if (loggingContext != null) {
             loggingContext.logDeprecationUsages(usages);
+        }
+    }
+    
+
+    @Override
+    public void logClientApiUsages(final Map<String, List<String>> usages) {
+        final LoggingContext loggingContext = getLoggingContext();
+        if (loggingContext != null) {
+            loggingContext.logClientApiUsages(usages);
         }
     }
 

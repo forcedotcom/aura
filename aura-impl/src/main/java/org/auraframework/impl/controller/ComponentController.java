@@ -246,6 +246,21 @@ public class ComponentController implements GlobalController {
             this.loggingService.logDeprecationUsages(usages);
         }
     }
+    
+    /**
+     * This method is called by the client to log the usage of different Client APIs.
+     * 
+     * @param usages A {@link Map} of function usages. This is data to log.
+     * @see #reportDeprecationUsages(Map)
+     */
+    @CabooseAction
+    @AuraEnabled
+    @ActionGroup(value = "aura")
+    public void reportUsages(@Key("usages") final Map<String, List<String>> usages) {
+        if (usages != null) {
+            this.loggingService.logClientApiUsages(usages);
+        }
+    }
 
     @Inject
     public void setInstanceService(InstanceService instanceService) {

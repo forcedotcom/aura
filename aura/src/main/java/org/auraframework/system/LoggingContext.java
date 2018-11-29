@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.instance.Action;
+import org.auraframework.service.LoggingService;
 import org.auraframework.util.json.Json;
 
 import com.google.common.cache.CacheStats;
@@ -67,7 +68,21 @@ public interface LoggingContext {
 
     void logCSPReport(Map<String, Object> report);
 
+    /**
+     * Log deprecated Aura client API usages as a warning message.
+     *
+     * @param usages - a map of deprecated API name and a list of its callers
+     * @see LoggingService#logClientApiUsages(Map)
+     */
     void logDeprecationUsages(Map<String, List<String>> usages);
+    
+    /**
+     * Log Aura client API usages as an info level message. This is used to tell which APIs people are using.
+     * 
+     * @param usages a map of JS API name and a list of its callers
+     * @see #logDeprecationUsages(Map)
+     */
+    void logClientApiUsages(final Map<String, List<String>> usages);
 
     /**
      * Log cache statistics.

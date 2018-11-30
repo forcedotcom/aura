@@ -33,7 +33,7 @@ export default class Child extends LightningElement {
         this.dispatchEvent(event);
         testUtil.assertDefined(domEvent, "Event handler never called after firing event created via document.createEvent");
         testUtil.assertStartsWith("SecureDOMEvent", domEvent.toString(), "Expected event param in listener to be a wrapped event");
-        testUtil.assertStartsWith("SecureElement", domEvent.target.toString(), "Expected event.target to return SecureElement");
+        testUtil.assertStartsWith("SecureElement", targetElement.toString(), "Expected event.target to return SecureElement");
         testUtil.assertEquals("SECUREMODULETEST-CHILD", targetElement.tagName, "Expected event.target to be retargeted to host");
     }
 

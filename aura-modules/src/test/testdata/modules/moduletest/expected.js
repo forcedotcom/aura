@@ -5,13 +5,17 @@ define('modules/moduletest', ['x/test', 'lwc'], function (_xTest, lwc) {
         d: api_dynamic,
         c: api_custom_element
       } = $api;
-
       return [api_custom_element("x-test", _xTest, {
         key: 2
       }, [api_dynamic($cmp.test)])];
     }
 
     var _tmpl = lwc.registerTemplate(tmpl);
+    tmpl.stylesheets = [];
+    tmpl.stylesheetTokens = {
+      hostAttribute: "modules-moduletest_moduletest-host",
+      shadowAttribute: "modules-moduletest_moduletest"
+    };
 
     class Test extends lwc.LightningElement {
       constructor(...args) {

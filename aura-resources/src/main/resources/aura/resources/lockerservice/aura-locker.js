@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-11-23
- * Version: 0.6.4
+ * Generated: 2018-11-30
+ * Version: 0.6.5
  */
 
 (function (exports) {
@@ -2331,6 +2331,30 @@ SecureScriptElement.run = function(st) {
   xhr.send();
 };
 
+function SecureIFrameContentWindow(w, key) {
+  const cached = getFromCache(w, key);
+  if (cached) {
+    return cached;
+  }
+
+  const sms = SecureMessageEventSource(w, key);
+  defineProperty(sms, 'toString', {
+    value: function() {
+      return `SecureIFrameContentWindow: ${w}{ key: ${JSON.stringify(key)} }`;
+    }
+  });
+
+  addMethodIfSupported(sms, w, 'focus');
+  addPropertyIfSupported(sms, w, 'opener');
+  addPropertyIfSupported(sms, w, 'closed', { writable: false });
+
+  setRef(sms, w, key);
+  addToCache(w, sms, key);
+  registerProxy(sms);
+
+  return sms;
+}
+
 const SecureIFrameElement = {
   addMethodsAndProperties: function(prototype) {
     defineProperties(prototype, {
@@ -2342,7 +2366,7 @@ const SecureIFrameElement = {
         get: function() {
           const raw = getRawThis(this);
           return raw.contentWindow
-            ? SecureIFrameElement.SecureIFrameContentWindow(raw.contentWindow, getKey(this))
+            ? SecureIFrameContentWindow(raw.contentWindow, getKey(this))
             : raw.contentWindow;
         }
       },
@@ -2374,31 +2398,6 @@ const SecureIFrameElement = {
     ['height', 'width', 'name'].forEach(name =>
       defineProperty(prototype, name, createFilteredPropertyStateless(name, prototype))
     );
-  },
-
-  // TODO: Move this function into a separate file
-  SecureIFrameContentWindow: function(w, key) {
-    let sicw = getFromCache(w, key);
-    if (sicw) {
-      return sicw;
-    }
-    sicw = create$1(null, {
-      toString: {
-        value: function() {
-          return `SecureIFrameContentWindow: ${w}{ key: ${JSON.stringify(key)} }`;
-        }
-      }
-    });
-
-    defineProperties(sicw, {
-      postMessage: createFilteredMethod(sicw, w, 'postMessage', { rawArguments: true })
-    });
-
-    setRef(sicw, w, key);
-    addToCache(w, sicw, key);
-    registerProxy(sicw);
-
-    return sicw;
   }
 };
 
@@ -5289,6 +5288,42 @@ function evaluate(src, key, sourceURL) {
   }
 }
 
+function SecureMessageEventSource(raw, key) {
+  if (!raw) {
+    return undefined;
+  }
+
+  const cached = getFromCache(raw, key);
+  if (cached) {
+    return cached;
+  }
+
+  const st = create$1(null);
+  const objectProps = ObjectKeys(raw);
+
+  objectProps.forEach(prop => {
+    switch (prop) {
+      case 'postMessage':
+        defineProperty(st, prop, createFilteredMethod(st, raw, prop, { rawArguments: true }));
+        break;
+      case 'close':
+      case 'start':
+        defineProperty(st, prop, createFilteredMethod(st, raw, prop));
+        break;
+      case 'onmessage':
+      case 'onmessageerror':
+        defineProperty(st, prop, createFilteredProperty(st, raw, prop));
+        break;
+      default:
+        break;
+    }
+  });
+
+  setKey(st, key);
+  addToCache(raw, st, key);
+  return st;
+}
+
 function SecureDOMEvent(event, key) {
   assert$1.invariant(event, 'Wrapping an undefined event is prohibited.');
   let o = getFromCache(event, key);
@@ -5309,14 +5344,21 @@ function SecureDOMEvent(event, key) {
     // https://developer.mozilla.org/en-US/docs/Web/Events
     target: createFilteredProperty(o, event, 'target', SKIP_OPAQUE_ASCENDING),
     currentTarget: createFilteredProperty(o, event, 'currentTarget'),
-
     initEvent: createFilteredMethod(o, event, 'initEvent'),
     // Touch Events are special on their own:
     // https://developer.mozilla.org/en-US/docs/Web/API/Touch
     touches: SecureDOMEvent.filterTouchesDescriptor(o, event, 'touches'),
     targetTouches: SecureDOMEvent.filterTouchesDescriptor(o, event, 'targetTouches'),
     changedTouches: SecureDOMEvent.filterTouchesDescriptor(o, event, 'changedTouches'),
-
+    source: {
+      enumerable: true,
+      get() {
+        if (event.source === window) {
+          return SecureWindow(event.source, key);
+        }
+        return SecureMessageEventSource(event.source, key);
+      }
+    },
     view: {
       get: function() {
         const key = getKey(o);
@@ -5335,26 +5377,6 @@ function SecureDOMEvent(event, key) {
   ['relatedTarget', 'srcElement', 'explicitOriginalTarget', 'originalTarget'].forEach(property =>
     addPropertyIfSupported(o, event, property)
   );
-
-  // For MessageEvent, special handling if the message is from a cross origin iframe
-  if (event instanceof MessageEvent) {
-    let xorigin = false;
-    const eventSource = event.source;
-    try {
-      xorigin = !!(eventSource && eventSource.nodeType);
-    } catch (e) {
-      xorigin = true;
-    }
-    // If the MessageEvent object is from a different domain,
-    // and accessing the nodeType property triggers an exception, then the source is a content window,
-    // wrap the source in a SecureIFrameContentWindow
-    if (xorigin) {
-      defineProperty(o, 'source', {
-        enumerable: true,
-        value: SecureIFrameElement.SecureIFrameContentWindow(eventSource, key)
-      });
-    }
-  }
 
   // re-exposing externals
   // TODO: we might need to include non-enumerables
@@ -5720,17 +5742,6 @@ function filterObject(key, raw, options) {
       return options.defaultValue;
     } else if (raw instanceof Event) {
       swallowed = SecureDOMEvent(raw, key);
-      mutated = true;
-    } else if (typeof raw['Window'] === 'function' && raw instanceof raw['Window']) {
-      // Cross realm window instances (window.open() and iframe.contentWindow)
-      swallowed = SecureIFrameElement.SecureIFrameContentWindow(raw, key);
-      // TODO: Move these properties into SecureIFrameContentWindow class
-      // so every instance gets the properties
-      addMethodIfSupported(swallowed, raw, 'close');
-      addMethodIfSupported(swallowed, raw, 'focus');
-      addPropertyIfSupported(swallowed, raw, 'opener');
-      addPropertyIfSupported(swallowed, raw, 'closed', { writable: false });
-
       mutated = true;
     } else if (raw instanceof CanvasRenderingContext2D) {
       swallowed = SecureCanvasRenderingContext2D(raw, key);
@@ -7685,7 +7696,7 @@ function SecureDocument(doc, key) {
         return keyFiltered.join('; ');
       },
       set: function(cookie) {
-        const chunks = cookie.split(';');
+        const chunks = asString(cookie).split(';');
         const entry = chunks[0].split('=');
         const newKey = getCookieKey() + entry[0];
         chunks[0] = `${newKey}=${entry[1]}`;
@@ -9140,6 +9151,7 @@ function SecureWindow(sandbox, key) {
 
   freeze(emptyProto);
 
+  let parentValue;
   o = create$1(emptyProto, {
     document: {
       enumerable: true,
@@ -9190,6 +9202,32 @@ function SecureWindow(sandbox, key) {
       enumerable: true,
       value: SecureURL(win.URL)
     },
+    top: {
+      enumerable: true,
+      get() {
+        if (win.top === window) {
+          return o;
+        }
+        return SecureIFrameContentWindow(win.top, key);
+      }
+    },
+    parent: {
+      enumerable: true,
+      get() {
+        if (parentValue) {
+          return parentValue;
+        }
+
+        if (win.parent === window) {
+          return o;
+        }
+        return SecureIFrameContentWindow(win.parent, key);
+      },
+      set(value) {
+        parentValue = value;
+        return true;
+      }
+    },
     toString: {
       value: function() {
         return `SecureWindow: ${win}{ key: ${JSON.stringify(key)} }`;
@@ -9217,7 +9255,7 @@ function SecureWindow(sandbox, key) {
       if (confirmLocationChange(win.location.href, href)) {
         const filteredArgs = filterArguments(o, [href, ...args]);
         const res = win.open(...filteredArgs);
-        return filter(key, res);
+        return SecureIFrameContentWindow(res, key);
       }
       // window.open spec expects a null return value if the operation fails
       return null;
@@ -10374,7 +10412,7 @@ function SecureAura(AuraInstance, key) {
         const fnReturnedValue = AuraInstance.createComponent(
           type,
           filteredArgs,
-          filter(o, callback)
+          filter(key, callback)
         );
         return filter(key, fnReturnedValue);
       }

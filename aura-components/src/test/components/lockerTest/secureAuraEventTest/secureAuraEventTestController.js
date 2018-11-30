@@ -2,13 +2,13 @@
     testGetEventSourceReturnsSecureComponent: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var secureAuraEvent = cmp.getEvent("debugLog");
-        testUtils.assertStartsWith("SecureComponent", secureAuraEvent.getSource().toString());
+        testUtils.assertStartsWith("SecureComponent:", secureAuraEvent.getSource().toString());
     },
 
     testGetSourceReturnsSecureComponentRefWhenNoAccess: function(cmp, event) {
         var testUtils = cmp.get("v.testUtils");
         var actual = event.getSource();
-        testUtils.assertStartsWith("SecureComponentRef", actual.toString());
+        testUtils.assertStartsWith("SecureComponentRef:", actual.toString());
     },
 
     testExerciseEventAPIs: function(cmp) {
@@ -105,7 +105,7 @@
                 function() { return onCreateCalled; },
                 "ui:createPanel onCreate callback never called creating a panel",
                 function() {
-                    testUtils.assertStartsWith("SecureComponentRef", callbackParam.toString(), "Expected event param callback to filter component");
+                    testUtils.assertStartsWith("SecureComponentRef:", callbackParam.toString(), "Expected event param callback to filter component");
                 }
         );
     },
@@ -118,7 +118,7 @@
         cmp.addEventHandler("lockerTest:applicationEvent", function(event) {
             var params = event.getParams();
             var paramBag = params.paramBag;
-            testUtils.assertStartsWith("SecureComponent", paramBag.foo.toString(), "Expected SecureComponent when passing cmp as event parameter");
+            testUtils.assertStartsWith("SecureComponent:", paramBag.foo.toString(), "Expected SecureComponent when passing cmp as event parameter");
 
             // pass back a DOM element to verify filtering logic
             var callback = event.getParams().callback;
@@ -165,7 +165,7 @@
                 function() { return callbackCalled; },
                 "Event callback set as param never called",
                 function() {
-                    testUtils.assertStartsWith("SecureComponentRef", callbackParam.toString(),
+                    testUtils.assertStartsWith("SecureComponentRef:", callbackParam.toString(),
                             "Expected SecureComponentRef when event handler from another namespace passes own component ref back in callback function");
                 }
         );

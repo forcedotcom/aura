@@ -54,6 +54,15 @@
         }
     },
 
+    testDynamicallyCreatedAuraHtmlComponentIsSecureComponent: {
+        test: function(cmp) {
+            cmp.testDynamicallyCreatedAuraHtmlComponentIsSecureComponent();
+            $A.test.addWaitFor(true, function() {
+                return !!cmp.get("v.testComplete");
+            });
+        }
+    },
+
     testGetRootReturnsSecureComponent: {
         test: function(cmp) {
             cmp.testGetRootReturnsSecureComponent();

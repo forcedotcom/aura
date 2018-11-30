@@ -15,7 +15,7 @@
 
     testGetRootReturnsSecureComponent: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
-        testUtils.assertStartsWith("SecureComponent", $A.getRoot().toString(), "Expected $A.getRoot() to return"
+        testUtils.assertStartsWith("SecureComponent:", $A.getRoot().toString(), "Expected $A.getRoot() to return"
                 + " a SecureComponent");
     },
     
@@ -44,7 +44,7 @@
         var testUtils = cmp.get("v.testUtils");
         var globalId = cmp.find("textCmp").getGlobalId();
         var secureComponentRef = $A.getComponent(globalId);
-        testUtils.assertStartsWith("SecureComponentRef", secureComponentRef.toString(), "Expected $A.getComponent on a component"
+        testUtils.assertStartsWith("SecureComponentRef:", secureComponentRef.toString(), "Expected $A.getComponent on a component"
                 + " from another namespace to be a SecureComponentRef");
     },
     
@@ -52,7 +52,7 @@
         var testUtils = cmp.get("v.testUtils");
         var globalId = cmp.find("lockerCmp").getGlobalId();
         var secureComponent = $A.getComponent(globalId);
-        testUtils.assertStartsWith("SecureComponent", secureComponent.toString(), "Expected $A.getComponent on a component"
+        testUtils.assertStartsWith("SecureComponent:", secureComponent.toString(), "Expected $A.getComponent on a component"
                 + " from the same namespace to be a SecureComponent");
     },
 
@@ -82,7 +82,7 @@
                  testUtils.assertEquals(3, components.length, "Did not receive expected number of components from $A.createComponents");
                  for (var i = 0; i < components.length; i++) {
                      var newCmp = components[i];
-                     testUtils.assertStartsWith("SecureComponentRef", newCmp.toString(), "Created components (via $A.createComponents) should be of type SecureComponentRef");
+                     testUtils.assertStartsWith("SecureComponentRef:", newCmp.toString(), "Created components (via $A.createComponents) should be of type SecureComponentRef");
                  }
                  cmp.set("v.testComplete", true);
              }
@@ -94,9 +94,20 @@
         $A.createComponent("lockerTest:secureWindowTest", {},
                 function(newCmp, status, statusMessagesList){
                     testUtils.assertEquals("SUCCESS", status, "$A.createComponent call did not return SUCCESS");
-                    testUtils.assertStartsWith("SecureComponent", newCmp.toString(), "Created component (via $A.createComponent) should be of type SecureComponent");
+                    testUtils.assertStartsWith("SecureComponent:", newCmp.toString(), "Created component (via $A.createComponent) should be of type SecureComponent");
                     cmp.set("v.testComplete", true);
                 }
+        );
+    },
+
+    testDynamicallyCreatedAuraHtmlComponentIsSecureComponent: function(cmp) {
+        var testUtils = cmp.get("v.testUtils"); 
+        $A.createComponent("aura:html", {"tag":"div"},
+            function(newCmp, status) {
+                testUtils.assertEquals("SUCCESS", status, "$A.createComponent call did not return SUCCESS");
+                testUtils.assertStartsWith("SecureComponent:", newCmp.toString(), "Created aura:html component (via $A.createComponent) should be of type SecureComponent");
+                cmp.set("v.testComplete", true);
+            }
         );
     },
 

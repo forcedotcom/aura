@@ -11,7 +11,7 @@
 
     testComponentLockerInController: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
-        testUtils.assertStartsWith("SecureComponent", cmp.toString(), "Expected component in controller"
+        testUtils.assertStartsWith("SecureComponent:", cmp.toString(), "Expected component in controller"
                 + " to be a SecureComponent");
     },
 
@@ -99,7 +99,7 @@
         var testUtils = cmp.get("v.testUtils");
         var secureComponent = cmp.find("innerCmp");
         // Make sure it's really a SecureComponent before setting
-        testUtils.assertStartsWith("SecureComponent", secureComponent.toString());
+        testUtils.assertStartsWith("SecureComponent:", secureComponent.toString());
         cmp.set("v.componentStore", secureComponent);
     },
 
@@ -219,9 +219,9 @@
 
         var thisAttribute = cmp.get("v.thisAttribute");
 
-        testUtils.assertStartsWith("SecureComponent", thisAttribute.toString(), "Attribute with value {!this} should" +
+        testUtils.assertStartsWith("SecureComponent:", thisAttribute.toString(), "Attribute with value {!this} should" +
                 " be a SecureComponent");
-        testUtils.assertStartsWith("SecureComponent", cmp._eventParamValue.toString(), "init handler event param" +
+        testUtils.assertStartsWith("SecureComponent:", cmp._eventParamValue.toString(), "init handler event param" +
                 " should be a SecureComponent");
         testUtils.assertUndefined(cmp._thisFromInit, "'this' in init handler should be undefined");
         testUtils.assertUndefined(this, "'this' in controller method should be undefined");
@@ -264,7 +264,7 @@
                 "DOM element with return from createComponent never updated",
                 function assertReturnIsSecureComponentRef() {
                     var content = cmp.find("content").get("v.body")[0].get("v.output");
-                    testUtils.assertStartsWith("SecureComponentRef", content,
+                    testUtils.assertStartsWith("SecureComponentRef:", content,
                             "SecureComponent passed to another namespace should be filtered to SecureComponentRef");
                 });
     },

@@ -3,7 +3,7 @@
         var testUtils = cmp.get("v.testUtils");
         var secureComponentRef = cmp.find("module-lib");
 
-        testUtils.assertStartsWith("SecureComponentRef", secureComponentRef.toString(),
+        testUtils.assertStartsWith("SecureComponentRef:", secureComponentRef.toString(),
             "Module lib from another namespace should surface as SecureComponentRef");
     },
 
@@ -11,7 +11,7 @@
         var testUtils = cmp.get("v.testUtils");
         var secureComponentRef = cmp.find("module-cmp");
 
-        testUtils.assertStartsWith("SecureComponentRef", secureComponentRef.toString(),
+        testUtils.assertStartsWith("SecureComponentRef:", secureComponentRef.toString(),
             "Module component from another namespace should surface as SecureComponentRef");
     },
 
@@ -19,7 +19,7 @@
         var testUtils = cmp.get("v.testUtils");
         var secureComponentRef = cmp.find("lockerized-lib");
 
-        testUtils.assertStartsWith("SecureComponentRef", secureComponentRef.toString(),
+        testUtils.assertStartsWith("SecureComponentRef:", secureComponentRef.toString(),
             "Lockerized module lib from another namespace should surface as SecureComponentRef");
     },
 
@@ -27,7 +27,7 @@
         var testUtils = cmp.get("v.testUtils");
         var secureComponentRef = cmp.find("lockerized-cmp");
 
-        testUtils.assertStartsWith("SecureComponentRef", secureComponentRef.toString(),
+        testUtils.assertStartsWith("SecureComponentRef:", secureComponentRef.toString(),
             "Lockerized module component from another namespace should surface as SecureComponentRef");
     },
 

@@ -2,7 +2,7 @@
     testFacetFromAnotherNamespaceIsSecureComponentRef: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var secureComponentRef = cmp.find("facet");
-        testUtils.assertStartsWith("SecureComponentRef", secureComponentRef.toString(), "Expected facet from another namesapce"
+        testUtils.assertStartsWith("SecureComponentRef:", secureComponentRef.toString(), "Expected facet from another namesapce"
                 + " to be of type SecureComponentRef");
     },
 
@@ -40,7 +40,7 @@
     testGetComponentEvent: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var eventSource = cmp.find("eventSource");
-        testUtils.assertStartsWith("SecureComponentRef", eventSource.toString());
+        testUtils.assertStartsWith("SecureComponentRef:", eventSource.toString());
         
         var foo = eventSource.get("e.foo");
         testUtils.assertDefined(foo);
@@ -53,7 +53,7 @@
         var testUtils = cmp.get("v.testUtils");
         
         var eventSource = cmp.find("eventSource");
-        testUtils.assertStartsWith("SecureComponentRef", eventSource.toString());
+        testUtils.assertStartsWith("SecureComponentRef:", eventSource.toString());
         
         eventSource.sayHello();
         testUtils.assertEquals("Hello from sayHello()", eventSource.get("v.message"));

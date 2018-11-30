@@ -29,7 +29,7 @@
     testFindReturnsSecureComponent: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var cmpViaFind = cmp.find("innerCmp");
-        testUtils.assertStartsWith("SecureComponent", cmpViaFind.toString(), "Expected component found via find()"
+        testUtils.assertStartsWith("SecureComponent:", cmpViaFind.toString(), "Expected component found via find()"
                 + " to be a SecureComponent");
     },
 
@@ -38,7 +38,7 @@
         var innerCmp = cmp.find("innerCmp");
         // Reach for the component inside my facet
         var deepInnerCmp = innerCmp.find("outputText");
-        testUtils.assertStartsWith("SecureComponentRef", deepInnerCmp.toString(), "Expected deep inner component found via find()"
+        testUtils.assertStartsWith("SecureComponentRef:", deepInnerCmp.toString(), "Expected deep inner component found via find()"
             + " to be a SecureComponentRef");
     },
 
@@ -79,7 +79,7 @@
         var testUtils = cmp.get("v.testUtils");
         var vp = {
             get: function(key, comp) {
-                testUtils.assertStartsWith("SecureComponent", comp.toString(), "Component passed to value provider should be SecureComponent");
+                testUtils.assertStartsWith("SecureComponent:", comp.toString(), "Component passed to value provider should be SecureComponent");
             }
         }
         cmp.addValueProvider('foo', vp);

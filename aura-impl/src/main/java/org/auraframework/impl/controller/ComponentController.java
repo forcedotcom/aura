@@ -18,7 +18,6 @@ package org.auraframework.impl.controller;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
 import javax.inject.Inject;
 
 import org.auraframework.adapter.ConfigAdapter;
@@ -30,7 +29,8 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
-import org.auraframework.def.RootDefinition;
+import org.auraframework.def.LibraryDef;
+import org.auraframework.def.PlatformDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.ds.servicecomponent.GlobalController;
 import org.auraframework.instance.Application;
@@ -185,18 +185,28 @@ public class ComponentController implements GlobalController {
 
     @AuraEnabled
     @ActionGroup(value = "aura")
-    public ComponentDef getComponentDef(@Key(value = "name", loggable = true) String name) throws QuickFixException {
+    public PlatformDef getComponentDef(@Key(value = "name", loggable = true) String name) throws QuickFixException {
         DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor(name, ComponentDef.class);
+        if (!definitionService.exists(desc)) {
+            DefDescriptor<LibraryDef> libraryDescriptor = definitionService.getDefDescriptor(name, LibraryDef.class);
+            if (definitionService.exists(libraryDescriptor)) {
+                return definitionService.getDefinition(libraryDescriptor);
+            }
+            DefDescriptor<ModuleDef> moduleDescriptor = definitionService.getDefDescriptor(name, ModuleDef.class);
+            if (definitionService.exists(moduleDescriptor)) {
+                return definitionService.getDefinition(moduleDescriptor);
+            }
+        }
         return definitionService.getDefinition(desc);
     }
 
     @AuraEnabled
     @ActionGroup(value = "aura")
-    public List<RootDefinition> getDefinitions(@Key(value = "names", loggable = true) List<String> names) throws QuickFixException {
+    public List<PlatformDef> getDefinitions(@Key(value = "names", loggable = true) List<String> names) throws QuickFixException {
         if (names == null) {
             return Collections.emptyList();
         }
-        List<RootDefinition> returnDefs = Lists.newArrayListWithCapacity(names.size());
+        List<PlatformDef> returnDefs = Lists.newArrayListWithCapacity(names.size());
         for(String name : names) {
             if(name.contains("e.")) {
                 returnDefs.add(getEventDef(name));

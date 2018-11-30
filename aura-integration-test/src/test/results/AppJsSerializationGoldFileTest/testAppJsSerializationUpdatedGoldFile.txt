@@ -15406,7 +15406,7 @@ $A.componentService.initControllerDefs([
         "n":"getComponentDef",
         "descriptor":"aura://ComponentController/ACTION$getComponentDef",
         "at":"SERVER",
-        "rt":"java://org.auraframework.def.ComponentDef",
+        "rt":"java://org.auraframework.def.PlatformDef",
         "ag":"aura",
         "pa":[
           {

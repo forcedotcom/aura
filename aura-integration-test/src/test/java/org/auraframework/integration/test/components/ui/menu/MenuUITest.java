@@ -626,9 +626,8 @@ public class MenuUITest extends WebDriverTestCase {
         WebElement menuLabel = driver.findElement(By.className(label));
         WebElement menu = driver.findElement(By.className(menuName));
         
-        if (BrowserType.FIREFOX.equals(getBrowserType())) {
-            ((JavascriptExecutor)driver).executeScript("arguments[0].scrollIntoView(true);", menuLabel);
-        }
+        ((JavascriptExecutor)driver).executeScript("arguments[0].scrollIntoView(true);", menuLabel);
+
         new Actions(driver).doubleClick(menuLabel).perform();
         waitForMenuOpen(menu);
     }

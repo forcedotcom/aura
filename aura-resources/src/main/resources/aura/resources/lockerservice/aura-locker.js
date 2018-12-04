@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-11-30
- * Version: 0.6.5
+ * Generated: 2018-12-03
+ * Version: 0.6.6
  */
 
 (function (exports) {
@@ -118,6 +118,22 @@ function asString(html) {
     return `${html}`;
   } catch (e) {
     return '';
+  }
+}
+
+let warn = typeof console !== 'undefined' ? console.warn : function() {}; // eslint-disable-line no-console
+let error = Error;
+let severity = {
+  QUIET: 'QUIET',
+  FATAL: 'FATAL',
+  ALERT: 'ALERT'
+};
+
+function registerReportAPI(api) {
+  if (api) {
+    warn = api.warn;
+    error = api.error;
+    severity = api.severity;
   }
 }
 
@@ -556,6 +572,28 @@ function sanitizeURLForElement(url) {
   const normalized = document.createElement('a');
   normalized.href = url;
   return sanitizeURLString(normalized.href);
+}
+
+/**
+ * Sanitizes request URL!
+ * @param {*} url
+ */
+function sanitizeURLForRequests(url) {
+  const normalizer = document.createElement('a');
+  normalizer.setAttribute('href', url);
+
+  // Order of operations are important!
+  let pathname = normalizer.pathname;
+  pathname = decodeURIComponent(pathname);
+  pathname = pathname.toLowerCase();
+
+  if (pathname.includes('/aura')) {
+    throw new error(
+      `Request URL cannot be made to Aura framework internal API endpoints ${url}!`
+    );
+  }
+
+  return normalizer.getAttribute('href');
 }
 
 const DEFAULT = {};
@@ -2103,22 +2141,6 @@ function createFunctionEvaluator(sandbox) {
   // This instance is namespace-specific, and therefore doesn't
   // need to be frozen (only the objects reachable from it).
   return evaluator;
-}
-
-let warn = typeof console !== 'undefined' ? console.warn : function() {}; // eslint-disable-line no-console
-let error = Error;
-let severity = {
-  QUIET: 'QUIET',
-  FATAL: 'FATAL',
-  ALERT: 'ALERT'
-};
-
-function registerReportAPI(api) {
-  if (api) {
-    warn = api.warn;
-    error = api.error;
-    severity = api.severity;
-  }
 }
 
 function SecureScriptElement() {}
@@ -5354,7 +5376,7 @@ function SecureDOMEvent(event, key) {
       enumerable: true,
       get() {
         if (event.source === window) {
-          return SecureWindow(event.source, key);
+          return getEnv$1(key);
         }
         return SecureMessageEventSource(event.source, key);
       }
@@ -7947,25 +7969,10 @@ function SecureXMLHttpRequest(key) {
         enumerable: true,
         writable: true,
         value: function() {
-          const normalizer = document.createElement('a');
-          normalizer.setAttribute('href', arguments[1]);
-
-          // Order of operations are important!
-          let pathname = normalizer.pathname;
-          pathname = decodeURIComponent(pathname);
-          pathname = pathname.toLowerCase();
-
-          if (pathname.includes('/aura')) {
-            throw new error(
-              `SecureXMLHttpRequest.open cannot be used with Aura framework internal API endpoints ${
-                arguments[1]
-              }!`
-            );
+          if (arguments[1]) {
+            arguments[1] = sanitizeURLForRequests(arguments[1]);
           }
-
-          arguments[1] = normalizer.getAttribute('href');
-
-          return xhr.open.apply(xhr, arguments);
+          return xhr.open(...arguments);
         }
       },
 
@@ -9261,6 +9268,18 @@ function SecureWindow(sandbox, key) {
       return null;
     }
   });
+
+  if ('fetch' in win) {
+    defineProperty(o, 'fetch', {
+      enumerable: true,
+      value: function() {
+        if (arguments[0]) {
+          arguments[0] = sanitizeURLForRequests(arguments[0]);
+        }
+        return win.fetch(...arguments);
+      }
+    });
+  }
 
   if ('localStorage' in win) {
     defineProperty(o, 'localStorage', {

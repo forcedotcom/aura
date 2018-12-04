@@ -14,12 +14,14 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-11-30
- * Version: 0.6.5
+ * Generated: 2018-12-03
+ * Version: 0.6.6
  */
 
 (function (exports) {
 'use strict';
+
+// eslint-disable-line no-console
 
 function asString(arg) {
   try {
@@ -393,6 +395,12 @@ function isAllowedSvgTag(tag) {
 /**
  * Sanitizes for a DOM element. Typical use would be when wanting to sanitize for
  * an href or src attribute of an element or window.open
+ * @param {*} url
+ */
+
+
+/**
+ * Sanitizes request URL!
  * @param {*} url
  */
 

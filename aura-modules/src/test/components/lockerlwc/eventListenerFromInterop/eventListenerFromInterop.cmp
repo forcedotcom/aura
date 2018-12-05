@@ -1,0 +1,17 @@
+<aura:component  implements="aura:requireLocker">
+    <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined"/>
+
+    <section class="container-samenamespace-child" id="container-samenamespace-child">
+        <lockerlwc:eventDispatcherRootNode aura:id="sameNamespaceChild" class="sameNamespaceChild" id="sameNamespaceChild"/>
+    </section>
+
+    <section class="container-crossnamespace-child" id="container-crossnamespace-child">
+        <secureothernamespace:eventDispatcherRootNode aura:id="crossNamespaceChild" class="crossNamespaceChild"/>
+    </section>
+
+    <aura:method name="testListenToComposedEventsOnSameNSChildComponent"/>
+    <aura:method name="testListenToComposedEventsOnSameNSShadowElement"/>
+
+    <aura:method name="testListenToComposedEventsOnCrossNSChildComponent"/>
+    <aura:method name="testListenToComposedEventsOnCrossNSShadowElement"/>
+</aura:component>

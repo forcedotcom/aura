@@ -117,9 +117,13 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 Map<DefDescriptor<?>, String> descriptors = mapDescriptorsToDefDesriptorAndUid(requestedDescriptors);
     
                 StringBuilder allUIDs = new StringBuilder();
-    
+
+                boolean hasRestrictedNamespace = false;
                 for (Entry<DefDescriptor<?>, String> defDesc : descriptors.entrySet()) {
                     allUIDs.append(defDesc.getValue());
+                    if (!hasRestrictedNamespace && !configAdapter.isInternalNamespace(defDesc.getKey().getNamespace())) {
+                        hasRestrictedNamespace = true;
+                    }
                 }
                 String computedUID = allUIDs.toString();
     
@@ -138,7 +142,14 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                         throw new InvalidDefinitionException("requestedComponentUID can't be 'null'", null);
                     }
     
-                    StringBuilder redirectUrl = getHost(request);
+                    StringBuilder redirectUrl;
+
+                    if (hasRestrictedNamespace || !configAdapter.cdnEnabled()) {
+                        redirectUrl = getHost(request);
+                    } else {
+                        redirectUrl = new StringBuilder(configAdapter.getCDNDomain());
+                    }
+
                     redirectUrl.append(generateRedirectURI(descriptors, computedUID, request));
     
                     servletUtilAdapter.setNoCache(response);

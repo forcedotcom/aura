@@ -288,7 +288,7 @@ ComponentDefLoader.prototype.buildBundleComponentUri = function(descriptorMap) {
     for (var def=0; def<uris.length; def++) {
         var finalURI = this.buildURIString(uris[def][0], uris[def][1], uris[def][3]);
         var host = $A.clientService._host;
-        if (!uris[def][2]) {
+        if (/* it doesn't have a restricted namespace */ !uris[def][2] && /* uid is not LATEST-N */ uris[def][1].length) {
             host = $A.getContext().cdnHost || host;
         }
         processedURI.push(host + baseURI + finalURI.uriString);

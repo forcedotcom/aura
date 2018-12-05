@@ -126,6 +126,32 @@ public class AuraComponentDefinitionServletTest {
 
     @SuppressWarnings("unchecked")
     @Test
+    public void testMismatchUIDsendRedirectWithCDN() throws Exception {
+        // Arrange
+        setMockRequestParameters("myApp", "true", "", "styling", "def", "UID");
+        DefDescriptor<Definition> defDescriptorMock = Mockito.mock(DefDescriptor.class);
+        Mockito.when(defDescriptorMock.getNamespace()).thenReturn("def");
+        Mockito.when(defDescriptorMock.getName()).thenReturn("qualifiedName");
+        Mockito.when(defDescriptorMock.getQualifiedName()).thenReturn("def:qualifiedName");
+        Mockito.when(definitionService.getDefDescriptor(Matchers.eq("def"), Matchers.any())).thenReturn(defDescriptorMock);
+        Mockito.when(definitionService.getUid(null, defDescriptorMock)).thenReturn("DIFFERENT_UID");
+        Mockito.when(definitionService.exists(defDescriptorMock)).thenReturn(true);
+        Mockito.when(configAdapter.isSecureRequest(request)).thenReturn(true);
+        Mockito.when(response.getWriter()).thenReturn(Mockito.mock(PrintWriter.class));
+        Mockito.when(request.getHeader("Host")).thenReturn("example.host");
+        Mockito.when(configAdapter.getCDNDomain()).thenReturn("https://example.cdn.host");
+        Mockito.when(configAdapter.cdnEnabled()).thenReturn(true);
+        Mockito.when(configAdapter.isInternalNamespace("def")).thenReturn(true);
+
+        // Act
+        AuraPrivateAccessor.invoke(auraComponentDefinitionServlet, "doGet", request, response);
+
+        // Assert
+        Mockito.verify(response).sendRedirect("https://example.cdn.host/auraCmpDef?aura.app=myApp&_ff=null&_l=false&_cssvar=false&_l10n=&_style=styling&_def=def:qualifiedName&_uid=DIFFERENT_UID");
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
     public void testContainsRestrictedDefs() throws Exception {
         // Arrange
         //private Boolean containsOnlyRestrictedDefs = true;

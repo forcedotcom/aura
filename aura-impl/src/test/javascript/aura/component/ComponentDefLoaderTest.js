@@ -356,6 +356,46 @@ Test.Aura.Component.ComponentDefLoaderTest = function() {
 
             Assert.Equal(expect, actual);
         }
+
+        [Fact]
+        function shouldNotUseCDNWhenUIDisUnknown() {
+            var actual;
+            var expect = "/auraCmpDef?aura.app=markup://test_type&_ff=null&_l=true&_def=markup://namespace0:name&_uid=LATEST-0";
+
+            var mock = Object.Clone(defaultMock);
+
+            mock["$A"]["clientService"]["isInternalNamespace"] = function(name) {
+                return name === "namespace0";
+            };
+
+            Mocks.GetMocks(Object.Global(), mock)(function () {
+                var defLoader = new Aura.Component.ComponentDefLoader();
+                var descriptorMap = {"namespace0:name":""};
+                actual = defLoader.buildBundleComponentUri(descriptorMap);
+            });
+
+            Assert.Equal(expect, actual);
+        }
+
+        [Fact]
+        function shouldUseCDNWhenUIDisKnown() {
+            var actual;
+            var expect = "cdnHost/auraCmpDef?aura.app=markup://test_type&_ff=null&_l=true&_def=markup://namespace0:name&_uid=uidKnown";
+
+            var mock = Object.Clone(defaultMock);
+
+            mock["$A"]["clientService"]["isInternalNamespace"] = function(name) {
+                return name === "namespace0";
+            };
+
+            Mocks.GetMocks(Object.Global(), mock)(function () {
+                var defLoader = new Aura.Component.ComponentDefLoader();
+                var descriptorMap = {"namespace0:name":"uidKnown"};
+                actual = defLoader.buildBundleComponentUri(descriptorMap);
+            });
+
+            Assert.Equal(expect, actual);
+        }
     }
 
     [Fixture]

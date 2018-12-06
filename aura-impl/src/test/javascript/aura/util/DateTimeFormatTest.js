@@ -161,6 +161,20 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             Assert.Equal(expected, actual);
         }
 
+        [Fact]
+        function FormatsThreeDigitsYearWithPaddings() {
+            var date = new Date(214, 2, 18);
+            var expected = "0214";
+            var actual;
+
+            mockAura(function() {
+                var locale = new Aura.Utils.Locale("en-US");
+                var dateTimeFormat = new Aura.Utils.DateTimeFormat("YYYY", locale);
+                actual = dateTimeFormat.format(date);
+            });
+
+            Assert.Equal(expected, actual);
+        }
 
         [Fact]
         function FormatsDateTimeWithH24Cycle() {
@@ -515,13 +529,13 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             var date = new Date(2014, 9, 23, 16, 30, 45);
             var expected = data.expected;
             var actual;
-    
+
             mockAura(function() {
                 var locale = new Aura.Utils.Locale("en-US");
                 var dateTimeFormat = new Aura.Utils.DateTimeFormat("yyyy-MM-ddThh:mm:ssZ", locale);
                 actual = dateTimeFormat.format(date, data.offset);
             });
-    
+
             Assert.Equal(expected, actual);
         }
 
@@ -813,7 +827,7 @@ Test.Aura.Util.DateTimeFormatTest = function() {
             Assert.Null(actual);
         }
     }
-    
+
     [Fixture]
     function constructor() {
 
@@ -847,11 +861,11 @@ Test.Aura.Util.DateTimeFormatTest = function() {
                     actual = e.message;
                 }
             });
-            
+
             // Assert
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact, Data({locale: null},
                     {locale: undefined})]
         function NullLocale(data) {
@@ -867,7 +881,7 @@ Test.Aura.Util.DateTimeFormatTest = function() {
                     actual = e.message;
                 }
             });
-            
+
             // Assert
             Assert.Equal(expected, actual);
         }

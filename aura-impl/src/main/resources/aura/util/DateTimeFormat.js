@@ -184,6 +184,7 @@ Aura.Utils.DateTimeFormat = function(formatString, locale) {
                     }
 
                     token["type"] = "number";
+                    token["minDigits"] = token["value"].length;
                     token["localized"] = true;
                     break;
                 case "yy":

@@ -101,7 +101,7 @@ public class ConcreteProvider implements ComponentConfigProvider {
             attributeDefs.put(definitionService.getDefDescriptor("whatToDo", AttributeDef.class), new AttributeDefImpl(
                     definitionService.getDefDescriptor("whatToDo", AttributeDef.class), null, type, null, true,
                     AttributeDef.SerializeToType.BOTH, null, new DefinitionAccessImpl(AuraContext.Access.PUBLIC)));
-            builder.attributeDefs = attributeDefs;
+            builder.setAttributeDefs(attributeDefs);
             builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
             ComponentDef cmpDef = builder.build();
             //add dynamic namespace to MasterDefRegistry so later we can getDef from it during the injectComponent();

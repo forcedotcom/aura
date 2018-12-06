@@ -15,10 +15,13 @@
  */
 package org.auraframework.modules.impl;
 
-import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertThat;
 
+import java.io.ByteArrayOutputStream;
+import java.io.NotSerializableException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,10 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+
 import javax.inject.Inject;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectOutputStream;
-import java.io.NotSerializableException;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
@@ -39,14 +40,14 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
+
 import org.auraframework.def.module.ModuleDef.CodeType;
-import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.service.ModulesCompilerService;
 import org.auraframework.tools.node.impl.sidecar.NodeLambdaFactorySidecar;
-import org.junit.Test;
 import org.junit.Assert;
-
+import org.junit.Test;
 import org.lwc.OutputConfig;
 import org.lwc.bundle.BundleType;
 import org.lwc.decorator.DecoratorParameterValue;

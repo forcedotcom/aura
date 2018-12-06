@@ -15,6 +15,8 @@
  */
 package org.auraframework.modules.impl.documentation;
 
+import static org.junit.Assert.assertArrayEquals;
+
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +25,7 @@ import javax.inject.Inject;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
+import org.auraframework.def.MethodDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.pojo.Meta;
@@ -137,4 +140,72 @@ public class ModulesDocumentationTest extends AuraImplTestCase {
         String actualDescription = descriptions.get(0);
         assertEquals("documentation value did not match", expectedDescription, actualDescription);
     }
+    
+
+    @Test
+    public void testPrivateMethodsAreNotIncluded() throws Exception {
+        final DefDescriptor<ModuleDef> descriptor = definitionService.getDefDescriptor("moduleTest:documentedCmp", ModuleDef.class);
+        final ModuleDef definition = definitionService.getDefinition(descriptor);
+
+        final MethodDef method = definition.getMethodDef("privateMethod");
+
+        assertNull(method);
+    }
+    
+    @Test
+    public void testPublicMethodsAreIncluded() throws Exception {
+        final DefDescriptor<ModuleDef> descriptor = definitionService.getDefDescriptor("moduleTest:documentedCmp", ModuleDef.class);
+        final ModuleDef definition = definitionService.getDefinition(descriptor);
+
+        final MethodDef method = definition.getMethodDef("publicMethod");
+        
+        assertNotNull(method);
+    }
+    
+    @Test
+    public void testPublicMethodParameters() throws Exception {
+        final DefDescriptor<ModuleDef> descriptor = definitionService.getDefDescriptor("moduleTest:documentedCmp", ModuleDef.class);
+        final ModuleDef definition = definitionService.getDefinition(descriptor);
+
+        final MethodDef method = definition.getMethodDef("publicMethodWithParameters");
+
+        // Verify Order
+        final String[] parameterNames = method.getAttributeDefs().keySet().stream().map(DefDescriptor::getName).toArray(size -> new String[size]);
+        assertArrayEquals(new String[]{"param1", "param2"}, parameterNames);
+
+        final AttributeDef param1 = method.getAttributeDef("param1");
+        //assertEquals("String", param1.getTypeDef().getName());
+        assertEquals("description for param1", param1.getDescription());
+        assertTrue(param1.isRequired());
+
+        final AttributeDef param2 = method.getAttributeDef("param2");
+        //assertEquals("Object", param2.getTypeDef().getName());
+        assertEquals("description for param2", param2.getDescription());
+        assertFalse(param2.isRequired());
+
+        assertEquals(2, method.getAttributeDefs().size());
+    }
+
+    @Test
+    public void testRequiredProperty() throws Exception {
+        final DefDescriptor<ModuleDef> descriptor = definitionService.getDefDescriptor("moduleTest:documentedCmp", ModuleDef.class);
+        final ModuleDef definition = definitionService.getDefinition(descriptor);
+
+        assertTrue(definition.getAttributeDef("isRequired").isRequired());
+    }   
+
+    @Test
+    public void testGetMethodDefsIsSameAsGetMethodDef() throws Exception {
+        final DefDescriptor<ModuleDef> descriptor = definitionService.getDefDescriptor("moduleTest:documentedCmp", ModuleDef.class);
+        final ModuleDef definition = definitionService.getDefinition(descriptor);
+
+        final Map<DefDescriptor<MethodDef>, MethodDef> methods = definition.getMethodDefs();
+
+        for(Map.Entry<DefDescriptor<MethodDef>, MethodDef> entry : methods.entrySet()) {
+            assertEquals(entry.getValue(), definition.getMethodDef(entry.getKey().getName()));
+        }
+
+        assertTrue(methods.size() > 0);
+    }
+    
 }

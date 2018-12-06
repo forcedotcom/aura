@@ -27,6 +27,7 @@ import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventType;
+import org.auraframework.def.MethodDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;

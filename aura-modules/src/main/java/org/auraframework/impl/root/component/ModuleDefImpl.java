@@ -15,7 +15,19 @@
  */
 package org.auraframework.impl.root.component;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
@@ -23,14 +35,17 @@ import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.LibraryDef;
+import org.auraframework.def.MethodDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDesignDef;
 import org.auraframework.def.module.ModuleExample;
 import org.auraframework.def.module.impl.ModuleDesignDefImpl;
+import org.auraframework.def.module.pojo.Slot;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.root.PlatformDefImpl;
+import org.auraframework.impl.root.PlatformDefImpl.Builder;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.impl.util.ModuleDefinitionUtil;
 import org.auraframework.instance.AuraValueProviderType;
@@ -49,20 +64,12 @@ import org.lwc.metadata.ModuleExport;
 import org.lwc.reference.Reference;
 import org.lwc.template.TemplateModuleDependencies;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * ModuleDef holds compiled code and serializes for client
  */
 public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleDef {
 
-    private static final long serialVersionUID = -8355860123070388889L;
+    private static final long serialVersionUID = -1540137510503257468L;
 
     private final String path;
     private final Set<String> moduleDependencies;
@@ -83,7 +90,9 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     private final Collection<ModulesCompilerData.WireDecoration> wireDecorations;
     private final List<TemplateModuleDependencies> experimentalTemplateModuleDependencies;
     private final List<ModuleExport> exports;
+    private final Map<DefDescriptor<MethodDef>, MethodDef> methodDefs;
     private final List<ModuleExample> examples;
+    private final List<Slot> slots;
 
     private ModuleDefImpl(Builder builder) {
         super(builder);
@@ -93,7 +102,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         this.moduleName = builder.moduleName;
         this.customElementName = builder.customElementName;
         this.labelReferences = AuraUtil.immutableSet(builder.labelReferences);
-        this.minVersion = builder.minVersion;
+        this.minVersion = builder.getMinVersion();
         this.requireLocker = builder.requireLocker;
         this.moduleDesignDef = builder.moduleDesignDef;
         this.validTargets = AuraUtil.immutableSet(builder.validTargets);
@@ -106,6 +115,8 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         this.experimentalTemplateModuleDependencies = builder.experimentalTemplateModuleDependencies;
         this.exports = builder.exports;
         this.examples = AuraUtil.immutableList(builder.examples);
+        this.slots = AuraUtil.immutableList(builder.slots);
+        this.methodDefs = AuraUtil.immutableMap(builder.methodDefs);
     }
 
     @Override
@@ -172,9 +183,19 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     }
 
     @Override
+    public MethodDef getMethodDef(String name) throws QuickFixException {
+        return getMethodDefs().get(Aura.getDefinitionService().getDefDescriptor(name, MethodDef.class));
+    }
+    
+    @Override
     public List<ModuleExample> getExamples() {
         return examples;
     }
+
+	@Override
+	public List<Slot> getSlots() {
+		return this.slots;
+	}
 
     @Override
     public void serialize(Json json) throws IOException {
@@ -375,9 +396,13 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
         return this.attributeDefs;
     }
+    
+    @Override
+    public Map<DefDescriptor<MethodDef>, MethodDef> getMethodDefs() throws QuickFixException {
+        return methodDefs;
+    }
 
     public static final class Builder extends PlatformDefImpl.Builder<ModuleDef> {
-
         private String path;
         private Map<CodeType, String> codes;
         private Set<String> moduleDependencies;
@@ -395,7 +420,9 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         private SVGDef svgDef;
         private Collection<ModulesCompilerData.WireDecoration> wireDecorations;
         private List<TemplateModuleDependencies> experimentalTemplateModuleDependencies;
+        private final Map<DefDescriptor<MethodDef>, MethodDef> methodDefs = Maps.newLinkedHashMap();
         private List<ModuleExport> exports;
+        private List<Slot> slots;
 
         private List<ModuleExample> examples;
         
@@ -498,6 +525,42 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         public void setSVGDef(SVGDef svgDef) {
             this.svgDef = svgDef;
         }
+        
+
+        /**
+         * Gets the attributeDefs for this instance.
+         *
+         * @return The attributeDefs.
+         */
+        public Map<DefDescriptor<MethodDef>, MethodDef> getMethodDef() {
+            return methodDefs;
+        }
+        
+        /**
+         * Sets the attributeDefs for this instance.
+         */
+        public Builder addMethodDef(DefDescriptor<MethodDef> defDescriptor, MethodDef methodDef) {
+            methodDefs.put(defDescriptor, methodDef);
+            return this;
+        }
+        
+        
+        public Builder setSlots(List<Slot> slots) {
+	        	this.slots = slots;
+	        	return this;
+        }
+        
+        public List<Slot> getSlots() {
+        		return slots;
+        }
+        
+        public Builder addSlot(Slot slot) {
+        		if(this.slots == null) {
+        			this.slots = Lists.newLinkedList();
+        		}
+        		this.slots.add(slot);
+        		return this;
+        }
 
         @Override
         public ModuleDef build() throws QuickFixException {
@@ -507,4 +570,5 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
             return new ModuleDefImpl(this);
         }
     }
+
 }

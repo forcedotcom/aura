@@ -34,12 +34,22 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
+import com.google.common.base.CaseFormat;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.Ordering;
+
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DocumentationDef;
+import org.auraframework.def.MethodDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDef.CodeType;
@@ -47,9 +57,12 @@ import org.auraframework.def.module.ModuleExample;
 import org.auraframework.def.module.ModuleExampleFile;
 import org.auraframework.def.module.impl.ModuleExampleFileImpl;
 import org.auraframework.def.module.impl.ModuleExampleImpl;
+import org.auraframework.def.module.pojo.Slot;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.documentation.DocumentationDefImpl;
 import org.auraframework.impl.root.AttributeDefImpl;
+import org.auraframework.impl.root.AttributeDefRefImpl;
+import org.auraframework.impl.root.MethodDefImpl;
 import org.auraframework.impl.root.component.ModuleDefImpl;
 import org.auraframework.impl.root.component.ModuleDefImpl.Builder;
 import org.auraframework.impl.service.CompilerServiceImpl;
@@ -78,17 +91,12 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
 import org.lwc.bundle.BundleType;
 import org.lwc.classmember.ClassMember;
+import org.lwc.classmember.ClassMethod;
+import org.lwc.classmember.ClassMethodParameter;
+import org.lwc.classmember.ClassProperty;
+import org.lwc.classmember.ClassPropertyValue;
 import org.lwc.diagnostic.Diagnostic;
 import org.lwc.documentation.BundleDocumentation;
-
-import com.google.common.base.CaseFormat;
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.Ordering;
 
 /**
  * Provides ModuleDef implementation
@@ -243,21 +251,10 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
             }
         }
 
-        Set<ClassMember> publicProperties = compilerData.publicProperties;
-        for (ClassMember property : publicProperties) {
-            String attributeName = property.getName();
-            AttributeDefImpl.Builder attrBuilder = new AttributeDefImpl.Builder();
-            DefDescriptor<AttributeDef> attributeDefDesc = new DefDescriptorImpl<>(null, null, attributeName, AttributeDef.class);
-            attrBuilder.setDescriptor(attributeDefDesc);
-            attrBuilder.setAccess(new DefinitionAccessImpl(Access.GLOBAL));
-
-            Optional<String> description = property.getDescription();
-            if (description.isPresent()) {
-                attrBuilder.setDescription(description.get());
-            }
-
-            builder.addAttributeDef(attributeDefDesc, attrBuilder.build());
-        }
+        // Process Specification Members
+        processAttributes(builder, compilerData.publicProperties);
+        processMethods(builder, compilerData.publicMethods);
+        processSlots(builder, compilerData.publicSlots);
 
         // json metadata (lightning.json)
         // TODO: remove once meta.xml is in place
@@ -281,7 +278,99 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         }
         return builder.build();
     }
+
+    private void processAttributes(Builder builder, Set<ClassMember> publicProperties) {
+        if(publicProperties == null) {
+                return;
+        }
+        
+        for (ClassMember classMember : publicProperties) {
+                if (classMember instanceof ClassProperty) {
+                    ClassProperty property = (ClassProperty) classMember;
+                    String attributeName = property.getName();
+                    AttributeDefImpl.Builder attrBuilder = new AttributeDefImpl.Builder();
+                    DefDescriptor<AttributeDef> attributeDefDesc = new DefDescriptorImpl<>(null, null, attributeName, AttributeDef.class);
+                    attrBuilder.setDescriptor(attributeDefDesc);
+                    attrBuilder.setAccess(new DefinitionAccessImpl(Access.GLOBAL));
+                    if (property.getDocumentation() != null) {
+                        attrBuilder.setRequired(property.getDocumentation().isRequired());
+                    }
+                    // Use the ClassPropertyValue to set the default value. 
+                    // Decided we shouldn't use the @default from the documentation as thats doc, not metadata.
+                    // Commented because it needs tests still.
+                    // if (property.getValue() != null) {
+                    //     final AttributeDefRefImpl.Builder defRefBuilder = new AttributeDefRefImpl.Builder();
+                    //     defRefBuilder.setValue(ClassPropertyValue.getValue(property.getValue().value));
+                    //     defRefBuilder.setAccess(new DefinitionAccessImpl(Access.GLOBAL));
+                    //     attrBuilder.setDefaultValue(defRefBuilder.build());
+                    // }
+                    Optional<String> description = property.getDescription();
+                    if (description.isPresent()) {
+                        attrBuilder.setDescription(description.get());
+                    }
+
+                    builder.addAttributeDef(attributeDefDesc, attrBuilder.build());
+                }
+        }
+    }
     
+    private void processMethods(Builder builder, Set<ClassMember> publicMethods) {
+            if(publicMethods == null) {
+                return;
+            }
+            
+        for (ClassMember classMember : publicMethods) {
+                if(classMember instanceof ClassMethod) {
+                ClassMethod method = (ClassMethod) classMember;
+                String methodName = method.getName();
+                MethodDefImpl.Builder methodBuilder = new MethodDefImpl.Builder();
+                DefDescriptor<MethodDef> methodDefDesc = new DefDescriptorImpl<>(null, null, methodName, MethodDef.class);
+                methodBuilder.setDescriptor(methodDefDesc);
+                methodBuilder.setAccess(new DefinitionAccessImpl(Access.GLOBAL));
+    
+                Optional<String> description = method.getDescription();
+                if (description.isPresent()) {
+                        methodBuilder.setDescription(description.get());
+                }
+    
+                if (method.getParameters().isPresent()) {
+                        List<ClassMethodParameter> parameters = method.getParameters().get();
+                        for(ClassMethodParameter parameter : parameters) {
+                            String attributeName = parameter.getName();
+                            AttributeDefImpl.Builder attrBuilder = new AttributeDefImpl.Builder();
+                            DefDescriptor<AttributeDef> attributeDefDesc = new DefDescriptorImpl<>(null, null, attributeName, AttributeDef.class);
+                            attrBuilder.setDescriptor(attributeDefDesc);
+                            attrBuilder.setAccess(new DefinitionAccessImpl(Access.GLOBAL));
+                            if (parameter.getDocumentation() != null) {
+                                attrBuilder.setRequired(parameter.getDocumentation().isRequired());
+
+                                Optional<String> paramDescription = parameter.getDocumentation().getDescription();
+                                if (paramDescription.isPresent()) {
+                                    attrBuilder.setDescription(paramDescription.get());
+                                }
+                            }
+                            methodBuilder.addAttributeDef(attributeDefDesc, attrBuilder.build());
+                        }
+                }
+                builder.addMethodDef(methodDefDesc, methodBuilder.build());
+            }
+        }
+    }
+    
+    private void processSlots(Builder builder, Set<ClassMember> slots) {
+            if(slots == null) {
+                return;
+            }
+            
+        for (ClassMember slot : slots) {
+                if (slot.getDescription().isPresent()) {
+                    builder.addSlot(new Slot(slot.getName(), slot.getDescription().get()));
+                } else {
+                    builder.addSlot(new Slot(slot.getName()));
+                }
+        }
+    }
+
     /**
      * Process xml metadata
      *
@@ -403,7 +492,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
             
             if(examples.containsKey(exampleName)) {
                 throw new RuntimeException(
-                               String.format("The example '%s' was duplicated for module '%s'.", exampleName, documentation.getClassDescription()));
+                        String.format("The example '%s' was duplicated for module '%s'.", exampleName, documentation.getClassDescription()));
                 
             }
             
@@ -488,7 +577,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
                     return entry.getValue() instanceof TextSource;
                 }).
                 map(entry -> {
-                               Source<?> source = entry.getValue();
+                    Source<?> source = entry.getValue();
                     String contents = ((TextSource<?>) source).getContents();
                     DefDescriptor<?> desc = ((TextSource<?>) source).getDescriptor();
                     return new ModuleExampleFileImpl(desc.getName(), contents);

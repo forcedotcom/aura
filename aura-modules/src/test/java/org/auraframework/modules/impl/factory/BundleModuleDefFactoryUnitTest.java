@@ -33,19 +33,28 @@ import static org.powermock.api.mockito.PowerMockito.when;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
+import org.auraframework.def.MethodDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDef.CodeType;
+import org.auraframework.def.module.pojo.Slot;
 import org.auraframework.impl.source.file.FileSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.validation.ReferenceValidationContextImpl;
@@ -73,18 +82,19 @@ import org.junit.runner.RunWith;
 import org.lwc.CompilerReport;
 import org.lwc.bundle.BundleType;
 import org.lwc.classmember.ClassMember;
+import org.lwc.classmember.ClassMethod;
+import org.lwc.classmember.ClassProperty;
+import org.lwc.classmember.ClassPropertyValue;
+import org.lwc.classmember.ClassPropertyValueType;
 import org.lwc.classmember.MemberType;
 import org.lwc.diagnostic.Diagnostic;
 import org.lwc.diagnostic.DiagnosticLevel;
 import org.lwc.documentation.BundleDocumentation;
+import org.lwc.documentation.ClassMethodDocumentation;
+import org.lwc.documentation.ClassPropertyDocumentation;
 import org.lwc.metadata.ReportMetadata;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -135,8 +145,8 @@ public class BundleModuleDefFactoryUnitTest {
     }
 
     private ModulesCompilerService mockModulesCompilerService(CompilerReport compilerReport) throws Exception {
-        ModulesCompilerData compilerData = new ModulesCompilerData(mockCodeMap(), new HashSet<>(), new HashSet<>(),
-                new HashSet<>(), new HashSet<>(), compilerReport);
+        ModulesCompilerData compilerData = new ModulesCompilerData(mockCodeMap(), new HashSet<>(), new HashSet<>(), new HashSet<>(),
+                new HashSet<>(), new HashSet<>(), new HashSet<>(), compilerReport);
 
         ModulesCompilerService modulesCompilerService = mock(ModulesCompilerService.class);
         when(modulesCompilerService.compile(anyString(), anyMap(), any(BundleType.class), anyMap())).thenReturn(compilerData);
@@ -191,9 +201,11 @@ public class BundleModuleDefFactoryUnitTest {
                 Sets.newHashSet(),
                 Sets.newHashSet(),
                 Sets.newHashSet(
-                        new ClassMember("prop1", MemberType.PROPERTY, null, null),
-                        new ClassMember("prop2", MemberType.PROPERTY, null, null),
-                        new ClassMember("prop3", MemberType.PROPERTY, null, null)),
+                        new ClassProperty("prop1", null, new ClassPropertyValue(ClassPropertyValueType.UNRESOLVED, null), null),
+                        new ClassProperty("prop2", null, new ClassPropertyValue(ClassPropertyValueType.UNRESOLVED, null), null),
+                        new ClassProperty("prop3", null, new ClassPropertyValue(ClassPropertyValueType.UNRESOLVED, null), null)),
+                Sets.newHashSet(),
+                Sets.newHashSet(),
                 Sets.newHashSet(),
                 mockReport);
         when(mockCompiler.compile(anyString(), anyMap(), any(BundleType.class), anyMap())).thenReturn(compilerData);
@@ -301,9 +313,11 @@ public class BundleModuleDefFactoryUnitTest {
                 Sets.newHashSet(),
                 Sets.newHashSet(),
                 Sets.newHashSet(
-                        new ClassMember("prop1", MemberType.PROPERTY, null, null),
-                        new ClassMember("prop2", MemberType.PROPERTY, null, null),
-                        new ClassMember("prop3", MemberType.PROPERTY, null, null)),
+                        new ClassMember("prop1", MemberType.PROPERTY, null),
+                        new ClassMember("prop2", MemberType.PROPERTY, null),
+                        new ClassMember("prop3", MemberType.PROPERTY, null)),
+                Sets.newHashSet(),
+                Sets.newHashSet(),
                 Sets.newHashSet(),
                 mockReport);
         when(mockCompiler.compile(anyString(), anyMap(), any(BundleType.class), anyMap())).thenReturn(compilerData);
@@ -349,7 +363,7 @@ public class BundleModuleDefFactoryUnitTest {
         codeMap.put(CodeType.DEV, mockCompiled);
 
         ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
-        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet());
+        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet());
         when(mockCompiler.compile(anyString(), anyMap(), any(BundleType.class), anyMap())).thenReturn(compilerData);
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
@@ -387,7 +401,7 @@ public class BundleModuleDefFactoryUnitTest {
         ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
 
         CompilerReport mockReport = new CompilerReport(mock(Boolean.class), mock(String.class), mock(List.class), mock(List.class), mock(ReportMetadata.class), null);
-        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), mockReport);
+        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet(), mockReport);
         when(mockCompiler.compile(anyString(), anyMap(), any(BundleType.class), anyMap())).thenReturn(compilerData);
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
@@ -652,8 +666,10 @@ public class BundleModuleDefFactoryUnitTest {
                 new HashSet<>(),
                 new HashSet<>(),
                 Sets.newHashSet(
-                        new ClassMember("prop1", MemberType.PROPERTY, "api", "prop1 description"),
-                        new ClassMember("prop2", MemberType.PROPERTY, "api", "prop2 description")),
+                        new ClassProperty("prop1", "api", new ClassPropertyValue(ClassPropertyValueType.UNRESOLVED, null), new ClassPropertyDocumentation("prop1 description", null, null, false)),
+                        new ClassProperty("prop2", "api", new ClassPropertyValue(ClassPropertyValueType.UNRESOLVED, null), new ClassPropertyDocumentation("prop2 description", null, null, false))),
+                Sets.newHashSet(),
+                new HashSet<>(),
                 new HashSet<>(),
                 mockReport);
 
@@ -666,7 +682,7 @@ public class BundleModuleDefFactoryUnitTest {
         ModuleDef moduleDef = moduleDefFactory.getDefinition(descriptor, mockBundleSource);
 
         Map<DefDescriptor<AttributeDef>, AttributeDef> attributes = moduleDef.getAttributeDefs();
-        assertEquals("expected to find three attributes on module def", 2, attributes.size());
+        assertEquals("expected to find two attributes on module def", 2, attributes.size());
 
         DefDescriptor<AttributeDef> desc = new DefDescriptorImpl<>(null, null, "prop1", AttributeDef.class);
         AttributeDef attr = attributes.get(desc);
@@ -679,6 +695,110 @@ public class BundleModuleDefFactoryUnitTest {
         assertNotNull("could not find attribute with name 'prop2'", attr);
         assertTrue("attribute 'prop2' should have access global", attr.getAccess().isGlobal());
         assertEquals("attribute 'prop2' did not have expected description", "prop2 description", attr.getDescription());
+    }
+    
+
+    @Test
+    public void testMethods() throws Exception {
+        DefDescriptor<ModuleDef> descriptor = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX,
+                "namespace", "cmp", ModuleDef.class);
+
+        BundleSource<ModuleDef> mockBundleSource = mockBundleSource(ImmutableMap.of(
+                descriptor, mockFile("cmp.js")));
+
+        CompilerReport mockReport = new CompilerReport(true,
+                "version",
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ReportMetadata(),
+                null);
+
+        ModulesCompilerData compilerData = new ModulesCompilerData(mockCodeMap(),
+                new HashSet<>(),
+                new HashSet<>(),
+                Sets.newHashSet(
+                        new ClassProperty("prop1", "api", new ClassPropertyValue(ClassPropertyValueType.UNRESOLVED, null), new ClassPropertyDocumentation("prop1 description", null, null, false)),
+                        new ClassProperty("prop2", "api", new ClassPropertyValue(ClassPropertyValueType.UNRESOLVED, null), new ClassPropertyDocumentation("prop2 description", null, null, false))),
+                Sets.newHashSet(
+                        new ClassMethod("method1", "api", new ClassMethodDocumentation("method1 description", Collections.emptyList())),
+                        new ClassMethod("method2", "api", new ClassMethodDocumentation("method2 description", Collections.emptyList()))),
+                new HashSet<>(),
+                new HashSet<>(),
+                mockReport);
+
+        ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
+        when(mockCompiler.compile(anyString(), anyMap(), any(BundleType.class), anyMap())).thenReturn(compilerData);
+
+        BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
+        moduleDefFactory.setModulesCompilerService(mockCompiler);
+
+        ModuleDef moduleDef = moduleDefFactory.getDefinition(descriptor, mockBundleSource);
+
+        Map<DefDescriptor<MethodDef>, MethodDef> methods = moduleDef.getMethodDefs();
+        assertEquals("expected to find three attributes on module def", 2, methods.size());
+
+        DefDescriptor<MethodDef> desc = new DefDescriptorImpl<>(null, null, "method1", MethodDef.class);
+        MethodDef method = methods.get(desc);
+        assertNotNull("could not find method with name 'method1'", method);
+        assertTrue("method 'method1' should have access global", method.getAccess().isGlobal());
+        assertEquals("method 'method1' did not have expected description", "method1 description", method.getDescription());
+
+        desc = new DefDescriptorImpl<>(null, null, "method2", MethodDef.class);
+        method = methods.get(desc);
+        assertNotNull("could not find method with name 'method2'", method);
+        assertTrue("method 'method2' should have access global", method.getAccess().isGlobal());
+        assertEquals("method 'method2' did not have expected description", "method2 description", method.getDescription());
+    }
+    
+
+    @Test
+    public void testSlots() throws Exception {
+        LinkedHashSet<ClassMember> slotsData = Sets.newLinkedHashSet();
+        slotsData.add(new ClassMember("slotName", MemberType.SLOT, "slotName description"));
+        slotsData.add(new ClassMember("default", MemberType.SLOT, "default description"));
+
+        DefDescriptor<ModuleDef> descriptor = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX,
+                "namespace", "cmp", ModuleDef.class);
+
+        BundleSource<ModuleDef> mockBundleSource = mockBundleSource(ImmutableMap.of(
+                descriptor, mockFile("cmp.js")));
+
+        CompilerReport mockReport = new CompilerReport(true,
+                "version",
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ReportMetadata(),
+                null);
+
+        ModulesCompilerData compilerData = new ModulesCompilerData(mockCodeMap(),
+                new HashSet<>(),
+                new HashSet<>(),
+                Sets.newHashSet(),
+                Sets.newHashSet(),
+                slotsData,
+                new HashSet<>(),
+                mockReport);
+
+        ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
+        when(mockCompiler.compile(anyString(), anyMap(), any(BundleType.class), anyMap())).thenReturn(compilerData);
+
+        BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
+        moduleDefFactory.setModulesCompilerService(mockCompiler);
+
+        ModuleDef moduleDef = moduleDefFactory.getDefinition(descriptor, mockBundleSource);
+
+        final List<Slot> slots = moduleDef.getSlots();
+        assertEquals("expected to find two slots on module def", 2, slots.size());
+
+        Slot slot = slots.get(0);
+        assertNotNull(slot);
+        assertEquals("slotName", slot.getName());
+        assertEquals("slotName description", slot.getDescription());
+
+        slot = slots.get(1);
+        assertNotNull(slot);
+        assertEquals("default", slot.getName());
+        assertEquals("default description", slot.getDescription());
     }
 
     @Test

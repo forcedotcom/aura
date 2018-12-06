@@ -33,6 +33,8 @@ public final class ModulesCompilerData {
     public final Set<String> bundleDependencies;
     public final Set<String> labels;
     public final Set<ClassMember> publicProperties;
+    public final Set<ClassMember> publicMethods;
+    public final Set<ClassMember> publicSlots;
     public final Set<WireDecoration> wireDecorations;
     public final CompilerReport compilerReport;
 
@@ -41,29 +43,33 @@ public final class ModulesCompilerData {
             Set<String> bundleDependencies,
             Set<String> labels,
             Set<ClassMember> publicProperties,
+            Set<ClassMember> publicMethods,
+            Set<ClassMember> publicSlots,
+            Set<WireDecoration> wireDecorations) {
+        this(codes, bundleDependencies, labels, publicProperties, publicMethods, publicSlots, wireDecorations, null);
+    }
+
+    public ModulesCompilerData(
+            Map<CodeType, String> codes,
+            Set<String> bundleDependencies,
+            Set<String> labels,
+            Set<ClassMember> publicProperties,
+            Set<ClassMember> publicMethods,
+            Set<ClassMember> publicSlots,
             Set<WireDecoration> wireDecorations,
             CompilerReport report) {
         this.codes = codes;
         this.bundleDependencies = bundleDependencies;
         this.labels = labels;
         this.publicProperties = publicProperties;
+        this.publicMethods = publicMethods;
+        this.publicSlots = publicSlots;
         this.wireDecorations = wireDecorations;
         this.compilerReport = report;
     }
-    
-    public ModulesCompilerData(
-            Map<CodeType, String> codes,
-            Set<String> bundleDependencies,
-            Set<String> labels,
-            Set<ClassMember> publicProperties,
-            Set<WireDecoration> wireDecorations) {
-        this(codes, bundleDependencies, labels, publicProperties, wireDecorations, null);
-    }
 
     public static final class WireDecoration implements Serializable {
-
         private static final long serialVersionUID = 6260256431012350935L;
-
         public final String type;
         public final String name;
         public final WireAdapter adapter;
@@ -85,9 +91,7 @@ public final class ModulesCompilerData {
     }
 
     public static final class WireAdapter implements Serializable {
-
         private static final long serialVersionUID = 5266256731423939088L;
-
         public final String name;
         public final String reference;
 

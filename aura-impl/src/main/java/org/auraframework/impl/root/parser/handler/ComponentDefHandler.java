@@ -91,7 +91,7 @@ public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef, C
     protected void readAttributes() throws QuickFixException {
         boolean isTemplate = getBooleanAttributeValue(ATTRIBUTE_ISTEMPLATE);
         builder.isTemplate = isTemplate;
-        builder.minVersion = getDoubleAttributeValue(ATTRIBUTE_MINVERSION);
+        builder.setMinVersion(getDoubleAttributeValue(ATTRIBUTE_MINVERSION));
         if (tc != null) {
             tc.callback(isTemplate);
         }

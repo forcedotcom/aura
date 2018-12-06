@@ -19,16 +19,17 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
 import org.auraframework.Aura;
 import org.auraframework.builder.PlatformDefBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.MethodDef;
 import org.auraframework.def.PlatformDef;
 import org.auraframework.throwable.quickfix.QuickFixException;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 public abstract class PlatformDefImpl<T extends PlatformDef> extends BundleDefImpl<T> implements PlatformDef {
 
@@ -41,11 +42,13 @@ public abstract class PlatformDefImpl<T extends PlatformDef> extends BundleDefIm
     protected PlatformDefImpl(Builder<T> builder) {
         super(builder);
         this.support = builder.support;
+        
         if (builder.attributeDefs == null || builder.attributeDefs.size() == 0) {
             this.attributeDefs = ImmutableMap.of();
         } else {
             this.attributeDefs = Collections.unmodifiableMap(builder.attributeDefs);
         }
+        
         this.minVersion = builder.minVersion;
         this.targets = Collections.unmodifiableSet(builder.targets);
     }
@@ -57,7 +60,7 @@ public abstract class PlatformDefImpl<T extends PlatformDef> extends BundleDefIm
     public AttributeDef getAttributeDef(String name) throws QuickFixException {
         return getAttributeDefs().get(Aura.getDefinitionService().getDefDescriptor(name, AttributeDef.class));
     }
-
+    
     /**
      * Define the minimum API version that a component should be at to use the current component.
      * @return Double value if set, null otherwise
@@ -78,10 +81,9 @@ public abstract class PlatformDefImpl<T extends PlatformDef> extends BundleDefIm
     }
 
     public abstract static class Builder<T extends PlatformDef> extends BundleDefImpl.Builder<T> implements PlatformDefBuilder<T> {
-
-        public Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs = Maps.newLinkedHashMap();
-        public Double minVersion;
-        public Set<String> targets = Collections.emptySet();
+        private final Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs = Maps.newLinkedHashMap();
+        private Double minVersion;
+        protected Set<String> targets = Collections.emptySet();
         private SupportLevel support = SupportLevel.PROTO;
 
         public Builder(Class<T> defClass) {
@@ -94,15 +96,30 @@ public abstract class PlatformDefImpl<T extends PlatformDef> extends BundleDefIm
          * @return The attributeDefs.
          */
         public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() {
-            return this.attributeDefs;
+            return attributeDefs;
         }
 
         /**
          * Sets the attributeDefs for this instance.
          */
-        public void addAttributeDef(DefDescriptor<AttributeDef> defDescriptor, AttributeDef attributeDef) {
-            this.attributeDefs.put(defDescriptor, attributeDef);
+        public Builder<T> addAttributeDef(DefDescriptor<AttributeDef> defDescriptor, AttributeDef attributeDef) {
+            attributeDefs.put(defDescriptor, attributeDef);
+            return this;
         }
+
+        /**
+         * Sets the attributeDefs for this instance.
+         * We use a setter instead of allowing modification of the builder properties so we always know that attributeDefs is a collection. 
+         * Otherwise it could be set to null.
+         */
+        public Builder<T> setAttributeDefs(Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs) {
+        		this.attributeDefs.clear();
+        		if(attributeDefs != null) {
+        			this.attributeDefs.putAll(attributeDefs);
+        		}
+            return this;
+        }
+
 
         public void setTargets(Set<String> targets) {
             this.targets = targets;
@@ -115,8 +132,14 @@ public abstract class PlatformDefImpl<T extends PlatformDef> extends BundleDefIm
             this.targets.add(target);
         }
 
-        public void setMinVersion(Double minVersion) {
+
+        public Builder<T> setMinVersion(Double minVersion) {
             this.minVersion = minVersion;
+            return this;
+        }
+        
+        public Double getMinVersion() {
+        		return minVersion;
         }
 
         @Override

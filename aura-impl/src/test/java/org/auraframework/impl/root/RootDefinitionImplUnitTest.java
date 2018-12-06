@@ -77,7 +77,7 @@ public abstract class RootDefinitionImplUnitTest<I extends RootDefinitionImpl<D>
 
     @Override
     protected D buildDefinition(B builder) throws Exception {
-        builder.attributeDefs = this.attributeDefs;
+        builder.setAttributeDefs(this.attributeDefs);
         if (this.providerDescriptors != null) {
             for (String provider : this.providerDescriptors) {
                 builder.addProvider(provider);

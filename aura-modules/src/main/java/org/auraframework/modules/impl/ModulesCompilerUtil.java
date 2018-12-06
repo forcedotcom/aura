@@ -15,6 +15,21 @@
  */
 package org.auraframework.modules.impl;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Supplier;
+
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.modules.ModulesCompilerData.WireAdapter;
@@ -25,7 +40,6 @@ import org.auraframework.tools.node.impl.NodeBundleBuilder;
 import org.auraframework.tools.node.impl.NodeTool;
 import org.auraframework.tools.node.impl.sidecar.NodeLambdaFactorySidecar;
 import org.auraframework.util.IOUtil;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.lwc.CompilerReport;
@@ -33,7 +47,8 @@ import org.lwc.OutputConfig;
 import org.lwc.bundle.BundleResult;
 import org.lwc.bundle.BundleType;
 import org.lwc.classmember.ClassMember;
-import org.lwc.classmember.MemberType;
+import org.lwc.classmember.ClassMethod;
+import org.lwc.classmember.ClassProperty;
 import org.lwc.decorator.Decorator;
 import org.lwc.decorator.DecoratorParameterValue;
 import org.lwc.decorator.DecoratorTarget;
@@ -42,21 +57,7 @@ import org.lwc.metadata.ReportMetadata;
 import org.lwc.reference.Reference;
 import org.lwc.reference.ReferenceType;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Supplier;
+import com.google.common.collect.Sets;
 
 public final class ModulesCompilerUtil {
 
@@ -127,57 +128,6 @@ public final class ModulesCompilerUtil {
 
        return input;
    }
-
-   static String[] convertJsonArrayToStringArray(JSONArray input) {
-       if (input == null) {
-           return null;
-       }
-
-       String[] ret = new String[input.length()];
-       for (int i = 0; i < input.length(); i++) {
-           try {
-               ret[i] = input.getString(i);
-           } catch(JSONException e) {
-               return null;
-           }
-       }
-
-       return ret;
-   }
-
-    static Set<ClassMember> parsePublicProperties(List<DecoratorTarget> targets, List<ClassMember> classMembers) {
-        if (targets == null) {
-            return Collections.emptySet();
-        }
-
-        Map<String, ClassMember> publicClassMembers = new HashMap<>(targets.size());
-        for (ClassMember member : classMembers) {
-            Optional<String> decorator = member.getDecorator();
-            if (decorator.isPresent() && decorator.get().equals("api")) {
-                publicClassMembers.put(member.getName(), member);
-            }
-        }
-
-        Set<ClassMember> ret = new LinkedHashSet<>();
-
-        for (DecoratorTarget publicDecoration : targets) {
-            if (publicDecoration != null) {
-                try {
-                    if (publicDecoration.type.name().equals("property")) {
-                        ClassMember found = publicClassMembers.get(publicDecoration.name);
-                        // TODO: get rid of this junk when we fold decorators into class members
-                        ClassMember member = found != null ?
-                                found : new ClassMember(publicDecoration.name, MemberType.PROPERTY, null, null);
-                        ret.add(member);
-                    }
-                } catch (JSONException e) {
-                    // ignore
-                }
-            }
-        }
-
-        return ret;
-    }
 
     static Set<WireDecoration> parseWireDecorations(List<DecoratorTarget> targets) {
         if (targets == null) {
@@ -274,8 +224,7 @@ public final class ModulesCompilerUtil {
             }
         }
 
-        List<Decorator> decorators = metadata.decorators;
-        Set<ClassMember> publicProperties = Collections.emptySet();
+        final List<Decorator> decorators = metadata.decorators;
         Set<WireDecoration> wireDecorations = Collections.emptySet();
 
         // TODO: convert to use Java classes
@@ -283,14 +232,68 @@ public final class ModulesCompilerUtil {
             String type = decorator.type.name();
             List<DecoratorTarget> decorations = decorator.targets;
 
-            if (type.equals("api")) {
-                publicProperties = parsePublicProperties(decorations, metadata.classMembers);
-            } else if (type.equals("wire")) {
+            if (type.equals("wire")) {
                 wireDecorations = parseWireDecorations(decorations);
             }
         }
+        
+        ClassMemberParseReport classMemberParseReport = parseClassMembers(metadata.classMembers);
 
-        return new ModulesCompilerData(codeMap, bundleDependencies, bundleLabels, publicProperties, wireDecorations, report);
+        if(classMemberParseReport == null) {
+            classMemberParseReport = new ModulesCompilerUtil.ClassMemberParseReport(Collections.emptySet(), Collections.emptySet(), Collections.emptySet());
+        }
+
+        return new ModulesCompilerData(codeMap, 
+            bundleDependencies, 
+            bundleLabels, 
+            classMemberParseReport.publicProperties, 
+            classMemberParseReport.publicMethods, 
+            classMemberParseReport.publicSlots, 
+            wireDecorations, 
+            report);
+    }
+
+    static private ClassMemberParseReport parseClassMembers(List<ClassMember> classMembers) {
+
+        final Set<ClassMember> publicProperties = Sets.newLinkedHashSet();
+        final Set<ClassMember> publicMethods = Sets.newLinkedHashSet();; 
+        final Set<ClassMember> publicSlots = Sets.newLinkedHashSet();;
+
+        for (ClassMember classMember : classMembers) {
+                switch (classMember.getType()){
+                    case PROPERTY:
+                        ClassProperty propertyClassMember = (ClassProperty) classMember;
+                        // Only @api
+                        if (propertyClassMember.getDecorator().isPresent() && "api".equals(propertyClassMember.getDecorator().get())) {
+                            publicProperties.add(propertyClassMember);
+                        }
+                        break;
+                    case METHOD:
+                        ClassMethod methodClassMember = (ClassMethod) classMember;
+                        // Only @api
+                        if (methodClassMember.getDecorator().isPresent() && "api".equals(methodClassMember.getDecorator().get())) {
+                            publicMethods.add(methodClassMember);
+                        }
+                        break;
+                    case SLOT:
+                        publicSlots.add(classMember);
+                        break;
+                }
+        };
+
+        return new ModulesCompilerUtil.ClassMemberParseReport(publicProperties, publicMethods, publicSlots);
+    }
+
+    static final private class ClassMemberParseReport {
+        final Set<ClassMember> publicProperties;
+        final Set<ClassMember> publicMethods; 
+        final Set<ClassMember> publicSlots;
+
+        public ClassMemberParseReport(Set<ClassMember> publicProperties, Set<ClassMember> publicMethods, Set<ClassMember> publicSlots) {
+            this.publicProperties = publicProperties != null ? publicProperties : Collections.emptySet();
+            this.publicMethods = publicMethods != null ? publicMethods : Collections.emptySet();
+            this.publicSlots = publicSlots != null ? publicSlots : Collections.emptySet();
+        }
     }
 
     public static String getDependencyName(Reference reference) {

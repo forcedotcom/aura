@@ -21,8 +21,14 @@
         } else {
             var cfg = {
                 FORBID_TAGS: ["style", "meta", "script", "link"],
-                ADD_TAGS: ["iframe"],
-                ADD_ATTR: ["allowfullscreen","allow","referrerpolicy","sandbox","target"]
+                ADD_TAGS: ["basefont", "iframe", "xmp"],
+                ADD_ATTR: [
+                    "abbr", "accept-charset", "accesskey", "alink", "allow", "allowfullscreen", "axis",
+                    "char", "charoff", "charset", "classid", "code", "codebase", "codetype", "compact", "content",
+                    "data", "declare", "defer", "frameborder", "hspace", "http-equiv", "language", "link", "longdesc",
+                    "marginheight", "marginwidth", "mozallowfullscreen", "nohref", "noresize", "referrerpolicy", "rules",
+                    "sandbox", "scheme", "scrolling", "standby", "target", "text", "valuetype", "version", "vlink",
+                    "vspace", "webkitallowfullscreen"]
             };
             if ($A.get("$Global")["srcdoc"]) {
                 // only if the current gvp is set to allow srcdoc

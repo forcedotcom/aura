@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-12-03
- * Version: 0.6.6
+ * Generated: 2018-12-07
+ * Version: 0.6.7
  */
 
 (function (exports) {
@@ -2449,14 +2449,17 @@ const metadata$3 = {
   compareDocumentPosition: FUNCTION_RAW_ARGS,
   contains: FUNCTION_RAW_ARGS,
   firstChild: SKIP_OPAQUE,
+  getRootNode: FUNCTION,
   hasChildNodes: FUNCTION,
   insertBefore: FUNCTION,
   isDefaultNamespace: FUNCTION,
   isEqualNode: FUNCTION_RAW_ARGS,
   isSameNode: FUNCTION_RAW_ARGS,
   lastChild: SKIP_OPAQUE,
+  // localName (NOT EXPOSED!) Obsolete: https://developer.mozilla.org/en-US/docs/Web/API/Node/localName
   lookupNamespaceURI: FUNCTION,
   lookupPrefix: FUNCTION,
+  // namespaceURI (NOT EXPOSED!) Obsolete: https://developer.mozilla.org/en-US/docs/Web/API/Node/namespaceURI
   nextSibling: SKIP_OPAQUE,
   nodeName: DEFAULT,
   nodeType: DEFAULT,
@@ -9476,68 +9479,32 @@ function SecureRTCPeerConnection(raw, key) {
 
 // TODO: unused
 
+const { prototypes: { DocumentFragment: DocumentFragment$1 } } = metadata$2;
+
 const metadata$7 = {
   prototypes: {
-    ShadowRoot: {
-      childNodes: READ_ONLY_PROPERTY,
-      compareDocumentPosition: FUNCTION_RAW_ARGS,
-      contains: FUNCTION_RAW_ARGS,
-      delegatesFocus: READ_ONLY_PROPERTY,
-      firstChild: READ_ONLY_PROPERTY,
-      mode: READ_ONLY_PROPERTY,
-      hasChildNodes: FUNCTION,
-      host: READ_ONLY_PROPERTY,
-      innerHTML: READ_ONLY_PROPERTY,
-      lastChild: READ_ONLY_PROPERTY,
-      textContent: READ_ONLY_PROPERTY
+    DocumentFragment: DocumentFragment$1,
+    DocumentOrShadowRoot: {
+      activeElement: READ_ONLY_PROPERTY
+      // elementFromPoint: FUNCTION_RAW_ARGS (NOT EXPOSED!)
+      // elementsFromPoint: FUNCTION_RAW_ARGS (NOT EXPOSED!)
+      // getSelection: FUNCTION (NOT EXPOSED!)
+      // styleSheets: DEFAULT (NOT EXPOSED!)
     },
-    ARIA: {
-      ariaAutoComplete: DEFAULT,
-      ariaChecked: DEFAULT,
-      ariaCurrent: DEFAULT,
-      ariaDisabled: DEFAULT,
-      ariaExpanded: DEFAULT,
-      ariaHasPopUp: DEFAULT,
-      ariaHidden: DEFAULT,
-      ariaInvalid: DEFAULT,
-      ariaLabel: DEFAULT,
-      ariaLevel: DEFAULT,
-      ariaMultiLine: DEFAULT,
-      ariaMultiSelectable: DEFAULT,
-      ariaOrientation: DEFAULT,
-      ariaPressed: DEFAULT,
-      ariaReadOnly: DEFAULT,
-      ariaRequired: DEFAULT,
-      ariaSelected: DEFAULT,
-      ariaSort: DEFAULT,
-      ariaValueMax: DEFAULT,
-      ariaValueMin: DEFAULT,
-      ariaValueNow: DEFAULT,
-      ariaValueText: DEFAULT,
-      ariaLive: DEFAULT,
-      ariaRelevant: DEFAULT,
-      ariaAtomic: DEFAULT,
-      ariaBusy: DEFAULT,
-      ariaActiveDescendant: DEFAULT,
-      ariaControls: DEFAULT,
-      ariaDescribedBy: DEFAULT,
-      ariaFlowTo: DEFAULT,
-      ariaLabelledBy: DEFAULT,
-      ariaOwns: DEFAULT,
-      ariaPosInSet: DEFAULT,
-      ariaSetSize: DEFAULT,
-      ariaColCount: DEFAULT,
-      ariaColIndex: DEFAULT,
-      ariaDetails: DEFAULT,
-      ariaErrorMessage: DEFAULT,
-      ariaKeyShortcuts: DEFAULT,
-      ariaModal: DEFAULT,
-      ariaPlaceholder: DEFAULT,
-      ariaRoleDescription: DEFAULT,
-      ariaRowCount: DEFAULT,
-      ariaRowIndex: DEFAULT,
-      ariaRowSpan: DEFAULT,
-      role: DEFAULT
+    EventTarget: {
+      addEventListener: FUNCTION,
+      removeEventListener: FUNCTION
+    },
+    Node: metadata$3,
+    NonDocumentTypeChildNode: {
+      // nextElementSibling: DEFAULT (NOT EXPOSED!)
+      // previousElementSibling: DEFAULT (NOT EXPOSED!)
+    },
+    ShadowRoot: {
+      delegatesFocus: READ_ONLY_PROPERTY,
+      mode: READ_ONLY_PROPERTY,
+      host: READ_ONLY_PROPERTY,
+      innerHTML: READ_ONLY_PROPERTY
     }
   }
 };
@@ -9545,13 +9512,43 @@ const metadata$7 = {
 // 1 wrapped template per key, 1 per key to isolate the prototype
 const WRAPPED_TEMPLATE_BY_KEY = new Map();
 
-function getWrappedTemplatePrototype() {
+function getWrappedTemplatePrototype(template) {
   const wrappedTemplatePrototype = create$1(getObjectLikeProto(), {
     toString: {
       value: function() {
         const template = getRawThis(this);
         return `SecureTemplate: ${template}{ key: ${JSON.stringify(getKey(this))} }`;
       }
+    },
+    localName: {
+      value: null
+    },
+    namespaceURI: {
+      value: null
+    },
+    nodeValue: {
+      value: null
+    },
+    nextElementSibling: {
+      value: null
+    },
+    nextSibling: {
+      value: null
+    },
+    parentNode: {
+      value: null
+    },
+    parentElement: {
+      value: null
+    },
+    prefix: {
+      value: undefined
+    },
+    previousElementSibling: {
+      value: null
+    },
+    previousSibling: {
+      value: null
     },
     querySelector: {
       value: function(selector) {
@@ -9584,21 +9581,24 @@ function getWrappedTemplatePrototype() {
     }
   });
 
-  // When the native ShadowRoot is used by LWC, then switch this over to addPrototypeMethodsAndPropertiesStateless
-  const prototypes = metadata$7['prototypes'];
-  const supportedInterfaces = ['ShadowRoot', 'ARIA'];
+  const config = {};
+  const metadataPrototypes = metadata$7['prototypes'];
+  const supportedInterfaces = ObjectKeys(metadataPrototypes);
   supportedInterfaces.forEach(name => {
-    const prototype = prototypes[name];
-    for (const property in prototype) {
-      if (!wrappedTemplatePrototype.hasOwnProperty(property)) {
-        defineProperty(
-          wrappedTemplatePrototype,
-          property,
-          createFilteredPropertyStateless(property, wrappedTemplatePrototype, prototype[property])
-        );
-      }
+    const metadataPrototype = metadataPrototypes[name];
+    for (const property in metadataPrototype) {
+      addPrototypeMethodsAndPropertiesStatelessHelper(
+        property,
+        metadataPrototype,
+        undefined,
+        wrappedTemplatePrototype,
+        template,
+        config
+      );
     }
   });
+
+  defineProperties(wrappedTemplatePrototype, config);
 
   freeze(wrappedTemplatePrototype);
   return wrappedTemplatePrototype;
@@ -9617,7 +9617,7 @@ function SecureTemplate(template, key) {
   let wrappedTemplatePrototype = WRAPPED_TEMPLATE_BY_KEY.get(key);
 
   if (!wrappedTemplatePrototype) {
-    wrappedTemplatePrototype = getWrappedTemplatePrototype();
+    wrappedTemplatePrototype = getWrappedTemplatePrototype(template);
     WRAPPED_TEMPLATE_BY_KEY.set(key, wrappedTemplatePrototype);
   }
 
@@ -10091,9 +10091,11 @@ const lwcElementProtoPropNames = [
   'ariaRowIndex',
   'ariaRowSpan',
   'role',
-  // Lightning component properties
+  // Lightning Component Properties:
   'accessKeyLabel',
+  // 'attachShadow', (Not available to end users!)
   'addEventListener',
+  'blur',
   'classList',
   'className',
   'contentEditable',
@@ -10104,6 +10106,8 @@ const lwcElementProtoPropNames = [
   'getAttribute',
   'getAttributeNS',
   'getBoundingClientRect',
+  // 'getElementsByClassName', (NOT EXPOSED! Needs to be fixed in LWC!)
+  // 'getElementsByTagName', (NOT EXPOSED! Needs to be fixed in LWC!)
   'isContentEditable',
   'itemScope',
   'itemType',
@@ -10123,11 +10127,11 @@ const lwcElementProtoPropNames = [
   'removeAttribute',
   'removeEventListener',
   'render',
-  // 'root', (Deprecated, previous name for template)
+  // 'root', (Deprecated. Previous name for template!)
   'setAttribute',
   'setAttributeNS',
-  // 'shadowRoot', (TODO W-5527917)
-  // 'slot', (experimental property, not supported by all browsers https://developer.mozilla.org/en-US/docs/Web/API/Element/slot, LWC throws error on access)
+  // 'shadowRoot', (TODO: W-5527917)
+  // 'slot', (Experimental property. Not supported by all browsers. LWC throws error on access!) [https://developer.mozilla.org/en-US/docs/Web/API/Element/slot]
   'spellcheck',
   'style',
   'template',
@@ -10249,7 +10253,7 @@ SecureLightningElementFactory.getWrappedLightningElement = function(LightningEle
     querySelectorAll: {
       enumerable: true,
       value: function(selector) {
-        const { value } = getRawPropertyDescriptor(LElementPrototype, 'querySelector');
+        const { value } = getRawPropertyDescriptor(LElementPrototype, 'querySelectorAll');
         const rawNodeList = value.call(this, selector);
         return getFilteredValue(this, rawNodeList);
       }

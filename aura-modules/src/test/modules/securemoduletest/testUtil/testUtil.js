@@ -20,8 +20,12 @@ export function assertNull(condition, message) {
     assert(condition === null, `Error message: ${message}\nExpected: null\nActual: ${condition}`);
 }
 
+export function assertNotNull(condition, message) {
+    assert(condition !== null, `Error message: ${message}\nExpected: not null\nActual: ${condition}`);
+}
+
 export function assertNotUndefinedOrNull(condition, message) {
-    assert(condition === undefined || condition === null, `Error message: ${message}\nExpected truthy value\nActual: ${condition}`);
+    assert(!(condition === undefined || condition === null), `Error message: ${message}\nExpected not undefined or null\nActual: ${condition}`);
 }
 
 export function assertStartsWith(start, full, message) {

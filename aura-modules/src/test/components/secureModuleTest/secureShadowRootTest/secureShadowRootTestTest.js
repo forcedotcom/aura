@@ -43,5 +43,11 @@
         test: function(cmp) {
             cmp.secureShadowRootTester("testShadowRootOtherNamespace");
         }
+    },
+
+    testInternalFieldsAreNotAccessibleOnTemplate: {
+        test: function(cmp) {
+            cmp.secureShadowRootTester("testInternalFieldsAreNotAccessibleOnTemplate");
+        }
     }
 })

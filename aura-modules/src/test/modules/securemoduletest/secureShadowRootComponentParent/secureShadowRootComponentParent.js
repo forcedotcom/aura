@@ -104,6 +104,12 @@ export default class SecureShadowRootComponentParent extends LightningElement {
         
         child.testShadowRoot();
     }
+
+    @api
+    testInternalFieldsAreNotAccessibleOnTemplate() {
+        const internalFields = Object.getOwnPropertySymbols(this.template);
+        testUtils.assertEquals(0, internalFields.length, 'Did not expect internal symbols to be exposed on shadowRoot(aka template)');
+    }
 }
 
 const secureElementRegex = /^SecureElement: \[object .*\]{ key: {"namespace":"secureModuleTest"} }/;

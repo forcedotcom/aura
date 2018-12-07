@@ -1,0 +1,3 @@
+<aura:component>
+    <lockerlwc:hostElementTest aura:id="lwcChild"></lockerlwc:hostElementTest>
+</aura:component>

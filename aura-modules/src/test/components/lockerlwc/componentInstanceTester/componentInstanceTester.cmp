@@ -1,0 +1,3 @@
+<aura:component>
+    <lockerlwc:componentInstance aura:id="instance"></lockerlwc:componentInstance>
+</aura:component>

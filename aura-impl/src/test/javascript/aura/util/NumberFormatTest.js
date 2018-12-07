@@ -69,6 +69,50 @@ Test.Aura.Util.NumberFormatTest = function() {
             Assert.Equal(data.expected, result);
         }
 
+        [Fact, Data({value: 1234567890.0987654321, pattern: "0.###", expected: "1234567890.099"},
+                    {value: 1234567890.0987654321, pattern: "#0.###", expected: "1234567890.099"},
+                    {value: 1234567890.0987654321, pattern: "##0.###", expected: "1234567890.099"},
+                    {value: 1234567890.0987654321, pattern: "#,##0.###", expected: "1,234,567,890.099"},
+                    {value: 1234567890.0987654321, pattern: "#,#0.###", expected: "12,34,56,78,90.099"},
+                    {value: 1234567890.0987654321, pattern: "#,##,##0.###", expected: "1,23,45,67,890.099"},
+                    {value: 1234567890.0987654321, pattern: "#,###,##,##0.###", expected: "12,345,67,890.099"},
+                    {value: 1000000000.0987654321, pattern: "0.###", expected: "1000000000.099"},
+                    {value: 1000000000.0987654321, pattern: "#0.###", expected: "1000000000.099"},
+                    {value: 1000000000.0987654321, pattern: "##0.###", expected: "1000000000.099"},
+                    {value: 1000000000.0987654321, pattern: "#,##0.###", expected: "1,000,000,000.099"},
+                    {value: 1000000000.0987654321, pattern: "#,#0.###", expected: "10,00,00,00,00.099"},
+                    {value: 1000000000.0987654321, pattern: "#,##,##0.###", expected: "1,00,00,00,000.099"},
+                    {value: 1000000000.0987654321, pattern: "#,###,##,##0.###", expected: "10,000,00,000.099"},
+                    {value: 0.0987654321, pattern: "0.###", expected: "0.099"},
+                    {value: 0.0987654321, pattern: "#0.###", expected: "0.099"},
+                    {value: 0.0987654321, pattern: "##0.###", expected: "0.099"},
+                    {value: 0.0987654321, pattern: "#,##0.###", expected: "0.099"},
+                    {value: 0.0987654321, pattern: "#,#0.###", expected: "0.099"},
+                    {value: 0.0987654321, pattern: "#,##,##0.###", expected: "0.099"},
+                    {value: 0.0987654321, pattern: "#,###,##,##0.###", expected: "0.099"},
+                    {value: 1234.0987654321, pattern: "00000.###", expected: "01234.099"},
+                    {value: 1234.0987654321, pattern: "#0000.###", expected: "1234.099"},
+                    {value: 1234.0987654321, pattern: "##000.###", expected: "1234.099"},
+                    {value: 1234.0987654321, pattern: "#,000.###", expected: "1,234.099"},
+                    {value: 1234.0987654321, pattern: "#0,000.###", expected: "1,234.099"},
+                    {value: 1234.0987654321, pattern: "#00,00.###", expected: "12,34.099"},
+                    {value: 123.0987654321, pattern: "#0,000.###", expected: "0,123.099"},
+                    {value: 123.0987654321, pattern: "#00,00.###", expected: "01,23.099"},
+                    )]
+        function formatIntegerGroups(data) {
+            var result, symbols = {
+                "decimalSeparator": ".",
+                "groupingSeparator": ",",
+                "currency": "$",
+                "currencyCode": "USD",
+                "zeroDigit": "0"
+            };
+            auraMock(function () {
+                result = new Aura.Utils.NumberFormat(data.pattern, symbols).format(data.value);
+            });
+            Assert.Equal(data.expected, result);
+        }
+
         [Fact]
         function formatZero() {
             var format = "0.##";

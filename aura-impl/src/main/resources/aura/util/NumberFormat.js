@@ -33,7 +33,7 @@ Aura.Utils.NumberFormat = function NumberFormat(format, symbols) {
     this.hasCurrency = false;
     this.multiplier = 0;
     this.minDigits = 1;
-    this.groupingDigits = -1;
+    this.positiveGroupingDigits = []; /** decimal group places, starting from group next to decimal point */
     this.minFractionDigits = 0;
     this.maxFractionDigits = 0;
     this.prefix = null;
@@ -107,6 +107,9 @@ Aura.Utils.NumberFormat = function NumberFormat(format, symbols) {
                     this.parseError("grouping separator found after the decimal separator");
                 }
                 // start counting the numbers between groups
+                if (group > 0) {
+                    this.positiveGroupingDigits.unshift(group);
+                }
                 group = 0;
                 break;
             case ".":
@@ -129,11 +132,12 @@ Aura.Utils.NumberFormat = function NumberFormat(format, symbols) {
             break;
         }
     }
-
+    if (group > 0) {
+        this.positiveGroupingDigits.unshift(group);
+    }
     if (group === 0) {
         this.parseError("grouping cannot be 0");
     }
-    this.groupingDigits = group;
     if (!decimal) {
         this.minDigits = zeros;
         this.minFractionDigits = 0;
@@ -362,17 +366,27 @@ Aura.Utils.NumberFormat.prototype.format = function(number) {
     }
 
     // format the integral part
-    if (this.groupingDigits <= 0 || decimalPos <= this.groupingDigits) {
+    if (this.positiveGroupingDigits.length === 0 || decimalPos <= this.positiveGroupingDigits[0]) {
         // no need for grouping
         result = result.concat(this.translateDigits(charArray.slice(0, decimalPos)));
     } else {
-        var dist = decimalPos % this.groupingDigits || this.groupingDigits;
-        result = result.concat(this.translateDigits(charArray.slice(0, dist)));
-        var intPart = charArray.slice(dist, decimalPos);
-        while (intPart.length > 0) {
-            result.push(this.symbols["groupingSeparator"]);
-            result = result.concat(this.translateDigits(intPart.splice(0, this.groupingDigits)));
+        // Parsing charArray from decimalPos leftwards, so intermediate results prepends to intChars, and appended to result at the end
+        var intChars = [];
+        var parsedIndex = decimalPos;
+        var groupIndex = 0;
+        while (parsedIndex > 0) {
+            var currentGroupingDigits = this.positiveGroupingDigits[groupIndex];
+            if ((groupIndex + 1) < this.positiveGroupingDigits.length) {
+                groupIndex++;
+            }
+            var nextParsedIndex = (parsedIndex - currentGroupingDigits) < 0 ? 0 : (parsedIndex - currentGroupingDigits);
+            intChars = this.translateDigits(charArray.slice(nextParsedIndex, parsedIndex)).concat(intChars);
+            if (nextParsedIndex > 0) {
+                intChars.unshift(this.symbols["groupingSeparator"]);
+            }
+            parsedIndex = nextParsedIndex;
         }
+        result = result.concat(intChars);
     }
 
     // format the fractional part

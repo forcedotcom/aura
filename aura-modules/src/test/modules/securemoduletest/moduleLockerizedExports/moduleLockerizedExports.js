@@ -90,10 +90,3 @@ export class MyClass {
     return document.createElement('DIV');
   }
 }
-
-export default function* () {
-  yield window;
-  yield document;
-  yield document.createElement('');
-  return 'Default!';
-}

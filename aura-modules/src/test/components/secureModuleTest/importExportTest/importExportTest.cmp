@@ -12,6 +12,7 @@
     </secureModuleTest:importLockerizedFromDifferentNamespaceExportNonLockerized>
     <secureModuleTest:importNonLockerizedFromDifferentNamespaceExportLockerized aura:id="importNonLockerizedFromDifferentNamespaceExportLockerized">
     </secureModuleTest:importNonLockerizedFromDifferentNamespaceExportLockerized>
+
     <aura:method name="testImportLockerizedFromSameNamespaceExportLockerized">
         <aura:attribute name="testCase" type="String"/>
     </aura:method>

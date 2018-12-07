@@ -1,6 +1,6 @@
 import { LightningElement, api } from 'lwc';
 import * as testUtil from 'securemoduletest/testUtil';
-import defaultFunction, {
+import {
     BOOLEAN,
     NULL,
     UNDEFINED,
@@ -86,25 +86,5 @@ export default class ImportNonLockerizedFromSameNamespaceExportLockerized extend
         testUtil.assertEquals('[object Window]', getWindowReturnFunction(function() { return window; }).toString());
         testUtil.assertEquals('[object HTMLDocument]', getDocumentReturnFunction(function() { return document; }).toString());
         testUtil.assertEquals('[object HTMLDivElement]', getElementReturnFunction(function() { return document.createElement('DIV'); }).toString());
-    }
-
-    @api
-    testDefault() {
-        let iterator = defaultFunction();
-
-        let firstYield = iterator.next();
-        testUtil.assertEquals({ value: window, done: false }, firstYield);
-        testUtil.assertEquals('[object Window]', firstYield.value.toString());
-
-        let secondYield = iterator.next();
-        testUtil.assertEquals({ value: document, done: false }, secondYield);
-        testUtil.assertEquals('[object HTMLDocument]', secondYield.value.toString());
-
-        let thirdYield = iterator.next();
-        testUtil.assertEquals({ value: document.createElement('DIV'), done: false }, thirdYield);
-        testUtil.assertEquals('SecureObject: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }', thirdYield.value.toString());
-
-        let finalReturn = iterator.next();
-        testUtil.assertEquals({ value: 'Default!', done: true }, finalReturn);
     }
 }

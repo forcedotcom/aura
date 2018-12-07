@@ -1,6 +1,6 @@
 import { LightningElement, api } from 'lwc';
 import * as testUtil from 'securemoduletest/testUtil';
-import defaultFunction, {
+import {
     BOOLEAN,
     NULL,
     UNDEFINED,
@@ -86,25 +86,5 @@ export default class ImportLockerizedFromDifferentNamespaceExportLockerized exte
         testUtil.assertEquals('SecureWindow: [object Window]{ key: {"namespace":"secureModuleTest"} }', getWindowReturnFunction(function() { return window; }).toString());
         testUtil.assertEquals('SecureDocument: [object HTMLDocument]{ key: {"namespace":"secureModuleTest"} }', getDocumentReturnFunction(function() { return document; }).toString());
         testUtil.assertEquals('SecureObject: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }', getElementReturnFunction(function() { return document.createElement('DIV'); }).toString());
-    }
-
-    @api
-    testDefault() {
-        let iterator = defaultFunction();
-
-        let firstYield = iterator.next();
-        testUtil.assertEquals({ value: window, done: false }, firstYield);
-        testUtil.assertEquals('SecureWindow: [object Window]{ key: {"namespace":"secureModuleTest"} }', firstYield.value.toString());
-
-        let secondYield = iterator.next();
-        testUtil.assertEquals({ value: document, done: false }, secondYield);
-        testUtil.assertEquals('SecureDocument: [object HTMLDocument]{ key: {"namespace":"secureModuleTest"} }', secondYield.value.toString());
-
-        let thirdYield = iterator.next();
-        testUtil.assertEquals({ value: document.createElement('DIV'), done: false }, thirdYield);
-        testUtil.assertEquals('SecureObject: [object HTMLDivElement]{ key: {"namespace":"secureModuleTest"} }', thirdYield.value.toString());
-
-        let finalReturn = iterator.next();
-        testUtil.assertEquals({ value: 'Default!', done: true }, finalReturn);
     }
 }

@@ -71,10 +71,3 @@ export function getElementReturnFunction(el) {
   elReturn = el();
   return elReturn;
 }
-
-export default function* () {
-  yield window;
-  yield document;
-  yield document.createElement('');
-  return 'Default!';
-}

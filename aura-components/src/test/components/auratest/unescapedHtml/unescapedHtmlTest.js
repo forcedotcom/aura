@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 ({
+    /* flapping test in IE it just times out sometimes */
+    browsers: ["-IE11"],
+
     /**
      * Empty string value renders no elements.
      */

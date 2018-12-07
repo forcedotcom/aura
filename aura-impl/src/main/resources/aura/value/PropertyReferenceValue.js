@@ -132,7 +132,7 @@ PropertyReferenceValue.prototype.removeChangeHandler=function(cmp, key){
     var cmpOwner = cmp.getOwner();
     if(expression !== this.expression && cmp.getType() !== "aura:expression" && cmpOwner) {
         var changeHandler = cmpOwner.handlers["change"];
-        if(changeHandler[expression]) {
+        if(changeHandler && changeHandler[expression]) {
             changeHandler[expression] = null;
         }
     }

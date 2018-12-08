@@ -40,6 +40,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.http.resource.Manifest;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.service.CSPInliningService;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
@@ -74,6 +75,9 @@ public class ManifestTest extends AuraImplTestCase {
     private RenderingService renderingService;
 
     @Inject
+    private CSPInliningService cspInliningService;
+
+    @Inject
     private InstanceService instanceService;
 
     @Inject
@@ -92,6 +96,7 @@ public class ManifestTest extends AuraImplTestCase {
         manifest.setContextService(contextService);
         manifest.setServerService(serverService);
         manifest.setRenderingService(renderingService);
+        manifest.setCspInliningService(cspInliningService);
         manifest.setExceptionAdapter(exceptionAdapter);
         manifest.setManifestUtil(new ManifestUtil(definitionService, contextService, configAdapter));
         return manifest;
@@ -316,5 +321,61 @@ public class ManifestTest extends AuraImplTestCase {
 
         // Assert
         assertThat("Failed to find expected client library in manifest file", content, containsString(expected));
+    }
+
+    @Test
+    public void testManifestIncludesInlineJsWhenInlineModeUnsupported() throws Exception {
+        // Arrange
+        if (contextService.isEstablished()) {
+            contextService.endContext();
+        }
+        DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor("appCache:testApp", ApplicationDef.class);
+        AuraContext context = contextService.startContext(Mode.PROD, Format.MANIFEST,
+                Authentication.AUTHENTICATED, appDesc);
+        context.setApplicationDescriptor(appDesc);
+
+        MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+        MockHttpServletResponse mockResponse = new MockHttpServletResponse();
+
+        CSPInliningService spyCSPInliningService = Mockito.mock(CSPInliningService.class);
+        doReturn(CSPInliningService.InlineScriptMode.UNSUPPORTED).when(spyCSPInliningService).getInlineMode();
+
+        Manifest manifest = getManifest();
+        manifest.setCspInliningService(spyCSPInliningService);
+
+        // Act
+        manifest.write(mockRequest, mockResponse, context);
+        String content = mockResponse.getContentAsString();
+
+        // Assert
+        assertThat("Failed to find inline.js in manifest file.", content, containsString("inline.js"));
+    }
+
+    @Test
+    public void testManifestShouldNotIncludeInlineJsWhenInlineModeSupported() throws Exception {
+        // Arrange
+        if (contextService.isEstablished()) {
+            contextService.endContext();
+        }
+        DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor("appCache:testApp", ApplicationDef.class);
+        AuraContext context = contextService.startContext(Mode.PROD, Format.MANIFEST,
+                Authentication.AUTHENTICATED, appDesc);
+        context.setApplicationDescriptor(appDesc);
+
+        MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+        MockHttpServletResponse mockResponse = new MockHttpServletResponse();
+
+        CSPInliningService spyCSPInliningService = Mockito.mock(CSPInliningService.class);
+        doReturn(CSPInliningService.InlineScriptMode.NONCE).when(spyCSPInliningService).getInlineMode();
+
+        Manifest manifest = getManifest();
+        manifest.setCspInliningService(spyCSPInliningService);
+
+        // Act
+        manifest.write(mockRequest, mockResponse, context);
+        String content = mockResponse.getContentAsString();
+
+        // Assert
+        assertThat("Inline.js shouldn't be added to manifest file when scripts are csp inlined.", content, not(containsString("inline.js")));
     }
 }

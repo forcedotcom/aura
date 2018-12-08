@@ -34,6 +34,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.instance.Component;
+import org.auraframework.service.CSPInliningService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
@@ -53,6 +54,7 @@ public class Manifest extends AuraResourceImpl {
 
     // FIXME: this is horrendous we actually render the manifest as a component.
     private RenderingService renderingService;
+    private CSPInliningService cspInliningService;
     private ManifestUtil manifestUtil;
 
     public Manifest() {
@@ -181,9 +183,11 @@ public class Manifest extends AuraResourceImpl {
                 sw.write('\n');
             }
 
-            // inline.js is included in appcache so the app may boot while offline
-            sw.write(servletUtilAdapter.getInlineJsUrl(context, attributes));
-            sw.write('\n');
+            if(cspInliningService.getInlineMode() == CSPInliningService.InlineScriptMode.UNSUPPORTED) {
+                // inline.js is included in appcache so the app may boot while offline
+                sw.write(servletUtilAdapter.getInlineJsUrl(context, attributes));
+                sw.write('\n');
+            }
 
             // Add in any application specific resources
             if (descr != null && descr.getDefType().equals(DefType.APPLICATION)) {
@@ -250,6 +254,11 @@ public class Manifest extends AuraResourceImpl {
     @Inject
     public void setRenderingService(RenderingService renderingService) {
         this.renderingService = renderingService;
+    }
+
+    @Inject
+    public void setCspInliningService(CSPInliningService service) {
+        this.cspInliningService = service;
     }
 
     public void setManifestUtil(ManifestUtil manifestUtil) {

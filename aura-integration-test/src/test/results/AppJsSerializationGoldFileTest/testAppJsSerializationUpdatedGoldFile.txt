@@ -15715,6 +15715,24 @@ $A.componentService.initControllerDefs([
         ]
       }
     ]
+  },
+  {
+    "descriptor":"aura://TestInternalGlobalController",
+    "xs":"I",
+    "ac":[
+      {
+        "n":"getString",
+        "descriptor":"aura://TestInternalGlobalController/ACTION$getString",
+        "at":"SERVER",
+        "rt":"java://java.lang.String",
+        "pa":[
+          {
+            "name":"param",
+            "type":"java://java.lang.String"
+          }
+        ]
+      }
+    ]
   }
 ]);
 

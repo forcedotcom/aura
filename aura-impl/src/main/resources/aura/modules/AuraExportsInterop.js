@@ -36,11 +36,19 @@ Aura.ExportsModule = {
      */
     "executeGlobalController": function (endpoint, params, options) {
         var hotspot = options && options.hotspot;
-        var controllerName = 'c.aura://' + endpoint;
-        var action = $A.get(controllerName);
-
+        var controller = 'aura://' + endpoint;
+        var path = controller.split(".");
+        var controllerName = path.shift();
+        var actionName = path.shift();
+        
+        var controllerDef = $A.componentService.controllerDefRegistry[controllerName];
+        if (!controllerDef) {
+            return Promise.reject(new Error('Controller for endpoint ' + endpoint + ' does not exist'));
+        }
+        
+        var action = controllerDef.getActionDef(actionName).newInstance();
         if (!action) {
-            return Promise.reject(new Error('Controller for endpoint ' + endpoint + ' is not registered'));
+            return Promise.reject(new Error('Action of endpoint ' + endpoint + ' is not registered'));
         }
         action.setParams(params);
 

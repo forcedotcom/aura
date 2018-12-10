@@ -576,14 +576,19 @@ Aura.Utils.DateTimeFormat = function(formatString, locale) {
     /**
      * Format date to a localized string.
      *
-     * This method is only used in framework. We assume date is valid here.
+     * This method is only used in framework. We assume date is valid
+     * here.
+     * 
+     * Note: The method name should not be minified because it has to
+     * match the name used by the Native Intl.DateTimeFormat.format
+     * function.
      *
      * @param {!Date} date - A valid date.
      * @param {number=} utcOffset - The time zone offset from UTC in minute.
      *   For now, we need it to be a parameter, because Intl doesn't give the current format.
      * @return {!string} The formatted date
      */
-    this.format = function(date, utcOffset) {
+    this["format"] = function(date, utcOffset) {
         var parts;
 
         // For date before 1970, formatToParts() doesn't have consistent behavior across browsers.

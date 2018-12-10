@@ -2933,8 +2933,8 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             // Act
             mockUtil(function() {
                 targetService.getDateStringBasedOnTimezone("America/Los_Angeles", date, function(dateString) {
-                        actual = dateString;
-                    });
+                    actual = dateString;
+                });
             });
 
             // Assert

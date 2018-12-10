@@ -104,9 +104,6 @@ function AuraLocalizationService() {
     // hh:mm, hh:mm:ss, hh:mm:ss.SSS, hh:mmZ, hh:mm:ssZ, hh:mm:ss.SSSZ
     /** @const {!RegExp} */
     this.ISO_TIME_REGEX = /^\s*(\d\d:\d\d(?::\d\d(?:\.\d+)?)?)((?:[\+\-]\d\d(?::?\d\d)?)|(?:\s*Z))?$/;
-    // month/day/year, hour:minute
-    /** @const {!RegExp} */
-    this.EN_US_DATETIME_PATTERN = /(\d{1,2})\/(\d{1,2})\/(\d{4})\D+(\d{1,2}):(\d{1,2})/;
     /** @const {!RegExp} */
     this.ISO_OFFSET_PATTERN = /(Z)|([+-]\d\d):?(\d\d)/;
 
@@ -149,6 +146,61 @@ function AuraLocalizationService() {
     this.HOUR_MIN = /(\d{1,2})(\d\d)/; // hmm
     /** @const {!RegExp} */
     this.HOUR_MIN_SEC = /(\d{1,2})(\d\d)(\d\d)/; // hmmss
+    
+    /**
+     * @const {!Object}
+     * @private
+     */
+    this.enUsDateTimePatterns = {
+        // month/day/year, hour:minute
+        /** @struct */
+        primaryPattern: {
+            /** @const {!RegExp} */
+            REG_EXP: /(\d{1,2})\/(\d{1,2})\/(\d{4})\D+(\d{1,2}):(\d{1,2})/,
+            /** @const {!number} */
+            MONTH: 1,
+            /** @const {!number} */
+            DAY: 2,
+            /** @const {!number} */
+            YEAR: 3,
+            /** @const {!number} */
+            HOUR: 4,
+            /** @const {!number} */
+            MINUTE: 5
+        },
+        // year-month-day, hour:minute
+        /** @struct */
+        secondaryPattern: {
+            /** @const {!RegExp} */
+            REG_EXP: /(\d{4})-(\d{1,2})-(\d{1,2})\D+(\d{1,2}):(\d{1,2})/,
+            /** @const {!number} */
+            MONTH: 2,
+            /** @const {!number} */
+            DAY: 3,
+            /** @const {!number} */
+            YEAR: 1,
+            /** @const {!number} */
+            HOUR: 4,
+            /** @const {!number} */
+            MINUTE: 5
+        },
+        /**
+         * Used to swap the primaryPattern and secondaryPattern. When
+         * executing the primary pattern expression and it fails to find
+         * a match, we need to switch over to the secondary pattern
+         * expression and see if that will find a match. If the
+         * secondary pattern expression finds a match we need to make it
+         * the primary so we don't have to run 2 regular expressions
+         * every time.
+         *
+         * @private
+         */
+        swap: function () {
+            var tmp = this.primaryPattern;
+            this.primaryPattern = this.secondaryPattern;
+            this.secondaryPattern = tmp;
+        }
+    };
 }
 
 /**
@@ -900,7 +952,7 @@ AuraLocalizationService.prototype.getToday = function(timezone, callback) {
  * Get the date's date string based on a time zone.
  * @param {string} timeZone - A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
  * @param {!Date} date - A Date object
- * @param {!function(!string)} callback - A function to be called after the date string is obtained
+ * @param {!function(string)} callback - A function to be called after the date string is obtained
  * @memberOf AuraLocalizationService
  * @example
  * var timezone = $A.get("$Locale.timezone");
@@ -925,9 +977,17 @@ AuraLocalizationService.prototype.getDateStringBasedOnTimezone = function(timeZo
     timeZone = this.normalizeTimeZone(timeZone);
 
     var dateTimeString = this.formatDateToEnUSString(date, timeZone);
-    var match = this.EN_US_DATETIME_PATTERN.exec(dateTimeString);
+	var match = this.enUsDateTimePatterns.primaryPattern.REG_EXP.exec(dateTimeString);
+    if (match === null) {
+        match = this.enUsDateTimePatterns.secondaryPattern.REG_EXP.exec(dateTimeString);
+        if (match === null) {
+            callback(null);
+            return;
+        }
+        this.enUsDateTimePatterns.swap();
+    }
 
-    callback(match[3] + "-" + match[1] + "-" + match[2]);
+    callback(match[this.enUsDateTimePatterns.primaryPattern.YEAR] + "-" + match[this.enUsDateTimePatterns.primaryPattern.MONTH] + "-" + match[this.enUsDateTimePatterns.primaryPattern.DAY]);
 };
 
 /**
@@ -1746,7 +1806,7 @@ AuraLocalizationService.prototype.formatDateToEnUSString = function(date, timeZo
     var timeZoneFormat = this.createEnUSDateTimeFormat(timeZone);
     var dateString = timeZoneFormat ? this.format(timeZoneFormat, date) : null;
 
-    // If something wrong with the native funtion, using local time as fallback
+    // If something wrong with the native function, using local time as fallback
     return (dateString !== null) ? dateString : this.formatDateTime(date, "MM/dd/yyyy, hh:mm");
 };
 
@@ -1758,13 +1818,17 @@ AuraLocalizationService.prototype.formatDateToEnUSString = function(date, timeZo
  * @private
  */
 AuraLocalizationService.prototype.parseEnUSDateTimeString = function(dateTimeString) {
-    var match = this.EN_US_DATETIME_PATTERN.exec(dateTimeString);
+    var match = this.enUsDateTimePatterns.primaryPattern.REG_EXP.exec(dateTimeString);
     if (match === null) {
-        return null;
+        match = this.enUsDateTimePatterns.secondaryPattern.REG_EXP.exec(dateTimeString);
+        if (match === null) {
+            return null;
+        }
+        this.enUsDateTimePatterns.swap();
     }
 
     // month param is between 0 and 11
-    return Date.UTC(parseInt(match[3], 10), parseInt(match[1], 10) - 1, parseInt(match[2], 10), parseInt(match[4], 10), parseInt(match[5], 10));
+    return Date.UTC(parseInt(match[this.enUsDateTimePatterns.primaryPattern.YEAR], 10), parseInt(match[this.enUsDateTimePatterns.primaryPattern.MONTH], 10) - 1, parseInt(match[this.enUsDateTimePatterns.primaryPattern.DAY], 10), parseInt(match[this.enUsDateTimePatterns.primaryPattern.HOUR], 10), parseInt(match[this.enUsDateTimePatterns.primaryPattern.MINUTE], 10));
 };
 
 /**
@@ -1972,7 +2036,7 @@ AuraLocalizationService.prototype.formatDateTimeToString = function(date, format
     var dateTimeFormat = this.createDateTimeFormat(formatString, locale);
 
     var utcOffset = (isUTCDate === true) ? 0 : (date.getTimezoneOffset() * -1);
-    return dateTimeFormat.format(date, utcOffset);
+    return dateTimeFormat["format"](date, utcOffset);
 };
 
 /**

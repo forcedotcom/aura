@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.util.IOUtil;
+import org.auraframework.util.javascript.JavascriptProcessingError.Level;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -265,7 +266,7 @@ public enum JavascriptWriter {
      * Does the actual compression work.
      */
     private List<JavascriptProcessingError> compress(SourceFile in, Writer out, Writer sourceMapWriter,
-            String filename, Map<String, String> sourceMapLocationMapping) throws IOException {
+            String filename, Map<String, String> sourceMapLocationMapping) {
 
         List<JavascriptProcessingError> msgs = new ArrayList<>();
 
@@ -323,12 +324,14 @@ public enum JavascriptWriter {
 
             // errors and warnings
             for (JSError e : compiler.getErrors()) {
-                JavascriptProcessingError.makeError(msgs, manager.getErrorMessage(e.sourceName, e.getLineNumber(), e.getCharno()), e.getLineNumber(), e.getCharno(),
-                        in.getName(), null);
+                JavascriptProcessingError msg = new JavascriptProcessingError(manager.getErrorMessage(e.sourceName, e.getLineNumber(), e.getCharno()), e.getLineNumber(), e.getCharno(), in.getName(), null,
+				        Level.Error);
+				msgs.add(msg);
             }
             for (JSError e : compiler.getWarnings()) {
-                JavascriptProcessingError.makeWarning(msgs, manager.getErrorMessage(e.sourceName, e.getLineNumber(), e.getCharno()), e.getLineNumber(), e.getCharno(),
-                        in.getName(), null);
+                JavascriptProcessingError msg = new JavascriptProcessingError(manager.getErrorMessage(e.sourceName, e.getLineNumber(), e.getCharno()), e.getLineNumber(), e.getCharno(), in.getName(), null,
+				        Level.Warning);
+				msgs.add(msg);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

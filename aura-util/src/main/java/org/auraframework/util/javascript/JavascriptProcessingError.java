@@ -15,26 +15,14 @@
  */
 package org.auraframework.util.javascript;
 
-import java.util.List;
-import java.util.Map;
-
 import org.auraframework.util.validation.ValidationError;
 
 /**
- * javascript ouchies
+ * javascript error with position information.
  */
 public final class JavascriptProcessingError extends ValidationError {
-
     public enum Level {
         Warning, Error;
-    }
-
-    public JavascriptProcessingError() {
-        super("js/custom", Level.Error);
-    }
-
-    JavascriptProcessingError(String tool, String filename, Map<String, ?> error) {
-        super(tool, filename, error);
     }
 
     public JavascriptProcessingError(String message, int line, int character, String filename, String evidence,
@@ -42,28 +30,10 @@ public final class JavascriptProcessingError extends ValidationError {
         super("js/custom", filename, line, character, message, evidence, level, null);
     }
 
-    private static JavascriptProcessingError make(List<JavascriptProcessingError> errorsList, String message, int line,
-            int character, String filename, String evidence, Level level) {
-        JavascriptProcessingError msg = new JavascriptProcessingError(message, line, character, filename, evidence,
-                level);
-        errorsList.add(msg);
-        return msg;
-    }
-
-    public static JavascriptProcessingError makeWarning(List<JavascriptProcessingError> errorsList, String message,
-            int line, int character, String filename, String evidence) {
-        return make(errorsList, message, line, character, filename, evidence, Level.Warning);
-    }
-
-    public static JavascriptProcessingError makeError(List<JavascriptProcessingError> errorsList, String message,
-            int line, int character, String filename, String evidence) {
-        return make(errorsList, message, line, character, filename, evidence, Level.Error);
-    }
-
     @Override
     public String toString() {
-        String s = String.format("JS Processing %s: %s (line %s, char %s) : %s", getLevel(), getFilename(), getLine(),
-                getStartColumn(), getMessage());
+        String s = String.format("JS Processing %s: %s (line %s, char %s) : %s", getLevel(), getFilename(), Integer.valueOf(getLine()),
+                Integer.valueOf(getStartColumn()), getMessage());
         String evidence = getEvidence();
         if (evidence != null && evidence.length() > 0) {
             s += String.format(" \n %s", evidence);

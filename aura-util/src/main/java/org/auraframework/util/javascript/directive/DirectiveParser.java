@@ -27,6 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.auraframework.util.javascript.JavascriptProcessingError;
+import org.auraframework.util.javascript.JavascriptProcessingError.Level;
 
 /**
  * parses files for directives
@@ -136,12 +137,7 @@ public class DirectiveParser {
     }
 
     private void addError(int lineNum, String message, String code) {
-        JavascriptProcessingError e = new JavascriptProcessingError();
-        e.setFilename(file.getName());
-        e.setLine(lineNum);
-        e.setStartColumn(0);
-        e.setMessage(message);
-        e.setEvidence(code);
+        JavascriptProcessingError e = new JavascriptProcessingError(message, lineNum, 0, file.getName(), code, Level.Error);
         this.parseErrors.add(e);
     }
 

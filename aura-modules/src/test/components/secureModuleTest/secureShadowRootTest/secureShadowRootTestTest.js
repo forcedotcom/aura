@@ -1,6 +1,24 @@
 ({
     browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-SAFARI", "-IPHONE", "-IPAD"],
 
+    testBlacklistedProperties: {
+        test: function(cmp) {
+          cmp.secureShadowRootTester("testBlacklistedProperties");
+        }  
+    },
+
+    testNullProperties: {
+        test: function(cmp) {
+          cmp.secureShadowRootTester("testNullProperties");
+        }  
+    },
+
+    testUndefinedProperties: {
+        test: function(cmp) {
+          cmp.secureShadowRootTester("testUndefinedProperties");
+        }  
+    },
+
     testTemplateChildNodes: {
         test: function(cmp) {
           cmp.secureShadowRootTester("testTemplateChildNodes");
@@ -23,13 +41,13 @@
         test: function(cmp) {  
             cmp.secureShadowRootTester("testTemplateQuerySelector");   
         }  
-    }, 
+    },
     
     testTemplateQuerySelectorAll: {    
         test: function(cmp) {
             cmp.secureShadowRootTester("testTemplateQuerySelectorAll");
         }  
-    }, 
+    },
 
     // TODO: Enable After @W-5527917@
     _testShadowRoot: {

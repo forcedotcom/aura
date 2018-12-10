@@ -1,9 +1,69 @@
 import { LightningElement, api } from "lwc";
 import * as testUtils from "securemoduletest/testUtil";
 
-const parentComponentTagName = "SECUREMODULETEST-SECURE-SHADOW-ROOT-COMPONENT-PARENT";
-
 export default class SecureShadowRootComponentParent extends LightningElement {
+    @api
+    testBlacklistedProperties() {
+        const { template } = this;
+        const blacklistedProperties = [
+            'elementFromPoint',
+            'elementsFromPoint',
+            'getSelection',
+            'styleSheets'
+        ];
+
+        for (let i = 0, n = blacklistedProperties.length; i < n; i++) {
+            const blacklistedProperty = blacklistedProperties[i];
+            if (blacklistedProperty in template) {
+                testUtils.fail(`Expected "${blacklistedProperty}" property of SecureTemplate to be blacklisted.`);
+            } else {
+                testUtils.assertUndefined(template[blacklistedProperty], `Expected "${blacklistedProperty}" property of SecureTemplate to be undefined!`);
+            }
+        }
+    }
+
+    @api
+    testNullProperties() {
+        const { template } = this;
+        const nullProperties = [
+            'nodeValue',
+            'namespaceURI',
+            'nextSibling',
+            'previousSibling',
+            'nextElementSibling',
+            'previousElementSibling',
+            'localName',
+            'parentNode',
+            'parentElement'
+        ];
+
+        for (let i = 0, n = nullProperties.length; i < n; i++) {
+            const nullProperty = nullProperties[i];
+            if (nullProperty in template) {
+                testUtils.assertNull(template[nullProperty], `Expected "${nullProperty}" property of SecureTemplate to be null!`);
+            } else {
+                testUtils.fail(`Expected "${nullProperty}" property of SecureTemplate to exist.`);
+            }
+        }
+    }
+
+    @api
+    testUndefinedProperties() {
+        const { template } = this;
+        const undefinedProperties = [
+            'prefix'
+        ];
+
+        for (let i = 0, n = undefinedProperties.length; i < n; i++) {
+            const undefinedProperty = undefinedProperties[i];
+            if (undefinedProperty in template) {
+                testUtils.assertUndefined(template[undefinedProperty], `Expected "${undefinedProperty}" property of SecureTemplate to be undefined!`);
+            } else {
+                testUtils.fail(`Expected "${undefinedProperty}" property of SecureTemplate to exist.`);
+            }
+        }
+    }
+
     @api
     testTemplateChildNodes() {
       const childNodes = this.template.childNodes;
@@ -23,7 +83,7 @@ export default class SecureShadowRootComponentParent extends LightningElement {
     testTemplateHost() {
         // NOTE: The host of "this.template" belongs to a component, secureModuleTest/secureShadowRootTest, which is in the same namespace as "this".
         const host = this.template.host;
-        testUtils.assertEquals(parentComponentTagName, host.tagName, 'Expected tagName to be "SECUREMODULETEST-SECURE-SHADOW-ROOT-COMPONENT-PARENT"');
+        testUtils.assertEquals('SECUREMODULETEST-SECURE-SHADOW-ROOT-COMPONENT-PARENT', host.tagName, 'Expected tagName to be "SECUREMODULETEST-SECURE-SHADOW-ROOT-COMPONENT-PARENT"');
         testUtils.assertEquals('SecureElement: [object HTMLElement]{ key: {"namespace":"secureModuleTest"} }', host.toString(), 'Expected a SecureElement: [object HTMLElement].');
         testUtils.assertEquals('', host.innerText, 'Expected "innerText" to be an empty string.');
 

@@ -7,7 +7,3 @@ export function executedGlobalControllerWithCustomException() {
             throw new Error(err['data']['customMessage']); // eslint-disable-line dot-notation
         });
 }
-
-export function executeTestInternalGlobalController(param) {
-    return executeGlobalController("TestInternalGlobalController.getString", { param: param});
-}

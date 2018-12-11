@@ -81,6 +81,7 @@ import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil.JSONEscapedFunctionStringBuilder;
 import org.auraframework.util.javascript.Literal;
+import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
 import org.springframework.context.annotation.Lazy;
@@ -453,7 +454,9 @@ public class ServerServiceImpl implements ServerService {
     public void writeDefinitions(final Set<DefDescriptor<?>> dependencies, Writer out, boolean hasParts, int partIndex, HYDRATION_TYPE hydrationType, boolean preloading)
             throws IOException, QuickFixException {
         AuraContext context = contextService.getCurrentContext();
-        final boolean minify = context.getMode().minify();
+        final Mode mode = context.getMode();
+        final boolean minify = mode.minify();
+        final JavascriptGeneratorMode jsMode = mode.getJavascriptMode();
 
         context.setPreloading(preloading);
         DefDescriptor<? extends BaseComponentDef> appDesc = context.getLoadingApplicationDescriptor();
@@ -462,7 +465,8 @@ public class ServerServiceImpl implements ServerService {
         final String uid = context.getUid(appDesc);
         final String lockerService = configAdapter.isLockerServiceEnabled() ? ":ls" : "";
         final String compat = context.useCompatSource() ? ":c" : "";
-        final String key = "JS:" + mKey + uid + (hasParts ? ":" + partIndex : "") + ":" + lockerService + compat;
+        final String debug = jsMode == JavascriptGeneratorMode.PRODUCTIONDEBUG || jsMode == JavascriptGeneratorMode.PERFORMANCEDEBUG ? ":DEBUG" : "";
+        final String key = "JS:" + mKey + uid + (hasParts ? ":" + partIndex : "") + ":" + lockerService + compat + debug;
 
         final Callable<String> buildFunction = () -> {
             String res = getDefinitionsString(dependencies, hydrationType);

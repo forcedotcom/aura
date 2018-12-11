@@ -41,7 +41,7 @@ import java.util.Set;
 public interface ModuleDef extends PlatformDef {
 
     enum CodeType {
-        DEV, PROD, COMPAT, PROD_COMPAT
+        DEV, PROD, COMPAT, PROD_COMPAT, PROD_DEBUG, PROD_DEBUG_COMPAT
     }
 
     // arbitrary descriptor prefix for html template

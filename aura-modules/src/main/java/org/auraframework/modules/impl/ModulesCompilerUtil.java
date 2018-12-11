@@ -15,6 +15,9 @@
  */
 package org.auraframework.modules.impl;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -28,7 +31,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.modules.ModulesCompilerData;
@@ -57,11 +59,15 @@ import org.lwc.metadata.ReportMetadata;
 import org.lwc.reference.Reference;
 import org.lwc.reference.ReferenceType;
 
-import com.google.common.collect.Sets;
-
 public final class ModulesCompilerUtil {
 
     static final String COMPILER_HANDLER = "src/lwc/invokeCompile.js";
+    private static final String NODE_ENV = "NODE_ENV";
+    private static final String DEVELOPMENT = "development";
+    private static final String PRODUCTION = "production";
+    private static final Map<String, String> DEV_ENV = ImmutableMap.of(NODE_ENV, DEVELOPMENT);
+    private static final Map<String, String> PROD_ENV = ImmutableMap.of(NODE_ENV, PRODUCTION);
+    private static final Optional<Map<String, Object>> PROXY_CONFIG = Optional.of(ImmutableMap.of("independent", "proxy-compat"));
 
     private static NodeBundle COMPILER_BUNDLE;
 
@@ -76,18 +82,8 @@ public final class ModulesCompilerUtil {
      */
     static NodeBundle createCompilerBundle(NodeLambdaFactory consumingFactory) throws Exception {
         NodeBundleBuilder builder = new NodeBundleBuilder(NodeTool.BUNDLE, "lwc-compiler");
-        builder.add("src/lwc/compiler.js", new Supplier<InputStream>() {
-            @Override
-            public InputStream get() {
-                return ModulesCompilerUtil.class.getResourceAsStream("/modules/compiler.js");
-            }
-        });
-        builder.add(COMPILER_HANDLER, new Supplier<InputStream>() {
-            @Override
-            public InputStream get() {
-                return ModulesCompilerUtil.class.getResourceAsStream("/modules/invokeCompile.js");
-            }
-        });
+        builder.add("src/lwc/compiler.js", () -> ModulesCompilerUtil.class.getResourceAsStream("/modules/compiler.js"));
+        builder.add(COMPILER_HANDLER, () -> ModulesCompilerUtil.class.getResourceAsStream("/modules/invokeCompile.js"));
         // sidecar services don't need node-env.zip, they use the existing ~/tools installation directly
         boolean createNodeEnvZip = !(consumingFactory instanceof NodeLambdaFactorySidecar);
         return builder.build(createNodeEnvZip);
@@ -200,6 +196,10 @@ public final class ModulesCompilerUtil {
                 codeMap.put(CodeType.COMPAT, code);
             } else if (isProdCompat(config)) {
                 codeMap.put(CodeType.PROD_COMPAT, code);
+            } else if (isProdDebug(config)) {
+                codeMap.put(CodeType.PROD_DEBUG, code);
+            } else if (isProdDebugCompat(config)) {
+                codeMap.put(CodeType.PROD_DEBUG_COMPAT, code);
             } else {
                 throw new Exception("Unable to map bundle config to a mode: " + config);
             }
@@ -260,25 +260,25 @@ public final class ModulesCompilerUtil {
         final Set<ClassMember> publicSlots = Sets.newLinkedHashSet();;
 
         for (ClassMember classMember : classMembers) {
-                switch (classMember.getType()){
-                    case PROPERTY:
-                        ClassProperty propertyClassMember = (ClassProperty) classMember;
-                        // Only @api
-                        if (propertyClassMember.getDecorator().isPresent() && "api".equals(propertyClassMember.getDecorator().get())) {
-                            publicProperties.add(propertyClassMember);
-                        }
-                        break;
-                    case METHOD:
-                        ClassMethod methodClassMember = (ClassMethod) classMember;
-                        // Only @api
-                        if (methodClassMember.getDecorator().isPresent() && "api".equals(methodClassMember.getDecorator().get())) {
-                            publicMethods.add(methodClassMember);
-                        }
-                        break;
-                    case SLOT:
-                        publicSlots.add(classMember);
-                        break;
-                }
+            switch (classMember.getType()){
+                case PROPERTY:
+                    ClassProperty propertyClassMember = (ClassProperty) classMember;
+                    // Only @api
+                    if (propertyClassMember.getDecorator().isPresent() && "api".equals(propertyClassMember.getDecorator().get())) {
+                        publicProperties.add(propertyClassMember);
+                    }
+                    break;
+                case METHOD:
+                    ClassMethod methodClassMember = (ClassMethod) classMember;
+                    // Only @api
+                    if (methodClassMember.getDecorator().isPresent() && "api".equals(methodClassMember.getDecorator().get())) {
+                        publicMethods.add(methodClassMember);
+                    }
+                    break;
+                case SLOT:
+                    publicSlots.add(classMember);
+                    break;
+            }
         };
 
         return new ModulesCompilerUtil.ClassMemberParseReport(publicProperties, publicMethods, publicSlots);
@@ -302,63 +302,51 @@ public final class ModulesCompilerUtil {
     }
 
     public static boolean isDev(OutputConfig config) {
-        return !config.minify && !config.compat;
+        return !config.minify && !config.compat && isDevEnv(config.env);
     }
 
     public static boolean isProd(OutputConfig config) {
-        return config.minify && !config.compat;
+        return config.minify && !config.compat && isProdEnv(config.env);
     }
 
     public static boolean isCompat(OutputConfig config) {
-        return !config.minify && config.compat;
+        return !config.minify && config.compat && isDevEnv(config.env);
     }
 
     public static boolean isProdCompat(OutputConfig config) {
-        return config.minify && config.compat;
+        return config.minify && config.compat && isProdEnv(config.env);
+    }
+
+    public static boolean isProdDebug(OutputConfig config) {
+        return !config.minify && !config.compat && isProdEnv(config.env);
+    }
+
+    public static boolean isProdDebugCompat(OutputConfig config) {
+        return !config.minify && config.compat && isProdEnv(config.env);
     }
 
     public static OutputConfig createDevOutputConfig(BundleType bundleType) {
-        Map<String, String> env = new HashMap<>();
-        if (bundleType != BundleType.platform) {
-            env.put("NODE_ENV", "development");
-        }
-
-        return new OutputConfig(false, false, env, null);
+        return new OutputConfig(false, false, getEnvMap(bundleType, DEVELOPMENT), null);
     }
 
     public static OutputConfig createCompatOutputConfig(BundleType bundleType) {
-        Map<String, String> env = new HashMap<>();
-        if (bundleType != BundleType.platform) {
-            env.put("NODE_ENV", "development");
-        }
-
-        Map<String, Object> proxyMap = new HashMap<>();
-        proxyMap.put("independent", "proxy-compat");
-        Optional<Map<String, Object>> proxyConfig = Optional.of(proxyMap);
-
-        return new OutputConfig(true, false, env, proxyConfig);
+        return new OutputConfig(true, false, getEnvMap(bundleType, DEVELOPMENT), PROXY_CONFIG);
     }
 
     public static OutputConfig createProdOutputConfig(BundleType bundleType) {
-        Map<String, String> env = new HashMap<>();
-        if (bundleType != BundleType.platform) {
-            env.put("NODE_ENV", "production");
-        }
-
-        return new OutputConfig(false, true, env, null);
+        return new OutputConfig(false, true, getEnvMap(bundleType, PRODUCTION), null);
     }
 
     public static OutputConfig createProdCompatOutputConfig(BundleType bundleType) {
-        Map<String, String> env = new HashMap<>();
-        if (bundleType != BundleType.platform) {
-            env.put("NODE_ENV", "production");
-        }
+        return new OutputConfig(true, true, getEnvMap(bundleType, PRODUCTION), PROXY_CONFIG);
+    }
 
-        Map<String, Object> proxyMap = new HashMap<>();
-        proxyMap.put("independent", "proxy-compat");
-        Optional<Map<String, Object>> proxyConfig = Optional.of(proxyMap);
+    public static OutputConfig createProdDebugOutputConfig(BundleType bundleType) {
+        return new OutputConfig(false, false, getEnvMap(bundleType, PRODUCTION), null);
+    }
 
-        return new OutputConfig(true, true, env, proxyConfig);
+    public static OutputConfig createProdDebugCompatOutputConfig(BundleType bundleType) {
+        return new OutputConfig(true, false, getEnvMap(bundleType, PRODUCTION), PROXY_CONFIG);
     }
 
     public static String convertKebabCaseToCamelCase(String name) {
@@ -381,5 +369,27 @@ public final class ModulesCompilerUtil {
             }
         }
         return result.toString();
+    }
+
+    private static boolean isDevEnv(Map<String, String> env) {
+        boolean platform = env == null || env.isEmpty();
+        return platform || env.get(NODE_ENV).equalsIgnoreCase(DEVELOPMENT);
+    }
+
+    private static boolean isProdEnv(Map<String, String> env) {
+        boolean platform = env == null || env.isEmpty();
+        return platform || env.get(NODE_ENV).equalsIgnoreCase(PRODUCTION);
+    }
+
+    private static Map<String, String> getEnvMap(BundleType bundleType, String env) {
+        Map<String, String> envMap = Collections.emptyMap();
+        if (bundleType == BundleType.internal) {
+            if (DEVELOPMENT.equals(env)) {
+                envMap = DEV_ENV;
+            } else {
+                envMap = PROD_ENV;
+            }
+        }
+        return envMap;
     }
 }

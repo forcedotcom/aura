@@ -26,7 +26,7 @@ import org.lwc.OutputConfig;
 import org.lwc.bundle.BundleType;
 
 import javax.inject.Inject;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,12 +78,15 @@ public class ModulesCompilerServiceImpl implements ModulesCompilerService {
         }
 
         if (configs == null || configs.size() == 0) {
-            configs = Arrays.asList(
-                    ModulesCompilerUtil.createDevOutputConfig(bundleType),
-                    ModulesCompilerUtil.createProdOutputConfig(bundleType),
-                    ModulesCompilerUtil.createProdCompatOutputConfig(bundleType),
-                    ModulesCompilerUtil.createCompatOutputConfig(bundleType)
-            );
+            configs = new ArrayList<>();
+            configs.add(ModulesCompilerUtil.createDevOutputConfig(bundleType));
+            configs.add(ModulesCompilerUtil.createProdOutputConfig(bundleType));
+            configs.add(ModulesCompilerUtil.createProdCompatOutputConfig(bundleType));
+            configs.add(ModulesCompilerUtil.createCompatOutputConfig(bundleType));
+            if (bundleType == BundleType.internal) {
+                configs.add(ModulesCompilerUtil.createProdDebugOutputConfig(bundleType));
+                configs.add(ModulesCompilerUtil.createProdDebugCompatOutputConfig(bundleType));
+            }
         }
 
 	    // The compiler is created lazily to avoid the core modularity enforcer

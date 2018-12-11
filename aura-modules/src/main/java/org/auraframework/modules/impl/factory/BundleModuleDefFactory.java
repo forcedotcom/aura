@@ -191,12 +191,14 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         builder.setModuleName(namespace + '/' + name);
         builder.setCustomElementName(namespace + '-' + CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, name));
 
+        BundleType bundleType = BundleType.internal;
+        if (sourceOptions != null && sourceOptions.contains(BundleSourceOption.Lint)) {
+            bundleType = BundleType.platform;
+        }
+        builder.setBundleType(bundleType);
+
         ModulesCompilerData compilerData;
         try {
-            BundleType bundleType = BundleType.internal;
-            if (sourceOptions != null && sourceOptions.contains(BundleSourceOption.Lint)) {
-                bundleType = BundleType.platform;
-            }
             compilerData = modulesCompilerService.compile(componentPath, sources, bundleType, compileOptions.getNamespaceMapping());
         } catch (ModulesCompilerException mce) {
             List<Diagnostic> diags = mce.getDiagnostics();

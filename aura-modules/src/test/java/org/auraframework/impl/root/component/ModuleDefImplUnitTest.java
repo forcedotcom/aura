@@ -23,19 +23,23 @@ import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.module.ModuleDef;
+import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Mode;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.lwc.bundle.BundleType;
 import org.lwc.decorator.DecoratorParameterValue;
 import org.lwc.decorator.DecoratorParameterValueType;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 
 import java.io.ByteArrayOutputStream;
 import java.io.NotSerializableException;
@@ -129,7 +133,7 @@ public class ModuleDefImplUnitTest {
         ModuleDefImpl.Builder moduleDefBuilder = new ModuleDefImpl.Builder();
         Set<String> bundleDependencies = new HashSet(Arrays.asList("namespace/component", "@salesforce/apex/Controller.method", "bar/foo.js"));
         moduleDefBuilder.setModuleDependencies(bundleDependencies);
-        moduleDefBuilder.setDescriptor(new DefDescriptorImpl<ModuleDef>(DefDescriptor.MARKUP_PREFIX, "namespace", "yo", ModuleDef.class));
+        moduleDefBuilder.setDescriptor(new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "namespace", "yo", ModuleDef.class));
 
         ModuleDef moduleDef = moduleDefBuilder.build();
 
@@ -139,5 +143,89 @@ public class ModuleDefImplUnitTest {
         } catch(Exception e) {
             assertTrue("Should contain correct error message with bar/foo.js", e.getMessage().startsWith("Invalid import 'bar/foo.js'"));
         }
+    }
+
+    @Test
+    public void testCodeTypeForInternalBundleType() throws Exception {
+        ModuleDefImpl.Builder moduleDefBuilder = new ModuleDefImpl.Builder();
+        moduleDefBuilder.setDescriptor(new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "namespace", "yo", ModuleDef.class));
+        moduleDefBuilder.setBundleType(BundleType.internal);
+        ModuleDef moduleDef = moduleDefBuilder.build();
+        CodeType codeType;
+
+        when(mockContext.getMode()).thenReturn(Mode.DEV);
+        codeType = Whitebox.invokeMethod(moduleDef, "getCodeType", mockContext);
+        assertEquals("Should be CodeType.DEV for BundleType.internal and Mode.DEV", CodeType.DEV, codeType);
+
+        when(mockContext.getMode()).thenReturn(Mode.PROD);
+        codeType = Whitebox.invokeMethod(moduleDef, "getCodeType", mockContext);
+        assertEquals("Should be CodeType.PROD for BundleType.internal and Mode.PROD", CodeType.PROD, codeType);
+
+        when(mockContext.getMode()).thenReturn(Mode.PRODDEBUG);
+        codeType = Whitebox.invokeMethod(moduleDef, "getCodeType", mockContext);
+        assertEquals("Should be CodeType.PROD_DEBUG for BundleType.internal and Mode.PRODDEBUG", CodeType.PROD_DEBUG, codeType);
+
+        when(mockContext.getMode()).thenReturn(Mode.PERFDEBUG);
+        codeType = Whitebox.invokeMethod(moduleDef, "getCodeType", mockContext);
+        assertEquals("Should be CodeType.PROD_DEBUG for BundleType.internal and Mode.PERFDEBUG", CodeType.PROD_DEBUG, codeType);
+
+        when(mockContext.useCompatSource()).thenReturn(true);
+        when(mockContext.getMode()).thenReturn(Mode.DEV);
+        codeType = Whitebox.invokeMethod(moduleDef, "getCodeType", mockContext);
+        assertEquals("Should be CodeType.COMPAT for BundleType.internal, useCompatSource, and Mode.DEV", CodeType.COMPAT, codeType);
+
+        when(mockContext.getMode()).thenReturn(Mode.PROD);
+        codeType = Whitebox.invokeMethod(moduleDef, "getCodeType", mockContext);
+        assertEquals("Should be CodeType.PROD_COMPAT for BundleType.internal, useCompatSource, and Mode.PROD", CodeType.PROD_COMPAT, codeType);
+
+        when(mockContext.getMode()).thenReturn(Mode.PRODDEBUG);
+        codeType = Whitebox.invokeMethod(moduleDef, "getCodeType", mockContext);
+        assertEquals("Should be CodeType.PROD_DEBUG_COMPAT for BundleType.internal, useCompatSource, and Mode.PRODDEBUG", CodeType.PROD_DEBUG_COMPAT, codeType);
+
+        when(mockContext.getMode()).thenReturn(Mode.PERFDEBUG);
+        codeType = Whitebox.invokeMethod(moduleDef, "getCodeType", mockContext);
+        assertEquals("Should be CodeType.PROD_DEBUG_COMPAT for BundleType.internal, useCompatSource, and Mode.PERFDEBUG", CodeType.PROD_DEBUG_COMPAT, codeType);
+    }
+
+    @Test
+    public void testCodeTypeForPlatformBundleType() throws Exception {
+        ModuleDefImpl.Builder moduleDefBuilder = new ModuleDefImpl.Builder();
+        moduleDefBuilder.setDescriptor(new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "namespace", "yo", ModuleDef.class));
+        moduleDefBuilder.setBundleType(BundleType.platform);
+        ModuleDef moduleDef = moduleDefBuilder.build();
+        CodeType codeType;
+
+        when(mockContext.getMode()).thenReturn(Mode.DEV);
+        codeType = Whitebox.invokeMethod(moduleDef, "getCodeType", mockContext);
+        assertEquals("Should be CodeType.DEV for BundleType.platform and Mode.DEV", CodeType.DEV, codeType);
+
+        when(mockContext.getMode()).thenReturn(Mode.PROD);
+        codeType = Whitebox.invokeMethod(moduleDef, "getCodeType", mockContext);
+        assertEquals("Should be CodeType.PROD for BundleType.platform and Mode.PROD", CodeType.PROD, codeType);
+
+        when(mockContext.getMode()).thenReturn(Mode.PRODDEBUG);
+        codeType = Whitebox.invokeMethod(moduleDef, "getCodeType", mockContext);
+        assertEquals("Should be CodeType.DEV for BundleType.platform and Mode.PRODDEBUG", CodeType.DEV, codeType);
+
+        when(mockContext.getMode()).thenReturn(Mode.PERFDEBUG);
+        codeType = Whitebox.invokeMethod(moduleDef, "getCodeType", mockContext);
+        assertEquals("Should be CodeType.DEV for BundleType.platform and Mode.PERFDEBUG", CodeType.DEV, codeType);
+
+        when(mockContext.useCompatSource()).thenReturn(true);
+        when(mockContext.getMode()).thenReturn(Mode.DEV);
+        codeType = Whitebox.invokeMethod(moduleDef, "getCodeType", mockContext);
+        assertEquals("Should be CodeType.COMPAT for BundleType.platform, useCompatSource, and Mode.DEV", CodeType.COMPAT, codeType);
+
+        when(mockContext.getMode()).thenReturn(Mode.PROD);
+        codeType = Whitebox.invokeMethod(moduleDef, "getCodeType", mockContext);
+        assertEquals("Should be CodeType.PROD_COMPAT for BundleType.platform, useCompatSource, and Mode.PROD", CodeType.PROD_COMPAT, codeType);
+
+        when(mockContext.getMode()).thenReturn(Mode.PRODDEBUG);
+        codeType = Whitebox.invokeMethod(moduleDef, "getCodeType", mockContext);
+        assertEquals("Should be CodeType.COMPAT for BundleType.platform, useCompatSource, and Mode.PRODDEBUG", CodeType.COMPAT, codeType);
+
+        when(mockContext.getMode()).thenReturn(Mode.PERFDEBUG);
+        codeType = Whitebox.invokeMethod(moduleDef, "getCodeType", mockContext);
+        assertEquals("Should be CodeType.COMPAT for BundleType.platform, useCompatSource, and Mode.PERFDEBUG", CodeType.COMPAT, codeType);
     }
 }

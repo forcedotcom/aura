@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -45,7 +44,6 @@ import org.auraframework.def.module.pojo.Slot;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.root.PlatformDefImpl;
-import org.auraframework.impl.root.PlatformDefImpl.Builder;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.impl.util.ModuleDefinitionUtil;
 import org.auraframework.instance.AuraValueProviderType;
@@ -53,13 +51,16 @@ import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.Json.ApplicationKey;
 import org.auraframework.validation.ReferenceValidationContext;
+import org.lwc.bundle.BundleType;
 import org.lwc.metadata.ModuleExport;
 import org.lwc.reference.Reference;
 import org.lwc.template.TemplateModuleDependencies;
@@ -69,7 +70,7 @@ import org.lwc.template.TemplateModuleDependencies;
  */
 public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleDef {
 
-    private static final long serialVersionUID = -1540137510503257468L;
+    private static final long serialVersionUID = -8355860123070388890L;
 
     private final String path;
     private final Set<String> moduleDependencies;
@@ -93,6 +94,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
     private final Map<DefDescriptor<MethodDef>, MethodDef> methodDefs;
     private final List<ModuleExample> examples;
     private final List<Slot> slots;
+    private final BundleType bundleType;
 
     private ModuleDefImpl(Builder builder) {
         super(builder);
@@ -117,6 +119,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         this.examples = AuraUtil.immutableList(builder.examples);
         this.slots = AuraUtil.immutableList(builder.slots);
         this.methodDefs = AuraUtil.immutableMap(builder.methodDefs);
+        this.bundleType = builder.bundleType;
     }
 
     @Override
@@ -192,20 +195,17 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         return examples;
     }
 
-	@Override
-	public List<Slot> getSlots() {
-		return this.slots;
-	}
+    @Override
+    public List<Slot> getSlots() {
+        return this.slots;
+    }
 
     @Override
     public void serialize(Json json) throws IOException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         ConfigAdapter configAdapter = Aura.getConfigAdapter();
-        boolean compat = context.useCompatSource();
-        boolean minified = context.getMode().minify();
-        CodeType codeType = compat ?
-                ( minified ? CodeType.PROD_COMPAT : CodeType.COMPAT ) :
-                ( minified ? CodeType.PROD : CodeType.DEV );
+
+        CodeType codeType = getCodeType(context);
         String code = this.codes.get(codeType);
 
         try {
@@ -250,6 +250,19 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         } catch (QuickFixException qfe) {
             throw new AuraUnhandledException("Unhandled module exception", qfe);
         }
+    }
+
+    private CodeType getCodeType(AuraContext context) {
+        Mode mode = context.getMode();
+        JavascriptGeneratorMode jsMode = mode.getJavascriptMode();
+        boolean debug =  jsMode == JavascriptGeneratorMode.PRODUCTIONDEBUG || jsMode == JavascriptGeneratorMode.PERFORMANCEDEBUG;
+        boolean compat = context.useCompatSource();
+        boolean minified = mode.minify();
+        boolean internalDebug = debug && this.bundleType == BundleType.internal;
+
+        return compat ?
+            ( minified ? CodeType.PROD_COMPAT   : ( internalDebug ? CodeType.PROD_DEBUG_COMPAT  : CodeType.COMPAT )) :
+            ( minified ? CodeType.PROD          : ( internalDebug ? CodeType.PROD_DEBUG         : CodeType.DEV ));
     }
 
     @Override
@@ -422,6 +435,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         private List<TemplateModuleDependencies> experimentalTemplateModuleDependencies;
         private final Map<DefDescriptor<MethodDef>, MethodDef> methodDefs = Maps.newLinkedHashMap();
         private List<ModuleExport> exports;
+        private BundleType bundleType;
         private List<Slot> slots;
 
         private List<ModuleExample> examples;
@@ -446,7 +460,7 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         }
 
         public void setModuleName(String moduleName) {
-        	this.moduleName = moduleName;
+            this.moduleName = moduleName;
         }
 
         public void setCustomElementName(String customElementName) {
@@ -546,20 +560,24 @@ public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleD
         
         
         public Builder setSlots(List<Slot> slots) {
-	        	this.slots = slots;
-	        	return this;
+            this.slots = slots;
+            return this;
         }
         
         public List<Slot> getSlots() {
-        		return slots;
+            return slots;
         }
         
         public Builder addSlot(Slot slot) {
-        		if(this.slots == null) {
-        			this.slots = Lists.newLinkedList();
-        		}
-        		this.slots.add(slot);
-        		return this;
+            if(this.slots == null) {
+                this.slots = Lists.newLinkedList();
+            }
+            this.slots.add(slot);
+            return this;
+        }
+
+        public void setBundleType(BundleType bundleType) {
+            this.bundleType = bundleType;
         }
 
         @Override

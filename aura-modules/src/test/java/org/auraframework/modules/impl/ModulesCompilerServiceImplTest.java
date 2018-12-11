@@ -78,17 +78,17 @@ public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
     @Test
     public void testCompile() throws Exception {
         String entry = "modules/moduletest/moduletest.js";
-        String sourceTemplate = Files.toString(getResourceFile("/testdata/modules/moduletest/moduletest.html"),
-                Charsets.UTF_8);
-        String sourceClass = Files.toString(getResourceFile("/testdata/modules/moduletest/moduletest.js"),
-                Charsets.UTF_8);
+        String sourceTemplate = Files.asCharSource(getResourceFile("/testdata/modules/moduletest/moduletest.html"),
+                Charsets.UTF_8).read();
+        String sourceClass = Files.asCharSource(getResourceFile("/testdata/modules/moduletest/moduletest.js"),
+                Charsets.UTF_8).read();
 
         Map<String, String> sources = new HashMap<>();
         sources.put("modules/moduletest/moduletest.js", sourceClass);
         sources.put("modules/moduletest/moduletest.html", sourceTemplate);
 
         ModulesCompilerData compilerData = modulesCompilerService.compile(entry, sources);
-        String expected = Files.toString(getResourceFile("/testdata/modules/moduletest/expected.js"), Charsets.UTF_8);
+        String expected = Files.asCharSource(getResourceFile("/testdata/modules/moduletest/expected.js"), Charsets.UTF_8).read();
 
         assertEquals(expected.trim(), compilerData.codes.get(CodeType.DEV).trim());
     }
@@ -96,12 +96,12 @@ public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
     @Test
     public void testCompileNamespaceMapping() throws Exception {
         String entry = "modules/nsmoduletest/nsmoduletest.js";
-        String sourceTemplate = Files.toString(getResourceFile("/testdata/modules/nsmoduletest/nsmoduletest.html"),
-                Charsets.UTF_8);
-        String sourceClass = Files.toString(getResourceFile("/testdata/modules/nsmoduletest/nsmoduletest.js"),
-                Charsets.UTF_8);
-        String sourceCSS = Files.toString(getResourceFile("/testdata/modules/nsmoduletest/nsmoduletest.css"),
-                Charsets.UTF_8);
+        String sourceTemplate = Files.asCharSource(getResourceFile("/testdata/modules/nsmoduletest/nsmoduletest.html"),
+                Charsets.UTF_8).read();
+        String sourceClass = Files.asCharSource(getResourceFile("/testdata/modules/nsmoduletest/nsmoduletest.js"),
+                Charsets.UTF_8).read();
+        String sourceCSS = Files.asCharSource(getResourceFile("/testdata/modules/nsmoduletest/nsmoduletest.css"),
+                Charsets.UTF_8).read();
 
         Map<String, String> sources = new HashMap<>();
         sources.put("modules/nsmoduletest/nsmoduletest.js", sourceClass);
@@ -111,7 +111,7 @@ public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
         Map<String, String> namespaceMapping = new HashMap<>();
         namespaceMapping.put("c", "ns");
         ModulesCompilerData compilerData = modulesCompilerService.compile(entry, sources, BundleType.internal, namespaceMapping);
-        String expected = Files.toString(getResourceFile("/testdata/modules/nsmoduletest/nsexpected.js"), Charsets.UTF_8);
+        String expected = Files.asCharSource(getResourceFile("/testdata/modules/nsmoduletest/nsexpected.js"), Charsets.UTF_8).read();
 
         assertEquals(expected.trim(), compilerData.codes.get(CodeType.DEV).trim());
         assertEquals("[some-module, lwc, ns/bar, x/foo, ns/utils]", compilerData.bundleDependencies.toString());
@@ -119,7 +119,7 @@ public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
 
     @Test
     public void test() throws Exception {
-        String expected = Files.toString(getResourceFile("/testdata/modules/moduletest/expected.js"), Charsets.UTF_8);
+        String expected = Files.asCharSource(getResourceFile("/testdata/modules/moduletest/expected.js"), Charsets.UTF_8).read();
 
         ModulesCompilerData compilerData = compileModule("modules/moduletest/moduletest");
 
@@ -130,10 +130,10 @@ public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
     @Test
     public void testSalesforceBundleDependencies() throws Exception {
         String entry = "modules/bundledependencies/bundledependencies.js";
-        String sourceTemplate = Files.toString(getResourceFile("/testdata/modules/bundledependencies/bundledependencies.html"),
-                Charsets.UTF_8);
-        String sourceClass = Files.toString(getResourceFile("/testdata/modules/bundledependencies/bundledependencies.js"),
-                Charsets.UTF_8);
+        String sourceTemplate = Files.asCharSource(getResourceFile("/testdata/modules/bundledependencies/bundledependencies.html"),
+                Charsets.UTF_8).read();
+        String sourceClass = Files.asCharSource(getResourceFile("/testdata/modules/bundledependencies/bundledependencies.js"),
+                Charsets.UTF_8).read();
 
         Map<String, String> sources = new HashMap<>();
         sources.put("modules/bundledependencies/bundledependencies.js", sourceClass);
@@ -293,12 +293,12 @@ public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
     }
 
     @Test
-    public void testCompileWithoutConfigs() throws Exception {
+    public void testCompilePlatformWithoutConfigs() throws Exception {
         String entry = "modules/moduletest/moduletest.js";
-        String sourceTemplate = Files.toString(getResourceFile("/testdata/modules/moduletest/moduletest.html"),
-                Charsets.UTF_8);
-        String sourceClass = Files.toString(getResourceFile("/testdata/modules/moduletest/moduletest.js"),
-                Charsets.UTF_8);
+        String sourceTemplate = Files.asCharSource(getResourceFile("/testdata/modules/moduletest/moduletest.html"),
+                Charsets.UTF_8).read();
+        String sourceClass = Files.asCharSource(getResourceFile("/testdata/modules/moduletest/moduletest.js"),
+                Charsets.UTF_8).read();
 
         Map<String, String> sources = new HashMap<>();
         sources.put("modules/moduletest/moduletest.js", sourceClass);
@@ -306,7 +306,7 @@ public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
 
         ModulesCompilerData compilerData = modulesCompilerService.compile(entry, sources, BundleType.platform);
 
-        //All configs should be generated when no configs are passed to the compiler
+        // All configs should be generated when no configs are passed to the compiler
         assertEquals(4, compilerData.compilerReport.results.size());
         assertNotNull(compilerData.codes.get(CodeType.PROD));
         assertNotNull(compilerData.codes.get(CodeType.PROD_COMPAT));
@@ -319,18 +319,20 @@ public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
         ModulesCompilerData compilerData = compileModule("modules/moduletest/moduletest");
 
         //All configs should be generated when no configs are passed to the compiler
-        assertEquals(4, compilerData.compilerReport.results.size());
+        assertEquals(6, compilerData.compilerReport.results.size());
         assertNotNull(compilerData.codes.get(CodeType.PROD));
         assertNotNull(compilerData.codes.get(CodeType.PROD_COMPAT));
         assertNotNull(compilerData.codes.get(CodeType.COMPAT));
         assertNotNull(compilerData.codes.get(CodeType.DEV));
+        assertNotNull(compilerData.codes.get(CodeType.PROD_DEBUG));
+        assertNotNull(compilerData.codes.get(CodeType.PROD_DEBUG_COMPAT));
     }
 
     @Test
     public void testCompileWithOnlyDevConfig() throws Exception {
         OutputConfig devConfig = ModulesCompilerUtil.createDevOutputConfig(BundleType.internal);
         ModulesCompilerData compilerData = compileModule("modules/moduletest/moduletest", Lists.newArrayList(devConfig));
-        String expected = Files.toString(getResourceFile("/testdata/modules/moduletest/expected.js"), Charsets.UTF_8);
+        String expected = Files.asCharSource(getResourceFile("/testdata/modules/moduletest/expected.js"), Charsets.UTF_8).read();
 
         assertEquals(1, compilerData.compilerReport.results.size());
         assertNull(compilerData.codes.get(CodeType.PROD));
@@ -346,14 +348,12 @@ public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
         ModulesCompilerData compilerData = compileModule("modules/nodeEnv/nodeEnv", Lists.newArrayList(devConfig, prodConfig));
 
         String devCode = compilerData.codes.get(CodeType.DEV);
-        System.out.println(devCode);
         assertTrue(
                 "Prod console should be stripped",
                 devCode.contains("I am in dev") && !devCode.contains("I am in prod")
         );
 
         String prodCode = compilerData.codes.get(CodeType.PROD);
-        System.out.println(prodCode);
         assertTrue(
                 "Dev console should be stripped",
                 !prodCode.contains("I am in dev") && prodCode.contains("I am in prod")
@@ -367,7 +367,6 @@ public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
         ModulesCompilerData compilerData = compileModule("modules/nodeEnv/nodeEnv", Lists.newArrayList(devConfig, prodConfig));
 
         String devCode = compilerData.codes.get(CodeType.DEV);
-        System.out.println(devCode);
         assertTrue(
                 "Console should not be stripped in dev",
                 devCode.contains("I am in dev") && devCode.contains("I am in prod")
@@ -378,6 +377,61 @@ public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
                 "Console should not be stripped in prod",
                 prodCode.contains("I am in dev") && prodCode.contains("I am in prod")
         );
+    }
+
+    @Test
+    public void testCompileInternalNodeEnv() throws Exception {
+        String entry = "modules/nodeEnv/nodeEnv.js";
+        String sourceTemplate = Files.asCharSource(getResourceFile("/testdata/modules/nodeEnv/nodeEnv.html"),
+                Charsets.UTF_8).read();
+        String sourceClass = Files.asCharSource(getResourceFile("/testdata/modules/nodeEnv/nodeEnv.js"),
+                Charsets.UTF_8).read();
+
+        Map<String, String> sources = new HashMap<>();
+        sources.put("modules/nodeEnv/nodeEnv.js", sourceClass);
+        sources.put("modules/nodeEnv/nodeEnv.html", sourceTemplate);
+
+        ModulesCompilerData compilerData = modulesCompilerService.compile(entry, sources, BundleType.internal);
+
+        String devCode = compilerData.codes.get(CodeType.DEV);
+        String prodCode = compilerData.codes.get(CodeType.PROD);
+        String prodDebugCode = compilerData.codes.get(CodeType.PROD_DEBUG);
+        String prodDebugCompatCode = compilerData.codes.get(CodeType.PROD_DEBUG_COMPAT);
+        assertEquals(6, compilerData.compilerReport.results.size());
+        assertNotNull(compilerData.codes.get(CodeType.PROD_COMPAT));
+        assertNotNull(compilerData.codes.get(CodeType.COMPAT));
+        assertNotNull(devCode);
+        assertNotNull(prodCode);
+        assertNotNull(prodDebugCode);
+        assertNotNull(prodDebugCompatCode);
+
+        assertTrue("Prod console should be stripped for DEV", devCode.contains("I am in dev") && !devCode.contains("I am in prod"));
+        assertTrue("Dev console should be stripped for PROD", !prodCode.contains("I am in dev") && prodCode.contains("I am in prod"));
+        assertTrue("Dev console should be stripped for PROD_DEBUG", !prodDebugCode.contains("I am in dev") && prodDebugCode.contains("I am in prod"));
+        assertTrue("Dev console should be stripped for PROD_DEBUG_COMPAT", !prodDebugCompatCode.contains("I am in dev") && prodDebugCompatCode.contains("I am in prod"));
+    }
+
+    @Test
+    public void testCompilePlatformNodeEnv() throws Exception {
+        String entry = "modules/nodeEnv/nodeEnv.js";
+        String sourceTemplate = Files.asCharSource(getResourceFile("/testdata/modules/nodeEnv/nodeEnv.html"),
+                Charsets.UTF_8).read();
+        String sourceClass = Files.asCharSource(getResourceFile("/testdata/modules/nodeEnv/nodeEnv.js"),
+                Charsets.UTF_8).read();
+
+        Map<String, String> sources = new HashMap<>();
+        sources.put("modules/nodeEnv/nodeEnv.js", sourceClass);
+        sources.put("modules/nodeEnv/nodeEnv.html", sourceTemplate);
+
+        ModulesCompilerData compilerData = modulesCompilerService.compile(entry, sources, BundleType.platform);
+
+        assertEquals(4, compilerData.compilerReport.results.size());
+        assertNotNull(compilerData.codes.get(CodeType.PROD_COMPAT));
+        assertNotNull(compilerData.codes.get(CodeType.COMPAT));
+        assertNotNull(compilerData.codes.get(CodeType.DEV));
+        assertNotNull(compilerData.codes.get(CodeType.PROD));
+        assertNull(compilerData.codes.get(CodeType.PROD_DEBUG));
+        assertNull(compilerData.codes.get(CodeType.PROD_DEBUG_COMPAT));
     }
 
     @Test
@@ -420,11 +474,11 @@ public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
         Map<String, String> sources = new HashMap<>();
 
         String htmlModule = modulePath + ".html";
-        String htmlSource = Files.toString(getResourceFile("/testdata/" + htmlModule), Charsets.UTF_8);
+        String htmlSource = Files.asCharSource(getResourceFile("/testdata/" + htmlModule), Charsets.UTF_8).read();
         sources.put(htmlModule, htmlSource);
 
         String jsModule = modulePath + ".js";
-        String jsSource = Files.toString(getResourceFile("/testdata/" + jsModule), Charsets.UTF_8);
+        String jsSource = Files.asCharSource(getResourceFile("/testdata/" + jsModule), Charsets.UTF_8).read();
         sources.put(jsModule, jsSource);
 
         return modulesCompilerService.compile(jsModule, sources, BundleType.internal, null, configs);

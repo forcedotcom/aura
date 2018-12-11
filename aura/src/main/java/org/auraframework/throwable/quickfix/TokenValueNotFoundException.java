@@ -28,12 +28,12 @@ public final class TokenValueNotFoundException extends AuraValidationException {
     private static final String MSG = "The token '%s' was not found on the %s %s";
     private static final long serialVersionUID = -2571041901012359701L;
 
-    public TokenValueNotFoundException(String name, DefDescriptor<TokensDef> descriptor) {
-        this(name, descriptor, null);
-    }
-
     public TokenValueNotFoundException(String name, DefDescriptor<TokensDef> descriptor, Location location) {
         super(getMessage(checkNotNull(name), descriptor), location);
+    }
+    
+    public TokenValueNotFoundException(String name, DefDescriptor<TokensDef> descriptor) {
+        this(name, descriptor, null);
     }
 
     private static String getMessage(String variable, DefDescriptor<TokensDef> descriptor) {

@@ -16,6 +16,7 @@
 package org.auraframework.throwable;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.http.HttpStatus;
@@ -27,17 +28,18 @@ import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 
 /**
  * An exception to fire an arbitrary event on the client side.
  * A generic event class to fire events on the client side to indicate an error state
  * while executing a server action. This object will encapsulate all the information
  * required to create and fire the event client side.
- * Note: This event should not be used by the Aura framework itself, it should only be used inside of a server action.
+ * <p><i>Note: This event should not be used by the Aura framework itself, it should only be used inside of a
+ * server action.</i></p>
  */
 public class GenericEventException extends ClientSideEventException {
-    private static final long serialVersionUID = 8972903096686059699L;
+
+    private static final long serialVersionUID = 136968404446222002L;
 
     private String eventName;
     private Map<String,Object> params;
@@ -45,30 +47,31 @@ public class GenericEventException extends ClientSideEventException {
     /**
      * A flag indicating whether default error handling should be executed.
      */
-    private Boolean useDefault = false;
+    private Boolean useDefault = Boolean.FALSE;
 
     /**
      * Create an exception with a (visible) cause.
      *
-     * @see AuraHandledException#AuraHandledException(Throwable)
+     * @param eventName the name of the event triggering the exception
      * @param cause the cause (usually logged).
+     * @see AuraHandledException#AuraHandledException(Throwable)
+     * @see #GenericEventException(String)
      */
     public GenericEventException(String eventName, Throwable cause) {
         super(eventName, cause);
         this.eventName = eventName;
-        this.params = Maps.newHashMap();
+        this.params = new HashMap<>();
     }
 
     /**
      * Create an exception with a (visible) cause.
      *
+     * @param eventName the name of the event triggering the exception
      * @see AuraHandledException#AuraHandledException(Throwable)
-     * @param cause the cause (usually logged).
+     * @see #GenericEventException(String, Throwable)
      */
     public GenericEventException(String eventName) {
-        super(eventName);
-        this.eventName = eventName;
-        this.params = Maps.newHashMap();
+        this(eventName, null);
     }
 
     public GenericEventException addParam(String name, Object value) {
@@ -85,7 +88,7 @@ public class GenericEventException extends ClientSideEventException {
      * Turn off default error handling to allow custom handling by action callback in client code.
      */
     public void setDefault() {
-        this.useDefault = true;
+        this.useDefault = Boolean.TRUE;
     }
 
     @Override
@@ -99,7 +102,7 @@ public class GenericEventException extends ClientSideEventException {
 
     @Override
     public JsFunction getDefaultHandler() {
-        return new JsFunction(ImmutableList.<String> of(),
+        return new JsFunction(ImmutableList.<String>of(),
                 "var e=new Error('[GenericEventException from server] Unable to process event');" +
                 "e.reported=true;" +
                 "throw e;");
@@ -112,7 +115,6 @@ public class GenericEventException extends ClientSideEventException {
 
     /**
      * Serialize to JSON.
-     *
      */
     @Override
     public void serialize(Json json) throws IOException {

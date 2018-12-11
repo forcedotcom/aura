@@ -28,14 +28,11 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-
 /**
  * Public interface for retrieving aura definitions.
  *
  * This interface has several implementations with highly variable performance parameters.
  * There should be no assumption that exists/getDef/find are efficient.
- *
- * Note: The typing here is as bogus as it gets. T is not valid.
  */
 public interface DefRegistry extends Serializable {
 
@@ -68,14 +65,14 @@ public interface DefRegistry extends Serializable {
     /**
      * Find the set of components that have a tag.
      *
-     * For a component to be returned here, it must implement the PlatformDef interface
-     * and have one of the tags passed in.
+     * For a component to be returned here, it must implement the {@link org.auraframework.def.PlatformDef}
+     * interface and have one of the tags passed in.
      *
      * @param tags the set of requested tags (any tag suffices)
      * @return the set of descriptors for defs that match.
      */
     @Nonnull
-    default Set<DefDescriptor<?>> findByTags(@Nonnull Set<String> tags) { return Collections.emptySet(); };
+    default Set<DefDescriptor<?>> findByTags(@Nonnull Set<String> tags) { return Collections.emptySet(); }
 
     /**
      * Returns true if the source related to the descriptor exists. Does not

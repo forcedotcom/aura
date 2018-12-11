@@ -15,11 +15,10 @@
  */
 package org.auraframework.test.mock;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.auraframework.throwable.AuraRuntimeException;
-
-import com.google.common.collect.Lists;
 
 /**
  * A stubbed method invocation that provides a sequence of Answers for a
@@ -38,7 +37,7 @@ public class Stub<T> {
 					"Must provide at least one answer for a stub");
 		}
 		this.invocation = invocation;
-		this.answers = Lists.newLinkedList(answers);
+		this.answers = new LinkedList<>(answers);
 		reset();
 	}
 
@@ -68,19 +67,18 @@ public class Stub<T> {
         	Answer<T> ret = answers.get(answerIndex);
             answerIndex++;
             return ret;
-        } else {
+        }
         	Answer<T> lastAnswer = answers.get(answers.size() - 1);
         	Object value = lastAnswer.answer();
         	String extraMessage = "";
         	if(value instanceof MockModel) {
         		extraMessage = ((MockModel) value).getDescriptor().getQualifiedName();
-        	} else if (value instanceof MockAction){
+        	} else if (value instanceof MockAction) {
         		extraMessage = ((MockAction) value).getDescriptor().getQualifiedName();
         	} else {
         		extraMessage = "**New mock type other than Action or Model, please update the type here**";
         	}
-        	throw new AuraRuntimeException("You have "+answers.size()+" answers for mocking "+extraMessage
-        			+", but they are all exhausted");
-        }
+        	throw new AuraRuntimeException("You have " + answers.size() + " answers for mocking " + extraMessage
+        			+ ", but they are all exhausted");
     }
 }

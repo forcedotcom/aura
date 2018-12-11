@@ -16,6 +16,7 @@
 package org.auraframework.test.mock;
 
 import java.io.IOException;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.auraframework.adapter.ConfigAdapter;
@@ -31,8 +32,6 @@ import org.auraframework.util.json.Serialization;
 import org.auraframework.util.json.Serialization.ReferenceScope;
 import org.auraframework.util.json.Serialization.ReferenceType;
 import org.auraframework.validation.ReferenceValidationContext;
-
-import com.google.common.collect.Sets;
 
 /**
  * A simple Definition.
@@ -74,6 +73,8 @@ public abstract class MockDefinition<D extends Definition> implements Definition
 
     @Override
     public void serialize(Json json) throws IOException {
+        // Provides an empty implementation that can be overridden by the child implementation if additional
+        // functionality is needed
     }
 
     @Override
@@ -83,26 +84,33 @@ public abstract class MockDefinition<D extends Definition> implements Definition
 
     @Override
     public void markValid() {
+        // Provides an empty implementation that can be overridden by the child implementation if additional
+        // functionality is needed
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies){
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        // Provides an empty implementation that can be overridden by the child implementation if additional
+        // functionality is needed
     }
 
     @Override
     public Set<DefDescriptor<?>> getDependencySet() {
-        Set<DefDescriptor<?>> dependencies = Sets.newLinkedHashSet();
+        final Set<DefDescriptor<?>> dependencies = new LinkedHashSet<>();
         appendDependencies(dependencies);
         return dependencies;
     }
 
-
     @Override
     public void validateDefinition() throws QuickFixException {
+        // Provides an empty implementation that can be overridden by the child implementation if additional
+        // functionality is needed
     }
 
     @Override
     public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        // Provides an empty implementation that can be overridden by the child implementation if additional
+        // functionality is needed
     }
 
     @Override
@@ -115,7 +123,7 @@ public abstract class MockDefinition<D extends Definition> implements Definition
         return null;
     }
 
-    public class MockDefinitionAccess implements DefinitionAccess {
+    public static class MockDefinitionAccess implements DefinitionAccess {
         private static final long serialVersionUID = 5004058964564727486L;
 
         @Override
@@ -149,17 +157,21 @@ public abstract class MockDefinition<D extends Definition> implements Definition
         }
 
         @Override
-        public void serialize(Json json) throws IOException{
+        public void serialize(Json json) throws IOException {
             json.writeString("FAKE_ACCESS");
         }
 
         @Override
         public void validate(String namespace, boolean allowAuth,
                              boolean allowPrivate, ConfigAdapter configAdapter) throws InvalidAccessValueException {
+            // Provides an empty implementation that can be overridden by the child implementation if
+            // additional functional is needed
         }
 
         @Override
         public void validateReferences() throws InvalidAccessValueException {
+            // Provides an empty implementation that can be overridden by the child implementation if
+            // additional functional is needed
         }
 
         @Override
@@ -175,5 +187,7 @@ public abstract class MockDefinition<D extends Definition> implements Definition
 
     @Override
     public void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException {
+        // Provides an empty implementation that can be overridden by the child implementation if additional
+        // functionality is needed
     }
 }

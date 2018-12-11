@@ -16,7 +16,7 @@
 package org.auraframework.system;
 
 /**
- * Used as the message for changes to the source of a Definition
+ * Used as the message for changes to the source of a {@link org.auraframework.def.Definition}
  */
 public interface SourceListener {
 
@@ -25,7 +25,7 @@ public interface SourceListener {
      */
     enum SourceMonitorEvent {
         CREATED, DELETED, CHANGED
-    };
+    }
 
     /**
      * 

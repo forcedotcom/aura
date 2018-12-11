@@ -15,6 +15,7 @@
  */
 package org.auraframework.throwable.quickfix;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -31,8 +32,8 @@ public class DefinitionNotFoundException extends AuraValidationException
 
     private final DefDescriptor<?> descriptor;
 
-    private static final String messageFormat = "No %s named %s found";
-
+    private static final String MESSAGE_FORMAT = "No %s named %s found";
+    
     public DefinitionNotFoundException(DefDescriptor<?> descriptor, Location l) {
         super(getMessage(descriptor.getDefType(), descriptor.getQualifiedName()), l);
         this.descriptor = descriptor;
@@ -42,26 +43,24 @@ public class DefinitionNotFoundException extends AuraValidationException
         super(getMessage(descriptor.getDefType(), descriptor.getQualifiedName(), usedAt), l);
         this.descriptor = descriptor;
     }
-
+    
     public DefinitionNotFoundException(DefDescriptor<?> descriptor) {
         this(descriptor, null);
     }
 
     public static String getMessage(DefType defType, String defName, String usedAt) {
-        if (usedAt == null || usedAt.length() == 0) {
-            return String.format(messageFormat, defType, defName);
-        } else {
-            return String.format(messageFormat, defType, defName) + " : " + usedAt;
+        if (StringUtils.isEmpty(usedAt)) {
+            return String.format(MESSAGE_FORMAT, defType, defName);
         }
+        return String.format(MESSAGE_FORMAT, defType, defName) + " : " + usedAt;
     }
 
     public static String getMessage(DefType defType, String defName) {
-        return String.format(messageFormat, defType, defName);
+        return String.format(MESSAGE_FORMAT, defType, defName);
     }
 
     @Override
     public DefDescriptor<? extends Definition> getDescriptor() {
         return descriptor;
     }
-
 }

@@ -134,7 +134,7 @@ public interface AuraContext {
         PUBLIC,
     }
 
-    class GlobalValue implements JsonSerializable {
+    static class GlobalValue implements JsonSerializable {
         private final boolean writable; // if not writable, the contextImpl must provide a mechanism to set
         private Object value;
         private Object defaultValue;
@@ -155,7 +155,7 @@ public interface AuraContext {
             // We'll serialize it down to the client so that when we do a merge
             // we say, is the current value the original that we had on the server?
             // If yes, then use this new value, otherwise the value was probably changed mid flight, don't reset.
-            if(this.originalValue == null && this.value != value) {
+            if((this.originalValue == null) && (this.value != value)) {
                 this.originalValue = this.value;
             }
             this.value = value;
@@ -182,11 +182,10 @@ public interface AuraContext {
             return this.defaultValue;
         }
 
-
         @Override
-        public void serialize(Json json) throws IOException {
+        public void serialize(final Json json) throws IOException {
             json.writeMapBegin();
-            json.writeMapEntry("writable", this.writable);
+            json.writeMapEntry("writable", Boolean.valueOf(this.writable));
             json.writeMapEntry("defaultValue", this.defaultValue);
             json.writeMapEntry("value", this.value);
             if(this.originalValue != null) {
@@ -591,17 +590,31 @@ public interface AuraContext {
      */
     void setGlobalValue(String approvedName, Object value);
 
-
-    /*
+    /**
      * The encoding style for URLs.
      */
     enum EncodingStyle {
-        Bare, // ! Minimal context, no UIDs
-        AppResource, // ! Similar to Normal, except no FWUID and includes serializationVersion
-        Normal, // ! Standard encoding, include UIDs
-        Css, // ! Token UIDs, Client and StyleContext info included
-        Full // ! Everything
-    };
+        /**
+         * Minimal context, no UIDs
+         */
+        Bare,
+        /**
+         * Similar to {@link #Normal}, except no FWUID and includes {@code serializationVersion}
+         */
+        AppResource,
+        /**
+         * Standard encoding, include UIDs
+         */
+        Normal,
+        /**
+         * Token UIDs, Client and StyleContext info included
+         */
+        Css,
+        /**
+         * Everything
+         */
+        Full
+    }
 
     /**
      * Encode the context for use in json.
@@ -667,13 +680,12 @@ public interface AuraContext {
     void addDynamicMatches(Set<DefDescriptor<?>> matched, DescriptorFilter matcher);
 
     /**
-     * Filter our loaded set of dependencies on the preloads.
+     * <p>Filter our loaded set of dependencies on the preloads.</p>
      *
-     * This filters the set of definitions currently loaded in the master def
-     * registry on the set of preloads given. This allows for definitions to be
-     * loaded with {@link getDef(DefDescriptor)} then filtered here for
-     * preloads. The resulting map of definitions is the complete set that has
-     * not been preloaded.
+     * <p>This filters the set of definitions currently loaded in the master def registry on the set of
+     * preloads given. This allows for definitions to be loaded with {@link DefFactory#getDef(DefDescriptor)}
+     * then filtered here for preloads. The resulting map of definitions is the complete set that has not
+     * been preloaded.</p>
      *
      * @param preloads The set of preloaded definitions.
      * @return the full set of loaded definitions not included in the preload.

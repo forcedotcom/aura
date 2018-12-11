@@ -15,85 +15,73 @@
  */
 package org.auraframework.test.system;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasToString;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
+
 import org.auraframework.system.Location;
-import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Test class for (@link Location}.
+ */
 public class LocationTest {
     private static final Location testLocationFileOnly = new Location("filenameonly", 10);
     private static final Location testLocation = new Location("filename", 5, 5, 10);
 
+    @SuppressWarnings("static-method")
     @Test
-    public void testLocationStringIntInt() throws Exception {
+    public void testLocationStringIntInt() {
         Location testLocationLocal = new Location("filename", 5, 5, 10);
-        Assert.assertNotNull(testLocationLocal);
+        assertThat(testLocationLocal, notNullValue());
     }
 
+    @SuppressWarnings("static-method")
     @Test
-    public void testLocationString() throws Exception {
+    public void testLocationString() {
         Location testLocationFileOnlyLocal = new Location("filename", 10);
-        Assert.assertNotNull(testLocationFileOnlyLocal);
+        assertThat(testLocationFileOnlyLocal, notNullValue());
     }
 
+    @SuppressWarnings("static-method")
     @Test
-    public void testGetFileName() throws Exception {
-        Assert.assertEquals("filenameonly", testLocationFileOnly.getFileName());
-        Assert.assertEquals("filename", testLocation.getFileName());
+    public void testGetFileName() {
+        assertThat(testLocationFileOnly.getFileName(), equalTo("filenameonly"));
+        assertThat(testLocation.getFileName(), equalTo("filename"));
 
-        Assert.assertFalse("filenameonly".equals(testLocation.getFileName()));
-        Assert.assertFalse("filename".equals(testLocationFileOnly.getFileName()));
+        assertThat(testLocation.getFileName(), not(equalTo("filenameonly")));
+        assertThat(testLocationFileOnly.getFileName(), not(equalTo("filename")));
     }
 
+    @SuppressWarnings("static-method")
     @Test
-    public void testGetLine() throws Exception {
-        Assert.assertEquals(-1, testLocationFileOnly.getLine());
-        Assert.assertEquals(5, testLocation.getLine());
+    public void testGetLine() {
+        assertThat(testLocationFileOnly.getLine(), equalTo(-1));
+        assertThat(testLocation.getLine(), equalTo(5));
 
-        Assert.assertFalse(-1 == testLocation.getLine());
-        Assert.assertFalse(5 == testLocationFileOnly.getLine());
+        assertThat(testLocation.getLine(), not(equalTo(-1)));
+        assertThat(testLocationFileOnly.getLine(), not(equalTo(5)));
     }
 
+    @SuppressWarnings("static-method")
     @Test
-    public void testGetColumn() throws Exception {
-        Assert.assertEquals(-1, testLocationFileOnly.getColumn());
-        Assert.assertEquals(5, testLocation.getColumn());
+    public void testGetColumn() {
+        assertThat(testLocationFileOnly.getColumn(), equalTo(-1));
+        assertThat(testLocation.getColumn(), equalTo(5));
 
-        Assert.assertFalse(-1 == testLocation.getColumn());
-        Assert.assertFalse(5 == testLocationFileOnly.getColumn());
+        assertThat(testLocation.getColumn(), not(equalTo(-1)));
+        assertThat(testLocationFileOnly.getColumn(), not(equalTo(5)));
     }
 
+    @SuppressWarnings("static-method")
     @Test
-    public void testToString() throws Exception {
-        Assert.assertEquals("filenameonly", testLocationFileOnly.toString());
-        Assert.assertEquals("filename:5,5", testLocation.toString());
+    public void testToString() {
+        assertThat(testLocationFileOnly, hasToString(equalTo("filenameonly")));
+        assertThat(testLocation, hasToString(equalTo("filename:5,5")));
 
-        Assert.assertFalse("filenameonly".equals(testLocation.toString()));
-        Assert.assertFalse("filename:5,5".equals(testLocationFileOnly.toString()));
-    }
-
-    @Test
-    public void testEquals() throws Exception {
-        Location testLocationLocal = new Location("filename", 5, 5, 10);
-        Location testLocationFileOnlyLocal = new Location("filenameonly", 10);
-
-        Assert.assertEquals(testLocationLocal, testLocation);
-        Assert.assertEquals(testLocationFileOnlyLocal, testLocationFileOnly);
-
-        Assert.assertFalse(testLocationLocal.equals(testLocationFileOnly));
-        Assert.assertFalse(testLocationFileOnlyLocal.equals(testLocation));
-
-        Assert.assertFalse(testLocationLocal.equals("string"));
-        Assert.assertFalse(testLocationFileOnlyLocal.equals("string"));
-    }
-
-    @Test
-    public void testHashCode() throws Exception {
-        Location testLocationLocal = new Location("filename", 5, 5, 10);
-        Location testLocationFileOnlyLocal = new Location("filenameonly", 10);
-
-        Assert.assertEquals(testLocationLocal.hashCode(), testLocation.hashCode());
-        Assert.assertEquals(testLocationFileOnlyLocal.hashCode(), testLocationFileOnly.hashCode());
-
-        Assert.assertTrue(testLocationFileOnlyLocal.hashCode() != testLocation.hashCode());
+        assertThat(testLocation, hasToString(not(equalTo("filenameonly"))));
+        assertThat(testLocationFileOnly, hasToString(not(equalTo("filename:5,5"))));
     }
 }

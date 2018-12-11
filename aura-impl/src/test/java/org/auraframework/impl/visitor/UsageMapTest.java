@@ -15,9 +15,13 @@
  */
 package org.auraframework.impl.visitor;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Iterator;
@@ -43,9 +47,9 @@ public class UsageMapTest {
         underTest.add(key, location1);
         Set<Map.Entry<String, Set<Location>>> entrySet = underTest.entrySet();
         assertThat("Should have one entry", entrySet, Matchers.iterableWithSize(1));
-        assertEquals(key, entrySet.iterator().next().getKey());
-        assertEquals(1, entrySet.iterator().next().getValue().size());
-        assertTrue(entrySet.iterator().next().getValue().contains(location1));
+        assertThat(entrySet, contains(hasProperty("key", equalTo(key))));
+        assertThat(entrySet, contains(hasProperty("value", hasSize(1))));
+        assertThat(entrySet, contains(hasProperty("value", contains(location1))));
     }
 
     @Test
@@ -57,11 +61,10 @@ public class UsageMapTest {
         underTest.add(key, location1);
         underTest.add(key, location2);
         Set<Map.Entry<String, Set<Location>>> entrySet = underTest.entrySet();
-        assertEquals(1, entrySet.size());
-        assertEquals(key, entrySet.iterator().next().getKey());
-        assertEquals(2, entrySet.iterator().next().getValue().size());
-        assertTrue(entrySet.iterator().next().getValue().contains(location1));
-        assertTrue(entrySet.iterator().next().getValue().contains(location2));
+        assertThat(entrySet, hasSize(1));
+        assertThat(entrySet, contains(hasProperty("key", equalTo(key))));
+        assertThat(entrySet, contains(hasProperty("value", hasSize(2))));
+        assertThat(entrySet, contains(hasProperty("value", contains(location1, location2))));
     }
 
     @Test
@@ -84,15 +87,16 @@ public class UsageMapTest {
             entry2 = entry1;
             entry1 = tmp;
         }
-        assertEquals(key, entry1.getKey());
-        assertEquals(1, entry1.getValue().size());
-        assertTrue(entry1.getValue().contains(location1));
+        assertThat(entry1.getKey(), equalTo(key));
+        assertThat(entry1.getValue(), hasSize(1));
+        assertThat(entry1.getValue(), contains(location1));
 
-        assertEquals(key2, entry2.getKey());
-        assertEquals(1, entry2.getValue().size());
-        assertTrue(entry2.getValue().contains(location2));
+        assertThat(entry2.getKey(), equalTo(key2));
+        assertThat(entry2.getValue(), hasSize(1));
+        assertThat(entry2.getValue(), contains(location2));
     }
 
+    @SuppressWarnings("static-method")
     @Test
     public void testAddAllOneEntry() throws Exception {
         String key = "key";
@@ -103,13 +107,12 @@ public class UsageMapTest {
         underTest.addAll(key, locations);
         Set<Map.Entry<String, Set<Location>>> entrySet = underTest.entrySet();
 
-        assertEquals(1, entrySet.size());
-        assertEquals(key, entrySet.iterator().next().getKey());
+        assertThat(entrySet, hasSize(1));
+        assertThat(entrySet, contains(hasProperty("key", equalTo(key))));
 
         Set<Location> actualLocation = entrySet.iterator().next().getValue();
-        assertEquals(2, actualLocation.size());
-        assertTrue(actualLocation.contains(location1));
-        assertTrue(actualLocation.contains(location2));
+        assertThat(actualLocation, hasSize(2));
+        assertThat(actualLocation, contains(location1, location2));
     }
 
     @Test
@@ -132,7 +135,7 @@ public class UsageMapTest {
         Set<Location> actualLocations2 = null;
 
         Set<Map.Entry<String, Set<Location>>> entrySet = underTest.entrySet();
-        assertEquals(2, entrySet.size());
+        assertThat(entrySet, hasSize(2));
 
         for (Map.Entry<String, Set<Location>> entry : entrySet) {
             if (entry.getKey().equals(key1)) {
@@ -144,13 +147,11 @@ public class UsageMapTest {
             }
         }
 
-        assertEquals(2, actualLocations1.size());
-        assertTrue(actualLocations1.contains(location1));
-        assertTrue(actualLocations1.contains(location2));
+        assertThat(actualLocations1, hasSize(2));
+        assertThat(actualLocations1, containsInAnyOrder(location1, location2));
 
-        assertEquals(2, actualLocations2.size());
-        assertTrue(actualLocations2.contains(location3));
-        assertTrue(actualLocations2.contains(location4));
+        assertThat(actualLocations2, hasSize(2));
+        assertThat(actualLocations2, containsInAnyOrder(location3, location4));
     }
 
     @Test
@@ -170,15 +171,12 @@ public class UsageMapTest {
 
 
         Set<Map.Entry<String, Set<Location>>> entrySet = underTest.entrySet();
-        assertEquals(1, entrySet.size());
+        assertThat(entrySet, hasSize(1));
         Map.Entry<String, Set<Location>> entry = entrySet.iterator().next();
 
-        assertEquals(key1, entry.getKey());
-        assertEquals(4, entry.getValue().size());
-        assertTrue(entry.getValue().contains(location1));
-        assertTrue(entry.getValue().contains(location2));
-        assertTrue(entry.getValue().contains(location3));
-        assertTrue(entry.getValue().contains(location4));
+        assertThat(entry.getKey(), equalTo(key1));
+        assertThat(entry.getValue(), hasSize(4));
+        assertThat(entry.getValue(), containsInAnyOrder(location1, location2, location3, location4));
     }
 
     @Test
@@ -195,16 +193,13 @@ public class UsageMapTest {
         underTest.addAll(key1, locations1);
         underTest.addAll(key1, locations2);
 
-
         Set<Map.Entry<String, Set<Location>>> entrySet = underTest.entrySet();
-        assertEquals(1, entrySet.size());
+        assertThat(entrySet, hasSize(1));
         Map.Entry<String, Set<Location>> entry = entrySet.iterator().next();
 
-        assertEquals(key1, entry.getKey());
-        assertEquals(3, entry.getValue().size());
-        assertTrue(entry.getValue().contains(location1));
-        assertTrue(entry.getValue().contains(location2));
-        assertTrue(entry.getValue().contains(location3));
+        assertThat(entry.getKey(), equalTo(key1));
+        assertThat(entry.getValue(), hasSize(3));
+        assertThat(entry.getValue(), containsInAnyOrder(location1, location2, location3));
     }
 
     @Test
@@ -216,24 +211,19 @@ public class UsageMapTest {
 
         Location location3 = new Location("file3", 0);
         Location location4 = new Location("file2", 0);
-        assertEquals(location2, location4);
+        assertThat(location4, Matchers.samePropertyValuesAs(location2));
         List<Location> locations2 = Lists.newArrayList(location3, location4);
 
         UsageMap<String> underTest = new UsageMap<>();
         underTest.addAll(key1, locations1);
         underTest.addAll(key1, locations2);
 
-
         Set<Map.Entry<String, Set<Location>>> entrySet = underTest.entrySet();
-        assertEquals(1, entrySet.size());
+        assertThat(entrySet, hasSize(1));
         Map.Entry<String, Set<Location>> entry = entrySet.iterator().next();
 
-        assertEquals(key1, entry.getKey());
-        assertEquals(3, entry.getValue().size());
-        assertTrue(entry.getValue().contains(location1));
-        assertTrue(entry.getValue().contains(location2));
-        assertTrue(entry.getValue().contains(location3));
-        // since the two locations are equal, we can see that both are "in" the set.
-        assertTrue(entry.getValue().contains(location4));
+        assertThat(entry.getKey(), equalTo(key1));
+        assertThat(entry.getValue(), hasSize(3));
+        assertThat(entry.getValue(), containsInAnyOrder(location1, location2, location3));
     }
 }

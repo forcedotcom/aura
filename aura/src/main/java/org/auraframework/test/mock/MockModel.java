@@ -18,6 +18,7 @@ package org.auraframework.test.mock;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -34,10 +35,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
-import com.google.common.collect.Maps;
-
 /**
- * A simple Model used when mocking ModelDef instantiations.
+ * A simple {@link Model} used when mocking {@link ModelDef} instantiations.
  */
 public class MockModel implements Model {
     private final DefDescriptor<ModelDef> descriptor;
@@ -45,7 +44,7 @@ public class MockModel implements Model {
 
     public MockModel(DefDescriptor<ModelDef> modelDefDescriptor, Map<String, Object> properties) {
         this.descriptor = modelDefDescriptor;
-        this.properties = (properties != null ? properties : Maps.<String,Object>newHashMap());
+        this.properties = (properties != null ? properties : new HashMap<>());
     }
 
     public Map<String,Object> getProperties() {
@@ -61,9 +60,8 @@ public class MockModel implements Model {
             } catch (Throwable e) {
                 if (e instanceof QuickFixException) {
                     throw (QuickFixException)e;
-                } else {
-                    throw new AuraRuntimeException(e);
                 }
+                throw new AuraRuntimeException(e);
             }
         }
         return ret;
@@ -80,9 +78,8 @@ public class MockModel implements Model {
                 } catch (Throwable e) {
                     if (e instanceof IOException) {
                         throw (IOException)e;
-                    } else {
-                        throw new AuraRuntimeException(e);
                     }
+                    throw new AuraRuntimeException(e);
                 }
             }
             json.writeMapEntry(entry.getKey(), value);
@@ -103,7 +100,7 @@ public class MockModel implements Model {
     /**
      * Get a value.
      * 
-     * Copied from JavaModel, and, well, still a stupid implementation.
+     * Copied from {@code JavaModel}, and, well, still a stupid implementation.
      *
      * This method is a rather painful departure from aura best practices, as it
      * is not really in a definition. This should probably be fixed, and the
@@ -113,7 +110,7 @@ public class MockModel implements Model {
      * @param key the key for the property.
      * @param def the model definition.
      */
-    private static Object getValue(Object root, PropertyReference key, ModelDef def) throws QuickFixException {
+    private static Object getValue(Object root, PropertyReference key, ModelDef def) {
         Object ret = null;
         try {
             String part = key.getRoot();
@@ -121,7 +118,7 @@ public class MockModel implements Model {
             if (root == null) {
                 return null;
             } else if (root instanceof Map) {
-                ret = ((Map<?, ?>) root).get(part);
+                ret = ((Map<String, ?>) root).get(part);
             } else if (root instanceof List) {
                 List<?> l = ((List<?>) root);
                 // special case for length property
@@ -177,10 +174,8 @@ public class MockModel implements Model {
 
     private static AuraRuntimeException makeException(String message, Throwable cause, ModelDef def) {
         if (def != null) {
-            return new AuraExecutionException(message,def.getLocation(),cause);
-        } else {
-            return new AuraRuntimeException(message, cause);
+            return new AuraExecutionException(message, def.getLocation(), cause);
         }
+        return new AuraRuntimeException(message, cause);
     }
 }
-

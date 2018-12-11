@@ -15,7 +15,8 @@
  */
 package org.auraframework.impl.util.mock;
 
-import java.io.IOException;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
@@ -29,11 +30,9 @@ import org.auraframework.util.json.Json;
 import org.auraframework.validation.ReferenceValidationContext;
 import org.mockito.Mockito;
 
-import com.google.common.collect.Sets;
-
 @SuppressWarnings("serial")
 public class MockDefinition implements Definition {
-    private DefDescriptor<Definition> descriptor;
+    private final DefDescriptor<Definition> descriptor;
     private Set<DefDescriptor<?>> localDeps;
     private DefinitionAccess access = Mockito.mock(DefinitionAccess.class);
     private String ownHash;
@@ -67,18 +66,22 @@ public class MockDefinition implements Definition {
 
     public void addDependency(DefDescriptor<?> descriptor) {
         if (localDeps == null) {
-            localDeps = Sets.newHashSet(descriptor);
-        } else {
-            localDeps.add(descriptor);
+            localDeps = new HashSet<>();
         }
+        localDeps.add(descriptor);
     }
 
     @Override
-    public void serialize(Json json) throws IOException {
+    public void serialize(Json json) {
+        // No implementation is needed when running this in the context of a test.
     }
 
+    /**
+     * @throws QuickFixException  
+     */
     @Override
     public void validateDefinition() throws QuickFixException {
+        // No implementation is needed when running this in the context of a test.
     }
 
     @Override
@@ -90,13 +93,17 @@ public class MockDefinition implements Definition {
 
     @Override
     public Set<DefDescriptor<?>> getDependencySet() {
-        Set<DefDescriptor<?>> dependencies = Sets.newLinkedHashSet();
+        Set<DefDescriptor<?>> dependencies = new LinkedHashSet<>();
         appendDependencies(dependencies);
         return dependencies;
     }
 
+    /**
+     * @throws QuickFixException  
+     */
     @Override
     public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
+        // No implementation is needed when running this in the context of a test.
     }
 
     @Override
@@ -144,7 +151,8 @@ public class MockDefinition implements Definition {
     }
 
     @Override
-    public void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException {
+    public void appendSupers(Set<DefDescriptor<?>> supers) {
+        // No implementation is needed when running this in the context of a test.
     }
 
     @Override

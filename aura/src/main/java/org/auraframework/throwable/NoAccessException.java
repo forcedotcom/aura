@@ -67,9 +67,8 @@ public class NoAccessException extends ClientSideEventException {
     public JsFunction getDefaultHandler() {
         if (this.redirectURL != null) {
             return new JsFunction(ImmutableList.<String> of(), String.format("window.location = '%s';", redirectURL));
-        } else {
-            return new JsFunction(ImmutableList.<String> of(), "$A.clientService.hardRefresh()");
         }
+        return new JsFunction(ImmutableList.<String> of(), "$A.clientService.hardRefresh()");
     }
 
     @Override

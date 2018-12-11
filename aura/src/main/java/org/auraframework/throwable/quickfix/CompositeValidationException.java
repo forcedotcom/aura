@@ -18,6 +18,7 @@ package org.auraframework.throwable.quickfix;
 import java.util.Collection;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.system.Location;
 
 /**
@@ -40,31 +41,29 @@ public class CompositeValidationException extends AuraValidationException {
     /** Prints an overall summary, and the message of each error. */
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
         String message = getMessage();
-        if (message != null && message.isEmpty()) {
-            message = null;
-        }
-        if (message == null) {
+        if (StringUtils.isEmpty(message)) {
             if (errors.size() == 1) {
                 message = "An error occurred";
             } else {
                 message = "Multiple errors occurred";
             }
         }
-        builder.append(message);
-        builder.append("\n");
+
+        StringBuilder builder = new StringBuilder()
+            .append(message)
+            .append('\n');
         if (errors.size() > 0) {
-            builder.append(errors.size());
-            builder.append(" threads failed with throwables\n");
+            builder.append(errors.size())
+                   .append(" threads failed with throwables\n");
             for (Map.Entry<Throwable,Collection<Location>> ent : errors.entrySet()) {
-                builder.append("[");
-                builder.append(ent.getKey().getClass().getName());
-                builder.append(":");
-                builder.append(ent.getKey().getMessage());
-                builder.append("] used at: ");
-                builder.append(ent.getValue());
-                builder.append("\n");
+                builder.append('[')
+                       .append(ent.getKey().getClass().getName())
+                       .append(':')
+                       .append(ent.getKey().getMessage())
+                       .append("] used at: ")
+                       .append(ent.getValue())
+                       .append('\n');
             }
         }
         return builder.toString();

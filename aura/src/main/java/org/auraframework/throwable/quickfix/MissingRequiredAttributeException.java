@@ -27,13 +27,13 @@ public class MissingRequiredAttributeException extends AuraValidationException
     private static final String MESSAGE = "%s %s is missing required attribute '%s'";
     private final DefDescriptor<?> descriptor;
 
-    public MissingRequiredAttributeException(DefDescriptor<?> descriptor, String attributeName) {
-        this(descriptor, attributeName, null);
-    }
-
     public MissingRequiredAttributeException(DefDescriptor<?> descriptor, String attributeName, Location l) {
         super(getMessage(descriptor, attributeName), l);
         this.descriptor = descriptor;
+    }
+    
+    public MissingRequiredAttributeException(DefDescriptor<?> descriptor, String attributeName) {
+        this(descriptor, attributeName, null);
     }
 
     public static String getMessage(DefDescriptor<?> desc, String attributeName) {

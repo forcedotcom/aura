@@ -18,10 +18,9 @@ package org.auraframework.system;
 import java.io.Serializable;
 
 /**
- * Information about a location in source code, including filename, line, and
- * column number. The "filename" will in most useful cases be an actual
- * filename, but may also be a jar URL (formatted as "jar://<em>filename</em>! <em>interiorFile</em>" or a synthetic URL
- * for string sources (formatted as,
+ * Information about a location in source code, including filename, line, and column number. The "filename"
+ * will in most useful cases be an actual filename, but may also be a jar URL (formatted as
+ * "jar://<em>filename</em>! <em>interiorFile</em>" or a synthetic URL for string sources (formatted as,
  * for example, "markup://string: <em>name</em>").
  */
 public class Location implements Serializable {
@@ -99,12 +98,11 @@ public class Location implements Serializable {
     @Override
     public String toString() {
         if (this.line != -1) {
-            return String.format("%s:%s,%s", this.fileName, this.line, this.column);
-        } else {
-            return this.fileName;
+            return new StringBuilder(this.fileName).append(':').append(this.line).append(',').append(this.column).toString();
         }
+        return this.fileName;
     }
-
+    
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Location) {

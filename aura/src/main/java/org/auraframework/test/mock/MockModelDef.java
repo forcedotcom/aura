@@ -16,6 +16,8 @@
 package org.auraframework.test.mock;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,11 +31,10 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
- * A simple ModelDef that provides a MockModel instance.
+ * A simple {@link ModelDef} that provides a {@link MockModel} instance.
  */
 public class MockModelDef extends MockDefinition<ModelDef> implements ModelDef {
     private static final long serialVersionUID = 8237818157530284425L;
@@ -42,13 +43,15 @@ public class MockModelDef extends MockDefinition<ModelDef> implements ModelDef {
 
     public MockModelDef(DefDescriptor<ModelDef> descriptor, Set<ValueDef> members, List<Answer<Model>> instances) {
         super(descriptor);
-        this.members = Maps.newLinkedHashMap();
-        if (members != null) {
+        if (members == null) {
+            this.members = new LinkedHashMap<>();
+        } else {
+            this.members = Maps.newLinkedHashMapWithExpectedSize(members.size());
             for (ValueDef val : members) {
                 this.members.put(val.getName(), val);
             }
         }
-        this.instances = instances != null ? Lists.newLinkedList(instances) : Lists.<Answer<Model>> newLinkedList();
+        this.instances = (instances != null) ? new LinkedList<>(instances) : new LinkedList<>();
     }
 
     @Override
@@ -67,9 +70,8 @@ public class MockModelDef extends MockDefinition<ModelDef> implements ModelDef {
         try {
             if (instances.size() > 1) {
                 return instances.remove(0).answer();
-            } else {
-                return instances.get(0).answer();
             }
+            return instances.get(0).answer();
         } catch (Throwable e) {
             throw new AuraRuntimeException(e);
         }

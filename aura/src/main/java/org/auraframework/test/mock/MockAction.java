@@ -16,6 +16,7 @@
 package org.auraframework.test.mock;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,8 +30,6 @@ import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.Json;
-
-import com.google.common.collect.Lists;
 
 /**
  * A simple Action used when mocking Controller creations.
@@ -59,7 +58,7 @@ public class MockAction extends AbstractActionImpl<ActionDef> {
         if (actions != null) {
             add(actions);
         }
-        this.errors = (errors == null) ? Lists.<Object> newLinkedList() : errors;
+        this.errors = (errors == null) ? new LinkedList<>() : errors;
         if (componentRegistry != null) {
             for (BaseComponent<?,?> comp : componentRegistry.values()) {
                 this.getInstanceStack().registerComponent(comp);
@@ -79,6 +78,7 @@ public class MockAction extends AbstractActionImpl<ActionDef> {
 
     @Override
     public void run() throws AuraExecutionException {
+        // Does not execute any more because there is no way to verify anything actually ran.
     }
 
     @Override

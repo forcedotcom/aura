@@ -231,7 +231,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
             throw new InvalidDefinitionException(e.getMessage(), location, e);
         }
 
-        Map<CodeType, String> codes = processCodes(descriptor, compilerData.codes, location);
+        Map<CodeType, String> codes = processCodes(descriptor, compilerData.codes, location, bundleType);
         builder.setCodes(codes);
         
         builder.setModuleDependencies(compilerData.bundleDependencies);
@@ -609,15 +609,20 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
      * @throws InvalidDefinitionException invalid definition
      */
     private Map<CodeType, String> processCodes(DefDescriptor<ModuleDef> descriptor, Map<CodeType, String> codeMap,
-                                               Location location) throws InvalidDefinitionException {
+                                               Location location, BundleType bundleType) throws InvalidDefinitionException {
         Map<CodeType, String> newCodeMap = new EnumMap<>(CodeType.class);
         for (CodeType codeType : CodeType.values()) {
             String code = codeMap.get(codeType);
             if (code == null) {
-                throw new InvalidDefinitionException(codeType + " compiled code not found", location);
+                // only internal has PROD_DEBUG and PROD_DEBUG_COMPAT code types
+                if (codeType == CodeType.DEV || codeType == CodeType.PROD || codeType == CodeType.COMPAT || codeType == CodeType.PROD_COMPAT ||
+                        (bundleType == BundleType.internal && (codeType == CodeType.PROD_DEBUG || codeType == CodeType.PROD_DEBUG_COMPAT))) {
+                    throw new InvalidDefinitionException(codeType + " compiled code not found", location);
+                }
+            } else {
+                String compiledCode = processCompiledCode(descriptor, code, codeType, location);
+                newCodeMap.put(codeType, compiledCode);
             }
-            String compiledCode = processCompiledCode(descriptor, code, codeType, location);
-            newCodeMap.put(codeType, compiledCode);
         }
         return newCodeMap;
     }
@@ -640,7 +645,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
             String amdString = "define(";
             int amdIndex = code.indexOf(amdString);
             String polyfills = code.substring(0, amdIndex);
-            String module = code.substring(amdIndex+amdString.length(), code.length());
+            String module = code.substring(amdIndex+amdString.length());
             processedCode
                 .append("function() { ")
                 .append(polyfills)
@@ -655,7 +660,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
             processedCode
                     .append("function() { $A.componentService.addModule('")
                     .append(descriptor.getQualifiedName()).append("', ")
-                    .append(code.substring(7, code.length()))
+                    .append(code.substring(7))
                     .append("}");
         }
         return processedCode.toString();

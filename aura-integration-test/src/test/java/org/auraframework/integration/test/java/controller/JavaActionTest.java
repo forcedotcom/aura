@@ -15,43 +15,32 @@
  */
 package org.auraframework.integration.test.java.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
-import org.auraframework.cache.Cache;
+import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DescriptorKey;
-import org.auraframework.def.Definition;
 import org.auraframework.def.JavaControllerDef;
-import org.auraframework.def.TypeDef;
+import org.auraframework.def.ValueDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.java.controller.JavaAction;
 import org.auraframework.impl.java.controller.JavaActionDef;
-import org.auraframework.impl.java.model.JavaValueDef;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Action.State;
-import org.auraframework.service.CachingService;
-import org.auraframework.service.InstanceService;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 /**
  * Integration tests for JavaAction.
  */
 public class JavaActionTest extends AuraImplTestCase {
-
-    @Inject
-    private CachingService cachingService;
-
-    @Inject
-    private InstanceService instanceService;
 
     /**
      * Tests to verify the APIs on Action to mark actions as storable.
@@ -159,15 +148,15 @@ public class JavaActionTest extends AuraImplTestCase {
         ControllerDef controllerDef = getJavaControllerDef(targetController);
 
         Map<String, Object> params = new HashMap<>();
-        params.put("a", 1);
-        params.put("b", 2);
+        params.put("a", Integer.valueOf(1));
+        params.put("b", Integer.valueOf(2));
         ActionDef actionDef = controllerDef.getSubDefinition("sumValues");
         JavaAction javaAction = instanceService.getInstance(actionDef, params);
         javaAction.run();
 
         assertEquals(State.SUCCESS, javaAction.getState());
         assertActionNotContainsError(javaAction);
-        assertEquals(3, javaAction.getReturnValue());
+        assertEquals(Integer.valueOf(3), javaAction.getReturnValue());
     }
 
     /**
@@ -180,8 +169,8 @@ public class JavaActionTest extends AuraImplTestCase {
 
         Map<String, Object> params = new HashMap<>();
         // Passing the wrong type (NaN instead of Integers)
-        params.put("a", Double.NaN);
-        params.put("b", Double.NaN);
+        params.put("a", Double.valueOf(Double.NaN));
+        params.put("b", Double.valueOf(Double.NaN));
         ActionDef actionDef = controllerDef.getSubDefinition("sumValues");
         JavaAction javaAction = instanceService.getInstance(actionDef, params);
         javaAction.run();
@@ -221,38 +210,34 @@ public class JavaActionTest extends AuraImplTestCase {
      */
     @Test
     public void testRunActionWithBadParameterThrowsQFE() throws Exception {
-        // create DefDescriptor for JavaValueDefExt, type doesn't matter as we plan to spy on it.
-        String instanceName = "java://java.lang.String";
-        DefDescriptor<TypeDef> JavaValueDefDesc = definitionService.getDefDescriptor(instanceName, TypeDef.class);
-        // spy on DefDescriptor, ask it to throw QFE when calling getDef()
-        DefDescriptor<TypeDef> JavaValueDefDescMocked = Mockito.spy(JavaValueDefDesc);
-        Mockito.doThrow(Mockito.mock(QuickFixException.class)).when(JavaValueDefDescMocked).getDef();
-        // time to ask MDR give us what we want
-        String name = "java://org.auraframework.impl.java.model.JavaValueDef";
-        Class<TypeDef> defClass = TypeDef.class;
-        DescriptorKey dk = new DescriptorKey(name, defClass);
-        Cache<DescriptorKey, DefDescriptor<? extends Definition>> cache =
-                cachingService.getDefDescriptorByNameCache();
-        cache.put(dk, JavaValueDefDescMocked);
+        JavaActionDef actionDef = Mockito.mock(JavaActionDef.class);
+        List<ValueDef> params = new ArrayList<>();
 
-        // jvd doesn't matter that much for triggering QFE, as we only used it as the Object param
-        JavaValueDef jvd = new JavaValueDef("tvdQFE", JavaValueDefDesc, null, false);
-        Map<String, Object> args = new HashMap<>();
-        args.put("keya", jvd);
-        ControllerDef controllerDef = getJavaControllerDef("java://org.auraframework.integration.test.java.controller.TestControllerOnlyForJavaControllerTest");
+        ValueDef valueDef = Mockito.mock(ValueDef.class);
+        QuickFixException expected = Mockito.mock(QuickFixException.class);
+        String name = "test";
+        Mockito.doThrow(expected).when(valueDef).getType();
+        Mockito.doReturn(name).when(valueDef).getName();
+        params.add(valueDef);
+        Mockito.doReturn(new Class[] { String.class }).when(actionDef).getJavaParams();
+        Mockito.doReturn(params).when(actionDef).getParameters();
 
-        // we actually catch the QFE in JavaAction.getArgs(), then wrap it up with AuraUnhandledException
-        ActionDef actionDef = controllerDef.getSubDefinition("customErrorParam");
-        Action action = instanceService.getInstance(actionDef, args);
-        action.run();
+        ExceptionAdapter excAdapt = Mockito.mock(ExceptionAdapter.class);
 
-        assertEquals(State.ERROR, action.getState());
-        assertEquals(null, action.getReturnValue());
-        assertEquals(1, action.getErrors().size());
-        Exception actualException = (Exception) action.getErrors().get(0);
-        // we actually catch the QFE in JavaAction.getArgs(), then wrap it up with AuraUnhandledException
-        String expectedMessage = "Invalid parameter keya: java://java.lang.String";
-        checkExceptionContains(actualException, AuraUnhandledException.class, expectedMessage);
+        Action target = new JavaAction(null, actionDef, null, new HashMap<>(), excAdapt, null, null);
+        Mockito.doReturn(expected).when(excAdapt).handleException(Mockito.any(), Mockito.any());
+
+        target.run();
+
+        assertEquals(State.ERROR, target.getState());
+        assertEquals(null, target.getReturnValue());
+        assertEquals(1, target.getErrors().size());
+        ArgumentCaptor<Throwable> throwableCaptor = ArgumentCaptor.forClass(Throwable.class);
+        ArgumentCaptor<Action> actionCaptor = ArgumentCaptor.forClass(Action.class);
+        Mockito.verify(excAdapt, Mockito.times(1)).handleException(throwableCaptor.capture(), actionCaptor.capture());
+        Mockito.verifyNoMoreInteractions(excAdapt);
+        assertEquals(expected, throwableCaptor.getValue().getCause());
+        assertEquals(target, actionCaptor.getValue());
     }
 
     @Test
@@ -309,9 +294,9 @@ public class JavaActionTest extends AuraImplTestCase {
         private String value = null;
 
         @Override
-        public void log(String key, String value) {
-            this.key = key;
-            this.value = value;
+        public void log(String keyIn, String valueIn) {
+            this.key = keyIn;
+            this.value = valueIn;
         }
     }
 
@@ -328,7 +313,7 @@ public class JavaActionTest extends AuraImplTestCase {
         int numOfError = action.getErrors().size();
         if(numOfError > 0) {
             fail(String.format("There are %d errors when running action %s: %s",
-                    numOfError, action.getDescriptor().getQualifiedName(), action.getErrors()));
+                    Integer.valueOf(numOfError), action.getDescriptor().getQualifiedName(), action.getErrors()));
         }
     }
 

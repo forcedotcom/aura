@@ -51,8 +51,6 @@ public class CacheController implements Controller {
             return cachingService.getAltStringsCache();
         } else if (cacheName.equals("clientlibraryoutputcache")) {
             return cachingService.getClientLibraryOutputCache();
-        } else if (cacheName.equals("defdescriptorbynamecache")) {
-            return cachingService.getDefDescriptorByNameCache();
         } else if (cacheName.equals("defscache")) {
             return cachingService.getDefsCache();
         } else if (cacheName.equals("depscache")) {

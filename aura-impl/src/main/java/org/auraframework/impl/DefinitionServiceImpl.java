@@ -43,7 +43,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.DefDescriptor.DescriptorKey;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.InterfaceDef;
@@ -123,7 +122,6 @@ public class DefinitionServiceImpl implements DefinitionService {
     public <T extends Definition, B extends Definition> DefDescriptor<T> getDefDescriptor(
             @CheckForNull String qualifiedName, @CheckForNull Class<T> defClass,
             @CheckForNull DefDescriptor<B> bundle) {
-
         if (qualifiedName == null || defClass == null) {
             //FIXME: we should not throw here.
             throw new AuraRuntimeException("descriptor is null");
@@ -131,53 +129,15 @@ public class DefinitionServiceImpl implements DefinitionService {
         if (defClass == ActionDef.class) {
             return SubDefDescriptorImpl.getInstance(qualifiedName, defClass, ControllerDef.class);
         }
-        DescriptorKey dk = new DescriptorKey(qualifiedName, defClass, bundle);
-
-        Cache<DescriptorKey, DefDescriptor<? extends Definition>> cache = null;
-        if (cachingService != null) {
-            cache = cachingService.getDefDescriptorByNameCache();
-        }
-
-        DefDescriptor<T> result = null;
-        if (cache != null) {
-            @SuppressWarnings("unchecked")
-            DefDescriptor<T> cachedResult = (DefDescriptor<T>) cache.getIfPresent(dk);
-            result = cachedResult;
-        }
-        if (result == null) {
-            if (defClass == TypeDef.class && qualifiedName.indexOf("://") == -1) {
-                TypeDef typeDef = AuraStaticTypeDefRegistry.INSTANCE.getInsensitiveDef(qualifiedName);
-                if (typeDef != null) {
-                    @SuppressWarnings("unchecked")
-                    DefDescriptor<T> typeDescriptor = (DefDescriptor<T>) typeDef.getDescriptor();
-                    return typeDescriptor;
-                }
-            }
-            result = new DefDescriptorImpl<>(qualifiedName, defClass, bundle, contextService);
-
-            // Our input names may not be qualified, but we should ensure that
-            // the fully-qualified is properly cached to the same object.
-            // I'd like an unqualified name to either throw or be resolved first,
-            // but that's breaking or non-performant respectively.
-            if (!dk.getName().equals(result.getQualifiedName())) {
-                DescriptorKey fullDK = new DescriptorKey(result.getQualifiedName(), defClass, result.getBundle());
-
+        if (defClass == TypeDef.class && qualifiedName.indexOf("://") == -1) {
+            TypeDef typeDef = AuraStaticTypeDefRegistry.INSTANCE.getInsensitiveDef(qualifiedName);
+            if (typeDef != null) {
                 @SuppressWarnings("unchecked")
-                DefDescriptor<T> fullResult = (DefDescriptor<T>) cache.getIfPresent(fullDK);
-                if (fullResult == null) {
-                    cache.put(fullDK, result);
-                } else {
-                    // We already had one, just under the proper name
-                    result = fullResult;
-                }
-            }
-
-            if (cache != null) {
-                cache.put(dk, result);
+                DefDescriptor<T> typeDescriptor = (DefDescriptor<T>) typeDef.getDescriptor();
+                return typeDescriptor;
             }
         }
-
-        return result;
+        return new DefDescriptorImpl<>(qualifiedName, defClass, bundle, contextService);
     }
 
     @Override
@@ -1051,7 +1011,6 @@ public class DefinitionServiceImpl implements DefinitionService {
         Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache = cachingService.getDefsCache();
 
         linker = new AuraLinker(descriptor, defsCache,
-                cachingService.getDefDescriptorByNameCache(),
                 loggingService, configAdapter, accessChecker, context.getAuraLocalStore(), context.getAccessCheckCache(),
                 context.getRegistries(), context.getJsonSerializationContext());
 
@@ -1219,7 +1178,6 @@ public class DefinitionServiceImpl implements DefinitionService {
         AuraContext context = contextService.getCurrentContext();
         Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache = cachingService.getDefsCache();
         AuraLinker linker = new AuraLinker(null, defsCache,
-                cachingService.getDefDescriptorByNameCache(),
                 loggingService, configAdapter, accessChecker, context.getAuraLocalStore(),
                 context.getAccessCheckCache(), context.getRegistries(),
                 context.getJsonSerializationContext());

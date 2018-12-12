@@ -92,7 +92,6 @@ public class CachingServiceImpl implements CachingService {
      */
     private Cache<String, DependencyEntry> depsCache;
     private Cache<String, String> clientLibraryOutputCache;
-    private Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> defDescriptorByNameCache;
     private Cache<RegistrySet.RegistrySetKey, RegistrySet> registrySetCache;
 
     private static final Logger logger = Logger.getLogger(CachingServiceImpl.class);
@@ -173,16 +172,6 @@ public class CachingServiceImpl implements CachingService {
                 .setName("clientLibraryOutputCache")
                 .setRecordStats(true).build();
 
-        size = getCacheSize("aura.cache.defDescByNameCacheSize", DEFINITION_CACHE_SIZE);
-        defDescriptorByNameCache =
-                this.<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> getCacheBuilder()
-                        .setInitialSize(size)
-                        .setLoggingAdapter(loggingAdapter)
-                        .setMaximumSize(size)
-                        .setConcurrencyLevel(20)
-                        .setName("defDescByNameCache")
-                        .build();
-        
         size = getCacheSize("aura.cache.registrySetCacheSize", REGISTRY_SET_CACHE_SIZE);
         registrySetCache = 
                this.<RegistrySet.RegistrySetKey, RegistrySet> getCacheBuilder()
@@ -236,11 +225,6 @@ public class CachingServiceImpl implements CachingService {
         return clientLibraryOutputCache;
     }
 
-    @Override
-    public final Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> getDefDescriptorByNameCache() {
-        return defDescriptorByNameCache;
-    }
-    
     @Override
     public Cache<RegistrySetKey, RegistrySet> getRegistrySetCache() {
         return registrySetCache;

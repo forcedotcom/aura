@@ -72,7 +72,7 @@ public class AuraLinkerTest {
         MockDefDescriptor desc1 = new MockDefDescriptor("markup", "b", "b");
         MockDefDescriptor desc2 = new MockDefDescriptor("markup", "b", "B");
 
-        AuraLinker linker = new AuraLinker(desc1, null, null, null, null, null, null, null, registries, null);
+        AuraLinker linker = new AuraLinker(desc1, null, null, null, null, null, null, registries, null);
         LinkingDefinition<Definition> ld1 = linker.getLinkingDef(desc1);
         LinkingDefinition<Definition> ld2 = linker.getLinkingDef(desc2);
         Assert.assertSame("Definitions should be the same", ld1, ld2);
@@ -86,7 +86,7 @@ public class AuraLinkerTest {
         MockDefDescriptor desc2 = new MockDefDescriptor("markup", "a", "b");
         MockDefinition def2 = new MockDefinition(desc1);
 
-        AuraLinker linker = new AuraLinker(desc1, null, null, null, null, null, null, null, registries, null);
+        AuraLinker linker = new AuraLinker(desc1, null, null, null, null, null, null, registries, null);
 
         LinkingDefinition<Definition> ld = linker.getLinkingDef(desc1);
         ld.def = def1;
@@ -112,7 +112,7 @@ public class AuraLinkerTest {
         MockDefDescriptor desc2 = new MockDefDescriptor("markup", "a", "b");
         MockDefinition def2 = new MockDefinition(desc1);
 
-        AuraLinker linker = new AuraLinker(desc1, null, null, null, null, null, null, null, registries, null);
+        AuraLinker linker = new AuraLinker(desc1, null, null, null, null, null, null, registries, null);
 
         LinkingDefinition<Definition> ld = linker.getLinkingDef(desc1);
         ld.def = def1;
@@ -388,7 +388,7 @@ public class AuraLinkerTest {
         AuraLocalStore localStore = Mockito.mock(AuraLocalStore.class);
         @SuppressWarnings("unchecked")
         Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache = Mockito.mock(Cache.class);
-        return new AuraLinker(root.getDescriptor(), defsCache, null,
+        return new AuraLinker(root.getDescriptor(), defsCache,
                 loggingService, configAdapter, accessChecker, localStore, null, registries, null);
     }
 

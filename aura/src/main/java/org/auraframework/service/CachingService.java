@@ -72,8 +72,6 @@ public interface CachingService {
 
     Cache<String, String> getClientLibraryOutputCache();
 
-    Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> getDefDescriptorByNameCache();
-
     Cache<RegistrySet.RegistrySetKey, RegistrySet> getRegistrySetCache();
     
     Lock getReadLock();

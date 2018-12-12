@@ -31,7 +31,6 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BundleDef;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DescriptorKey;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.root.component.BaseComponentDefImpl;
 import org.auraframework.impl.validation.ReferenceValidationContextImpl;
@@ -68,7 +67,6 @@ public class AuraLinker {
     private final ConfigAdapter configAdapter;
     private final JsonSerializationContext jsonSerializationContext;
     private final Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache;
-    private final Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> descriptorCache;
     private final Map<String, String> accessCheckCache;
 
     private final Map<DefDescriptor<? extends Definition>, LinkingDefinition<?>> linked = Maps.newHashMap();
@@ -90,7 +88,6 @@ public class AuraLinker {
 
     public AuraLinker(DefDescriptor<? extends Definition> topLevel,
                       Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache,
-                      Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> descriptorCache,
                       LoggingService loggingService, ConfigAdapter configAdapter,
                       AccessChecker accessChecker, AuraLocalStore localStore,
                       Map<String, String> accessCheckCache,
@@ -102,7 +99,6 @@ public class AuraLinker {
 
         this.topLevel = topLevel;
         this.defsCache = defsCache;
-        this.descriptorCache = descriptorCache;
         this.loggingService = loggingService;
         this.configAdapter = configAdapter;
         this.accessChecker = accessChecker;
@@ -557,11 +553,6 @@ public class AuraLinker {
         DefDescriptor<D> canonical = (DefDescriptor<D>) compiling.def.getDescriptor();
         compiling.descriptor = canonical;
 
-        if (descriptorCache != null) {
-            DescriptorKey dk = new DescriptorKey(canonical.getQualifiedName(),
-                    canonical.getDefType().getPrimaryInterface(), canonical.getBundle());
-            descriptorCache.put(dk, canonical);
-        }
         populateSubDefs(compiling.def);
 
         if (!registry.isStatic()) {

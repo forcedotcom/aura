@@ -220,6 +220,25 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     }
 
     /**
+     * Equality.
+     *
+     * Careful here, we optimize to avoid doing expensive calculations when we shouldn't, but
+     * this must match compareTo exactly.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o != null && o instanceof DefDescriptor) {
+            DefDescriptor<?> other = (DefDescriptor<?>)o;
+            if (other.getDefType() != defType) {
+                return false;
+            }
+            return this.qualifiedName.equalsIgnoreCase(other.getQualifiedName())
+                && (this.bundle == other.getBundle() || (this.bundle != null && this.bundle.equals(other.getBundle())));
+        }
+        return false;
+    }
+
+    /**
      * Helper method for various {@link DefDescriptor} subclasses to implement {@link #compareTo(DefDescriptor)}, since
      * interfaces aren't allowed to have static methods, and since {@code DefDescriptor} is an interface rather than an
      * abstract class.
@@ -296,14 +315,6 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     @Override
     public String toString() {
         return qualifiedName;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o instanceof DefDescriptor) {
-            return compare(this, (DefDescriptor<?>)o) == 0;
-        }
-        return false;
     }
 
     @Override

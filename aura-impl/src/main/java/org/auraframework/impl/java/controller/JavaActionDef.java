@@ -76,7 +76,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
         return loggableParams;
     }
 
-    Class<?>[] getJavaParams() {
+    public Class<?>[] getJavaParams() {
         return this.javaParams;
     }
 

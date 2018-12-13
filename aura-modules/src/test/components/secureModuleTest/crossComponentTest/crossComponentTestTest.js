@@ -16,7 +16,7 @@
     },
 
     // TODO W-5675343
-    _testGetElementByIDComponentOtherNamespace: {
+    testGetElementByIDComponentOtherNamespace: {
         test: function(cmp) {
             cmp.crossComponentTester("testGetElementByIDComponentOtherNamespace");
         }

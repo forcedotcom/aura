@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-12-07
- * Version: 0.6.7
+ * Generated: 2018-12-12
+ * Version: 0.6.8
  */
 
 (function (exports) {
@@ -351,15 +351,43 @@ const attrs = [
   'target'
 ];
 
+// use a floating element for attribute sanitization
+const floating$1 = document.createElement('a');
+
 // define sanitizers functions
 // these functions should be PURE
 
 // sanitize a str representing an href SVG attribute value
 function sanitizeHrefAttribute(str) {
-  if (str.startsWith('#')) {
-    return asString$1(str);
+  if (!str) {
+    return str;
   }
-  return '';
+
+  str = asString$1(str);
+  if (str.startsWith('#')) {
+    return str;
+  }
+
+  floating$1.href = str;
+  const urlParam = floating$1.href.split('#');
+  const url = `${urlParam[0]}`.replace(/[\\/,\\:]/g, '');
+  if (!document.getElementById(url)) {
+    const container = document.createElement('div');
+    container.setAttribute('style', 'display:none');
+    container.setAttribute('id', url);
+    document.body.appendChild(container);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', urlParam[0]);
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        container.innerHTML = sanitizeSvgText(xhr.responseText);
+      }
+    };
+    xhr.send();
+  }
+
+  return urlParam[1] ? `#${urlParam[1]}` : `#${url}`;
 }
 
 function uponSanitizeAttribute(node, data) {
@@ -388,6 +416,15 @@ const instances = new WeakMap();
 
 // precompile a list of all whitelisted tags
 const allTags = Array.from(new Set([].concat(svgTags).concat(htmlTags)));
+
+// use only SVG tags, DOMPurify to returns a String
+const RETURN_STRING_SVG = {
+  ALLOWED_TAGS: svgTags,
+  ADD_ATTR: attrs,
+  hooks: {
+    uponSanitizeAttribute
+  }
+};
 
 // use only SVG tags, sanitizer attempts in place sanitization
 const RETURN_NODE_SVG_INPLACE = {
@@ -499,7 +536,10 @@ function sanitizeElement(node) {
  * For compatibility reasons this method acts as a passthrough to DOMPurify
  * @param {String} input
  */
-
+function sanitizeSvgText(input) {
+  const sanitizer = getSanitizerForConfig(RETURN_STRING_SVG);
+  return sanitizer.sanitize(input);
+}
 
 /**
  * Will sanitize a string.
@@ -2423,6 +2463,112 @@ const SecureIFrameElement = {
   }
 };
 
+const isImport = /import/i;
+const secureRelList = {
+  get(target, property) {
+    const targetValue = get(target, property);
+    if (typeof targetValue === 'function') {
+      return function(...args) {
+        if (isImport.test(args.join(' '))) {
+          warn("SecureLinkElement does not allow setting 'rel' property to 'import' value.");
+          return undefined;
+        }
+        return target[property](...args);
+      };
+    }
+    return targetValue;
+  },
+  set(target, property, value) {
+    if (property === 'length') {
+      target[property] = value;
+    } else if (property === 'value') {
+      if (!isImport.test(value)) {
+        target[property] = value;
+      }
+    }
+
+    return true;
+  }
+};
+
+function createDescriptorMethods(method, indexOfValue, indexOfName, isNode) {
+  return {
+    value: function() {
+      if (isNode) {
+        const rawNodeAttr = getRawThis(arguments[indexOfValue]);
+        if (rawNodeAttr.name === 'rel' && isImport.test(rawNodeAttr.value)) {
+          warn("SecureLinkElement does not allow setting 'rel' property to 'import' value.");
+          return undefined;
+        }
+        return method.apply(this, arguments);
+      }
+      if (arguments[indexOfName] === 'rel' && isImport.test(arguments[indexOfValue])) {
+        warn("SecureLinkElement does not allow setting 'rel' property to 'import' value.");
+        return undefined;
+      }
+      return method.apply(this, arguments);
+    }
+  };
+}
+
+function createDescriptors(prototype) {
+  const { setAttribute, setAttributeNS, setAttributeNode, setAttributeNodeNS } = prototype;
+  return {
+    rel: {
+      enumerable: true,
+      get: function() {
+        const raw = getRawThis(this);
+        return raw.rel;
+      },
+      set: function(value) {
+        value = asString(value);
+        if (isImport.test(value)) {
+          warn("SecureLinkElement does not allow setting 'rel' property to 'import' value.");
+          return;
+        }
+        const raw = getRawThis(this);
+        raw.rel = value;
+      }
+    },
+    relList: {
+      get: function() {
+        const raw = getRawThis(this);
+        const key = getKey(raw);
+        const { relList } = raw;
+        let relListProxy = getFromCache(relList, key);
+        if (!relListProxy) {
+          relListProxy = new Proxy(relList, secureRelList);
+          addToCache(relList, relListProxy, key);
+          registerProxy(relListProxy);
+        }
+        return relListProxy;
+      },
+      set: function(relList) {
+        const raw = getRawThis(this);
+        if (relList instanceof DOMTokenList) {
+          if (isImport.test(relList.value)) {
+            warn(
+              "SecureLinkElement does not allow setting 'rel' property to 'import' value."
+            );
+            return undefined;
+          }
+          return raw['setAttribute']('rel', relList.value);
+        }
+        relList = asString(relList);
+        if (isImport.test(relList)) {
+          warn("SecureLinkElement does not allow setting 'rel' property to 'import' value.");
+          return undefined;
+        }
+        return raw['setAttribute']('rel', relList);
+      }
+    },
+    setAttribute: createDescriptorMethods(setAttribute, 1, 0, false),
+    setAttributeNS: createDescriptorMethods(setAttributeNS, 2, 1, false),
+    setAttributeNode: createDescriptorMethods(setAttributeNode, 0, undefined, true),
+    setAttributeNodeNS: createDescriptorMethods(setAttributeNodeNS, 0, undefined, true)
+  };
+}
+
 const metadata$3 = {
   ATTRIBUTE_NODE: DEFAULT,
   CDATA_SECTION_NODE: DEFAULT,
@@ -2693,10 +2839,7 @@ function customElementHook$1(el, prototype, tagNameSpecificConfig) {
  */
 function isAnLWCNode(node) {
   assert$1.invariant(node, 'Checking an undefined value to be node');
-  if (
-    lwcIsNodeFromTemplate(node) ||
-    (ShadowRoot && node instanceof ShadowRoot && lwcIsNodeFromTemplate(node.host))
-  ) {
+  if (lwcIsNodeFromTemplate(node) || (isShadowRoot(node) && lwcIsNodeFromTemplate(node.host))) {
     return true;
   }
   return false;
@@ -2808,12 +2951,35 @@ if (typeof window !== 'undefined') {
   window.devtoolsFormatters.push(lsProxyFormatter);
 }
 
+function createDescriptor(method, valIndex, isNode) {
+  return {
+    value() {
+      if (arguments[valIndex]) {
+        if (isNode) {
+          arguments[valIndex].value = sanitizeHrefAttribute(arguments[valIndex].value);
+        } else {
+          arguments[valIndex] = sanitizeHrefAttribute(arguments[valIndex]);
+        }
+      }
+      return method.apply(this, arguments);
+    }
+  };
+}
+
+function createDescriptors$1(prototype) {
+  const { setAttribute, setAttributeNode, setAttributeNS } = prototype;
+  return {
+    setAttribute: createDescriptor(setAttribute, 1, false),
+    setAttributeNS: createDescriptor(setAttributeNS, 2, false),
+    setAttributeNode: createDescriptor(setAttributeNode, 0, true),
+    setAttributeNodeNS: createDescriptor(setAttributeNode, 0, true)
+  };
+}
+
 let customElementHook$$1;
 function registerCustomElementHook(hook) {
   customElementHook$$1 = hook;
 }
-
-const REGEX_CONTAINS_IMPORT = /import/i;
 
 // Remove when SecureElement is refactored to use sandbox
 let shouldFreeze;
@@ -4010,7 +4176,6 @@ const metadata$2 = {
 function cloneFiltered(el, st) {
   const root = el.cloneNode(false);
   function cloneChildren(parent, parentClone) {
-    const { isAccessibleLWCNode: isAccessibleLWCNode$$1 } = lwcHelpers;
     const childNodes = parent.childNodes;
     const key = getKey(st);
     for (let i = 0; i < childNodes.length; i++) {
@@ -4018,7 +4183,7 @@ function cloneFiltered(el, st) {
       if (
         hasAccess(st, child) ||
         child.nodeType === Node.TEXT_NODE ||
-        isAccessibleLWCNode$$1(key, child)
+        isAccessibleLWCNode(key, child)
       ) {
         const childClone = child.cloneNode(false);
         parentClone.appendChild(childClone);
@@ -4288,7 +4453,7 @@ function SecureElement(el, key) {
       SecureIFrameElement.addMethodsAndProperties(prototype);
     }
 
-    const tagNameSpecificConfig = addPrototypeMethodsAndPropertiesStateless(
+    let tagNameSpecificConfig = addPrototypeMethodsAndPropertiesStateless(
       metadata$2,
       prototypicalInstance,
       prototype
@@ -4368,25 +4533,9 @@ function SecureElement(el, key) {
     }
 
     // Reason: [W-3564204] Web Components HTML imports only supported in Chrome.
-    // TODO: Implement SecureLinkElement when it is more standardized across browsers.
-    if (tagName === 'LINK' && 'rel' in el) {
-      tagNameSpecificConfig['rel'] = {
-        get: function() {
-          const raw = getRawThis(this);
-          return raw.rel;
-        },
-        set: function(value) {
-          value = String(value);
-          if (REGEX_CONTAINS_IMPORT.test(value)) {
-            warn(
-              "SecureLinkElement does not allow setting 'rel' property to 'import' value."
-            );
-          } else {
-            const raw = getRawThis(this);
-            raw.rel = value;
-          }
-        }
-      };
+    if (tagName === 'LINK') {
+      const descriptors = createDescriptors(prototype);
+      tagNameSpecificConfig = assign(tagNameSpecificConfig, descriptors);
     }
 
     // special handling for Text.splitText() instead of creating a new secure wrapper
@@ -4496,6 +4645,10 @@ function SecureElement(el, key) {
 
     if (tagName === 'SCRIPT') {
       SecureScriptElement.setOverrides(tagNameSpecificConfig, prototype);
+    }
+
+    if (tagName === 'USE') {
+      assign(tagNameSpecificConfig, createDescriptors$1(prototype));
     }
 
     // Custom Element with properties
@@ -4648,7 +4801,6 @@ SecureElement.addStandardNodeMethodAndPropertyOverrides = function(prototype) {
 
     hasChildNodes: {
       value: function() {
-        const { isAccessibleLWCNode: isAccessibleLWCNode$$1 } = lwcHelpers;
         const raw = getRawThis(this);
         // If this is a shared element, delegate the call to the shared element, no need to check for access
         if (isSharedElement(raw)) {
@@ -4657,7 +4809,7 @@ SecureElement.addStandardNodeMethodAndPropertyOverrides = function(prototype) {
         const childNodes = raw.childNodes;
         const key = getKey(this);
         for (let i = 0; i < childNodes.length; i++) {
-          if (hasAccess(this, childNodes[i]) || isAccessibleLWCNode$$1(key, childNodes[i])) {
+          if (hasAccess(this, childNodes[i]) || isAccessibleLWCNode(key, childNodes[i])) {
             return true;
           }
         }
@@ -4848,11 +5000,10 @@ SecureElement.createAttributeAccessMethodConfig = function(
 
 SecureElement.secureQuerySelector = function(el, key, selector) {
   const rawAll = el.querySelectorAll(selector);
-  const { isAccessibleLWCNode: isAccessibleLWCNode$$1 } = lwcHelpers;
   for (let n = 0; n < rawAll.length; n++) {
     const raw = rawAll[n];
     const rawKey = getKey(raw);
-    if (rawKey === key || isSharedElement(raw) || isAccessibleLWCNode$$1(key, raw)) {
+    if (rawKey === key || isSharedElement(raw) || isAccessibleLWCNode(key, raw)) {
       return SecureElement(raw, key);
     }
   }
@@ -5573,16 +5724,16 @@ class SecureNodeListProxyHandler {
  *  The default access check function for a node
  */
 const defaultNodeIsAccessible = (node, toKey) =>
-  getKey(node) === toKey || isSharedElement(node) || lwcHelpers.isAccessibleLWCNode(toKey, node);
+  getKey(node) === toKey || isSharedElement(node) || isAccessibleLWCNode(toKey, node);
 
 /**
  * Create a wrapper for a NodeList
  * Currently this wrapper handles both NodeList and HTMLCollection.
- * @param {*} raw nodelist to wrap
- * @param {*} toKey locker key for the destination trying to access the nodelist
- * @param {*} options
+ * @param {NodeList | HTMLCollection} raw nodelist to wrap
+ * @param {object} toKey locker key for the destination trying to access the nodelist
+ * @param {function} nodeIsAccessibleOverride Override the default access check function to determine if a node can be allowed accessed
  */
-function SecureNodeList(raw, toKey, options) {
+function SecureNodeList(raw, toKey, nodeIsAccessibleOverride) {
   const shadowTarget = create$1(getPrototypeOf(raw));
   setRef(shadowTarget, raw, toKey);
 
@@ -5591,14 +5742,13 @@ function SecureNodeList(raw, toKey, options) {
     new SecureNodeListProxyHandler(
       raw,
       toKey,
-      options && typeof options.nodeIsAccessible === 'function'
-        ? options.nodeIsAccessible
+      typeof nodeIsAccessibleOverride === 'function'
+        ? nodeIsAccessibleOverride
         : defaultNodeIsAccessible
     )
   );
-  setKey(proxy, toKey);
+  setRef(proxy, raw, toKey);
   registerProxy(proxy);
-
   return proxy;
 }
 
@@ -5615,12 +5765,6 @@ function registerDeepUnfilteringTypeHook(hook) {
 let isUnfilteredTypeHook$1;
 function registerIsUnfilteredTypeHook(hook) {
   isUnfilteredTypeHook$1 = hook;
-}
-const lwcHelpers = { isAccessibleLWCNode: () => false };
-function registerLWCHelpers(helpers) {
-  if (helpers) {
-    assign(lwcHelpers, helpers);
-  }
 }
 
 // TODO:W-5505278 Move add/create to LockerFactory
@@ -5742,7 +5886,6 @@ function filterObject(key, raw, options) {
     }
   } else if (isNodeList) {
     swallowed = SecureNodeList(raw, key);
-    setRef(swallowed, raw, key);
     mutated = true;
   } else {
     assert(key, 'A secure object should always have a key.');
@@ -6723,7 +6866,6 @@ function createFilteredProperty(st, raw, propertyName, options) {
   };
 
   descriptor.get = function() {
-    const { isAccessibleLWCNode } = lwcHelpers;
     let value = raw[propertyName];
 
     // Continue from the current object until we find an accessible object.
@@ -6776,7 +6918,6 @@ function createFilteredPropertyStateless(propertyName, prototype, options) {
   descriptor.get = function() {
     const st = this;
     const raw = getRawThis(st);
-    const { isAccessibleLWCNode } = lwcHelpers;
     const key = getKey(st);
     let value = raw[propertyName];
 
@@ -7626,6 +7767,10 @@ const metadata$5 = {
   }
 };
 
+// Node access checker function for queries originating from document, excludes nodes from shadow dom
+const nodeIsAccessible = (node, toKey) =>
+  isSharedElement(node) || (getKey(node) === toKey && !isAnLWCNode(node));
+
 function SecureDocument(doc, key) {
   let o = getFromCache(doc, key);
   if (o) {
@@ -7693,9 +7838,48 @@ function SecureDocument(doc, key) {
       }
     },
     querySelector: {
+      enumerable: true,
+      writable: true,
       value: function(selector) {
-        return SecureElement.secureQuerySelector(doc, key, selector);
+        const rawAll = doc.querySelectorAll(selector);
+        for (let n = 0, rawLength = rawAll.length; n < rawLength; n++) {
+          const raw = rawAll[n];
+          if (nodeIsAccessible(raw, key)) {
+            return SecureElement(raw, key);
+          }
+        }
+        return null;
       }
+    },
+    getElementById: {
+      enumerable: true,
+      writable: true,
+      value: function(id) {
+        const raw = doc.getElementById(id);
+        if (nodeIsAccessible(raw, key)) {
+          return SecureElement(raw, key);
+        }
+        return null;
+      }
+    }
+  });
+
+  [
+    'getElementsByClassName',
+    'getElementsByName',
+    'getElementsByTagName',
+    'getElementsByTagNameNS',
+    'querySelectorAll'
+  ].forEach(method => {
+    if (method in doc) {
+      defineProperty(o, method, {
+        enumerable: true,
+        writable: true,
+        value() {
+          const raw = doc[method](...arguments);
+          return SecureNodeList(raw, key, nodeIsAccessible);
+        }
+      });
     }
   });
 
@@ -11217,7 +11401,6 @@ function initialize(types, api) {
   registerFilterTypeHook(filterTypeHook);
   registerDeepUnfilteringTypeHook(deepUnfilteringTypeHook);
   registerIsUnfilteredTypeHook(isUnfilteredTypeHook);
-  registerLWCHelpers({ isAccessibleLWCNode });
   registerAddPropertiesHook$$1(windowAddPropertiesHook);
   registerAddPropertiesHook$1(navigatorAddPropertiesHook);
   registerCustomElementHook(customElementHook$1);

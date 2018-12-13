@@ -5,90 +5,86 @@ export default class crossComponentSource extends LightningElement {
 
     @api
     testGetElementByIDCrossComponentSameNamespace() {
-        let count = 0;
+        let elementFound = false;
         for (let i = 0; i < 10; i++) {
-          const element = document.getElementById(`same-namespace-target-${i}`);
-          if (element !== null) {
-            count++;
+          if (document.getElementById(`same-namespace-target-${i}`) !== null) {
+              elementFound = true;
+              break;
           }
         }
-
-        testUtil.assertEquals(1, count,
-            "Expected one element returned");
+        // Since document is patched to not allow access to shadow dom nodes
+        testUtil.assertFalse(elementFound,
+            "Expected no shadow dom element accessible from document.getElementById");
     }
 
     @api
     testGetElementByIDComponentOtherNamespace() {
-        let count = 0;
+        let elementFound = false;
         for (let i = 0; i < 10; i++) {
-          const element = document.getElementById(`other-namespace-target-${i}`);
-          if (element !== null) {
-            count++;
+          if (document.getElementById(`other-namespace-target-${i}`) !== null) {
+              elementFound = true;
+              break;
           }
         }
 
-        testUtil.assertEquals(0, count,
-            "Expected no element accessible");
+        testUtil.assertFalse(elementFound,
+            "Expected no cross-namespace dom element accessible from document.getElementById");
     }
 
     @api
     testGetElementByClassNameCrossComponentSameNamespace() {
         const elements = document.getElementsByClassName("same-namespace-target");
-
-        testUtil.assertEquals(1, elements.length,
-            "Expected one element returned");
+        // Since document is patched to not allow access to shadow dom nodes
+        testUtil.assertEquals(0, elements.length,
+            "Expected no shadow dom element accessible from document.getElementsByClassName");
     }
 
     @api
     testGetElementByClassNameComponentOtherNamespace() {
         const elements = document.getElementsByClassName("other-namespace-target");
-
         testUtil.assertEquals(0, elements.length,
-            "Expected no element accessible");
+            "Expected no cross-namespace element accessible from document.getElementsByClassName");
     }
 
     @api
     testQuerySelectorIDCrossComponentSameNamespace() {
         let count = 0;
         for (let i = 0; i < 10; i++) {
-          const element = document.querySelector(`#same-namespace-target-${i}`);
-          if (element !== null) {
-            count++;
+          if (document.querySelector(`#same-namespace-target-${i}`) !== null) {
+              count++;
           }
         }
 
-        testUtil.assertEquals(1, count,
-            "Expected one element returned");
+        // Since document is patched to not allow access to shadow dom nodes
+        testUtil.assertEquals(0, count,
+            "Expected no shadow dom element accessible from document.querySelector");
     }
 
     @api
     testQuerySelectorIDCrossComponentOtherNamespace() {
         let count = 0;
         for (let i = 0; i < 10; i++) {
-          const element = document.querySelector(`#other-namespace-target-${i}`);
-          if (element !== null) {
-            count++;
-          }
+            if (document.querySelector(`#other-namespace-target-${i}`) !== null) {
+                count++;
+            }
         }
 
         testUtil.assertEquals(0, count,
-            "Expected no element accessible");
+            "Expected no cross-namespace element accessible from document.querySelector");
     }
 
     @api
     testQuerySelectorClassCrossComponentSameNamespace() {
         const element = document.querySelector(".same-namespace-target");
-
-        testUtil.assertNotNull(element,
-            "Expected one element returned");
+        // Since document is patched to not allow access to shadow dom nodes
+        testUtil.assertNull(element, "Expected no shadow dom element accessible from document.querySelector");
     }
 
     @api
     testQuerySelectorClassCrossComponentOtherNamespace() {
         const element = document.querySelector(".other-namespace-target");
-
-        testUtil.assertNull(element,
-            "Expected no element accessible");
+        // Since document is patched to not allow access to shadow dom nodes
+        testUtil.assertNull(element, "Expected no cross-namespace dom element accessible from document.querySelector");
     }
 
 }

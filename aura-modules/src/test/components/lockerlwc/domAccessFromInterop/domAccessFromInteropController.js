@@ -50,7 +50,7 @@
             'Expected element with class "inTheShadow" to not be accessible from interop, breaking shadow dom semantics'
         );
         // Basic assertion in the LWC module as well
-        document.querySelector('.container-samenamespace-child').documentQuerySelector();
+        document.querySelector('.sameNamespaceChild').documentQuerySelector();
     },
 
     documentQuerySelectorAll: function(cmp) {
@@ -95,7 +95,7 @@
             'Expected to see no elements from shadow'
         );
         // Basic assertion in the LWC module as well
-        document.querySelector('.container-samenamespace-child').documentQuerySelectorAll();
+        document.querySelector('.sameNamespaceChild').documentQuerySelectorAll();
     },
 
     nodeQuerySelector: function(cmp, event, helper) {

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-12-07
- * Version: 0.6.7
+ * Generated: 2018-12-12
+ * Version: 0.6.8
  */
 
 (function (exports) {
@@ -197,15 +197,43 @@ var htmlTags = Object.keys(htmlTagsMap);
 // ATTRIBUTES
 var attrs = ['aria-activedescendant', 'aria-atomic', 'aria-autocomplete', 'aria-busy', 'aria-checked', 'aria-controls', 'aria-describedby', 'aria-disabled', 'aria-readonly', 'aria-dropeffect', 'aria-expanded', 'aria-flowto', 'aria-grabbed', 'aria-haspopup', 'aria-hidden', 'aria-disabled', 'aria-invalid', 'aria-label', 'aria-labelledby', 'aria-level', 'aria-live', 'aria-multiline', 'aria-multiselectable', 'aria-orientation', 'aria-owns', 'aria-posinset', 'aria-pressed', 'aria-readonly', 'aria-relevant', 'aria-required', 'aria-selected', 'aria-setsize', 'aria-sort', 'aria-valuemax', 'aria-valuemin', 'aria-valuenow', 'aria-valuetext', 'role', 'target'];
 
+// use a floating element for attribute sanitization
+var floating$1 = document.createElement('a');
+
 // define sanitizers functions
 // these functions should be PURE
 
 // sanitize a str representing an href SVG attribute value
 function sanitizeHrefAttribute(str) {
-  if (str.startsWith('#')) {
-    return asString(str);
+  if (!str) {
+    return str;
   }
-  return '';
+
+  str = asString(str);
+  if (str.startsWith('#')) {
+    return str;
+  }
+
+  floating$1.href = str;
+  var urlParam = floating$1.href.split('#');
+  var url = ('' + urlParam[0]).replace(/[\\/,\\:]/g, '');
+  if (!document.getElementById(url)) {
+    var container = document.createElement('div');
+    container.setAttribute('style', 'display:none');
+    container.setAttribute('id', url);
+    document.body.appendChild(container);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', urlParam[0]);
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        container.innerHTML = sanitizeSvgText(xhr.responseText);
+      }
+    };
+    xhr.send();
+  }
+
+  return urlParam[1] ? '#' + urlParam[1] : '#' + url;
 }
 
 function uponSanitizeAttribute(node, data) {
@@ -234,6 +262,15 @@ var instances = new WeakMap();
 
 // precompile a list of all whitelisted tags
 var allTags = Array.from(new Set([].concat(svgTags).concat(htmlTags)));
+
+// use only SVG tags, DOMPurify to returns a String
+var RETURN_STRING_SVG = {
+  ALLOWED_TAGS: svgTags,
+  ADD_ATTR: attrs,
+  hooks: {
+    uponSanitizeAttribute: uponSanitizeAttribute
+  }
+};
 
 // use only SVG tags, sanitizer attempts in place sanitization
 var RETURN_NODE_SVG_INPLACE = {
@@ -345,7 +382,10 @@ function sanitizeElement(node) {
  * For compatibility reasons this method acts as a passthrough to DOMPurify
  * @param {String} input
  */
-
+function sanitizeSvgText(input) {
+  var sanitizer = getSanitizerForConfig(RETURN_STRING_SVG);
+  return sanitizer.sanitize(input);
+}
 
 /**
  * Will sanitize a string.

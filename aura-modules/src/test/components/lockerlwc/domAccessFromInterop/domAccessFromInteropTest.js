@@ -24,13 +24,13 @@
     // ***
     // Tests disabled here due to a functional gap in shadow dom semantics. Locker and LWC are working on solutions. Locker spike is W-5612756
     // ***
-    _testDocumentQuerySelector: {
+    testDocumentQuerySelector: {
         test: function(cmp) {
             cmp.documentQuerySelector();
         }
     },
 
-    _testDocumentQuerySelectorAll: {
+    testDocumentQuerySelectorAll: {
         test: function(cmp) {
             cmp.documentQuerySelectorAll();
         }

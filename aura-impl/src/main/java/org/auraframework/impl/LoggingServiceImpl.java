@@ -15,6 +15,11 @@
  */
 package org.auraframework.impl;
 
+import java.math.BigDecimal;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.auraframework.adapter.LoggingAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.instance.Action;
@@ -22,11 +27,6 @@ import org.auraframework.service.LoggingService;
 import org.auraframework.system.LoggingContext;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.util.json.Json;
-
-import javax.inject.Inject;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  */
@@ -192,7 +192,7 @@ public class LoggingServiceImpl implements LoggingService {
     }
 
     @Override
-    public void logDeprecationUsages(final Map<String, List<String>> usages) {
+    public void logDeprecationUsages(final Map<String, Map<String, BigDecimal>> usages) {
         LoggingContext loggingContext = getLoggingContext();
         if (loggingContext != null) {
             loggingContext.logDeprecationUsages(usages);
@@ -201,7 +201,7 @@ public class LoggingServiceImpl implements LoggingService {
     
 
     @Override
-    public void logClientApiUsages(final Map<String, List<String>> usages) {
+    public void logClientApiUsages(final Map<String, Map<String, BigDecimal>> usages) {
         final LoggingContext loggingContext = getLoggingContext();
         if (loggingContext != null) {
             loggingContext.logClientApiUsages(usages);

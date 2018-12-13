@@ -29,7 +29,6 @@
  */
 function AuraInstance () {
     this.globalValueProviders = {};
-    this.deprecationUsages    = {};
     this.displayErrors        = true;
     this.initializers         = {};
 
@@ -606,6 +605,24 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
  * @private
  */
 AuraInstance.prototype.addTearDownHandler = function () {
+    window.addEventListener('unload', $A.getCallback(function beaconingWrapper() {
+        var actions = [];
+        if (this.deprecatedBeaconing) {
+            var deprecatedAction = this.deprecatedBeaconing.generateAction();
+            if (deprecatedAction) {
+                actions.push(deprecatedAction);
+            }
+        }
+        if (this.usageBeaconing) {
+            var usageAction = this.usageBeaconing.generateAction();
+            if (usageAction) {
+                actions.push(usageAction);
+            }
+        }
+        if (actions.length) {
+            $A.clientService.sendBeacon(actions);
+        }
+    }.bind(this)));
     window.addEventListener('unload', $A.getCallback($A.clientService.tearDown.bind($A.clientService)));
 };
 
@@ -622,10 +639,10 @@ AuraInstance.prototype.addDefaultEventHandlers = function (app) {
     app.addEventHandler("aura:customerError",$A.defaultErrorHandler);
 };
 
-/*
-*  Default Error handler
-*  @private
-* */
+/**
+ *  Default Error handler
+ *  @private
+ */
 AuraInstance.prototype.defaultErrorHandler=function(event) {
     if (event["handled"]){
         return;
@@ -634,10 +651,10 @@ AuraInstance.prototype.defaultErrorHandler=function(event) {
     event["handled"] = true;
 };
 
-/*
+/**
  * Default XSS controlled location redirect event handler
  * @private
- * */
+ */
 AuraInstance.prototype.defaultRedirectHandler=function(evt) {
     var url = evt.getParam('url');
     if (url != null) {
@@ -958,7 +975,7 @@ AuraInstance.prototype.message = function(msg, error, showReload) {
 AuraInstance.prototype.getCallback = function(callback) {
     $A.assert($A.util.isFunction(callback),"$A.getCallback(): 'callback' must be a valid Function");
     var context=$A.clientService.currentAccess;
-    function callbackWrapper(){
+    function callbackWrapper() {
         $A.clientService.setCurrentAccess(context);
         $A.clientService.pushStack("$A.getCallback()");
         try {
@@ -1006,7 +1023,7 @@ AuraInstance.prototype.getCallback = function(callback) {
             $A.clientService.releaseCurrentAccess();
         }
     }
-    if(callback.reference&&callback.toString()===callbackWrapper.toString()){ // don't double-wrap
+    if (callback.reference && (callback.toString() === callbackWrapper.toString())) { // don't double-wrap
         return callback;
     }
     callbackWrapper.reference=callback;
@@ -1301,19 +1318,106 @@ AuraInstance.prototype.trace = function() {
     }
 };
 
-/*
- * Called from methods that have entered or are entering the deprecation pipeline. Provides first warnings, then errors to developers.
- * When possible, includes a workaround for the behavior or method being deprecated.
- *
- * It reports the deprecation usages to server if reportSignature is provided.
- *
- * @param {String} message - The message to provide the developer indicating the method or behavior which has been or is being deprecated.
- * @param {String} workaround - Any known or suggested workaround to accomplish the behavior being deprecated.
- * @param {String} reportSignature - The deprecated function name if deprecating an API, or function signature if deprecating a function signature.
- *
+/**
+ * Object used to collect and beacon API usage data back to the server.
+ * 
+ * @constructor
+ * @param actionEndPoint {!string} The controller endpoint for the action,
+ *     where the data should be logged to.
  * @private
- * */
-AuraInstance.prototype.deprecated = function(message, workaround, reportSignature) {
+ */
+function Beaconing(actionEndPoint) {
+    this._actionEndPoint = actionEndPoint;
+    this._signatures = {};
+    this._hasData = false;
+}
+
+/**
+ * Used to log a metric to the server.
+ * 
+ * @param {!string} apiToLog The API being logged.
+ * @param {!string} caller The item which called the Aura API.
+ * @private
+ */
+Beaconing.prototype.queue = function(apiToLog, caller) {
+    var callers = this._signatures[apiToLog];
+    if (callers === undefined) {
+        callers = {};
+        this._signatures[apiToLog] = callers;
+        this._hasData = true;
+    }
+
+    // caller component will be missing if the caller is not in Aura loop
+    callers[caller] = callers[caller] ? (callers[caller] + 1) : 1;
+
+    if (!this._beaconingTimeoutId) {
+        var callback = $A.getCallback(function reportUsage() {
+            if (this._flushToServer()) {
+                for (var api in this._signatures) {
+                    delete this._signatures[api];
+                }
+                this._hasData = false;
+            }
+            this._beaconingTimeoutId = setTimeout(callback, 10000);
+        }).bind(this);
+        this._beaconingTimeoutId = setTimeout(callback, 10000);
+    }
+};
+
+/**
+ * @param {boolean=} immediately (Optional) If set to true the call to the
+ *     action will be set to send immediately, otherwise the action will be
+ *     caboosed. The default is false.
+ * @return {?AuraAction} Returns an aura action if the data exists, if not then
+ *     null is returned.
+ * @private
+ */
+Beaconing.prototype.generateAction = function(immediately) {
+    if (this._hasData) {
+        // Caboose action
+        var reportAction = $A.get(this._actionEndPoint);
+        reportAction.setParams({
+            "usages": $A.util.apply({}, this._signatures)
+        });
+        immediately || reportAction.setCaboose();
+        return reportAction;
+    }
+    return null;
+};
+
+/**
+ * Send the collected data to the server.
+ *
+ * @return {!boolean} returns true if there was data to beacon to the server.
+ * @private
+ */
+Beaconing.prototype._flushToServer = function() {
+    var reportAction = this.generateAction();
+    if (reportAction) {
+        $A.clientService.enqueueAction(reportAction);
+        return true;
+    }
+    return false;
+};
+
+/**
+ * Helper function for the "deprecated" and "logUsageOf" functions.
+ * 
+ * @param {!boolean} isDeprecated If true then log a deprecation log and require
+ *     the "message" argument. If false, log a usage log and require the
+ *     "reportSignature" argument.
+ * @param {?string=} reportSignature The function name of an API, or function
+ *     signature. Required if the "isDeprecated" is set to false, otherwise
+ *     optional.
+ * @param {string=} message The message to provide the developer indicating
+ *     the method or behavior which has been or is being deprecated. Required if
+ *     "isDeprecated" is set to true, otherwise it is not used.
+ * @param {?string=} workaround Any known or suggested workaround to accomplish
+ *     the behavior being deprecated. Optional if "isDeprecated" is set to true,
+ *     otherwise it is not used.
+ * @private
+ */
+AuraInstance.prototype._reportUsageHelper = function(isDeprecated, reportSignature, message, workaround) {
 
     // JBUCH: TEMPORARILY IGNORE CALLS BY ui: and aura: NAMESPACES.
     // REMOVE WHEN VIEW LOGIC IS COMPILED WITH FRAMEWORK.
@@ -1351,44 +1455,60 @@ AuraInstance.prototype.deprecated = function(message, workaround, reportSignatur
     }
 
     //#if {"excludeModes" : ["PRODUCTION"]}
-    if (workaround) {
-        message += ". Workaround: " + workaround;
+    if (isDeprecated) {
+        if (workaround) {
+            message += ". Workaround: " + workaround;
+        }
+        $A.warning("Deprecation warning: " + message);
     }
-    $A.warning("Deprecation warning: " + message);
     //#end
 
-
-    //#if {modes: ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
     // skip reporting, if there's no reporting signature.
     if (reportSignature) {
-        var reporting = false;
-        var callers = this.deprecationUsages[reportSignature];
-        if (callers === undefined) {
-            callers = [];
-            this.deprecationUsages[reportSignature] = callers;
-            // reporting when the deprecated API gets called for the first time
-            reporting = true;
-        }
-
-        // caller component will be missing if the caller is not in Aura loop
-        callers.push(callingCmp || caller.trim() || "UNKNOWN");
-
-        // reporting when a deprecated API gets called 5 times
-        if (reporting || callers.length === 5) {
-            // Caboose action
-            var reportAction = $A.get("c.aura://ComponentController.reportDeprecationUsages");
-            reportAction.setParams({
-                "usages": $A.util.apply({}, this.deprecationUsages)
-            });
-            reportAction.setCaboose();
-
-            $A.clientService.enqueueAction(reportAction);
-
-            for (var api in this.deprecationUsages) {
-                this.deprecationUsages[api] = [];
+        if (isDeprecated) {
+            if (!this.deprecatedBeaconing) {
+                this.deprecatedBeaconing = new Beaconing("c.aura://ComponentController.reportDeprecationUsages");
             }
+            this.deprecatedBeaconing.queue(reportSignature, (callingCmp || caller.trim() || "UNKNOWN"));
+        } else {
+            if (!this.usageBeaconing) {
+                this.usageBeaconing = new Beaconing("c.aura://ComponentController.reportUsages");
+            }
+            this.usageBeaconing.queue(reportSignature, (callingCmp || caller.trim() || "UNKNOWN"));
         }
     }
+};
+
+/**
+ * Called from methods that have entered or are entering the deprecation
+ * pipeline. Provides first warnings, then errors to developers. When possible, 
+ * includes a workaround for the behavior or method being deprecated.
+ *
+ * It reports the deprecation usages to server if reportSignature is provided.
+ *
+ * @param {!string} message The message to provide the developer indicating
+ *     the method or behavior which has been or is being deprecated.
+ * @param {?string} workaround Any known or suggested workaround to accomplish
+ *     the behavior being deprecated.
+ * @param {?string=} reportSignature The deprecated function name if deprecating
+ *     an API, or function signature if deprecating a function signature.
+ *
+ * @private
+ */
+AuraInstance.prototype.deprecated = function(message, workaround, reportSignature) {
+    this._reportUsageHelper(true, reportSignature, message, workaround);
+};
+
+/**
+ * It reports the API usages to server if reportSignature is provided.
+ *
+ * @param {!string} reportSignature The function name of an API, or function signature.
+ *
+ * @private
+ */
+AuraInstance.prototype.logUsageOf = function(reportSignature) {
+	//#if {modes: ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
+    this._reportUsageHelper(false, reportSignature);
     //#end
 };
 

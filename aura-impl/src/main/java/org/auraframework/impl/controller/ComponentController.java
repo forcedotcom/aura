@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.controller;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -251,7 +252,7 @@ public class ComponentController implements GlobalController {
     @CabooseAction
     @AuraEnabled
     @ActionGroup(value = "aura")
-    public void reportDeprecationUsages(@Key("usages") Map<String, List<String>> usages) {
+    public void reportDeprecationUsages(@Key("usages") Map<String, Map<String, BigDecimal>> usages) {
         if (usages != null) {
             this.loggingService.logDeprecationUsages(usages);
         }
@@ -266,7 +267,7 @@ public class ComponentController implements GlobalController {
     @CabooseAction
     @AuraEnabled
     @ActionGroup(value = "aura")
-    public void reportUsages(@Key("usages") final Map<String, List<String>> usages) {
+    public void reportUsages(@Key("usages") final Map<String, Map<String, BigDecimal>> usages) {
         if (usages != null) {
             this.loggingService.logClientApiUsages(usages);
         }

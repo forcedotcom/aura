@@ -15477,7 +15477,7 @@ $A.componentService.initControllerDefs([
         "pa":[
           {
             "name":"usages",
-            "type":"java://java.util.Map<java.lang.String,java.util.List<java.lang.String>>"
+            "type":"java://java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.math.BigDecimal>>"
           }
         ]
       },
@@ -15528,7 +15528,7 @@ $A.componentService.initControllerDefs([
         "pa":[
           {
             "name":"usages",
-            "type":"java://java.util.Map<java.lang.String,java.util.List<java.lang.String>>"
+            "type":"java://java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.math.BigDecimal>>"
           }
         ]
       }

@@ -15,6 +15,7 @@
  */
 package org.auraframework.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -172,7 +173,7 @@ public interface LoggingService {
      * @param usages - a map of deprecated API name and a list of its callers
      * @see LoggingService#logClientApiUsages(Map)
      */
-    void logDeprecationUsages(Map<String, List<String>> usages);
+    void logDeprecationUsages(final Map<String, Map<String, BigDecimal>> usages);
     
     /**
      * Log Aura client API usages. This is used to tell which APIs people are using.
@@ -180,7 +181,7 @@ public interface LoggingService {
      * @param usages a map of JS API name and a list of its callers
      * @see #logDeprecationUsages(Map)
      */
-    void logClientApiUsages(final Map<String, List<String>> usages);
+    void logClientApiUsages(final Map<String, Map<String, BigDecimal>> usages);
 
     /**
      * Logs an informational message, independent of context such as action or

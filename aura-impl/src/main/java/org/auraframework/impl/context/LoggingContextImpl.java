@@ -15,8 +15,11 @@
  */
 package org.auraframework.impl.context;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 import org.apache.log4j.Logger;
 import org.auraframework.annotations.Annotations.ServiceComponent;
@@ -401,25 +404,19 @@ public class LoggingContextImpl implements LoggingContext {
     }
 
     @Override
-    public void logDeprecationUsages(final Map<String, List<String>> usages) {
+    public void logDeprecationUsages(final Map<String, Map<String, BigDecimal>> usages) {
         if (usages != null) {
-            for (final Map.Entry<String, List<String>> entry : usages.entrySet()) {
-                final String message = "Aura API Deprecation Usages: api=" + entry.getKey() + ", caller=";
-                for (final String caller : entry.getValue()) {
-                    logger.warn(message + caller);
-                }
+            for (final Map.Entry<String, Map<String, BigDecimal>> entry : usages.entrySet()) {
+                logger.warn("Aura API Deprecation Usages: api=" + entry.getKey() + ", callers=" + entry.getValue());
             }
         }
     }
     
     @Override
-    public void logClientApiUsages(final Map<String, List<String>> usages) {
+    public void logClientApiUsages(final Map<String, Map<String, BigDecimal>> usages) {
         if ((usages != null) && logger.isInfoEnabled()) {
-            for (final Map.Entry<String, List<String>> entry : usages.entrySet()) {
-                final String message = "Aura Client API Usages: api=" + entry.getKey() + ", caller=";
-                for (final String caller : entry.getValue()) {
-                    logger.info(message + caller);
-                }
+            for (final Map.Entry<String, Map<String, BigDecimal>> entry : usages.entrySet()) {
+                logger.info("Aura Client API Usages: api=" + entry.getKey() + ", callers=" + entry.getValue());
             }
         }
     }

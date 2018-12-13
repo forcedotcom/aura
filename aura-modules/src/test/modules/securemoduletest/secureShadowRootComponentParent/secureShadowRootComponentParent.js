@@ -6,7 +6,6 @@ export default class SecureShadowRootComponentParent extends LightningElement {
     testBlacklistedProperties() {
         const { template } = this;
         const blacklistedProperties = [
-            'elementFromPoint',
             'elementsFromPoint',
             'getSelection',
             'styleSheets'

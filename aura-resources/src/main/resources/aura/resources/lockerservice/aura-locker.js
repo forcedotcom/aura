@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-12-12
- * Version: 0.6.8
+ * Generated: 2018-12-13
+ * Version: 0.6.10
  */
 
 (function (exports) {
@@ -2589,8 +2589,8 @@ const metadata$3 = {
   PROCESSING_INSTRUCTION_NODE: DEFAULT,
   TEXT_NODE: DEFAULT,
   appendChild: FUNCTION,
-  baseURI: DEFAULT,
-  childNodes: DEFAULT,
+  baseURI: READ_ONLY_PROPERTY,
+  childNodes: READ_ONLY_PROPERTY,
   cloneNode: FUNCTION,
   compareDocumentPosition: FUNCTION_RAW_ARGS,
   contains: FUNCTION_RAW_ARGS,
@@ -2599,19 +2599,20 @@ const metadata$3 = {
   hasChildNodes: FUNCTION,
   insertBefore: FUNCTION,
   isDefaultNamespace: FUNCTION,
+  isConnected: READ_ONLY_PROPERTY,
   isEqualNode: FUNCTION_RAW_ARGS,
   isSameNode: FUNCTION_RAW_ARGS,
   lastChild: SKIP_OPAQUE,
-  // localName (NOT EXPOSED!) Obsolete: https://developer.mozilla.org/en-US/docs/Web/API/Node/localName
+  // localName (NULL!) Obsolete: https://developer.mozilla.org/en-US/docs/Web/API/Node/localName
   lookupNamespaceURI: FUNCTION,
   lookupPrefix: FUNCTION,
-  // namespaceURI (NOT EXPOSED!) Obsolete: https://developer.mozilla.org/en-US/docs/Web/API/Node/namespaceURI
+  // namespaceURI (NULL!) Obsolete: https://developer.mozilla.org/en-US/docs/Web/API/Node/namespaceURI
   nextSibling: SKIP_OPAQUE,
-  nodeName: DEFAULT,
-  nodeType: DEFAULT,
+  nodeName: READ_ONLY_PROPERTY,
+  nodeType: READ_ONLY_PROPERTY,
   nodeValue: DEFAULT,
   normalize: FUNCTION,
-  ownerDocument: DEFAULT,
+  ownerDocument: READ_ONLY_PROPERTY,
   parentElement: SKIP_OPAQUE,
   parentNode: SKIP_OPAQUE,
   previousSibling: SKIP_OPAQUE,
@@ -2951,14 +2952,22 @@ if (typeof window !== 'undefined') {
   window.devtoolsFormatters.push(lsProxyFormatter);
 }
 
+const isBlacklistedAttr = attr => ['xlink:href', 'href'].includes(attr);
+
 function createDescriptor(method, valIndex, isNode) {
   return {
     value() {
-      if (arguments[valIndex]) {
+      const attr = arguments[valIndex];
+      if (attr) {
         if (isNode) {
-          arguments[valIndex].value = sanitizeHrefAttribute(arguments[valIndex].value);
+          // attr.name is readonly and we do not need to guard
+          attr.value = isBlacklistedAttr(attr.name)
+            ? sanitizeHrefAttribute(attr.value)
+            : attr.value;
         } else {
-          arguments[valIndex] = sanitizeHrefAttribute(arguments[valIndex]);
+          const attrName = asString(arguments[valIndex - 1]);
+          arguments[valIndex - 1] = attrName;
+          arguments[valIndex] = isBlacklistedAttr(attrName) ? sanitizeHrefAttribute(attr) : attr;
         }
       }
       return method.apply(this, arguments);
@@ -9663,27 +9672,39 @@ function SecureRTCPeerConnection(raw, key) {
 
 // TODO: unused
 
-const { prototypes: { DocumentFragment: DocumentFragment$1 } } = metadata$2;
-
 const metadata$7 = {
   prototypes: {
-    DocumentFragment: DocumentFragment$1,
+    DocumentFragment: {
+      childElementCount: READ_ONLY_PROPERTY,
+      children: READ_ONLY_PROPERTY,
+      firstElementChild: SKIP_OPAQUE,
+      // getElementById: FUNCTION (NOT EXPOSED!)
+      lastElementChild: SKIP_OPAQUE,
+      querySelector: FUNCTION,
+      querySelectorAll: FUNCTION
+    },
     DocumentOrShadowRoot: {
-      activeElement: READ_ONLY_PROPERTY
-      // elementFromPoint: FUNCTION_RAW_ARGS (NOT EXPOSED!)
-      // elementsFromPoint: FUNCTION_RAW_ARGS (NOT EXPOSED!)
+      activeElement: READ_ONLY_PROPERTY,
+      elementFromPoint: FUNCTION
+      // elementsFromPoint: FUNCTION (NOT EXPOSED!)
       // getSelection: FUNCTION (NOT EXPOSED!)
+      // pointerLockElement: DEFAULT (NOT EXPOSED!)
       // styleSheets: DEFAULT (NOT EXPOSED!)
     },
     EventTarget: {
       addEventListener: FUNCTION,
+      // dispatchEvent: FUNCTION (NOT EXPOSED!)
       removeEventListener: FUNCTION
     },
     Node: metadata$3,
-    NonDocumentTypeChildNode: {
-      // nextElementSibling: DEFAULT (NOT EXPOSED!)
-      // previousElementSibling: DEFAULT (NOT EXPOSED!)
-    },
+    // NonDocumentTypeChildNode: {
+    //   nextElementSibling: READ_ONLY_PROPERTY (NULL!)
+    //   previousElementSibling: READ_ONLY_PROPERTY (NULL!)
+    // },
+    // ParentNode: {
+    //   append: FUNCTION (NOT EXPOSED!)
+    //   prepend: FUNCTION (NOT EXPOSED!)
+    // }
     ShadowRoot: {
       delegatesFocus: READ_ONLY_PROPERTY,
       mode: READ_ONLY_PROPERTY,
@@ -9750,7 +9771,6 @@ function getWrappedTemplatePrototype(template) {
     }
   });
 
-  // define addEventListener and removeEventListener. dispatchEvent is not supported on template
   defineProperties(wrappedTemplatePrototype, {
     addEventListener: createAddEventListenerDescriptorStateless(),
     // TODO: RJ - This is a copy/paste of pieces of SecureEventTarget.addEventTargetMethodsStateless
@@ -10497,8 +10517,20 @@ function SecureLWC(lwc, key) {
     registerDecorators: {
       enumerable: true,
       value: lwc['registerDecorators']
-    }
+    },
     // *** end EXCEPTION
+    sanitizeAttribute: {
+      enumerable: true,
+      value() {
+        const tag = arguments[0];
+        const attrName = arguments[2];
+        const attrValue = arguments[3];
+        if (tag.toLowerCase() === 'use' && ['xlink:href', 'href'].includes(attrName)) {
+          return sanitizeHrefAttribute(attrValue);
+        }
+        return attrValue;
+      }
+    }
   });
   freeze(o);
 

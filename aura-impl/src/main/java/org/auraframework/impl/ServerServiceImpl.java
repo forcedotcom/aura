@@ -256,6 +256,8 @@ public class ServerServiceImpl implements ServerService {
                     found = true;
                 }
             }
+        } catch (UnsupportedOperationException uoe) {
+            // ignore, definitionService.exists throws this for dynamically created definitions (layout)
         } catch (Exception e) {
             // this should not happen, as "exists" should never throw, but if it does, just log it and continue.
             exceptionAdapter.handleException(e);

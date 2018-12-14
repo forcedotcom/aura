@@ -156,3 +156,32 @@ export function waitForPromise(expected, valueFn, message, threshold = 5000) {
 export function fail(message) {
     assert(false, message);
 }
+
+function getDiff(arr1, arr2) {
+    arr1 = arr1 || [];
+    arr2 = arr2 || [];
+    return arr1.filter(function(i) {
+        return arr2.indexOf(i) < 0;
+    });
+}
+
+/**
+  * @param rawProperties Properties on the raw platform object.
+  * @param secureProperties Properties found on the wrapped object.
+  * @param blacklistedProperties Properties restricted by locker.
+  * @param additionalProperties Properties additionally added by locker on the wrapped object.
+  */
+export function assertProperties(rawProperties, secureProperties, blacklistedProperties = [], additionalProperties = []) {
+    let failMessage = '';
+    let extraInLocker = getDiff(secureProperties, rawProperties.concat(additionalProperties));
+    let missingInLocker = getDiff(rawProperties, secureProperties.concat(blacklistedProperties));
+
+    if (extraInLocker.length > 0) {
+        failMessage += 'Secure API(s) exposed in Locker not in Raw API(s): [' + extraInLocker.toString() + ']\n';
+    }
+    if (missingInLocker.length > 0) {
+        failMessage += 'Raw API(s) not exposed in Locker: [' + missingInLocker.toString() + ']\n';
+    }
+
+    assert('' === failMessage, `Error message: ${failMessage}\n`);
+}

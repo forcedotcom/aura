@@ -1,8 +1,6 @@
 <aura:component implements="aura:requireLocker">
+    <secureModuleTest:secureLightningElementComponentParent aura:id="secureLightningElementComponentParent"/>
     <aura:method name="secureLightningElementTester">
         <aura:attribute name="testCase" type="String"/>
     </aura:method>
-
-    <secureModuleTest:secureLightningElementComponentParent aura:id="secureLightningElementComponentParent">
-	</secureModuleTest:secureLightningElementComponentParent>
 </aura:component>

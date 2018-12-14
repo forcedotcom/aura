@@ -1,15 +1,32 @@
 import { LightningElement, api } from 'lwc';
 import * as testUtils from 'securemoduletest/testUtil';
 
+const lockerBlacklist = [
+    'getElementsByTagName',
+    'getElementsByClassName',
+    'shadowRoot',
+    'slot'
+];
+
 export default class SecureLightningElementComponentParent extends LightningElement {
+    @api
+    testLightningElementSyncWithLockerWrapper() {
+        const child = this.template.querySelector('securemoduletest-raw-component');
+        const rawProperties = child.getInstanceProperties();
+        const secureChild = this.template.querySelector('securemoduletest-secure-component');
+        const secureProperties = secureChild.getInstanceProperties();
+
+        testUtils.assertProperties(rawProperties, secureProperties, lockerBlacklist);
+    }
+
     @api
     testBlacklistedProperties() {
         const lightningElement = this;
         const blacklistedProperties = [
-            'attachShadow',
+            'attachShadow', // NOT EXPOSED!
             'getElementsByTagName',
             'getElementsByClassName',
-            'root',
+            'root', // DEPRECATED!
             'shadowRoot',
             'slot'
         ];

@@ -1,6 +1,12 @@
 ({
     browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-SAFARI", "-IPHONE", "-IPAD"],
 
+    testLightningElementSyncWithLockerWrapper: {
+        test: function(cmp) {
+            cmp.secureLightningElementTester("testLightningElementSyncWithLockerWrapper");
+        }
+    },
+
     testBlacklistedProperties: {
         test: function(cmp) {
             cmp.secureLightningElementTester("testBlacklistedProperties");

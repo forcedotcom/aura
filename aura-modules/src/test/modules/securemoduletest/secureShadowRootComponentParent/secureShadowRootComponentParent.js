@@ -1,18 +1,36 @@
 import { LightningElement, api } from "lwc";
 import * as testUtils from "securemoduletest/testUtil";
 
+const lockerBlacklist = [
+    'append',
+    'constructor',
+    'dispatchEvent',
+    'elementsFromPoint',
+    'getElementById',
+    'getSelection',
+    'styleSheets',
+    'pictureInPictureElement',
+    'pointerLockElement',
+    'prepend'
+];
+
 export default class SecureShadowRootComponentParent extends LightningElement {
+    @api
+     testTemplateSyncWithLockerWrapper() {
+        const child = this.template.querySelector('securemoduletest-raw-component');
+        const rawProperties = child.getTemplateProperties();
+        const secureChild = this.template.querySelector('securemoduletest-secure-component');
+        const secureProperties = secureChild.getTemplateProperties();
+
+        testUtils.assertProperties(rawProperties, secureProperties, lockerBlacklist);
+    }
+
     @api
     testBlacklistedProperties() {
         const { template } = this;
-        const blacklistedProperties = [
-            'elementsFromPoint',
-            'getSelection',
-            'styleSheets'
-        ];
 
-        for (let i = 0, n = blacklistedProperties.length; i < n; i++) {
-            const blacklistedProperty = blacklistedProperties[i];
+        for (let i = 0, n = lockerBlacklist.length; i < n; i++) {
+            const blacklistedProperty = lockerBlacklist[i];
             if (blacklistedProperty in template) {
                 testUtils.fail(`Expected "${blacklistedProperty}" property of SecureTemplate to be blacklisted.`);
             } else {
@@ -66,7 +84,7 @@ export default class SecureShadowRootComponentParent extends LightningElement {
     @api
     testTemplateChildNodes() {
       const childNodes = this.template.childNodes;
-      testUtils.assertEquals(4, childNodes.length);
+      testUtils.assertEquals(6, childNodes.length);
 
       for (let i = 0; i < childNodes.length; i++) {
         testUtils.assertEquals(true, childNodes[i] instanceof Node);
@@ -74,8 +92,10 @@ export default class SecureShadowRootComponentParent extends LightningElement {
 
       testUtils.assertTrue(childNodes[0].className === 'div-in-parent');
       testUtils.assertTrue(childNodes[1].className === 'span-in-parent');
-      testUtils.assertTrue(childNodes[2].className === 'child-same-namespace');
-      testUtils.assertTrue(childNodes[3].className === 'child-different-namespace');
+      testUtils.assertTrue(childNodes[2].className === 'securemoduletest-raw-component');
+      testUtils.assertTrue(childNodes[3].className === 'securemoduletest-secure-component');
+      testUtils.assertTrue(childNodes[4].className === 'child-same-namespace');
+      testUtils.assertTrue(childNodes[5].className === 'child-different-namespace');
     }
 
     @api
@@ -123,11 +143,24 @@ export default class SecureShadowRootComponentParent extends LightningElement {
     @api
     testTemplateQuerySelectorAll() {
         const childNodes = this.template.querySelectorAll('*');
-        testUtils.assertEquals(4, childNodes.length);
+        testUtils.assertEquals(6, childNodes.length);
+
         assertNodeDetail(childNodes[0], {tagName: 'DIV', className: 'div-in-parent'});
         assertNodeDetail(childNodes[1], {tagName: 'SPAN', className: 'span-in-parent'});
-        assertNodeDetail(childNodes[2], {tagName: 'SECUREMODULETEST-SECURE-SHADOW-ROOT-COMPONENT', className: 'child-same-namespace'});
-        assertNodeDetail(childNodes[3], {tagName: 'SECUREOTHERNAMESPACE-SECURE-SHADOW-ROOT-COMPONENT', className: 'child-different-namespace'});
+        assertNodeDetail(childNodes[2], {tagName: 'SECUREMODULETEST-RAW-COMPONENT', className: 'securemoduletest-raw-component'});
+        assertNodeDetail(childNodes[3], {tagName: 'SECUREMODULETEST-SECURE-COMPONENT', className: 'securemoduletest-secure-component'});
+        assertNodeDetail(childNodes[4], {tagName: 'SECUREMODULETEST-SECURE-SHADOW-ROOT-COMPONENT', className: 'child-same-namespace'});
+        assertNodeDetail(childNodes[5], {tagName: 'SECUREOTHERNAMESPACE-SECURE-SHADOW-ROOT-COMPONENT', className: 'child-different-namespace'});
+    }
+
+    @api
+    testShadowRootWithLockerWrapper() {
+        const child = this.template.querySelector('securemoduletest-shadow-root-component');
+        const rawProperties = Object.getOwnPropertyNames(child.shadowRoot);
+        const secureChild = this.template.querySelector('securemoduletest-secure-shadow-root-component');
+        const secureProperties = Object.getOwnPropertyNames(secureChild.shadowRoot);
+
+        testUtils.assertProperties(rawProperties, secureProperties, 'Expected no API gap between raw "shadowRoot" and wrapped "shadowRoot" object!');
     }
 
     @api
@@ -138,7 +171,7 @@ export default class SecureShadowRootComponentParent extends LightningElement {
         const childShadowRoot = child.shadowRoot;
 
         testUtils.assertTrue(childShadowRoot instanceof ShadowRoot, 'Expected "child.shadowRoot" to be an "instanceof ShadowRoot"');
-        testUtils.assertEquals('SecureElement: [object ShadowRoot]{ key: {"namespace":"secureModuleTest"} }',  childShadowRoot.toString(), 'Expected "child.shadowRoot" to be "SecureElement: [object ShadowRoot]"');
+        testUtils.assertEquals('SecureTemplate: [object ShadowRoot]{ key: {"namespace":"secureModuleTest"} }',  childShadowRoot.toString(), 'Expected "child.shadowRoot" to be "SecureTemplate: [object ShadowRoot]"');
         testUtils.assertEquals('open', childShadowRoot.mode, 'Expected "child.shadowRoot.mode" property to be "closed"');
         testUtils.assertEquals(child, childShadowRoot.host, 'Expected "child.shadowRoot.host" property to be child element.');
         // ERROR: "eslint-lwc" - Using 'innerHTML/outputHTML/insertAdjacentHTML' is not allowed!
@@ -155,7 +188,7 @@ export default class SecureShadowRootComponentParent extends LightningElement {
         const childShadowRoot = child.shadowRoot;
 
         testUtils.assertTrue(childShadowRoot instanceof ShadowRoot, 'Expected "child.shadowRoot" to be an "instanceof ShadowRoot"');
-        testUtils.assertEquals('SecureObject: [object ShadowRoot]{ key: {"namespace":"secureModuleTest"} }',  childShadowRoot.toString(), 'Expected "child.shadowRoot" to be "SecureObject: [object ShadowRoot]"');
+        testUtils.assertEquals('SecureTemplate: [object ShadowRoot]{ key: {"namespace":"secureModuleTest"} }',  childShadowRoot.toString(), 'Expected "child.shadowRoot" to be "SecureTemplate: [object ShadowRoot]"');
         testUtils.assertEquals('closed', childShadowRoot.mode, 'Expected "child.shadowRoot.mode" property to be "closed"');
         testUtils.assertEquals(child, childShadowRoot.host, 'Expected "child.shadowRoot.host" property to be child element.');
         // ERROR: "eslint-lwc" - Using 'innerHTML/outputHTML/insertAdjacentHTML' is not allowed!
@@ -172,7 +205,6 @@ export default class SecureShadowRootComponentParent extends LightningElement {
 }
 
 const secureElementRegex = /^SecureElement: \[object .*\]{ key: {"namespace":"secureModuleTest"} }/;
-
 function assertNodeDetail(actualNode, expectedDetail) {
     for ( let [prop, expectedPropValue] of Object.entries(expectedDetail)) {
         testUtils.assertEquals(expectedPropValue, actualNode[prop]);

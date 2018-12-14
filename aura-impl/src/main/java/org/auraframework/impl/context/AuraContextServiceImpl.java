@@ -20,7 +20,6 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.auraframework.adapter.ContextAdapter;
-import org.auraframework.adapter.PrefixDefaultsAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -51,9 +50,6 @@ public class AuraContextServiceImpl implements ContextService {
 
     @Inject
     private ContextAdapter contextAdapter;
-
-    @Inject
-    private PrefixDefaultsAdapter prefixDefaultsAdapter;
 
     @Inject
     private JsonSerializerFactory jsonSerializerFactory;
@@ -105,7 +101,7 @@ public class AuraContextServiceImpl implements ContextService {
         // initialize logging context
         loggingService.establish();
         AuraContext context = contextAdapter.establish(mode, registryService.getDefaultRegistrySet(mode, access),
-                this.prefixDefaultsAdapter.getPrefixDefaults(mode), format, access,
+                format, access,
                 AuraJsonContext.createContext(mode, jsonSerializerFactory), globalValueProviders, appDesc);
         return context;
     }
@@ -114,7 +110,7 @@ public class AuraContextServiceImpl implements ContextService {
     public AuraContext startContextNoGVP(Mode mode, Format format, Authentication access,
                                          DefDescriptor<? extends BaseComponentDef> appDesc) {
         return contextAdapter.establish(mode, registryService.getDefaultRegistrySet(mode, access),
-                this.prefixDefaultsAdapter.getPrefixDefaults(mode), format, access,
+                format, access,
                 AuraJsonContext.createContext(mode, jsonSerializerFactory), ImmutableMap.of(), appDesc);
     }
 
@@ -122,8 +118,7 @@ public class AuraContextServiceImpl implements ContextService {
     public AuraContext startBasicContext(Mode mode, Format format, Authentication access, RegistrySet registries) {
         return contextAdapter.establish(mode, registries,
                 // FIXME; should use basic defaults here.
-                this.prefixDefaultsAdapter.getPrefixDefaults(mode), format, access,
-                new BasicJsonSerializationContext(true), ImmutableMap.of(), null);
+                format, access, new BasicJsonSerializationContext(true), ImmutableMap.of(), null);
     }
 
     @Override

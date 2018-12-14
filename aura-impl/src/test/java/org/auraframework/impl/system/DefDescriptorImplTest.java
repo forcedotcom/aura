@@ -176,8 +176,9 @@ public class DefDescriptorImplTest {
     }
 
     @Test
+    @Deprecated
     public void testControllerDescriptorParsedWithPrefix() {
-        DefDescriptor<ControllerDef> descriptor = new DefDescriptorImpl<>("java://foo.Bar", ControllerDef.class, null);
+        DefDescriptor<ControllerDef> descriptor = new DefDescriptorImpl<>("java://foo.Bar", ControllerDef.class, null, null);
         assertEquals("java", descriptor.getPrefix());
         assertEquals("Bar", descriptor.getName());
         assertEquals("foo", descriptor.getNamespace());
@@ -185,8 +186,9 @@ public class DefDescriptorImplTest {
     }
 
     @Test
+    @Deprecated
     public void testControllerDescriptorDifferentPrefix() {
-        DefDescriptor<ControllerDef> descriptor = new DefDescriptorImpl<>("frap://foo.Bar", ControllerDef.class, null);
+        DefDescriptor<ControllerDef> descriptor = new DefDescriptorImpl<>("frap://foo.Bar", ControllerDef.class, null, null);
         assertEquals("frap", descriptor.getPrefix());
         assertEquals("Bar", descriptor.getName());
         assertEquals("foo", descriptor.getNamespace());
@@ -194,11 +196,12 @@ public class DefDescriptorImplTest {
     }
 
     @Test
+    @Deprecated
     public void testBadNameChars() {
         DefDescriptor<ComponentDef> descriptor = null;
         
         try {
-            descriptor = new DefDescriptorImpl<>("markup://foo.1A+/", ComponentDef.class, null);
+            descriptor = new DefDescriptorImpl<>("markup://foo.1A+/", ComponentDef.class, null, null);
         } catch (Exception expected) {
             //FIXME: better checking
             assertNotNull(expected);
@@ -208,23 +211,26 @@ public class DefDescriptorImplTest {
     }
 
     @Test
+    @Deprecated
     public void testSerialize() throws Exception {
-        DefDescriptor<ControllerDef> descriptor = new DefDescriptorImpl<>("java://foo.Bar", ControllerDef.class, null);
+        DefDescriptor<ControllerDef> descriptor = new DefDescriptorImpl<>("java://foo.Bar", ControllerDef.class, null, null);
         Json json = Mockito.mock(Json.class);
         descriptor.serialize(json);
         Mockito.verify(json).writeValue("java://foo.Bar");
     }
 
     @Test
+    @Deprecated
     public void testGetDefType() throws Exception {
-        DefDescriptor<ComponentDef> testDescriptor = new DefDescriptorImpl<>("markup://aura:text", ComponentDef.class, null);
+        DefDescriptor<ComponentDef> testDescriptor = new DefDescriptorImpl<>("markup://aura:text", ComponentDef.class,null,  null);
         assertEquals(testDescriptor.getDefType(), DefType.COMPONENT);
     }
 
     @Test
+    @Deprecated
     public void testComparisonCaseInsensitiveName() throws Exception {
-        DefDescriptor<ControllerDef> descriptor1 = new DefDescriptorImpl<>("java://foo.bar", ControllerDef.class, null);
-        DefDescriptor<ControllerDef> descriptor2 = new DefDescriptorImpl<>("java://foo.Bar", ControllerDef.class, null);
+        DefDescriptor<ControllerDef> descriptor1 = new DefDescriptorImpl<>("java://foo.bar", ControllerDef.class, null, null);
+        DefDescriptor<ControllerDef> descriptor2 = new DefDescriptorImpl<>("java://foo.Bar", ControllerDef.class, null, null);
         assertTrue(descriptor1.equals(descriptor2));
         assertTrue(descriptor2.equals(descriptor1));
         assertEquals(0, descriptor2.compareTo(descriptor1));
@@ -232,9 +238,10 @@ public class DefDescriptorImplTest {
     }
 
     @Test
+    @Deprecated
     public void testComparisonCaseInsensitiveNamespace() throws Exception {
-        DefDescriptor<ControllerDef> descriptor1 = new DefDescriptorImpl<>("java://Foo.Bar", ControllerDef.class, null);
-        DefDescriptor<ControllerDef> descriptor2 = new DefDescriptorImpl<>("java://foo.Bar", ControllerDef.class, null);
+        DefDescriptor<ControllerDef> descriptor1 = new DefDescriptorImpl<>("java://Foo.Bar", ControllerDef.class, null, null);
+        DefDescriptor<ControllerDef> descriptor2 = new DefDescriptorImpl<>("java://foo.Bar", ControllerDef.class, null, null);
         assertTrue(descriptor1.equals(descriptor2));
         assertTrue(descriptor2.equals(descriptor1));
         assertEquals(0, descriptor2.compareTo(descriptor1));
@@ -277,16 +284,18 @@ public class DefDescriptorImplTest {
     }
 
     @Test
+    @Deprecated
     public void testFunkyDescriptor() {
-        DefDescriptor<ComponentDef> descriptor = new DefDescriptorImpl<>("layout://rl-Case-EDIT-FULL-----_1-0-6c5936744658364d59726d6c6a4d7a31654d697872673d3d.c", ComponentDef.class, null);
+        DefDescriptor<ComponentDef> descriptor = new DefDescriptorImpl<>("layout://rl-Case-EDIT-FULL-----_1-0-6c5936744658364d59726d6c6a4d7a31654d697872673d3d.c", ComponentDef.class, null, null);
         assertNotNull(descriptor);
     }
 
     @Test
+    @Deprecated
     public void testHyphenInNameThrows() throws Exception {
         DefDescriptor<ModuleDef> descriptor = null;
         try {
-            descriptor = new DefDescriptorImpl<>("markup://test:hyphened-underscored_name-component", ModuleDef.class, null);
+            descriptor = new DefDescriptorImpl<>("markup://test:hyphened-underscored_name-component", ModuleDef.class, null, null);
         } catch (AuraRuntimeException are) {
             assertThat(are.getMessage(), Matchers.containsString("Invalid Descriptor Format"));
             return;

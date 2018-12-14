@@ -18,9 +18,11 @@ package org.auraframework.adapter;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
 
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.system.AuraContext.Mode;
@@ -117,6 +119,9 @@ public interface ConfigAdapter extends AuraAdapter {
     void removePrivilegedNamespace(String namespace);
 
     String getDefaultNamespace();
+
+    @Nonnull
+    String getDefaultPrefix(@Nonnull DefType defType);
 
     boolean isUnsecuredPrefix(String prefix);
 

@@ -19,13 +19,12 @@ package org.auraframework.impl.system;
 import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.impl.util.TypeParser;
 import org.auraframework.impl.util.TypeParser.Type;
-import org.auraframework.service.ContextService;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -86,7 +85,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     }
 
     @Deprecated
-    public DefDescriptorImpl(String qualifiedName, Class<T> defClass, DefDescriptor<?> bundle, ContextService contextService) {
+    public DefDescriptorImpl(String qualifiedName, Class<T> defClass, DefDescriptor<?> bundle, ConfigAdapter configAdapter) {
         this.bundle = bundle;
         this.defType = DefType.getDefType(defClass);
         if (StringUtils.isBlank(qualifiedName)) {
@@ -97,6 +96,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         String namespace = null;
         String name = null;
         String nameParameters = null;
+        String realQN = qualifiedName;
 
         // Beware, here be dragons!
         // Any change to DefType necessitates a serialVersionUID update 
@@ -166,7 +166,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                     prefix = tag.prefix != null ? tag.prefix : MARKUP_PREFIX;
                     namespace = tag.namespace;
                     name = tag.name;
-                    qualifiedName = buildQualifiedName(prefix, namespace, name);
+                    realQN = buildQualifiedName(prefix, namespace, name);
                 } else {
                     throw new AuraRuntimeException(String.format("Invalid Descriptor Format: %s[%s]", qualifiedName, defType.toString()));
                 }
@@ -175,22 +175,18 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         }
 
         if (StringUtils.isBlank(prefix)) {
-            prefix = contextService.getCurrentContext().getDefaultPrefix(defType);
+            prefix = configAdapter.getDefaultPrefix(defType);
             if (prefix != null) {
-                qualifiedName = buildQualifiedName(prefix, namespace, name);
+                realQN = buildQualifiedName(prefix, namespace, name);
             }
         }
-        this.qualifiedName = qualifiedName;
+        this.qualifiedName = realQN;
         this.descriptorName = buildDescriptorName(prefix, namespace, name);
         this.prefix = prefix;
         this.namespace = namespace;
         this.name = name;
         this.hashCode = createHashCode();
         this.nameParameters = nameParameters;
-    }
-
-    protected DefDescriptorImpl(String qualifiedName, Class<T> defClass, ContextService contextService) {
-        this(qualifiedName, defClass, null, contextService);
     }
 
     public static String buildQualifiedName(String prefix, String namespace, String name) {
@@ -350,7 +346,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     @Override
     @Deprecated
     public T getDef() throws QuickFixException {
-        return Aura.getDefinitionService().getDefinition(this);
+        return org.auraframework.Aura.getDefinitionService().getDefinition(this);
     }
 
     public static <E extends Definition> DefDescriptor<E> getAssociateDescriptor(DefDescriptor<?> desc,
@@ -365,8 +361,9 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
      * @see DefDescriptor#exists()
      */
     @Override
+    @Deprecated
     public boolean exists() {
-        return Aura.getDefinitionService().exists(this);
+        return org.auraframework.Aura.getDefinitionService().exists(this);
     }
 
     /**

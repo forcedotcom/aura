@@ -50,10 +50,29 @@ public interface ContextAdapter extends AuraAdapter {
      * @param globalProviders global value providers.
      * @param appDesc the controlling application descriptor.
      */
+    @Deprecated
     AuraContext establish(Mode mode, RegistrySet registries, Map<DefType, String> defaultPrefixes,
             Format format, Authentication access, JsonSerializationContext jsonContext,
             Map<String, GlobalValueProvider> globalProviders,
             DefDescriptor<? extends BaseComponentDef> appDesc);
+
+    /**
+     * Establish a new context.
+     *
+     * @param mode the mode for the context.
+     * @param registries the set of registries to use.
+     * @param format the format expected as a result.
+     * @param access the access mode for the context.
+     * @param jsonContext a serialization context for serializing data.
+     * @param globalProviders global value providers.
+     * @param appDesc the controlling application descriptor.
+     */
+    default AuraContext establish(Mode mode, RegistrySet registries,
+            Format format, Authentication access, JsonSerializationContext jsonContext,
+            Map<String, GlobalValueProvider> globalProviders,
+            DefDescriptor<? extends BaseComponentDef> appDesc) {
+        return this.establish(mode, registries, null, format, access, jsonContext, globalProviders, appDesc);
+    }
 
     /**
      * is a context established in this thread?.

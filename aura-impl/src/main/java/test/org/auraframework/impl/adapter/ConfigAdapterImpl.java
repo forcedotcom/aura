@@ -27,6 +27,7 @@ import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -45,9 +46,9 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContentSecurityPolicy;
 import org.auraframework.adapter.DefaultContentSecurityPolicy;
 import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.RootDefinition;
@@ -113,8 +114,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     private final Map<String, String> moduleNamespaceAliases = Maps.newConcurrentMap();
 
-    @SuppressWarnings("unchecked")
-    private final DefDescriptor<InterfaceDef> CSS_TRANSFORM_MARKER_INTERFACE = new DefDescriptorImpl("markup", "aura", "enableCssVariableTransform", InterfaceDef.class);
+    private final DefDescriptor<InterfaceDef> CSS_TRANSFORM_MARKER_INTERFACE = new DefDescriptorImpl<>("markup", "aura", "enableCssVariableTransform", InterfaceDef.class);
 
     protected final Set<Mode> allModes = EnumSet.allOf(Mode.class);
     private JavascriptGroup jsGroup;
@@ -145,6 +145,30 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     private String resourceCacheDir;
 
+    protected final Map<DefType, String> prefixDefaults = new EnumMap<>(DefType.class);
+
+    private void setupPrefixDefaults() {
+        prefixDefaults.put(DefType.ACTION, DefDescriptor.JAVA_PREFIX);
+        prefixDefaults.put(DefType.APPLICATION, DefDescriptor.MARKUP_PREFIX);
+        prefixDefaults.put(DefType.COMPONENT, DefDescriptor.MARKUP_PREFIX);
+        prefixDefaults.put(DefType.CONTROLLER, DefDescriptor.JAVA_PREFIX);
+        prefixDefaults.put(DefType.MODEL, DefDescriptor.JAVA_PREFIX);
+        prefixDefaults.put(DefType.EVENT, DefDescriptor.MARKUP_PREFIX);
+        prefixDefaults.put(DefType.LIBRARY, DefDescriptor.MARKUP_PREFIX);
+        prefixDefaults.put(DefType.INCLUDE, DefDescriptor.JAVASCRIPT_PREFIX);
+        prefixDefaults.put(DefType.INTERFACE, DefDescriptor.MARKUP_PREFIX);
+        prefixDefaults.put(DefType.TOKENS, DefDescriptor.MARKUP_PREFIX);
+        prefixDefaults.put(DefType.STYLE, DefDescriptor.CSS_PREFIX);
+        prefixDefaults.put(DefType.FLAVORS, DefDescriptor.MARKUP_PREFIX);
+        prefixDefaults.put(DefType.TYPE, DefDescriptor.JAVA_PREFIX);
+        prefixDefaults.put(DefType.RENDERER, DefDescriptor.JAVASCRIPT_PREFIX);
+        prefixDefaults.put(DefType.PROVIDER, DefDescriptor.JAVA_PREFIX);
+        prefixDefaults.put(DefType.TESTSUITE, DefDescriptor.JAVASCRIPT_PREFIX);
+        prefixDefaults.put(DefType.DOCUMENTATION, DefDescriptor.MARKUP_PREFIX);
+        prefixDefaults.put(DefType.DESIGN, DefDescriptor.MARKUP_PREFIX);
+        prefixDefaults.put(DefType.SVG, DefDescriptor.MARKUP_PREFIX);
+    }
+
     public ConfigAdapterImpl() {
         this(IOUtil.newTempDir("auracache"));
     }
@@ -156,6 +180,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public ConfigAdapterImpl(final String resourceCacheDir) {
         this.resourceCacheDir = resourceCacheDir;
         setupTempDirDelete();
+        setupPrefixDefaults();
     }
 
     public ConfigAdapterImpl(String resourceCacheDir, InstanceService instanceService, ContextService contextService, FileMonitor fileMonitor) {
@@ -164,6 +189,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         this.contextService = contextService;
 
         this.fileMonitor = fileMonitor;
+        setupPrefixDefaults();
     }
 
     @PostConstruct
@@ -890,7 +916,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public boolean isCssVarTransformEnabled() { 
-        DefDescriptor appDesc = contextService.getCurrentContext().getApplicationDescriptor();
+        DefDescriptor<? extends BaseComponentDef> appDesc = contextService.getCurrentContext().getApplicationDescriptor();
         boolean isEnabled = false;
         try {
             isEnabled = appDesc != null && 
@@ -899,6 +925,11 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             // ignore
         }
         return isEnabled;
+    }
+    
+    @Override
+    public String getDefaultPrefix(DefType defType) {
+        return prefixDefaults.get(defType);
     }
 
     @Override

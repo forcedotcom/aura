@@ -93,8 +93,6 @@ public class AuraContextImpl implements AuraContext {
 
     private Action currentAction;
 
-    private final Map<DefType, String> defaultPrefixes;
-
     private String num;
 
     private final Set<String> dynamicNamespaces = Sets.newLinkedHashSet();
@@ -165,32 +163,6 @@ public class AuraContextImpl implements AuraContext {
 
     private boolean serializeDefinitions = false;
 
-    private AuraContextImpl(final Mode mode, final RegistrySet registries, final Map<DefType, String> defaultPrefixes,
-            final Format format, final Authentication access, final JsonSerializationContext jsonContext,
-            final Map<String, GlobalValueProvider> globalProviders, final ConfigAdapter configAdapter,
-            final DefinitionService definitionService, final TestContextAdapter testContextAdapter,
-            final GlobalValueProviderFactory globalValueProviderFactory) {
-        
-        if ((globalProviders == null) && (globalValueProviderFactory == null)) {
-            throw new IllegalArgumentException("If globalProviders is null then the globalValueProviderFactory parameter needs to populated (non-null).");
-        }
-
-        this.mode = mode;
-        this.registries = registries;
-        this.defaultPrefixes = defaultPrefixes;
-        this.format = format;
-        this.access = access;
-        this.jsonContext = jsonContext;
-        this.globalProviders = globalProviders;
-        this.configAdapter = configAdapter;
-        this.definitionService = definitionService;
-        this.testContextAdapter = testContextAdapter;
-        this.globalValues = new HashMap<>();
-        this.localStore = new AuraLocalStoreImpl();
-        this.clientClassesLoaded = new HashMap<>();
-        this.globalValueProviderFactory = globalValueProviderFactory;
-    }
-    
     /**
      * @param mode The aura mode
      * @param registries The set of regestries
@@ -204,11 +176,17 @@ public class AuraContextImpl implements AuraContext {
      * @param testContextAdapter The bean for getting the test context.
      * @see #AuraContextImpl(org.auraframework.system.AuraContext.Mode, RegistrySet, Map, org.auraframework.system.AuraContext.Format, org.auraframework.system.AuraContext.Authentication, JsonSerializationContext, ConfigAdapter, DefinitionService, TestContextAdapter, GlobalValueProviderAdapter, List)
      */
+    @Deprecated
     public AuraContextImpl(final Mode mode, final RegistrySet registries, final Map<DefType, String> defaultPrefixes,
             final Format format, final Authentication access, final JsonSerializationContext jsonContext,
             final Map<String, GlobalValueProvider> globalProviders, final ConfigAdapter configAdapter,
             final DefinitionService definitionService, final TestContextAdapter testContextAdapter) {
-        this(mode, registries, defaultPrefixes, format, access, jsonContext, globalProviders, configAdapter, definitionService, testContextAdapter, null);
+        this(mode, registries, format, access, jsonContext, configAdapter, definitionService,
+                testContextAdapter, null);
+        if (globalProviders == null) {
+            throw new IllegalArgumentException("If globalProviders is null then the globalValueProviderFactory parameter needs to populated (non-null).");
+        }
+        this.globalProviders = globalProviders;
     }
     
     /**
@@ -227,12 +205,37 @@ public class AuraContextImpl implements AuraContext {
      *        for the current request/context.
      * @see #AuraContextImpl(org.auraframework.system.AuraContext.Mode, RegistrySet, Map, org.auraframework.system.AuraContext.Format, org.auraframework.system.AuraContext.Authentication, JsonSerializationContext, Map, ConfigAdapter, DefinitionService, TestContextAdapter)
      */
+    @Deprecated
     public AuraContextImpl(final Mode mode, final RegistrySet registries, final Map<DefType, String> defaultPrefixes,
             final Format format, final Authentication access, final JsonSerializationContext jsonContext,
             final ConfigAdapter configAdapter, final DefinitionService definitionService,
             final TestContextAdapter testContextAdapter,
             final GlobalValueProviderFactory globalValueProviderFactory) {
-        this(mode, registries, defaultPrefixes, format, access, jsonContext, null, configAdapter, definitionService, testContextAdapter, globalValueProviderFactory);
+        this(mode, registries, format, access, jsonContext, configAdapter, definitionService,
+                testContextAdapter, globalValueProviderFactory);
+        if (globalValueProviderFactory == null) {
+            throw new IllegalArgumentException("If globalProviders is null then the globalValueProviderFactory parameter needs to populated (non-null).");
+        }
+    }
+    
+
+    public AuraContextImpl(final Mode mode, final RegistrySet registries,
+            final Format format, final Authentication access, final JsonSerializationContext jsonContext,
+            final ConfigAdapter configAdapter,
+            final DefinitionService definitionService, final TestContextAdapter testContextAdapter,
+            final GlobalValueProviderFactory globalValueProviderFactory) {
+        this.mode = mode;
+        this.registries = registries;
+        this.format = format;
+        this.access = access;
+        this.jsonContext = jsonContext;
+        this.configAdapter = configAdapter;
+        this.definitionService = definitionService;
+        this.testContextAdapter = testContextAdapter;
+        this.globalValues = new HashMap<>();
+        this.localStore = new AuraLocalStoreImpl();
+        this.clientClassesLoaded = new HashMap<>();
+        this.globalValueProviderFactory = globalValueProviderFactory;
     }
 
     @Override
@@ -365,16 +368,6 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public String getDefaultPrefix(DefType defType) {
-        return defaultPrefixes.get(defType);
-    }
-
-    @Override
-    public Map<DefType, String> getDefaultPrefixes() {
-        return defaultPrefixes;
-    }
-
-    @Override
     public Set<DefDescriptor<?>> getPreloadedDefinitions() {
         return unmodifiablePreloadedDefinitions;
     }
@@ -418,7 +411,7 @@ public class AuraContextImpl implements AuraContext {
     
     @Override
     public Map<String, GlobalValueProvider> getGlobalProviders() {
-        if(this.globalProviders == null) {
+        if (this.globalProviders == null) {
             this.globalProviders = globalValueProviderFactory.getGlobalProviders();
         }
         return this.globalProviders;

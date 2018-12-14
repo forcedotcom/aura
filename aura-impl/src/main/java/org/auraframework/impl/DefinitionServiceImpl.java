@@ -137,7 +137,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                 return typeDescriptor;
             }
         }
-        return new DefDescriptorImpl<>(qualifiedName, defClass, bundle, contextService);
+        return new DefDescriptorImpl<>(qualifiedName, defClass, bundle, configAdapter);
     }
 
     @Override
@@ -686,7 +686,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                                              @Nonnull String name, @Nonnull DefType defType) {
         StringBuilder sb = new StringBuilder();
         if (StringUtils.isBlank(prefix)) {
-            prefix = contextService.getCurrentContext().getDefaultPrefix(defType);
+            prefix = configAdapter.getDefaultPrefix(defType);
         }
         sb.append(prefix.toLowerCase());
         sb.append("://");

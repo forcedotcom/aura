@@ -64,20 +64,27 @@ public class ContextAdapterImpl implements ContextAdapter {
         this.definitionService = definitionService;
         this.globalValueProviderFactory = globalValueProviderFactory;
     }
-    
+
     @Override
     public AuraContext establish(Mode mode, RegistrySet registries,
                                  Map<DefType, String> defaultPrefixes, Format format, Authentication access,
                                  JsonSerializationContext jsonContext,
                                  Map<String, GlobalValueProvider> globalProviders,
                                  DefDescriptor<? extends BaseComponentDef> appDesc) {
+        return establish(mode, registries, format, access, jsonContext, globalProviders, appDesc);
+    }
+    
+    @Override
+    public AuraContext establish(Mode mode, RegistrySet registries, Format format, Authentication access,
+                                 JsonSerializationContext jsonContext, Map<String, GlobalValueProvider> globalProviders,
+                                 DefDescriptor<? extends BaseComponentDef> appDesc) {
         
         final AuraContext context;
         if ((globalProviders == null) || globalProviders.isEmpty()) {
-            context = new AuraContextImpl(mode, registries, defaultPrefixes, format, access, jsonContext, configAdapter,
+            context = new AuraContextImpl(mode, registries, format, access, jsonContext, configAdapter,
                     definitionService, testContextAdapter, globalValueProviderFactory);
         } else {
-            context = new AuraContextImpl(mode, registries, defaultPrefixes, format, access, jsonContext,
+            context = new AuraContextImpl(mode, registries, null, format, access, jsonContext,
                     globalProviders, configAdapter, definitionService, testContextAdapter);
         }
         currentContext.set(context);

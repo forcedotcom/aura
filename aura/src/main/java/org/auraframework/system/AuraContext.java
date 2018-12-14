@@ -244,20 +244,6 @@ public interface AuraContext {
     DefDescriptor<?> getCurrentCallingDescriptor();
 
     /**
-     * If a qualifiedName for a DefDescriptor of the given type does not include a prefix (apex:// or java://, etc...),
-     * this method on the context will be consulted to find out what the default prefix for the given DefType is.
-     *
-     * @param defType
-     * @return The default prefix for the given DefType in this context
-     */
-    String getDefaultPrefix(DefType defType);
-
-    /**
-     * Get the full set of default prefixes.
-     */
-    Map<DefType, String> getDefaultPrefixes();
-
-    /**
      * Get the mode of execution.
      *
      * This should be consistent across the entire request.

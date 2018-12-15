@@ -15,9 +15,14 @@
  */
 package org.auraframework.http;
 
+import static java.lang.Boolean.TRUE;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -59,7 +64,7 @@ import com.google.common.collect.Lists;
  * Unit tests for AuraTestFilter
  */
 public class AuraTestFilterUnitTest {
-    private abstract class SimpleTestRequestDispatcher implements RequestDispatcher {
+    abstract class SimpleTestRequestDispatcher implements RequestDispatcher {
         @Override
         public void include(ServletRequest request, ServletResponse response) throws ServletException, IOException {
         }
@@ -124,38 +129,38 @@ public class AuraTestFilterUnitTest {
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         StringWriter writer = new StringWriter();
-        Mockito.doReturn(new PrintWriter(writer)).when(response).getWriter();
+        doReturn(new PrintWriter(writer)).when(response).getWriter();
         
-        Mockito.doReturn("testContextKey").when(request).getParameter("aura.test");
-        Mockito.doReturn(testContext).when(testContextAdapter).getTestContext("testContextKey");
+        doReturn("testContextKey").when(request).getParameter("aura.test");
+        doReturn(testContext).when(testContextAdapter).getTestContext("testContextKey");
         
-        Mockito.doReturn(true).when(contextService).isEstablished();
-        Mockito.doReturn(context).when(contextService).getCurrentContext();
-        Mockito.doReturn(Format.HTML).when(context).getFormat();
-        Mockito.doReturn(Mode.AUTOJSTEST).when(context).getMode();
+        doReturn(TRUE).when(contextService).isEstablished();
+        doReturn(context).when(contextService).getCurrentContext();
+        doReturn(Format.HTML).when(context).getFormat();
+        doReturn(Mode.AUTOJSTEST).when(context).getMode();
 
-        Mockito.doReturn("GET").when(request).getMethod();
-        Mockito.doReturn("").when(request).getContextPath();
-        Mockito.doReturn("/namespace/name.app").when(request).getRequestURI();
-        Mockito.doReturn("someTest").when(request).getParameter("aura.jstestrun");
+        doReturn("GET").when(request).getMethod();
+        doReturn("").when(request).getContextPath();
+        doReturn("/namespace/name.app").when(request).getRequestURI();
+        doReturn("someTest").when(request).getParameter("aura.jstestrun");
         
-        Mockito.doReturn(targetDescriptor).when(definitionService).getDefDescriptor("namespace:name", ApplicationDef.class);
-        Mockito.doReturn("namespace").when(targetDescriptor).getNamespace();
-        Mockito.doReturn("name").when(targetDescriptor).getName();
-        Mockito.doReturn(DefType.APPLICATION).when(targetDescriptor).getDefType();
-        Mockito.doReturn(targetDescriptor).when(testSuiteDescriptor).getBundle();
-        Mockito.doReturn(testSuiteDescriptor).when(definitionService).getDefDescriptor(
-                        DefDescriptor.JAVASCRIPT_PREFIX+"://namespace.name",
+        doReturn(targetDescriptor).when(definitionService).getDefDescriptor("namespace:name", ApplicationDef.class);
+        doReturn("namespace").when(targetDescriptor).getNamespace();
+        doReturn("name").when(targetDescriptor).getName();
+        doReturn(DefType.APPLICATION).when(targetDescriptor).getDefType();
+        doReturn(targetDescriptor).when(testSuiteDescriptor).getBundle();
+        doReturn(testSuiteDescriptor).when(definitionService).getDefDescriptor(
+                        DefDescriptor.JAVASCRIPT_PREFIX + "://namespace.name",
                         TestSuiteDef.class, targetDescriptor);
-        Mockito.doReturn(testSuiteDef).when(definitionService).getDefinition(testSuiteDescriptor);
-        Mockito.doReturn(Lists.newArrayList(testCaseDef)).when(testSuiteDef).getTestCaseDefs();
-        Mockito.doReturn("someTest").when(testCaseDef).getName();
+        doReturn(testSuiteDef).when(definitionService).getDefinition(testSuiteDescriptor);
+        doReturn(Lists.newArrayList(testCaseDef)).when(testSuiteDef).getTestCaseDefs();
+        doReturn("someTest").when(testCaseDef).getName();
         
-        Mockito.doReturn(requestServletContext).when(request).getServletContext();
-        Mockito.doReturn(testServletContext).when(requestServletContext).getContext(Matchers.anyString());
+        doReturn(requestServletContext).when(request).getServletContext();
+        doReturn(testServletContext).when(requestServletContext).getContext(Matchers.anyString());
         
-        Mockito.doReturn(dispatcher).when(testServletContext).getRequestDispatcher(Matchers.startsWith("/aura?"));
-        Mockito.doReturn(dispatcher).when(request).getRequestDispatcher(Matchers.startsWith("/aura?"));
+        doReturn(dispatcher).when(testServletContext).getRequestDispatcher(Matchers.startsWith("/aura?"));
+        doReturn(dispatcher).when(request).getRequestDispatcher(Matchers.startsWith("/aura?"));
         
         String renderedTargetComponent = "RENDEREDTARGETCOMPONENT";
         SimpleTestRequestDispatcher simpleReqDispatcher = new SimpleTestRequestDispatcher() {
@@ -164,8 +169,8 @@ public class AuraTestFilterUnitTest {
                 res.getWriter().write(renderedTargetComponent);
             }
         };
-        Mockito.doReturn(simpleReqDispatcher).when(testServletContext).getRequestDispatcher(Matchers.startsWith("/aura?"));
-        Mockito.doReturn(simpleReqDispatcher).when(request).getRequestDispatcher(Matchers.startsWith("/aura?"));
+        doReturn(simpleReqDispatcher).when(testServletContext).getRequestDispatcher(Matchers.startsWith("/aura?"));
+        doReturn(simpleReqDispatcher).when(request).getRequestDispatcher(Matchers.startsWith("/aura?"));
 
         FilterChain chain = (req, res) -> {};
         filter.doFilter(request, response, chain);
@@ -210,7 +215,7 @@ public class AuraTestFilterUnitTest {
     public void testDoFilterHandlesRedirectionWithoutAnyParams() throws Exception {
         doRedirectionTest("/x/y.app", "/x/y.app?aura.jstestrun=someTest");
     }
-    
+
     private void doRedirectionTest(String redirectionUrl, String expectedUrl) throws Exception {
         AuraTestFilter filter = new AuraTestFilter();
         filter.setTestContextAdapter(testContextAdapter);
@@ -219,38 +224,38 @@ public class AuraTestFilterUnitTest {
         filter.setContextService(contextService);
         filter.setServletUtilAdapter(servletUtilAdapter);
 
-        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
         StringWriter writer = new StringWriter();
-        Mockito.doReturn(new PrintWriter(writer)).when(response).getWriter();
+        doReturn(new PrintWriter(writer)).when(response).getWriter();
         
-        Mockito.doReturn("testContextKey").when(request).getParameter("aura.test");
-        Mockito.doReturn(testContext).when(testContextAdapter).getTestContext("testContextKey");
+        doReturn("testContextKey").when(request).getParameter("aura.test");
+        doReturn(testContext).when(testContextAdapter).getTestContext("testContextKey");
         
-        Mockito.doReturn(true).when(contextService).isEstablished();
-        Mockito.doReturn(context).when(contextService).getCurrentContext();
-        Mockito.doReturn(Format.HTML).when(context).getFormat();
-        Mockito.doReturn(Mode.AUTOJSTEST).when(context).getMode();
+        doReturn(TRUE).when(contextService).isEstablished();
+        doReturn(context).when(contextService).getCurrentContext();
+        doReturn(Format.HTML).when(context).getFormat();
+        doReturn(Mode.AUTOJSTEST).when(context).getMode();
 
-        Mockito.doReturn("GET").when(request).getMethod();
-        Mockito.doReturn("").when(request).getContextPath();
-        Mockito.doReturn("/namespace/name.app").when(request).getRequestURI();
-        Mockito.doReturn("someTest").when(request).getParameter("aura.jstestrun");
+        doReturn("GET").when(request).getMethod();
+        doReturn("").when(request).getContextPath();
+        doReturn("/namespace/name.app").when(request).getRequestURI();
+        doReturn("someTest").when(request).getParameter("aura.jstestrun");
         
-        Mockito.doReturn(targetDescriptor).when(definitionService).getDefDescriptor("namespace:name", ApplicationDef.class);
-        Mockito.doReturn("namespace").when(targetDescriptor).getNamespace();
-        Mockito.doReturn("name").when(targetDescriptor).getName();
-        Mockito.doReturn("namespace:name").when(targetDescriptor).getDescriptorName();
-        Mockito.doReturn(DefType.APPLICATION).when(targetDescriptor).getDefType();
-        Mockito.doReturn(testSuiteDescriptor).when(definitionService).getDefDescriptor(
-                        DefDescriptor.JAVASCRIPT_PREFIX+"://namespace.name",
+        doReturn(targetDescriptor).when(definitionService).getDefDescriptor("namespace:name", ApplicationDef.class);
+        doReturn("namespace").when(targetDescriptor).getNamespace();
+        doReturn("name").when(targetDescriptor).getName();
+        doReturn("namespace:name").when(targetDescriptor).getDescriptorName();
+        doReturn(DefType.APPLICATION).when(targetDescriptor).getDefType();
+        doReturn(testSuiteDescriptor).when(definitionService).getDefDescriptor(
+                        DefDescriptor.JAVASCRIPT_PREFIX + "://namespace.name",
                         TestSuiteDef.class, targetDescriptor);
-        Mockito.doReturn(testSuiteDef).when(definitionService).getDefinition(testSuiteDescriptor);
-        Mockito.doReturn(Lists.newArrayList(testCaseDef)).when(testSuiteDef).getTestCaseDefs();
-        Mockito.doReturn("someTest").when(testCaseDef).getName();
+        doReturn(testSuiteDef).when(definitionService).getDefinition(testSuiteDescriptor);
+        doReturn(Lists.newArrayList(testCaseDef)).when(testSuiteDef).getTestCaseDefs();
+        doReturn("someTest").when(testCaseDef).getName();
         
-        Mockito.doReturn(requestServletContext).when(request).getServletContext();
-        Mockito.doReturn(testServletContext).when(requestServletContext).getContext(Matchers.anyString());
+        doReturn(requestServletContext).when(request).getServletContext();
+        doReturn(testServletContext).when(requestServletContext).getContext(Matchers.anyString());
 
         SimpleTestRequestDispatcher simpleReqDispatcher = new SimpleTestRequestDispatcher() {
             @Override
@@ -258,13 +263,12 @@ public class AuraTestFilterUnitTest {
                 ((HttpServletResponse)res).sendRedirect(redirectionUrl);
             }
         };
-        Mockito.doReturn(simpleReqDispatcher).when(testServletContext).getRequestDispatcher(Matchers.startsWith("/aura?"));
-        Mockito.doReturn(simpleReqDispatcher).when(request).getRequestDispatcher(Matchers.startsWith("/aura?"));
-
+        doReturn(simpleReqDispatcher).when(testServletContext).getRequestDispatcher(Matchers.startsWith("/aura?"));
+        doReturn(simpleReqDispatcher).when(request).getRequestDispatcher(Matchers.startsWith("/aura?"));
 
         FilterChain chain = (req, res) -> {};
         filter.doFilter(request, response, chain);
         
-        Mockito.verify(response, Mockito.times(1)).sendRedirect(expectedUrl);
+        verify(response, times(1)).sendRedirect(expectedUrl);
     }
 }

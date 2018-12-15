@@ -15,13 +15,14 @@
  */
 package org.auraframework.http.cspinlining;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static org.auraframework.service.CSPInliningService.InlineScriptMode.NONCE;
 import static org.auraframework.service.CSPInliningService.InlineScriptMode.UNSAFEINLINE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -32,20 +33,22 @@ import org.auraframework.system.AuraContext;
 import org.junit.Test;
 
 public class CSPInliningAISRuleTest {
+
     @Test
-    public void testIsRelevantNoAppDescriptor(){
+    public void testIsRelevantNoAppDescriptor() {
         AuraContext context = mock(AuraContext.class);
         CSPInliningCriteria criteria = new CSPInliningCriteria(context);
         CSPInliningAISRule target = new CSPInliningAISRule();
 
-        boolean expected = false;
-        boolean actual = target.isRelevant(criteria);
+        Boolean expected = FALSE;
+        @SuppressWarnings("boxing")
+        Boolean actual = target.isRelevant(criteria);
 
         assertEquals("CSPInliningAISRule should not have been relevant without an app descriptor", expected, actual);
     }
 
     @Test
-    public void testIsRelevantAlreadyUnsafeInline(){
+    public void testIsRelevantAlreadyUnsafeInline() {
         AuraContext context = mock(AuraContext.class);
         CSPInliningAISRule target = new CSPInliningAISRule();
         DefDescriptor<ApplicationDef> appDefDescriptor = mock(ApplicationDefDescriptor.class);
@@ -55,14 +58,15 @@ public class CSPInliningAISRuleTest {
         CSPInliningCriteria criteria = new CSPInliningCriteria(context);
         criteria.setMode(UNSAFEINLINE);
 
-        boolean expected = false;
-        boolean actual = target.isRelevant(criteria);
+        final Boolean expected = FALSE;
+        @SuppressWarnings("boxing")
+        final Boolean actual = target.isRelevant(criteria);
 
         assertEquals("CSPInliningAISRule should not have been relevant as it is already unsafeinline", expected, actual);
     }
 
     @Test
-    public void testProcess() throws Exception{
+    public void testProcess() throws Exception {
         AuraContext context = mock(AuraContext.class);
         CSPInliningAISRule target = new CSPInliningAISRule();
         DefDescriptor<ApplicationDef> appDefDescriptor = mock(ApplicationDefDescriptor.class);
@@ -73,9 +77,9 @@ public class CSPInliningAISRuleTest {
         target.setDefinitionService(definitionService);
 
         doReturn(appDefDescriptor).when(context).getApplicationDescriptor();
-        when(definitionService.getDefDescriptor("aura:integrationServiceApp", ApplicationDef.class)).thenReturn(aisDefDescriptor);
+        doReturn(aisDefDescriptor).when(definitionService).getDefDescriptor("aura:integrationServiceApp", ApplicationDef.class);
         doReturn(appComponentDef).when(definitionService).getDefinition(appDefDescriptor);
-        when(appComponentDef.isInstanceOf(aisDefDescriptor)).thenReturn(true);
+        doReturn(TRUE).when(appComponentDef).isInstanceOf(aisDefDescriptor);
 
         CSPInliningCriteria criteria = new CSPInliningCriteria(context);
         criteria.setMode(NONCE);
@@ -89,7 +93,7 @@ public class CSPInliningAISRuleTest {
     }
 
     @Test
-    public void testProcessNotAis() throws Exception{
+    public void testProcessNotAis() throws Exception {
         AuraContext context = mock(AuraContext.class);
         CSPInliningAISRule target = new CSPInliningAISRule();
         DefDescriptor<ApplicationDef> appDefDescriptor = mock(ApplicationDefDescriptor.class);
@@ -100,9 +104,9 @@ public class CSPInliningAISRuleTest {
         target.setDefinitionService(definitionService);
 
         doReturn(appDefDescriptor).when(context).getApplicationDescriptor();
-        when(definitionService.getDefDescriptor("aura:integrationServiceApp", ApplicationDef.class)).thenReturn(aisDefDescriptor);
+        doReturn(aisDefDescriptor).when(definitionService).getDefDescriptor("aura:integrationServiceApp", ApplicationDef.class);
         doReturn(appComponentDef).when(definitionService).getDefinition(appDefDescriptor);
-        when(appComponentDef.isInstanceOf(aisDefDescriptor)).thenReturn(false);
+        doReturn(FALSE).when(appComponentDef).isInstanceOf(aisDefDescriptor);
 
         CSPInliningCriteria criteria = new CSPInliningCriteria(context);
         criteria.setMode(NONCE);
@@ -115,5 +119,7 @@ public class CSPInliningAISRuleTest {
         assertNotEquals("CSPInliningAISRule should have not been set mode to unsafeinline given that AIS was not detected", notExpected, actual);
     }
 
-    interface ApplicationDefDescriptor extends DefDescriptor<ApplicationDef>{}
+    interface ApplicationDefDescriptor extends DefDescriptor<ApplicationDef> {
+        // This is only used for mocking and does not need to implement any new methods.
+    }
 }

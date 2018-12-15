@@ -13,8 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.auraframework.http.resource;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
+import java.io.PrintWriter;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.adapter.AppJsUtilAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
@@ -28,24 +46,6 @@ import org.auraframework.system.AuraContext.Format;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.PrintWriter;
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.same;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 
 /**
  * Simple (non-integration) test case for {@link AppCoreJs}, most useful for exercising hard-to-reach error
@@ -73,8 +73,8 @@ public class AppCoreJsTest {
     /**
      * Check for an exception being caught and routed to the exception handler.
      *
-     * Most of this is internal, but we want to make sure that we call handleServletException if there
-     * is an exception in the writing of the CSS.
+     * Most of this is internal, but we want to make sure that we call {@code handleServletException} if
+     * there is an exception in the writing of the CSS.
      */
     @Test
     public void testExceptionInWrite() throws Exception {

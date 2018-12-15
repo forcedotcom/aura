@@ -16,9 +16,9 @@
 package org.auraframework.def;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Map;
 
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.auraframework.def.design.DesignAttributeDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.design.DesignTemplateDef;
@@ -28,7 +28,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonSerializable;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * A descriptor "handle" for a definition. For applications which care about sorting, such as generating a unique hash
@@ -157,7 +157,11 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         MODULE(ModuleDef.class),
 
         REGISTEREVENT(RegisterEventDef.class);
-        private static Map<Class<? extends Definition>, DefType> defTypeMap;
+        private final static Map<Class<? extends Definition>, DefType> DEF_TYPE_MAP;
+        
+        static {
+            DEF_TYPE_MAP = Arrays.stream(DefType.values()).collect(ImmutableMap.toImmutableMap(t -> t.clz, t -> t));
+        }
 
         private final Class<? extends Definition> clz;
         private final boolean definesBundle;
@@ -165,32 +169,23 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         private DefType(Class<? extends Definition> clz, boolean definesBundle) {
             this.clz = clz;
             this.definesBundle = definesBundle;
-            mapDefType(clz, this);
         }
 
         private DefType(Class<? extends Definition> clz) {
             this(clz, false);
         }
 
-        private static void mapDefType(Class<? extends Definition> clz, DefType defType) {
-            if (defTypeMap == null) {
-                defTypeMap = Maps.newHashMapWithExpectedSize(40);
-            }
-
-            defTypeMap.put(clz, defType);
-        }
-
         public static boolean hasDefType(Class<? extends Definition> primaryInterface) {
-            return defTypeMap.containsKey(primaryInterface);
+            return DEF_TYPE_MAP.containsKey(primaryInterface);
         }
 
         public static DefType getDefType(
                 Class<? extends Definition> primaryInterface) {
-            DefType ret = defTypeMap.get(primaryInterface);
+            DefType ret = DEF_TYPE_MAP.get(primaryInterface);
             if (ret == null) {
                 String message = String
                         .format("Unsupported Java Interface %s specified for DefDescriptor. Valid types are : %s",
-                                primaryInterface.getName(), defTypeMap.keySet()
+                                primaryInterface.getName(), DEF_TYPE_MAP.keySet()
                                         .toString());
                 throw new AuraRuntimeException(message);
             }

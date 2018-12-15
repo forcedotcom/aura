@@ -15,8 +15,12 @@
  */
 package org.auraframework.http.resource;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,9 +48,11 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
-import com.google.common.collect.Maps;
-
+/**
+ * Unit test for the {@link Bootstrap} class.
+ */
 public class BootstrapUnitTest {
+
     @Test
     public void testName() {
         Assert.assertEquals("bootstrap.js", new Bootstrap().getName());
@@ -64,12 +70,12 @@ public class BootstrapUnitTest {
 
     @Test
     public void testPublicCacheExpirationZero() throws Exception {
-        verifyCacheHeaders(0, false);
+        verifyCacheHeaders(Integer.valueOf(0), false);
     }
 
     @Test
     public void testPublicCacheExpirationValidValue() throws Exception {
-        verifyCacheHeaders(600, true);
+        verifyCacheHeaders(Integer.valueOf(600), true);
     }
 
     @Test
@@ -79,7 +85,7 @@ public class BootstrapUnitTest {
         Bootstrap bootstrap = new Bootstrap() {
             @Override
             protected Map<String, Object> getComponentAttributes(HttpServletRequest request) {
-                return Maps.newHashMap();
+                return new HashMap<>();
             }
 
         };
@@ -94,9 +100,9 @@ public class BootstrapUnitTest {
         Mockito.doReturn(jwtToken).when(request).getParameter("jwt");
 
         ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
-        Mockito.doReturn(true).when(configAdapter).validateBootstrap(jwtToken);
+        Mockito.doReturn(TRUE).when(configAdapter).validateBootstrap(jwtToken);
         Mockito.doReturn(csrfToken).when(configAdapter).getCSRFToken();
-        Mockito.doReturn(true).when(configAdapter).isClientAppcacheEnabled();
+        Mockito.doReturn(TRUE).when(configAdapter).isClientAppcacheEnabled();
         bootstrap.setConfigAdapter(configAdapter);
 
         ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
@@ -105,14 +111,13 @@ public class BootstrapUnitTest {
         InstanceService instanceService = Mockito.mock(InstanceService.class);
         bootstrap.setInstanceService(instanceService);
 
-        @SuppressWarnings("unchecked")
         DefDescriptor<? extends BaseComponentDef> appDescriptor = Mockito.mock(DefDescriptor.class);
         ApplicationDef appDef = Mockito.mock(ApplicationDef.class);
         DefinitionService definitionService = Mockito.mock(DefinitionService.class);
         Mockito.doReturn(DefType.APPLICATION).when(appDescriptor).getDefType();
         Mockito.doReturn(appDef).when(definitionService).getDefinition(appDescriptor);
         Mockito.doReturn(appDef).when(definitionService).getUnlinkedDefinition(appDescriptor);
-        Mockito.doReturn(true).when(appDef).isAppcacheEnabled();
+        Mockito.doReturn(TRUE).when(appDef).isAppcacheEnabled();
         bootstrap.setDefinitionService(definitionService);
 
         AuraContext context = Mockito.mock(AuraContext.class);
@@ -142,7 +147,7 @@ public class BootstrapUnitTest {
         Bootstrap bootstrap = new Bootstrap() {
             @Override
             protected Map<String, Object> getComponentAttributes(HttpServletRequest request) {
-                return Maps.newHashMap();
+                return Collections.emptyMap();
             }
         };
 
@@ -153,7 +158,7 @@ public class BootstrapUnitTest {
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
 
         ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
-        Mockito.doReturn(false).when(configAdapter).isClientAppcacheEnabled();
+        Mockito.doReturn(FALSE).when(configAdapter).isClientAppcacheEnabled();
         bootstrap.setConfigAdapter(configAdapter);
 
         DefinitionService definitionService = Mockito.mock(DefinitionService.class);
@@ -165,7 +170,6 @@ public class BootstrapUnitTest {
         InstanceService instanceService = Mockito.mock(InstanceService.class);
         bootstrap.setInstanceService(instanceService);
 
-        @SuppressWarnings("unchecked")
         DefDescriptor<? extends BaseComponentDef> appDescriptor = Mockito.mock(DefDescriptor.class);
         ApplicationDef appDef = Mockito.mock(ApplicationDef.class);
         Mockito.doReturn(DefType.APPLICATION).when(appDescriptor).getDefType();
@@ -191,7 +195,7 @@ public class BootstrapUnitTest {
         Bootstrap bootstrap = new Bootstrap() {
             @Override
             protected Map<String, Object> getComponentAttributes(HttpServletRequest request) {
-                return Maps.newHashMap();
+                return Collections.emptyMap();
             }
         };
 
@@ -203,7 +207,7 @@ public class BootstrapUnitTest {
         Mockito.doReturn(jwtToken).when(request).getParameter("jwt");
 
         ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
-        Mockito.doReturn(false).when(configAdapter).validateBootstrap(jwtToken);
+        Mockito.doReturn(FALSE).when(configAdapter).validateBootstrap(jwtToken);
         bootstrap.setConfigAdapter(configAdapter);
 
         DefinitionService definitionService = Mockito.mock(DefinitionService.class);
@@ -215,7 +219,6 @@ public class BootstrapUnitTest {
         InstanceService instanceService = Mockito.mock(InstanceService.class);
         bootstrap.setInstanceService(instanceService);
 
-        @SuppressWarnings("unchecked")
         DefDescriptor<? extends BaseComponentDef> appDescriptor = Mockito.mock(DefDescriptor.class);
         ApplicationDef appDef = Mockito.mock(ApplicationDef.class);
         Mockito.doReturn(DefType.APPLICATION).when(appDescriptor).getDefType();
@@ -243,8 +246,7 @@ public class BootstrapUnitTest {
      *            means there should be no cache.
      * @throws Exception
      */
-    private void verifyCacheHeaders(Integer expirationSetting, boolean shouldCache) throws Exception {
-        @SuppressWarnings("unchecked")
+    private static void verifyCacheHeaders(Integer expirationSetting, boolean shouldCache) throws Exception {
         DefDescriptor<ApplicationDef> appDefDesc = Mockito.mock(DefDescriptor.class);
         ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);

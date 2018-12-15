@@ -25,7 +25,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.auraframework.service.LoggingService;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.*;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 /**
  * Simple (non-integration) test case for {@link CSPReporterServlet}.
@@ -47,7 +50,7 @@ public class CSPReporterServletUnitTest {
     }
 
     @SuppressWarnings("serial")
-    private static class CSPReporterServletExtender extends CSPReporterServlet {
+    static class CSPReporterServletExtender extends CSPReporterServlet {
         public void testDoPost(HttpServletRequest request, HttpServletResponse response) throws Exception {
             doPost(request, response);
         }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.auraframework.http.resource;
 
 import static org.mockito.Matchers.any;
@@ -72,8 +71,8 @@ public class AppCssTest {
     /**
      * Check for an exception being caught and routed to the exception handler.
      *
-     * Most of this is internal, but we want to make sure that we call handleServletException if there
-     * is an exception in the writing of the CSS.
+     * Most of this is internal, but we want to make sure that we call {@code handleServletException} if
+     * there is an exception in the writing of the CSS.
      */
     @Test
     public void testExceptionInWrite() throws Exception {

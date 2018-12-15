@@ -97,7 +97,7 @@ Test.Aura.Util.NumberFormatTest = function() {
                     {value: 1234.0987654321, pattern: "#0,000.###", expected: "1,234.099"},
                     {value: 1234.0987654321, pattern: "#00,00.###", expected: "12,34.099"},
                     {value: 123.0987654321, pattern: "#0,000.###", expected: "0,123.099"},
-                    {value: 123.0987654321, pattern: "#00,00.###", expected: "01,23.099"},
+                    {value: 123.0987654321, pattern: "#00,00.###", expected: "01,23.099"}
                     )]
         function formatIntegerGroups(data) {
             var result, symbols = {

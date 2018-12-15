@@ -15,13 +15,15 @@
  */
 package org.auraframework.http.cspinlining;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static org.auraframework.service.CSPInliningService.InlineScriptMode.UNSUPPORTED;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import org.auraframework.service.CSPInliningService.InlineScriptMode;
 import org.auraframework.service.ContextService;
@@ -33,12 +35,12 @@ import com.google.common.collect.Lists;
 public class AuraCSPInliningServiceTest {
 
     @Test
-    public void testEnsureEmptyRulesWhenCallingGetInlineMode(){
+    public void testEnsureEmptyRulesWhenCallingGetInlineMode() {
         AuraCSPInliningService target = new AuraCSPInliningService();
         ContextService contextService = mock(ContextService.class);
 
         target.setContextService(contextService);
-        when(contextService.getCurrentContext()).thenReturn(mock(AuraContext.class));
+        doReturn(mock(AuraContext.class)).when(contextService).getCurrentContext();
 
         InlineScriptMode expected = UNSUPPORTED;
         InlineScriptMode actual = target.getInlineMode();
@@ -47,7 +49,7 @@ public class AuraCSPInliningServiceTest {
     }
 
     @Test
-    public void testEnsureOnlyRelevantRulesProcessed(){
+    public void testEnsureOnlyRelevantRulesProcessed() {
         AuraCSPInliningService target = new AuraCSPInliningService();
         ContextService contextService = mock(ContextService.class);
         CSPInliningRule rule1 = mock(CSPInliningRule.class);
@@ -55,9 +57,9 @@ public class AuraCSPInliningServiceTest {
 
         target.setContextService(contextService);
         target.setRules(Lists.newArrayList(rule1, rule2));
-        when(contextService.getCurrentContext()).thenReturn(mock(AuraContext.class));
-        when(rule1.isRelevant(any())).thenReturn(false);
-        when(rule2.isRelevant(any())).thenReturn(true);
+        doReturn(mock(AuraContext.class)).when(contextService).getCurrentContext();
+        doReturn(FALSE).when(rule1).isRelevant(any());
+        doReturn(TRUE).when(rule2).isRelevant(any());
 
         target.getInlineMode();
 

@@ -108,8 +108,8 @@ public class Location implements Serializable {
         if (obj instanceof Location) {
             Location other = (Location) obj;
 
-            return fileName.equals(other.getFileName()) && line == other.getLine() && column == other.getColumn()
-                    && lastModified == other.getLastModified();
+            return fileName.equals(other.getFileName()) && (line == other.getLine()) && (column == other.getColumn())
+                    && (lastModified == other.getLastModified());
         }
 
         return false;
@@ -117,6 +117,7 @@ public class Location implements Serializable {
 
     @Override
     public int hashCode() {
+        @SuppressWarnings("boxing")
         Object[] toHash = new Object[] { fileName, line, column, lastModified };
         int hash = 7;
         for (Object o : toHash) {

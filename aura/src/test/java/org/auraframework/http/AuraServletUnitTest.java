@@ -54,8 +54,8 @@ public class AuraServletUnitTest {
         ArgumentCaptor<Throwable> exceptionCaptor = ArgumentCaptor.forClass(Throwable.class);
 
         Mockito.verify(servletUtilAdapter, Mockito.times(1)).handleServletException(exceptionCaptor.capture(),
-                Matchers.eq(Boolean.FALSE), Matchers.same(context), Matchers.same(request), Matchers.same(response),
-                Matchers.eq(Boolean.FALSE));
+                Matchers.eq(false), Matchers.same(context), Matchers.same(request), Matchers.same(response),
+                Matchers.eq(false));
         // The exception should be handled to avoid blowing up in the face of the user.
         assertThat(exceptionCaptor.getValue(), instanceOf(AuraHandledException.class));
         // The text is part of our API, because it hits customers.

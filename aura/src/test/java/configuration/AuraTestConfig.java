@@ -25,7 +25,7 @@ import org.auraframework.util.test.util.TestInventory;
 public class AuraTestConfig {
 
     @Impl(name = "auraTestInventory")
-    public static TestInventory auraTestInventory() throws Exception {
+    public final static TestInventory auraTestInventory() {
         return new TestInventory(AuraTestConfig.class);
     }
 }

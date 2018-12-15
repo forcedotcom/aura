@@ -15,6 +15,7 @@
  */
 package org.auraframework.test.util;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Properties;
@@ -26,8 +27,6 @@ import org.openqa.selenium.Platform;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.internal.BuildInfo;
 import org.openqa.selenium.remote.DesiredCapabilities;
-
-import com.google.common.collect.Lists;
 
 /**
  * Utility methods related to WebDriver
@@ -68,11 +67,11 @@ public final class WebDriverUtil {
             this.value = value;
         }
 
-        private String getCapabilityName() {
+        String getCapabilityName() {
             return this.name;
         }
 
-        private String getValue() {
+        String getValue() {
             return this.value;
         }
     }
@@ -235,9 +234,9 @@ public final class WebDriverUtil {
 
     public static synchronized ChromeOptions addChromeOptions(DesiredCapabilities capabilities, Dimension windowSize, boolean runHeadless) {
         ChromeOptions options = new ChromeOptions();
-        List<String> arguments = Lists.newArrayList();
+        List<String> arguments = new ArrayList<>(4);
         arguments.add("--ignore-gpu-blacklist");
-        Boolean noSandbox = Boolean.valueOf(System.getProperty("webdriver.chrome.nosandbox"));
+        boolean noSandbox = Boolean.getBoolean("webdriver.chrome.nosandbox");
         if (noSandbox) {
             arguments.add("--no-sandbox");
         }

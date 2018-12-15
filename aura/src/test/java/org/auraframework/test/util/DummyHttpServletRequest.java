@@ -21,6 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -38,20 +39,21 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
-import com.google.common.collect.Maps;
-
 /**
- * A testing mock of {@link HttpServletRequest}. The implementations here all do
- * nothing (return null, zero, etc.), so override what you need to.
+ * A testing mock of {@link HttpServletRequest}. The implementations here all do nothing (return null, zero,
+ * etc.), so override what you need to.
+ * 
+ * @deprecated Use {@link org.springframework.mock.web.MockHttpServletRequest} instead.
  */
+@Deprecated
 public class DummyHttpServletRequest implements HttpServletRequest {
 
     private String pathInfo = null;
     private String requestUri;
-    private Map<String, String> queryParams = Maps.newHashMap();
+    private Map<String, String> queryParams = new HashMap<>();
 
     public DummyHttpServletRequest() {
-    	this.requestUri = "/";
+        this.requestUri = "/";
     } 
     
     public DummyHttpServletRequest(String uri) {
@@ -321,7 +323,7 @@ public class DummyHttpServletRequest implements HttpServletRequest {
 
     @Override
     public String getRequestURI() {
-    	return this.requestUri;
+        return this.requestUri;
     }
 
     @Override

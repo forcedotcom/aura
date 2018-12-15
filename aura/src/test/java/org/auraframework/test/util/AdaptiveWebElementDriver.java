@@ -13,25 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.auraframework.test.util;
+
+import java.net.URL;
 
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import java.net.URL;
-
 public class AdaptiveWebElementDriver extends RemoteWebDriver {
 
-    public static String DEFAULT_CAPABILITY = "org.auraframework.webdriver.flexible.default";
+    public final static String DEFAULT_CAPABILITY = "org.auraframework.webdriver.flexible.default";
 
     /**
-     * @deprecated Use {@link AdaptiveWebElementDriver(CommandExecutor, Capabilities)}.
      * @param executor
      * @param desiredCapabilities
      * @param requiredCapabilities
+     * @deprecated Use {@link AdaptiveWebElementDriver(CommandExecutor, Capabilities)}.
      */
     @Deprecated
     public AdaptiveWebElementDriver(CommandExecutor executor, Capabilities desiredCapabilities,
@@ -39,7 +38,7 @@ public class AdaptiveWebElementDriver extends RemoteWebDriver {
         super(executor, desiredCapabilities.merge(requiredCapabilities));
 
         // Unless you explicitly request a "default" driver, return a driver that returns AdaptiveWebElements
-        if (!((desiredCapabilities != null && desiredCapabilities.is(DEFAULT_CAPABILITY)) || (requiredCapabilities != null && requiredCapabilities
+        if (!(desiredCapabilities.is(DEFAULT_CAPABILITY) || (requiredCapabilities != null && requiredCapabilities
                 .is(DEFAULT_CAPABILITY)))) {
             this.setElementConverter(new AdaptiveWebElement.JsonConverter(this));
         }
@@ -68,5 +67,4 @@ public class AdaptiveWebElementDriver extends RemoteWebDriver {
     public AdaptiveWebElementDriver(URL remoteAddress, Capabilities desiredCapabilities) {
         super(remoteAddress, desiredCapabilities);
     }
-
 }

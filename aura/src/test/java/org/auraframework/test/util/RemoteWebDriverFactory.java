@@ -29,8 +29,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 /**
- * Basic provider of RemoteWebDrivers.
- * 
+ * Basic provider of {@link org.openqa.selenium.remote.RemoteWebDriver}s.
  * 
  * @since 0.0.178
  */
@@ -87,7 +86,7 @@ public class RemoteWebDriverFactory implements WebDriverProvider {
                 Logger.getLogger(getClass().getName()).log(Level.WARNING, msg, t);
             }
         }
-        throw new Error(msg + String.format(" after %s tries", retries));
+        throw new Error(msg + String.format(" after %s tries", Integer.valueOf(retries)));
     }
 
     @Override

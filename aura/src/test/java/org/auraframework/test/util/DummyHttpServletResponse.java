@@ -25,10 +25,15 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.mock.web.MockHttpServletResponse;
+
 /**
- * A testing mock of {@link HttpServletResponse}. The implementations here all do nothing (and return null, zero, etc.),
- * so override what you need to.
+ * A testing mock of {@link HttpServletResponse}. The implementations here all do nothing (and return null,
+ * zero, etc.), so override what you need to.
+ * 
+ * @deprecated Use {@link MockHttpServletResponse} instead.
  */
+@Deprecated
 public class DummyHttpServletResponse implements HttpServletResponse {
 
     /**

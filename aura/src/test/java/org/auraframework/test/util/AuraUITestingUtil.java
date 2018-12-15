@@ -15,6 +15,10 @@
  */
 package org.auraframework.test.util;
 
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,21 +29,26 @@ import java.util.function.Function;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonReader;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.google.common.collect.Lists;
-
 /**
  * A place to put common UI testing specific helper methods
  */
-
 public class AuraUITestingUtil {
     private final WebDriver driver;
     private int timeoutInSecs = 30;
@@ -91,9 +100,9 @@ public class AuraUITestingUtil {
         public ActionDuringTransit[] getActionDuringTransit() {
             return actionDuringTransit;
         }
-    };
+    }
 
-    public static StressAction createStressAction(String auraActionWeCare, ActionTiming stressActionTiming,
+    public final static StressAction createStressAction(String auraActionWeCare, ActionTiming stressActionTiming,
             ActionDuringTransit... stressActionDuringTransitList) {
         return new StressAction(auraActionWeCare, stressActionTiming, stressActionDuringTransitList);
     }
@@ -187,11 +196,11 @@ public class AuraUITestingUtil {
         public Boolean apply(WebDriver d) {
             List<WebElement> elements = d.findElements(locator);
 
-            if (elements.size() > 0) {
+            if (!elements.isEmpty()) {
                 found = elements.get(0);
-                return true;
+                return Boolean.TRUE;
             }
-            return false;
+            return Boolean.FALSE;
         }
 
         public WebElement getFound() {
@@ -236,15 +245,16 @@ public class AuraUITestingUtil {
     }
 
     /**
-     * Waits for element to be not present
+     * {@link org.openqa.selenium.support.ui.Wait Wait}s for element to be not present
      * 
-     * @param locator By of element waiting to disapear
+     * @param locator By of element waiting to disappear
      * @return
      */
     public boolean waitForElementNotPresent(String msg, final By locator) {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
-        return wait.withMessage(msg)
-            .ignoring(StaleElementReferenceException.class).until((ExpectedCondition<Boolean>) d -> d.findElements(locator).isEmpty());
+        final Boolean result = wait.withMessage(msg)
+            .ignoring(StaleElementReferenceException.class).until((ExpectedCondition<Boolean>) d -> Boolean.valueOf(d.findElements(locator).isEmpty()));
+        return (result == null) ? false : result.booleanValue();
     }
 
     public WebElement findElementAndTypeEventNameInIt(String event) {
@@ -257,19 +267,19 @@ public class AuraUITestingUtil {
         return input;
     }
 
-    public void assertClassNameContains(WebElement element, String namePart) {
+    public final static void assertClassNameContains(WebElement element, String namePart) {
         assertClassNameContains(element, namePart, true);
     }
 
-    public void assertClassNameDoesNotContain(WebElement element, String namePart) {
+    public final static void assertClassNameDoesNotContain(WebElement element, String namePart) {
         assertClassNameContains(element, namePart, false);
     }
 
-    private void assertClassNameContains(WebElement element, String namePart, boolean doesContain) {
+    private static void assertClassNameContains(WebElement element, String namePart, boolean doesContain) {
         String className = element.getAttribute("class").trim();
-        className = " " + className + " "; // so we wont get false positive for
+        className = ' ' + className + ' '; // so we wont get false positive for
         // nonactive if looking for active
-        namePart = " " + namePart + " ";
+        namePart = ' ' + namePart + ' ';
 
         if (doesContain) {
             Assert.assertTrue("Class name '" + className + "' does not contain '" + namePart + "'",
@@ -280,17 +290,17 @@ public class AuraUITestingUtil {
         }
     }
 
-    public String getValueFromRootExpr(String val) {
+    public final static String getValueFromRootExpr(String val) {
         String exp = "window.$A.getRoot().get('" + val + "')";
         return exp;
     }
 
-    public String getFindAtRootExpr(String cmp) {
+    public final static String getFindAtRootExpr(String cmp) {
         String exp = "window.$A.getRoot().find('" + cmp + "')";
         return exp;
     }
 
-    public String getEncodedContextForServer() {
+    public final static String getEncodedContextForServer() {
         String exp = "window.$A.getContext().encodeForServer()";
         return exp;
     }
@@ -301,7 +311,7 @@ public class AuraUITestingUtil {
      * @param cmp: globalId of the component
      * @return
      */
-    public String getCmpExpr(String cmp) {
+    public final static String getCmpExpr(String cmp) {
         String exp = "window.$A.getCmp('" + cmp + "')";
         return exp;
     }
@@ -313,8 +323,8 @@ public class AuraUITestingUtil {
      * @param val : attribute name
      * @return
      */
-    public String getValueFromCmpRootExpression(String cmp, String val) {
-        return this.prepareReturnStatement(this.getFindAtRootExpr(cmp) + ".get('" + val + "')");
+    public final static String getValueFromCmpRootExpression(String cmp, String val) {
+        return prepareReturnStatement(getFindAtRootExpr(cmp) + ".get('" + val + "')");
     }
 
     /**
@@ -324,28 +334,27 @@ public class AuraUITestingUtil {
      * @param val: attribute name of the component
      * @return
      */
-    public String getValueFromCmpExpression(String cmp, String val) {
-        return this.prepareReturnStatement(this.getCmpExpr(cmp) + ".get('" + val + "')");
+    public final static String getValueFromCmpExpression(String cmp, String val) {
+        return prepareReturnStatement(getCmpExpr(cmp) + ".get('" + val + "')");
     }
 
     /**
-     * Execute the given javascript and args in the current window. Fail if the result is not a boolean. Otherwise,
-     * return the result.
+     * Execute the given javascript and args in the current window. Fail if the result is not a boolean.
+     * Otherwise, return the result.
      */
     public boolean getBooleanEval(String javascript, Object... args) {
-        Object status;
-        status = getEval(javascript, args);
+        Object status = getEval(javascript, args);
 
         // Special case for weird behavior with ios-driver returning 'ok' instead of true or false. Appears to be an
         // ios-driver bug. Return false so we can retry executing the js instead of erroring out.
-        if (status instanceof String && status.equals("ok")) {
+        if (status instanceof String && "ok".equals(status)) {
             return false;
         }
 
         if (status == null) {
             Assert.fail("Got a null status for " + javascript + "(" + args + ")");
-        }
-        if (!(status instanceof Boolean)) {
+            return false;
+        } else if (!(status instanceof Boolean)) {
             Assert.fail("Got unexpected return value: for " + javascript + "(" + args + ") :\n" + status.toString());
         }
 
@@ -442,11 +451,12 @@ public class AuraUITestingUtil {
     }
 
     /**
-     * Process the results from $A.test.getErrors(). If there were any errors, then fail the test accordingly.
+     * Process the results from {@code $A.test.getErrors()}. If there were any errors, then fail the test
+     * accordingly.
      * 
-     * @param errors the raw results from invoking $A.test.getErrors()
+     * @param errors the raw results from invoking {@code $A.test.getErrors()}
      */
-    public void assertJsTestErrors(String errors) {
+    public final static void assertJsTestErrors(String errors) {
         if (errors == null) {
             return;
         }
@@ -456,25 +466,25 @@ public class AuraUITestingUtil {
             List<Map<String, Object>> errorsList = (List<Map<String, Object>>) new JsonReader().read(errors);
             StringBuilder errorMessage = new StringBuilder();
             for (Map<String, Object> error : errorsList) {
-                errorMessage.append(error.get("message") + "\n");
-                errorMessage.append(error.get("testState") + "\n");
+                errorMessage.append(error.get("message")).append('\n');
+                errorMessage.append(error.get("testState")).append('\n');
             }
             Assert.fail(errorMessage.toString());
         }
     }
 
-    public String prepareReturnStatement(String returnStatement) {
+    public final static String prepareReturnStatement(String returnStatement) {
         return "return " + returnStatement;
     }
 
     public String findGlobalIdForComponentWithGivenProperties(String fromClause, String whereClause) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("var cmp = $A.getQueryStatement().from('component').field('globalId').");
-        sb.append(fromClause + ".where(\"" + whereClause + "\")" + ".query();\n");
-        sb.append("$A.test.assertEquals(1, cmp.rowCount,'Expected to find only one component with given properties.');\n");
-        sb.append("return cmp.rows[0].globalId;");
+        StringBuilder sb = new StringBuilder()
+                .append("var cmp = $A.getQueryStatement().from('component').field('globalId').")
+                .append(fromClause + ".where(\"" + whereClause + "\")" + ".query();\n")
+                .append("$A.test.assertEquals(1, cmp.rowCount,'Expected to find only one component with given properties.');\n")
+                .append("return cmp.rows[0].globalId;");
         Object returnVal = getEval(sb.toString());
-        return returnVal == null ? null : returnVal.toString();
+        return (returnVal == null) ? null : returnVal.toString();
     }
 
     /**
@@ -605,8 +615,8 @@ public class AuraUITestingUtil {
         WebElement errorBox = driver.findElement(By.id("auraErrorMessage"));
         if (errorBox == null) {
             Assert.fail("Aura errorBox not found.");
-        }
-        if (!errorBox.isDisplayed()) {
+            return null;
+        } else if (!errorBox.isDisplayed()) {
             return "";
         }
         return errorBox.getText();
@@ -615,7 +625,7 @@ public class AuraUITestingUtil {
     /**
      * Assert that our error message is the expected production error message.
      */
-    public void assertProdErrorMessage() throws Exception {
+    public void assertProdErrorMessage() {
         String actual = getAuraErrorMessage().replaceAll("\\s+", " ");
         Assert.assertEquals("Unable to process your request", actual);
     }
@@ -661,27 +671,29 @@ public class AuraUITestingUtil {
         return wait.withMessage(message).until(addErrorCheck(function));
     }
 
-    public String appCacheStatusIntToString(Integer ret) {
+    public final static String appCacheStatusIntToString(Integer ret) {
         String status = "Unknown cache state";
-        switch (ret) {
-        case 0:
-            status = "UNCACHED";
-            break;
-        case 1:
-            status = "IDLE";
-            break;
-        case 2:
-            status = "CHECKING";
-            break;
-        case 3:
-            status = "DOWNLOADING";
-            break;
-        case 4:
-            status = "UPDATEREADY";
-            break;
-        case 5:
-            status = "OBSOLETE";
-            break;
+        if (ret != null) {
+            switch (ret.intValue()) {
+            case 0:
+                status = "UNCACHED";
+                break;
+            case 1:
+                status = "IDLE";
+                break;
+            case 2:
+                status = "CHECKING";
+                break;
+            case 3:
+                status = "DOWNLOADING";
+                break;
+            case 4:
+                status = "UPDATEREADY";
+                break;
+            case 5:
+                status = "OBSOLETE";
+                break;
+            }
         }
         return status;
     }
@@ -691,7 +703,8 @@ public class AuraUITestingUtil {
                 new ExpectedCondition<Boolean>() {
                     @Override
                     public Boolean apply(WebDriver d) {
-                        boolean res = getBooleanEval("var cache=window.applicationCache;"
+                        @SuppressWarnings("boxing")
+                        Boolean res = getBooleanEval("var cache=window.applicationCache;"
                                 + "return $A.util.isUndefinedOrNull(cache) || (cache.status===cache.UNCACHED)"
                                 + "||(cache.status===cache.IDLE)||(cache.status===cache.OBSOLETE);");
                         return res;
@@ -701,7 +714,7 @@ public class AuraUITestingUtil {
                     @Override
                     public String apply(WebDriver d) {
                         Object ret = getRawEval("return window.applicationCache.status");
-                        return "Current AppCache status is " + appCacheStatusIntToString(((Long) ret).intValue());
+                        return "Current AppCache status is " + appCacheStatusIntToString(Integer.valueOf(((Long) ret).intValue()));
                     }
                 },
                 timeoutInSecs,
@@ -714,6 +727,7 @@ public class AuraUITestingUtil {
     public void waitForAuraTestComplete(int timeoutSecs) {
         waitUntilWithCallback(
                 new ExpectedCondition<Boolean>() {
+                    @SuppressWarnings("boxing")
                     @Override
                     public Boolean apply(WebDriver d) {
                         return getBooleanEval("return (window.$A && window.$A.test && window.$A.test.isComplete()) || false;");
@@ -770,6 +784,7 @@ public class AuraUITestingUtil {
     public void waitForDocumentReady() {
         waitUntilWithCallback(
                 new ExpectedCondition<Boolean>() {
+                    @SuppressWarnings("boxing")
                     @Override
                     public Boolean apply(WebDriver d) {
                         return getBooleanEval("return document.readyState === 'complete'");
@@ -809,6 +824,7 @@ public class AuraUITestingUtil {
                 .withMessage("Initialization error: $A present but failed to initialize")
                 .until(
                         new Function<WebDriver, Boolean>() {
+                            @SuppressWarnings("boxing")
                             @Override
                             public Boolean apply(WebDriver input) {
                                 assertNoAuraErrorMessage(expectedErrors);
@@ -875,7 +891,7 @@ public class AuraUITestingUtil {
 
     private void waitForElementDisplayed(final By locator, boolean isDisplayed, String message) {
         waitForElementFunction(locator, (element) -> {
-            return element != null && isDisplayed == element.isDisplayed();
+            return Boolean.valueOf((element != null) && (isDisplayed == element.isDisplayed()));
         }, message);
     }
 
@@ -889,13 +905,12 @@ public class AuraUITestingUtil {
      * @param looking for exact match or just partial
      */
     public void waitForElementText(final By locator, final String text, final boolean toBePresent, String message,
-            final Boolean matchFullText) {
+            final boolean matchFullText) {
         waitForElementFunction(locator, element -> {
-            if (matchFullText == true) {
-                return toBePresent == element.getText().equals(text);
-            } else {
-                return toBePresent == element.getText().contains(text);
+            if (matchFullText) {
+                return Boolean.valueOf(toBePresent == element.getText().equals(text));
             }
+            return Boolean.valueOf(toBePresent == element.getText().contains(text));
         }, message);
     }
 
@@ -923,11 +938,11 @@ public class AuraUITestingUtil {
 
         String result = (String) getEval(jsString);
 
-        ArrayList<String> resultList = new ArrayList<>();
-        String output = "";
+        ArrayList<String> resultList = new ArrayList<>(2);
+        String output;
 
         // No errors
-        if (result.equals("") || result.equals("Total Number of Errors found: 0")) {
+        if (StringUtils.isEmpty(result) || "Total Number of Errors found: 0".equals(result)) {
             output = "0";
         } else if (result.contains("Total Number of Errors found")) {
             output = "1";
@@ -942,41 +957,31 @@ public class AuraUITestingUtil {
 
     public void assertAccessible() {
         getEval("$A.test.assertAccessible()");
-
     }
 
     public String getUniqueIdOfFocusedElement() {
         return (String) getEval("return $A.test.getActiveElement().getAttribute('data-aura-rendered-by')");
     }
 
-    public void assertClassesSame(String message, String expectedClasses, String actualClasses) {
+    public final static void assertClassesSame(String message, String expectedClasses, String actualClasses) {
         List<String> expected = AuraTextUtil.splitSimpleAndTrim(" ", expectedClasses, 3);
         List<String> actual = AuraTextUtil.splitSimpleAndTrim(" ", actualClasses, 3);
-        List<String> extra = Lists.newArrayList();
 
-        for (String x : actual) {
-            if (expected.contains(x)) {
-                expected.remove(x);
-            } else {
-                extra.add(x);
-            }
-        }
-        Assert.assertTrue(message + ": Mismatched classes extra = " + extra + ", missing=" + expected,
-                extra.size() == 0 && expected.size() == 0);
+        assertThat(message + ": Mismatched classes" + expected, actual, containsInAnyOrder(expected.toArray()));
     }
 
     /**
      * Creates a random lower case string. NOTE: this is BAD WAY to produce Strings, as the results are
      * non-reproducible. Do not use it: call {@link #randString(int,long)} instead.
      */
-    public String randString(int len) {
+    public final static String randString(int len) {
         return randString(len, RAND);
     }
 
     /**
      * Creates a random lower case string of specified length, using given pseudo-Random number generator.
      */
-    public String randString(int len, Random rnd) {
+    public final static String randString(int len, Random rnd) {
         byte[] buff = new byte[len];
         for (int i = 0; i < len; i++) {
             buff[i] = (byte) (rnd.nextInt(26) + 'a');

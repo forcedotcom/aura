@@ -49,7 +49,7 @@ public interface StringSourceLoader extends BundleSourceLoader, InternalNamespac
         INTERNAL,
         PRIVILEGED,
         CUSTOM
-    };
+    }
 
     /**
      * Generate a {@link DefDescriptor} with a unique name. If namePrefix does not contain a namespace, the descriptor

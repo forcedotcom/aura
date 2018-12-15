@@ -15,7 +15,16 @@
  */
 package org.auraframework.test.util;
 
-import junit.framework.AssertionFailedError;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.junit.Assert.assertThat;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
+
+import javax.inject.Inject;
+
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
@@ -29,10 +38,7 @@ import org.auraframework.throwable.AuraExceptionInfo;
 import org.auraframework.util.FileMonitor;
 import org.auraframework.util.test.util.UnitTestCase;
 
-import javax.inject.Inject;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
+import junit.framework.AssertionFailedError;
 
 /**
  * Base class for unit tests referencing the Aura framework.
@@ -99,6 +105,7 @@ public abstract class AuraTestCase extends UnitTestCase {
         super.tearDown();
     }
 
+    @SuppressWarnings("unused")
     public void resetMocks() throws Exception {
     }
 
@@ -266,15 +273,15 @@ public abstract class AuraTestCase extends UnitTestCase {
     }
 
     /**
-     * Verify Throwable is from the expected Location.
+     * Verify {@link Throwable} is from the expected Location.
      */
-    private void assertLocation(Throwable e, String expectedLoc) {
+    private static void assertLocation(Throwable e, String expectedLoc) {
         Location l = null;
         if (e instanceof AuraExceptionInfo) {
             l = ((AuraExceptionInfo) e).getLocation();
         }
-        assertNotNull("Unable to find location, expected " + expectedLoc, l);
-        assertEquals("Unexpected location.", expectedLoc, l.getFileName());
+
+        assertThat("Unexpected location.", l, hasProperty("fileName", equalTo(expectedLoc)));
     }
 
     /**

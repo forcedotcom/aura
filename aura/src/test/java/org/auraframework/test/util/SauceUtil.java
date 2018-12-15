@@ -23,12 +23,12 @@ import java.net.UnknownHostException;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import junit.framework.TestCase;
-
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+
+import junit.framework.TestCase;
 
 /**
  * SauceLabs-related utility methods
@@ -39,11 +39,15 @@ public final class SauceUtil {
      * Utility to parse strings (i.e. system properties) into ints, with support for defaults as ints. This just saves a
      * bunch of conversions between Integer and String, relative to getProperty with a String default.
      */
-    private static int parseIntegerWithDefault(String str, int defVal) {
+    private static Integer parseIntegerWithDefault(String str, Integer defVal) {
         if (str != null) {
-            return Integer.parseInt(str);
+            return Integer.valueOf(str);
         }
         return defVal;
+    }
+    
+    private static Integer parseIntegerWithDefault(String str, int defVal) {
+        return parseIntegerWithDefault(str, Integer.valueOf(defVal));
     }
 
     private static final boolean TUNNEL_SELENIUM_COMMANDS_THROUGH_SAUCE_CONNECT = Boolean.parseBoolean(System.getProperty("sauce.SeleniumCommandThruSauceConnect", "false"));
@@ -64,11 +68,11 @@ public final class SauceUtil {
     // Allow properties for sauce timeouts. By default, the "command" timeout is used to derive the
     // others. We set to 60s command, 60s idle, 300s max duration; defaults were originally 5min, 90s,
     // 30min respectively.
-    static final int SAUCE_CMD_TIMEOUT = parseIntegerWithDefault(System.getProperty("sauce.timeout"), 60);
-    static final int SAUCE_IDLE_TIMEOUT = parseIntegerWithDefault(System.getProperty("sauce.timeout.idle"),
+    static final Integer SAUCE_CMD_TIMEOUT  = parseIntegerWithDefault(System.getProperty("sauce.timeout"), 60);
+    static final Integer SAUCE_IDLE_TIMEOUT = parseIntegerWithDefault(System.getProperty("sauce.timeout.idle"),
             SAUCE_CMD_TIMEOUT);
-    static final int SAUCE_MAX_TIMEOUT = parseIntegerWithDefault(System.getProperty("sauce.timeout.duration"),
-            5 * SAUCE_CMD_TIMEOUT);
+    static final Integer SAUCE_MAX_TIMEOUT  = parseIntegerWithDefault(System.getProperty("sauce.timeout.duration"),
+            5 * SAUCE_CMD_TIMEOUT.intValue());
 
     public static boolean areTestsRunningOnSauce() {
         // TODO: when running in SFDC this returns false even if running on SauceLabs

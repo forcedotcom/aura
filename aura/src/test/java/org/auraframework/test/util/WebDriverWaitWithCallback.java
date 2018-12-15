@@ -40,7 +40,7 @@ public class WebDriverWaitWithCallback extends WebDriverWait {
         } catch (TimeoutException e) {
             // catch timeout exception and throw exception with extra message from callback function
             V2 ret = callbackWhenTimeout.apply(driver);
-            throw new TimeoutException(e.getMessage() + "\n" + ret.toString(), e.getCause());
+            throw new TimeoutException(e.getMessage() + '\n' + ret.toString(), e.getCause());
         }
     }
 }

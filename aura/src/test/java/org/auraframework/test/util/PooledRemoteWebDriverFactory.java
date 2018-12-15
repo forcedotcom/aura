@@ -16,6 +16,7 @@
 package org.auraframework.test.util;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,16 +33,15 @@ import org.apache.http.message.BasicNameValuePair;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.common.collect.MapMaker;
 
 /**
- * Get pooled WebDriver instances for Aura tests.
+ * Get pooled {@link WebDriver} instances for Aura tests.
  * 
  * @since 0.0.178
  */
 public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
-    private final Map<DesiredCapabilities, Queue<PooledRemoteWebDriver>> pools = Maps.newConcurrentMap();
+    private final Map<DesiredCapabilities, Queue<PooledRemoteWebDriver>> pools = new MapMaker().makeMap();
 
     public PooledRemoteWebDriverFactory(URL serverUrl) {
         super(serverUrl);
@@ -81,10 +81,10 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
 
             // update query with a nonce
             if (!"about:blank".equals(url)) {
-                List<NameValuePair> newParams = Lists.newArrayList();
+                List<NameValuePair> newParams = new ArrayList<>();
                 URLEncodedUtils.parse(newParams, new Scanner(qs), "UTF-8");
                 newParams.add(new BasicNameValuePair("browser.nonce", String.valueOf(System.currentTimeMillis())));
-                url = url + "?" + URLEncodedUtils.format(newParams, "UTF-8") + hash;
+                url = url + '?' + URLEncodedUtils.format(newParams, "UTF-8") + hash;
             }
 
             super.get(url);
@@ -93,7 +93,7 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
         @Override
         public void close() {
             // don't close the final window; otherwise, we can't reuse it
-            if (getWindowHandles().size() > 1) {
+            if (!getWindowHandles().isEmpty()) {
                 super.close();
             }
         }
@@ -104,7 +104,7 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
                 for (int i = 0; i < 10; i++) {
                     switchTo().alert().accept();
                 }
-            } catch (Throwable t) {
+            } catch (Throwable ignored) {
                 // all alerts are now dismissed
             }
         }
@@ -128,7 +128,7 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
             }
         }
 
-        private void superQuit() {
+        void superQuit() {
             super.quit();
         }
     }
@@ -137,7 +137,7 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
     public synchronized WebDriver get(final DesiredCapabilities capabilities) {
         // default to use a pooled instance unless the test explicitly requests a brand new instance
         Object reuseBrowser = capabilities.getCapability(WebDriverProvider.REUSE_BROWSER_PROPERTY);
-        if ((reuseBrowser != null) && (reuseBrowser.equals(false))) {
+        if ((reuseBrowser != null) && (Boolean.FALSE.equals(reuseBrowser))) {
             return super.get(capabilities);
         }
 
@@ -148,17 +148,16 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
             pools.put(capabilities, pool);
         }
 
-        if (pool.size() > 0) {
+        if (!pool.isEmpty()) {
             return pool.poll();
-        } else {
-            final Queue<PooledRemoteWebDriver> thisPool = pool;
-            return retry(new Callable<WebDriver>() {
-                @Override
-                public WebDriver call() throws Exception {
-                    return new PooledRemoteWebDriver(thisPool, serverUrl, capabilities);
-                }
-            }, MAX_GET_RETRIES, getGetDriverTimeout(capabilities), "Failed to get a new PooledRemoteWebDriver");
         }
+        final Queue<PooledRemoteWebDriver> thisPool = pool;
+        return retry(new Callable<WebDriver>() {
+            @Override
+            public WebDriver call() throws Exception {
+                return new PooledRemoteWebDriver(thisPool, serverUrl, capabilities);
+            }
+        }, MAX_GET_RETRIES, getGetDriverTimeout(capabilities), "Failed to get a new PooledRemoteWebDriver");
     }
 
     @Override

@@ -28,8 +28,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Tests for AuraExceptionUtil.
- * 
+ * Tests for {@link AuraExceptionUtil}.
  * 
  * @since 0.0.210
  */
@@ -50,7 +49,7 @@ public class AuraExceptionUtilTest {
      * stack if location contains both properties.
      */
     @Test
-    public void testAddLocationWithFileAndLine() throws Exception {
+    public void testAddLocationWithFileAndLine() {
         Throwable t = new Throwable();
         AuraExceptionUtil.addLocation(new Location("test", 22, 0, 0), t);
         Assert.assertEquals("Expected StackTraceElement not inserted at top",
@@ -62,7 +61,7 @@ public class AuraExceptionUtilTest {
      * location has negative line number set.
      */
     @Test
-    public void testAddLocationWithoutLine() throws Exception {
+    public void testAddLocationWithoutLine() {
         Throwable t = new Throwable();
         AuraExceptionUtil.addLocation(new Location("test", 33), t);
         Assert.assertEquals("Expected StackTraceElement not inserted at top", new StackTraceElement("", "", "test", -1),
@@ -74,7 +73,7 @@ public class AuraExceptionUtilTest {
      * location contains null filename.
      */
     @Test
-    public void testAddLocationWithoutFile() throws Exception {
+    public void testAddLocationWithoutFile() {
         Throwable t = new Throwable();
         AuraExceptionUtil.addLocation(new Location(null, 33, 0, 0), t);
         Assert.assertEquals("Expected StackTraceElement not inserted at top", new StackTraceElement("", "", null, 33),
@@ -85,7 +84,7 @@ public class AuraExceptionUtilTest {
      * No new StackTraceElement is inserted at top of stack if location is null.
      */
     @Test
-    public void testAddLocationWithoutLocation() throws Exception {
+    public void testAddLocationWithoutLocation() {
         Throwable t = new Throwable();
         StackTraceElement expected = t.getStackTrace()[0];
         AuraExceptionUtil.addLocation(null, t);
@@ -93,20 +92,20 @@ public class AuraExceptionUtilTest {
     }
 
     /**
-     * QuickFixException is returned as is.
+     * {@link QuickFixException} is returned as is.
      */
     @Test
-    public void testWrapExecutionExceptionInstanceOfQuickFixException() throws Exception {
+    public void testWrapExecutionExceptionInstanceOfQuickFixException() {
         Exception t = new TestQuickFixException("test");
         Assert.assertEquals("Did not get the original QuickFixException", t,
                 AuraExceptionUtil.wrapExecutionException(t, new Location("here", 0)));
     }
 
     /**
-     * Topmost AuraUnhandledException is wrapped.
+     * Topmost {@link AuraExecutionException} is wrapped.
      */
     @Test
-    public void testWrapExecutionExceptionInstanceOfAuraUnhandledException() throws Exception {
+    public void testWrapExecutionExceptionInstanceOfAuraUnhandledException() {
         Throwable start = new Exception("start");
         Throwable child = new AuraUnhandledException("child", start);
         Exception t = new AuraUnhandledException("test", child);
@@ -121,10 +120,10 @@ public class AuraExceptionUtilTest {
     }
 
     /**
-     * Topmost AuraExecutionException is wrapped.
+     * Topmost {@link AuraExecutionException} is wrapped.
      */
     @Test
-    public void testWrapExecutionExceptionInstanceOfAuraExecutionException() throws Exception {
+    public void testWrapExecutionExceptionInstanceOfAuraExecutionException() {
         Throwable start = new Exception("start");
         Throwable child = new AuraUnhandledException("child", start);
         Exception t = new AuraExecutionException(child, new Location("there", 0));
@@ -139,10 +138,10 @@ public class AuraExceptionUtilTest {
     }
 
     /**
-     * Topmost AuraHandledException is unwrapped.
+     * Topmost {@link AuraExecutionException} is unwrapped.
      */
     @Test
-    public void testWrapExecutionExceptionInstanceOfAuraHandledException() throws Exception {
+    public void testWrapExecutionExceptionInstanceOfAuraHandledException() {
         Throwable start = new Exception("start");
         Throwable child = new AuraHandledException(start);
         Exception t = new AuraUnhandledException("test", child);
@@ -157,10 +156,10 @@ public class AuraExceptionUtilTest {
     }
 
     /**
-     * Topmost Error is rethrown.
+     * Topmost {@link Error} is re-thrown.
      */
     @Test
-    public void testWrapExecutionExceptionInstanceOfError() throws Exception {
+    public void testWrapExecutionExceptionInstanceOfError() {
         Throwable child = new TestQuickFixException("test");
         Throwable error = new IOError(child);
         Exception t = new Exception(error);
@@ -184,10 +183,10 @@ public class AuraExceptionUtilTest {
     }
 
     /**
-     * Nested QuickFixException is returned as is.
+     * Nested {@link QuickFixException} is returned as is.
      */
     @Test
-    public void testWrapExecutionExceptionNestedQuickFixException() throws Exception {
+    public void testWrapExecutionExceptionNestedQuickFixException() {
         Throwable t4 = new TestQuickFixException("test");
         Throwable t3 = new RuntimeException("intermediate3", t4);
         Throwable t2 = new RuntimeException("intermediate2", t3);
@@ -198,10 +197,10 @@ public class AuraExceptionUtilTest {
     }
 
     /**
-     * Topmost nested AuraRuntimeException is rethrown.
+     * Topmost nested {@link AuraRuntimeException} is re-thrown.
      */
     @Test
-    public void testWrapExecutionExceptionNestedAuraRuntimeException() throws Exception {
+    public void testWrapExecutionExceptionNestedAuraRuntimeException() {
         Throwable t4 = new Exception("intermediate3");
         Throwable t3 = new AuraUnhandledException("intermediate3", t4);
         Throwable t2 = new AuraUnhandledException("intermediate2", t3);
@@ -218,10 +217,10 @@ public class AuraExceptionUtilTest {
     }
 
     /**
-     * Topmost nested Error is rethrown.
+     * Topmost nested {@link Error} is re-thrown.
      */
     @Test
-    public void testWrapExecutionExceptionNestedError() throws Exception {
+    public void testWrapExecutionExceptionNestedError() {
         Throwable t4 = new TestQuickFixException("test");
         Throwable t3 = new IOError(t4);
         Throwable t2 = new RuntimeException("intermediate2", t3);
@@ -238,11 +237,11 @@ public class AuraExceptionUtilTest {
     }
 
     /**
-     * QuickFixException nested 5 or more levels deep is not extracted. New
-     * AuraRuntimeException is thrown.
+     * {@link QuickFixException} nested 5 or more levels deep is not extracted. New
+     * {@link AuraRuntimeException} is thrown.
      */
     @Test
-    public void testWrapExecutionExceptionNestedTooDeep() throws Exception {
+    public void testWrapExecutionExceptionNestedTooDeep() {
         Throwable t4 = new TestQuickFixException("test");
         Throwable t3 = new RuntimeException("intermediate3", t4);
         Throwable t2 = new RuntimeException("intermediate2", t3);
@@ -260,10 +259,10 @@ public class AuraExceptionUtilTest {
     }
 
     /**
-     * Any other Throwable is wrapped in a new AuraRuntimeException.
+     * Any other {@link Throwable} is wrapped in a new {@link AuraRuntimeException}.
      */
     @Test
-    public void testWrapExecutionExceptionWithoutMatching() throws Exception {
+    public void testWrapExecutionExceptionWithoutMatching() {
         Exception t = new RuntimeException("test");
         AuraRuntimeException expected = null;
         try {
@@ -276,19 +275,19 @@ public class AuraExceptionUtilTest {
     }
 
     /**
-     * QuickFixException is returned as is.
+     * {@link QuickFixException} is returned as is.
      */
     @Test
-    public void testPassQuickFixInstanceOfQuickFixException() throws Exception {
+    public void testPassQuickFixInstanceOfQuickFixException() {
         Throwable t = new TestQuickFixException("test");
         Assert.assertEquals("Did not get the original QuickFixException", t, AuraExceptionUtil.passQuickFix(t));
     }
 
     /**
-     * Topmost AuraRuntimeException is rethrown.
+     * Topmost {@link AuraRuntimeException} is re-thrown.
      */
     @Test
-    public void testPassQuickFixInstanceOfAuraRuntimeException() throws Exception {
+    public void testPassQuickFixInstanceOfAuraRuntimeException() {
         Throwable child = new AuraRuntimeException("test");
         Throwable t = new AuraRuntimeException("test", null, child);
         AuraRuntimeException expected = null;
@@ -302,10 +301,10 @@ public class AuraExceptionUtilTest {
     }
 
     /**
-     * Topmost Error is rethrown.
+     * Topmost {@link Error} is re-thrown.
      */
     @Test
-    public void testPassQuickFixInstanceOfError() throws Exception {
+    public void testPassQuickFixInstanceOfError() {
         Throwable child = new TestQuickFixException("test");
         Throwable t = new IOError(child);
         IOError expected = null;
@@ -319,10 +318,10 @@ public class AuraExceptionUtilTest {
     }
 
     /**
-     * Nested QuickFixException is returned as is.
+     * Nested {@link QuickFixException} is returned as is.
      */
     @Test
-    public void testPassQuickFixNestedQuickFixException() throws Exception {
+    public void testPassQuickFixNestedQuickFixException() {
         Throwable t4 = new TestQuickFixException("test");
         Throwable t3 = new RuntimeException("intermediate3", t4);
         Throwable t2 = new RuntimeException("intermediate2", t3);
@@ -332,10 +331,11 @@ public class AuraExceptionUtilTest {
     }
 
     /**
-     * Topmost nested AuraRuntimeException is rethrown.
+     * Topmost nested {@link AuraRuntimeException} is re-thrown.
      */
+    @SuppressWarnings("static-method")
     @Test
-    public void testPassQuickFixNestedAuraRuntimeException() throws Exception {
+    public void testPassQuickFixNestedAuraRuntimeException() {
         Throwable t4 = new Exception("intermediate3");
         Throwable t3 = new AuraUnhandledException("intermediate3", t4);
         Throwable t2 = new AuraUnhandledException("intermediate2", t3);
@@ -352,10 +352,10 @@ public class AuraExceptionUtilTest {
     }
 
     /**
-     * Topmost nested Error is rethrown.
+     * Topmost nested {@link Error} is re-thrown.
      */
     @Test
-    public void testPassQuickFixNestedError() throws Exception {
+    public void testPassQuickFixNestedError() {
         Throwable t4 = new TestQuickFixException("test");
         Throwable t3 = new IOError(t4);
         Throwable t2 = new RuntimeException("intermediate2", t3);
@@ -372,11 +372,11 @@ public class AuraExceptionUtilTest {
     }
 
     /**
-     * QuickFixException nested 5 or more levels deep is not extracted. New
-     * AuraRuntimeException is thrown.
+     * {@link QuickFixException} nested 5 or more levels deep is not extracted. New
+     * {@link AuraRuntimeException} is thrown.
      */
     @Test
-    public void testPassQuickFixNestedTooDeep() throws Exception {
+    public void testPassQuickFixNestedTooDeep() {
         Throwable t4 = new TestQuickFixException("test");
         Throwable t3 = new RuntimeException("intermediate3", t4);
         Throwable t2 = new RuntimeException("intermediate2", t3);
@@ -394,10 +394,10 @@ public class AuraExceptionUtilTest {
     }
 
     /**
-     * Any other Throwable is wrapped in a new AuraRuntimeException.
+     * Any other {@link Throwable} is wrapped in a new {@link AuraRuntimeException}.
      */
     @Test
-    public void testPassQuickFixWithoutMatching() throws Exception {
+    public void testPassQuickFixWithoutMatching() {
         Throwable t = new RuntimeException("test");
         AuraRuntimeException expected = null;
         try {

@@ -57,7 +57,6 @@ import org.auraframework.service.ServerService.HYDRATION_TYPE;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Location;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -88,6 +87,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
     protected ContextService contextService;
     protected ConfigAdapter configAdapter;
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -113,6 +113,18 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 }
     
                 updateContext(request);
+
+                // Thar be dragons.
+                // updating loaded in definitionService will avoid side affects of the definition's we're looking at to be affected by the application
+                // that we happen to be coming in to at this point.
+                // A.app could potentially affect the dependencies set for Foo.cmp, when B.app requests Foo.cmp it could be now contain more than it needs to.
+                @SuppressWarnings("rawtypes")
+                DefDescriptor appDescriptor = definitionService.getDefDescriptor(appReferrrer, ApplicationDef.class);
+                if (!definitionService.exists(appDescriptor)) {
+                    // direct component access as a 'top-level' is still allowed
+                    appDescriptor = definitionService.getDefDescriptor(appReferrrer, ComponentDef.class);
+                }
+                definitionService.updateLoaded(appDescriptor);
     
                 Map<DefDescriptor<?>, String> descriptors = mapDescriptorsToDefDesriptorAndUid(requestedDescriptors);
     
@@ -168,7 +180,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 // explicitly invoke the need to have a style context now, rather than later during serialization
                 context.getStyleContext();
     
-                serverService.writeDefinitions(descriptors.keySet(), responseStringWriter, false, 0, hydrationType, false);
+                serverService.writeDefinitions(descriptors.keySet(), responseStringWriter, false, 0, hydrationType, false, requestedUID);
     
                 try {
                     definitionService.populateGlobalValues(AuraValueProviderType.LABEL.getPrefix(),
@@ -186,18 +198,10 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 });
                 dependencies.removeAll(descriptors.keySet());
     
-                DefDescriptor<ApplicationDef> appDescriptor = definitionService.getDefDescriptor(appReferrrer, ApplicationDef.class);
-                String appUID;
-                try {
-                    appUID = definitionService.getUid(null, appDescriptor);
-                } catch (DefinitionNotFoundException dnfe) {
-                    // mainly tests directly access components as top level without an app.
-                    // if neither exist, let the error bubble up
-                    appUID = definitionService.getUid(null, definitionService.getDefDescriptor(appReferrrer, ComponentDef.class));
-                }
+                String appUID = definitionService.getUid(null, appDescriptor);
                 dependencies.removeAll(definitionService.getDependencies(appUID));
     
-                serverService.writeDefinitions(dependencies, responseStringWriter, false, 0, HYDRATION_TYPE.all, false);
+                serverService.writeDefinitions(dependencies, responseStringWriter, false, 0, HYDRATION_TYPE.all, false, String.format("%s-%d", requestedUID, dependencies.size()));
     
                 if (!dependencies.isEmpty()) {
                     try {

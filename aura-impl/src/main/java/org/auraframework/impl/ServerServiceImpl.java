@@ -455,6 +455,12 @@ public class ServerServiceImpl implements ServerService {
     @Override
     public void writeDefinitions(final Set<DefDescriptor<?>> dependencies, Writer out, boolean hasParts, int partIndex, HYDRATION_TYPE hydrationType, boolean preloading)
             throws IOException, QuickFixException {
+        writeDefinitions(dependencies, out, hasParts, partIndex, hydrationType, preloading, Integer.toString(dependencies.size()));
+    }
+
+    @Override
+    public void writeDefinitions(final Set<DefDescriptor<?>> dependencies, Writer out, boolean hasParts, int partIndex, HYDRATION_TYPE hydrationType, boolean preloading, String dependencySetUid)
+            throws IOException, QuickFixException {
         AuraContext context = contextService.getCurrentContext();
         final Mode mode = context.getMode();
         final boolean minify = mode.minify();
@@ -468,7 +474,7 @@ public class ServerServiceImpl implements ServerService {
         final String lockerService = configAdapter.isLockerServiceEnabled() ? ":ls" : "";
         final String compat = context.useCompatSource() ? ":c" : "";
         final String debug = jsMode == JavascriptGeneratorMode.PRODUCTIONDEBUG || jsMode == JavascriptGeneratorMode.PERFORMANCEDEBUG ? ":DEBUG" : "";
-        final String key = "JS:" + mKey + uid + (hasParts ? ":" + partIndex : "") + ":" + lockerService + compat + debug;
+        final String key = "JS:" + mKey + uid + (hasParts ? ":" + partIndex : "") + ":" + lockerService + compat + debug + dependencySetUid;
 
         final Callable<String> buildFunction = () -> {
             String res = getDefinitionsString(dependencies, hydrationType);

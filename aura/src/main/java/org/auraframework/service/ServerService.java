@@ -102,6 +102,9 @@ public interface ServerService {
     void writeDefinitions(Set<DefDescriptor<?>> dependencies, Writer out, boolean hasParts, int partIndex,
             HYDRATION_TYPE hydrationType, boolean preloading) throws IOException, QuickFixException;
 
+    void writeDefinitions(Set<DefDescriptor<?>> dependencies, Writer out, boolean hasParts, int partIndex,
+            HYDRATION_TYPE hydrationType, boolean preloading, String dependencySetUid) throws IOException, QuickFixException;
+
     String serializeInitializers(AuraContext context) throws IOException;
 
     String serializeContext(AuraContext context) throws QuickFixException, IOException;

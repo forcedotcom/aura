@@ -15,10 +15,14 @@
  */
 package org.auraframework.test.instance;
 
+import static java.lang.Boolean.TRUE;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.auraframework.def.ComponentDef;
@@ -28,8 +32,6 @@ import org.auraframework.instance.ActionDelegate;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import com.google.common.collect.Maps;
 
 public class ActionDelegateTest {
     //
@@ -41,7 +43,8 @@ public class ActionDelegateTest {
         }
     }
 
-    private void oneCall(Map<String, Method> methodMap, Map<String,Boolean> calledMap, String name,
+    @SafeVarargs
+    private final void oneCall(Map<String, Method> methodMap, Map<String,Boolean> calledMap, String name,
             Object... args) throws Throwable {
         Action spied = Mockito.mock(Action.class);
         Action delegate = new MyDelegateAction(spied);
@@ -58,15 +61,14 @@ public class ActionDelegateTest {
 
     @Test
     public void testCallsFunctions() throws Throwable {
-        Map<String,Method> methodMap = Maps.newHashMap();
-        Map<String,Boolean> calledMap = Maps.newHashMap();
+        Map<String, Method> methodMap = new HashMap<>();
+        Map<String, Boolean> calledMap = new HashMap<>();
 
-        @SuppressWarnings("unchecked")
         DefDescriptor<ComponentDef> componentDescriptor = mock(DefDescriptor.class);
         ComponentDef componentDef = mock(ComponentDef.class);
 
         for (Method m : Action.class.getMethods()) {
-            Assert.assertFalse("Duplicate method name "+m.getName(), methodMap.containsKey(m.getName()));
+            Assert.assertFalse("Duplicate method name " + m.getName(), methodMap.containsKey(m.getName()));
             methodMap.put(m.getName(), m);
             calledMap.put(m.getName(), Boolean.FALSE);
         }
@@ -102,7 +104,7 @@ public class ActionDelegateTest {
         oneCall(methodMap, calledMap, "setCallerVersion", new String("version"));
 
         for (Method m : Action.class.getMethods()) {
-            Assert.assertTrue(m.getName()+"was not called", calledMap.get(m.getName()));
+            assertThat(m.getName() + "was not called", calledMap.get(m.getName()), equalTo(TRUE));
         }
     }
 }

@@ -13,8 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.auraframework.http.resource;
+
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.util.Enumeration;
 import java.util.Vector;
@@ -26,10 +33,9 @@ import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
-import org.auraframework.test.util.DummyHttpServletResponse;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * Simple (non-integration) test case for {@link Manifest}, most useful for exercising hard-to-reach error
@@ -55,7 +61,7 @@ public class ManifestUnitTest {
         Assert.assertEquals(Format.MANIFEST, new Manifest().getFormat());
     }
 
-    private Enumeration<String> getEmptyStringEnumeration() {
+    private static Enumeration<String> getEmptyStringEnumeration() {
         Vector<String> vector = new Vector<>();
         return vector.elements();
     }
@@ -65,34 +71,34 @@ public class ManifestUnitTest {
      */
     @Test
     public void testManifestDisallowed() throws Exception {
-        ManifestUtil manifestUtil = Mockito.mock(ManifestUtil.class);
-        ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
+        ManifestUtil manifestUtil = mock(ManifestUtil.class);
+        ServletUtilAdapter servletUtilAdapter = mock(ServletUtilAdapter.class);
         Manifest manifest = new Manifest();
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        HttpServletRequest request = mock(HttpServletRequest.class);
 
         manifest.setManifestUtil(manifestUtil);
         manifest.setServletUtilAdapter(servletUtilAdapter);
 
-        Mockito.when(manifestUtil.isManifestEnabled()).thenReturn(false);
-        Mockito.when(request.getParameterNames()).thenReturn(getEmptyStringEnumeration());
+        doReturn(FALSE).when(manifestUtil).isManifestEnabled();
+        doReturn(getEmptyStringEnumeration()).when(request).getParameterNames();
 
         manifest.write(request, response, null);
 
         // This is mocked.
-        Mockito.verify(manifestUtil, Mockito.times(1)).isManifestEnabled();
+        verify(manifestUtil, times(1)).isManifestEnabled();
 
         //
         // These are the real verifications. It should not be cached, and it should be marked
         // as 'Not Found'
         //
-        Mockito.verify(servletUtilAdapter, Mockito.times(1)).setNoCache(response);
-        Mockito.verify(response, Mockito.times(1)).setStatus(HttpServletResponse.SC_NOT_FOUND);
+        verify(servletUtilAdapter, times(1)).setNoCache(response);
+        verify(response, times(1)).setStatus(HttpServletResponse.SC_NOT_FOUND);
 
 
-        Mockito.verifyNoMoreInteractions(servletUtilAdapter);
-        Mockito.verifyNoMoreInteractions(response);
-        Mockito.verifyNoMoreInteractions(manifestUtil);
+        verifyNoMoreInteractions(servletUtilAdapter);
+        verifyNoMoreInteractions(response);
+        verifyNoMoreInteractions(manifestUtil);
     }
 
     /**
@@ -100,34 +106,34 @@ public class ManifestUnitTest {
      */
     @Test
     public void testManifestCookieCheck() throws Exception {
-        ManifestUtil manifestUtil = Mockito.mock(ManifestUtil.class);
-        ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
+        ManifestUtil manifestUtil = mock(ManifestUtil.class);
+        ServletUtilAdapter servletUtilAdapter = mock(ServletUtilAdapter.class);
         Manifest manifest = new Manifest();
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        HttpServletRequest request = mock(HttpServletRequest.class);
 
         manifest.setManifestUtil(manifestUtil);
         manifest.setServletUtilAdapter(servletUtilAdapter);
 
-        Mockito.when(manifestUtil.isManifestEnabled()).thenReturn(true);
-        Mockito.when(manifestUtil.checkManifestCookie(request, response)).thenReturn(false);
-        Mockito.when(request.getParameterNames()).thenReturn(getEmptyStringEnumeration());
+        doReturn(TRUE).when(manifestUtil).isManifestEnabled();
+        doReturn(FALSE).when(manifestUtil).checkManifestCookie(request, response);
+        doReturn(getEmptyStringEnumeration()).when(request).getParameterNames();
 
         manifest.write(request, response, null);
 
         // This is mocked.
-        Mockito.verify(manifestUtil, Mockito.times(1)).isManifestEnabled();
-        Mockito.verify(manifestUtil, Mockito.times(1)).checkManifestCookie(request, response);
+        verify(manifestUtil, times(1)).isManifestEnabled();
+        verify(manifestUtil, times(1)).checkManifestCookie(request, response);
 
         //
         // These are the real verifications. It should not be cached checkManifestCookie sets the response
         // code, but that is not checked here.
         //
-        Mockito.verify(servletUtilAdapter, Mockito.times(1)).setNoCache(response);
+        verify(servletUtilAdapter, times(1)).setNoCache(response);
 
-        Mockito.verifyNoMoreInteractions(servletUtilAdapter);
-        Mockito.verifyNoMoreInteractions(response);
-        Mockito.verifyNoMoreInteractions(manifestUtil);
+        verifyNoMoreInteractions(servletUtilAdapter);
+        verifyNoMoreInteractions(response);
+        verifyNoMoreInteractions(manifestUtil);
     }
 
     /**
@@ -135,36 +141,36 @@ public class ManifestUnitTest {
      */
     @Test
     public void testNoDescriptor() throws Exception {
-        ManifestUtil manifestUtil = Mockito.mock(ManifestUtil.class);
-        ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
+        ManifestUtil manifestUtil = mock(ManifestUtil.class);
+        ServletUtilAdapter servletUtilAdapter = mock(ServletUtilAdapter.class);
         Manifest manifest = new Manifest();
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        AuraContext context = Mockito.mock(AuraContext.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        AuraContext context = mock(AuraContext.class);
 
         manifest.setManifestUtil(manifestUtil);
         manifest.setServletUtilAdapter(servletUtilAdapter);
 
-        Mockito.when(manifestUtil.isManifestEnabled()).thenReturn(true);
-        Mockito.when(manifestUtil.checkManifestCookie(request, response)).thenReturn(true);
-        Mockito.when(request.getParameterNames()).thenReturn(getEmptyStringEnumeration());
+        doReturn(TRUE).when(manifestUtil).isManifestEnabled();
+        doReturn(TRUE).when(manifestUtil).checkManifestCookie(request, response);
+        doReturn(getEmptyStringEnumeration()).when(request).getParameterNames();
 
         manifest.write(request, response, context);
 
         // This is mocked.
-        Mockito.verify(manifestUtil, Mockito.times(1)).isManifestEnabled();
-        Mockito.verify(manifestUtil, Mockito.times(1)).checkManifestCookie(request, response);
-        Mockito.verify(context, Mockito.times(1)).getApplicationDescriptor();
+        verify(manifestUtil, times(1)).isManifestEnabled();
+        verify(manifestUtil, times(1)).checkManifestCookie(request, response);
+        verify(context, times(1)).getApplicationDescriptor();
 
         //
         // These are the real verifications. It should not be cached, and should return Not Found
         //
-        Mockito.verify(servletUtilAdapter, Mockito.times(1)).setNoCache(response);
-        Mockito.verify(response, Mockito.times(1)).setStatus(HttpServletResponse.SC_NOT_FOUND);
+        verify(servletUtilAdapter, times(1)).setNoCache(response);
+        verify(response, times(1)).setStatus(HttpServletResponse.SC_NOT_FOUND);
 
-        Mockito.verifyNoMoreInteractions(servletUtilAdapter);
-        Mockito.verifyNoMoreInteractions(response);
-        Mockito.verifyNoMoreInteractions(manifestUtil);
+        verifyNoMoreInteractions(servletUtilAdapter);
+        verifyNoMoreInteractions(response);
+        verifyNoMoreInteractions(manifestUtil);
     }
 
     /**
@@ -173,11 +179,10 @@ public class ManifestUnitTest {
     @Test
     public void testSetContentType() {
         Manifest manifest = new Manifest();
-        ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
+        ServletUtilAdapter servletUtilAdapter = mock(ServletUtilAdapter.class);
         manifest.setServletUtilAdapter(servletUtilAdapter);
-        Mockito.when(servletUtilAdapter.getContentType(AuraContext.Format.MANIFEST))
-        .thenReturn("text/cache-manifest");
-        DummyHttpServletResponse response = new DummyHttpServletResponse() {
+        doReturn("text/cache-manifest").when(servletUtilAdapter).getContentType(AuraContext.Format.MANIFEST);
+        HttpServletResponse response = new MockHttpServletResponse() {
             String contentType = "defaultType";
 
             @Override

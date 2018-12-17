@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 public class ActionWithKeyOverrideTest {
+    @SuppressWarnings("unused")
     @Test
     public void testConstructingWithNullActionAsKey() {
         try {
@@ -37,6 +38,7 @@ public class ActionWithKeyOverrideTest {
         }
     }
 
+    @SuppressWarnings("unused")
     @Test
     public void testConstructingWithNullActionToExecute() {
         final Action actionAsKey = Mockito.mock(Action.class);

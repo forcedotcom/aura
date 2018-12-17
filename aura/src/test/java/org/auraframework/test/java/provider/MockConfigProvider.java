@@ -15,8 +15,11 @@
  */
 package org.auraframework.test.java.provider;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import org.auraframework.annotations.Annotations.ServiceComponentProvider;
 import org.auraframework.def.ComponentConfigProvider;
@@ -28,10 +31,6 @@ import org.auraframework.instance.ComponentConfig;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.QuickFixException;
-
-import com.google.common.collect.Maps;
-
-import javax.inject.Inject;
 
 @ServiceComponentProvider
 public class MockConfigProvider implements ComponentConfigProvider {
@@ -49,8 +48,7 @@ public class MockConfigProvider implements ComponentConfigProvider {
         ComponentConfig config = new ComponentConfig();
         config.setDescriptor(definitionService.getDefDescriptor("markup://ui:outputText", ComponentDef.class)); 
         String text = (String)component.getAttributes().getValue("providedAttribute");
-        Map<String, Object> attributes = Maps.newHashMap();
-        attributes.put("value", text);
+        Map<String, Object> attributes = Collections.singletonMap("value", text);
         config.setAttributes(attributes);
         
         //Tamper the current component and remove unwanted attributes
@@ -58,7 +56,7 @@ public class MockConfigProvider implements ComponentConfigProvider {
         return config;
     }
     
-    static void removeAttribute(BaseComponent<?,?> component, String name) throws QuickFixException {
+    static final void removeAttribute(BaseComponent<?,?> component, String name) throws QuickFixException {
         if (component != null) {
             AttributeSet componentAttributes = component.getAttributes();
             if (componentAttributes.getValue(name) != null) {

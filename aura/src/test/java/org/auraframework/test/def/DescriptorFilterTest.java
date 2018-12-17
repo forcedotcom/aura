@@ -15,19 +15,22 @@
  */
 package org.auraframework.test.def;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+
 import java.io.IOException;
 
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class DescriptorFilterTest {
-    private String getLabel(DescriptorFilter dm, boolean expected, String what, String value) {
+    private static String getLabel(DescriptorFilter dm, boolean expected, String what, String value) {
         String match;
 
         if (expected) {
@@ -35,25 +38,26 @@ public class DescriptorFilterTest {
         } else {
             match = "Matched ";
         }
-        return dm.toString() + ": " + match + " " + what + ": " + value;
+        return dm.toString() + ": " + match + ' ' + what + ": " + value;
     }
 
-    private void checkPrefix(DescriptorFilter dm, String prefix, boolean value) {
+    private static void checkPrefix(DescriptorFilter dm, String prefix, boolean value) {
         Assert.assertEquals(getLabel(dm, value, "prefix", prefix), value, dm.matchPrefix(prefix));
     }
 
-    private void checkNamespace(DescriptorFilter dm, String namespace, boolean value) {
+    private static void checkNamespace(DescriptorFilter dm, String namespace, boolean value) {
         Assert.assertEquals(getLabel(dm, value, "namespace", namespace), value, dm.matchNamespace(namespace));
     }
 
-    private void checkName(DescriptorFilter dm, String name, boolean value) {
+    private static void checkName(DescriptorFilter dm, String name, boolean value) {
         Assert.assertEquals(getLabel(dm, value, "name", name), value, dm.matchName(name));
     }
 
-    private void checkType(DescriptorFilter dm, DefType type, boolean value) {
+    private static void checkType(DescriptorFilter dm, DefType type, boolean value) {
         Assert.assertEquals(getLabel(dm, value, "type", type.toString()), value, dm.matchType(type));
     }
 
+    @SuppressWarnings("unused")
     @Test
     public void testInvalidPrefix() throws Exception {
         IllegalArgumentException expected = null;
@@ -63,10 +67,11 @@ public class DescriptorFilterTest {
             expected = e;
         }
         Assert.assertNotNull("should have gotten an exception", expected);
-        Assert.assertTrue("Unexpected exception message: "+expected.getMessage(),
+        Assert.assertTrue("Unexpected exception message: " + expected.getMessage(),
                 expected.getMessage().startsWith("Invalid prefix"));
     }
 
+    @SuppressWarnings("unused")
     @Test
     public void testInvalidNamespace() throws Exception {
         IllegalArgumentException expected = null;
@@ -80,6 +85,7 @@ public class DescriptorFilterTest {
                 expected.getMessage().startsWith("Invalid namespace"));
     }
 
+    @SuppressWarnings("unused")
     @Test
     public void testInvalidName() throws Exception {
         IllegalArgumentException expected = null;
@@ -93,6 +99,7 @@ public class DescriptorFilterTest {
                 expected.getMessage().startsWith("Invalid name"));
     }
 
+    @SuppressWarnings("unused")
     @Test
     public void testInvalidType() throws Exception {
         IllegalArgumentException expected = null;
@@ -107,7 +114,7 @@ public class DescriptorFilterTest {
     }
 
     @Test
-    public void testPrefixOnly() throws Exception {
+    public void testPrefixOnly() {
         DescriptorFilter dm;
 
         dm = new DescriptorFilter("notfound://");
@@ -123,7 +130,7 @@ public class DescriptorFilterTest {
     }
 
     @Test
-    public void testPrefixPlusNamespace() throws Exception {
+    public void testPrefixPlusNamespace() {
         DescriptorFilter dm;
 
         dm = new DescriptorFilter("notfound://hi");
@@ -139,7 +146,7 @@ public class DescriptorFilterTest {
     }
 
     @Test
-    public void testNamespaceOnly() throws Exception {
+    public void testNamespaceOnly() {
         DescriptorFilter dm;
 
         dm = new DescriptorFilter("hi");
@@ -155,7 +162,7 @@ public class DescriptorFilterTest {
     }
 
     @Test
-    public void testNamespaceAndName() throws Exception {
+    public void testNamespaceAndName() {
         DescriptorFilter dm;
 
         dm = new DescriptorFilter("hi:ho");
@@ -172,7 +179,7 @@ public class DescriptorFilterTest {
     }
 
     @Test
-    public void testFullWildcardMatcher() throws Exception {
+    public void testFullWildcardMatcher() {
         DescriptorFilter dm;
 
         dm = new DescriptorFilter("*://*:*");
@@ -188,7 +195,7 @@ public class DescriptorFilterTest {
     }
 
     @Test
-    public void testNoprefixWildcardMatcher() throws Exception {
+    public void testNoprefixWildcardMatcher() {
         DescriptorFilter dm;
 
         dm = new DescriptorFilter("notfound://*:*");
@@ -204,7 +211,7 @@ public class DescriptorFilterTest {
     }
 
     @Test
-    public void testNonamespaceWildcardMatcher() throws Exception {
+    public void testNonamespaceWildcardMatcher() {
         DescriptorFilter dm;
 
         dm = new DescriptorFilter("*://notfound:*");
@@ -220,7 +227,7 @@ public class DescriptorFilterTest {
     }
 
     @Test
-    public void testNonameWildcardMatcher() throws Exception {
+    public void testNonameWildcardMatcher() {
         DescriptorFilter dm;
 
         dm = new DescriptorFilter("*://*:notfound");
@@ -236,7 +243,7 @@ public class DescriptorFilterTest {
     }
 
     @Test
-    public void testExactMatcher() throws Exception {
+    public void testExactMatcher() {
         DescriptorFilter dm;
 
         dm = new DescriptorFilter("exactprefix://exactnamespace:exactname");
@@ -264,7 +271,7 @@ public class DescriptorFilterTest {
     }
 
     @Test
-    public void testAlmostMatcher() throws Exception {
+    public void testAlmostMatcher() {
         DescriptorFilter dm;
 
         dm = new DescriptorFilter("almostprefix*://almostnamespace*:almostname*");
@@ -292,7 +299,7 @@ public class DescriptorFilterTest {
     }
 
     @Test
-    public void testTypeMatcher() throws Exception {
+    public void testTypeMatcher() {
         for (DefType type : DefType.values()) {
             DescriptorFilter dm = new DescriptorFilter("exactprefix://exactnamespace:exactname", type.toString());
 
@@ -399,9 +406,9 @@ public class DescriptorFilterTest {
 
         dm = new DescriptorFilter("exactprefix://exactnamespace:exactname", "APPLICATION");
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.APPLICATION);
-        Assert.assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
+        Assert.assertEquals(getLabel(dm, true, "dd", dd.toString()), TRUE, Boolean.valueOf(dm.matchDescriptor(dd)));
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.COMPONENT);
-        Assert.assertEquals(getLabel(dm, false, "dd", dd.toString()), false, dm.matchDescriptor(dd));
+        Assert.assertEquals(getLabel(dm, false, "dd", dd.toString()), FALSE, Boolean.valueOf(dm.matchDescriptor(dd)));
     }
 
     @Test
@@ -411,11 +418,11 @@ public class DescriptorFilterTest {
 
         dm = new DescriptorFilter("exactprefix://exactnamespace:exactname", "APPLICATION,COMPONENT");
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.APPLICATION);
-        Assert.assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
+        Assert.assertEquals(getLabel(dm, true, "dd", dd.toString()), TRUE, Boolean.valueOf(dm.matchDescriptor(dd)));
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.COMPONENT);
-        Assert.assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
+        Assert.assertEquals(getLabel(dm, true, "dd", dd.toString()), TRUE, Boolean.valueOf(dm.matchDescriptor(dd)));
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.STYLE);
-        Assert.assertEquals(getLabel(dm, false, "dd", dd.toString()), false, dm.matchDescriptor(dd));
+        Assert.assertEquals(getLabel(dm, false, "dd", dd.toString()), FALSE, Boolean.valueOf(dm.matchDescriptor(dd)));
     }
 
     @Test
@@ -425,11 +432,11 @@ public class DescriptorFilterTest {
 
         dm = new DescriptorFilter("exactprefix://exactnamespace:exactname", "*");
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.APPLICATION);
-        Assert.assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
+        Assert.assertEquals(getLabel(dm, true, "dd", dd.toString()), TRUE, Boolean.valueOf(dm.matchDescriptor(dd)));
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.COMPONENT);
-        Assert.assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
+        Assert.assertEquals(getLabel(dm, true, "dd", dd.toString()), TRUE, Boolean.valueOf(dm.matchDescriptor(dd)));
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.STYLE);
-        Assert.assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
+        Assert.assertEquals(getLabel(dm, true, "dd", dd.toString()), TRUE, Boolean.valueOf(dm.matchDescriptor(dd)));
     }
 
     @Test
@@ -439,10 +446,10 @@ public class DescriptorFilterTest {
 
         dm = new DescriptorFilter("exactprefix://exactnamespace:exactname", (String)null);
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.APPLICATION);
-        Assert.assertEquals(getLabel(dm, false, "dd", dd.toString()), false, dm.matchDescriptor(dd));
+        Assert.assertEquals(getLabel(dm, false, "dd", dd.toString()), FALSE, Boolean.valueOf(dm.matchDescriptor(dd)));
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.COMPONENT);
-        Assert.assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
+        Assert.assertEquals(getLabel(dm, true, "dd", dd.toString()), TRUE, Boolean.valueOf(dm.matchDescriptor(dd)));
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.STYLE);
-        Assert.assertEquals(getLabel(dm, false, "dd", dd.toString()), false, dm.matchDescriptor(dd));
+        Assert.assertEquals(getLabel(dm, false, "dd", dd.toString()), FALSE, Boolean.valueOf(dm.matchDescriptor(dd)));
     }
 }

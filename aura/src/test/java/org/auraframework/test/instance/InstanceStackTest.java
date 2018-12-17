@@ -18,7 +18,6 @@ package org.auraframework.test.instance;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +36,7 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 
 /**
  * Unit tests for InstanceStack.java.
@@ -61,7 +60,6 @@ public class InstanceStackTest {
         protected final DefDescriptor<Definition> descriptor;
 
         private DefDescriptor<Definition> createMockDescriptor(String namespace) {
-            @SuppressWarnings("unchecked")
             DefDescriptor<Definition> desc = Mockito.mock(DefDescriptor.class);
             Mockito.when(desc.getNamespace()).thenReturn(namespace);
             return desc;
@@ -93,7 +91,8 @@ public class InstanceStackTest {
         }
 
         @Override
-        public void serialize(Json json) throws IOException {
+        public void serialize(Json json) {
+            // Does not do anything because there is not way to test that it ran the logic.
         }
     }
 
@@ -292,7 +291,7 @@ public class InstanceStackTest {
         Assert.assertEquals("missing clearAttributeIndex", expected.getMessage());
     }
 
-    private BaseComponent<?, ?> getComponentWithPath(final String path) {
+    private static BaseComponent<?, ?> getComponentWithPath(final String path) {
         BaseComponent<?, ?> comp = Mockito.mock(BaseComponent.class);
         Mockito.doReturn(path).when(comp).getPath();
         Mockito.doReturn(Boolean.TRUE).when(comp).hasLocalDependencies();
@@ -345,10 +344,7 @@ public class InstanceStackTest {
         iStack.registerComponent(a);
         iStack.serializeAsPart(jsonMock);
 
-        List<BaseComponent<?, ?>> sorted = Lists.newArrayList();
-        sorted.add(a);
-        sorted.add(b);
-        sorted.add(c);
+        List<BaseComponent<?, ?>> sorted = ImmutableList.of(a, b, c);
         verify(jsonMock).writeMapKey("components");
         verify(jsonMock).writeArray(sorted);
     }
@@ -364,9 +360,9 @@ public class InstanceStackTest {
         Assert.assertEquals("Components should empty when no registered components", 0, iStack.getComponents().size());
         verifyZeroInteractions(jsonMock);
     }
-	
-	@Test
-    public void testInternal() throws Exception {
+
+    @Test
+    public void testInternal() {
         // setting up
         String namespace_Internal = "internal";
         String namespace_External = "external";
@@ -410,13 +406,13 @@ public class InstanceStackTest {
     }
 
     @Test
-    public void testPeekAtEmptyStackReturnsNull() throws Exception {
+    public void testPeekAtEmptyStackReturnsNull() {
         InstanceStack iStack = new InstanceStack(mci);
         Assert.assertEquals("Expecting null at top of empty stack", null, iStack.peek());
     }
 
     @Test
-    public void testPeekAtStackWithOneReturnsTop() throws Exception {
+    public void testPeekAtStackWithOneReturnsTop() {
         InstanceStack iStack = new InstanceStack(mci);
         Instance<?> ti = new TestInstance();
         iStack.pushInstance(ti, ti.getDescriptor());
@@ -424,7 +420,7 @@ public class InstanceStackTest {
     }
 
     @Test
-    public void testPeekAtStackWithTwoReturnsTop() throws Exception {
+    public void testPeekAtStackWithTwoReturnsTop() {
         InstanceStack iStack = new InstanceStack(mci);
         Instance<?> ti1 = new TestInstance();
         iStack.pushInstance(ti1, ti1.getDescriptor());
@@ -436,7 +432,7 @@ public class InstanceStackTest {
     }
 
     @Test
-    public void testPeekAtStackAfterPopReturnsTop() throws Exception {
+    public void testPeekAtStackAfterPopReturnsTop() {
         InstanceStack iStack = new InstanceStack(mci);
         Instance<?> ti1 = new TestInstance();
         iStack.pushInstance(ti1, ti1.getDescriptor());
@@ -450,7 +446,7 @@ public class InstanceStackTest {
     }
 
     @Test
-    public void testPeekAtEmptiedStackReturnsNull() throws Exception {
+    public void testPeekAtEmptiedStackReturnsNull() {
         InstanceStack iStack = new InstanceStack(mci);
         Instance<?> ti1 = new TestInstance();
         iStack.pushInstance(ti1, ti1.getDescriptor());
@@ -465,7 +461,7 @@ public class InstanceStackTest {
     }
 
     @Test
-    public void testPushThenPopAccessSuccess() throws Exception {
+    public void testPushThenPopAccessSuccess() {
         InstanceStack iStack = new InstanceStack(mci);
         Instance<?> ti1 = new TestInstance("path1");
         Instance<?> ti2 = new TestInstance("path2");
@@ -477,7 +473,7 @@ public class InstanceStackTest {
     }
 
     @Test
-    public void testPopAccessWithDifferentInstanceThrowsError() throws Exception {
+    public void testPopAccessWithDifferentInstanceThrowsError() {
         InstanceStack iStack = new InstanceStack(mci);
         Instance<?> ti1 = new TestInstance("path1");
         Instance<?> ti2 = new TestInstance("path2");
@@ -493,7 +489,7 @@ public class InstanceStackTest {
     }
 
     @Test
-    public void testPopAccessPastEmptyThrowsError() throws Exception {
+    public void testPopAccessPastEmptyThrowsError() {
         InstanceStack iStack = new InstanceStack(mci);
         Instance<?> ti1 = new TestInstance("path1");
         AuraRuntimeException expected = null;
@@ -509,7 +505,7 @@ public class InstanceStackTest {
     }
 
     @Test
-    public void testGetAccessReturnsPushedAccess() throws Exception {
+    public void testGetAccessReturnsPushedAccess() {
         InstanceStack iStack = new InstanceStack(mci);
         Instance<?> ti1 = new TestInstance("path1");
         iStack.pushAccess(ti1);
@@ -517,7 +513,7 @@ public class InstanceStackTest {
     }
 
     @Test
-    public void testGetAccessReturnsInstanceWhenNoAccessStack() throws Exception {
+    public void testGetAccessReturnsInstanceWhenNoAccessStack() {
         InstanceStack iStack = new InstanceStack(mci);
         Instance<?> ti1 = new TestInstance("path1");
         iStack.pushInstance(ti1, ti1.getDescriptor());
@@ -525,7 +521,7 @@ public class InstanceStackTest {
     }
 
     @Test
-    public void testGetAccessReturnsTopOfAccessStackWhenInstance() throws Exception {
+    public void testGetAccessReturnsTopOfAccessStackWhenInstance() {
         InstanceStack iStack = new InstanceStack(mci);
         Instance<?> ti1 = new TestInstance("path1");
         Instance<?> ti2 = new TestInstance("path2");

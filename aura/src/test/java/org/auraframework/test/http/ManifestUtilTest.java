@@ -15,6 +15,12 @@
  */
 package org.auraframework.test.http;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,13 +35,12 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.util.DummyHttpServletResponse;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 public class ManifestUtilTest {
     @Mock
@@ -65,10 +70,9 @@ public class ManifestUtilTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    //public boolean isManifestEnabled()
     @Test
     public void testIsManifestEnabledWhenClientAppcacheDisabled() {
-        Mockito.when(configAdapter.isClientAppcacheEnabled()).thenReturn(false);
+        doReturn(FALSE).when(configAdapter).isClientAppcacheEnabled();
 
         boolean value = new ManifestUtil(definitionService, contextService, configAdapter).isManifestEnabled();
         Assert.assertFalse(value);
@@ -77,14 +81,14 @@ public class ManifestUtilTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testIsManifestEnabledWhenApplicationEnabled() throws Exception {
-        ApplicationDef def = Mockito.mock(ApplicationDef.class);
+        ApplicationDef def = mock(ApplicationDef.class);
 
-        Mockito.when(contextService.getCurrentContext()).thenReturn(auraContext);
-        Mockito.when(configAdapter.isClientAppcacheEnabled()).thenReturn(true);
-        Mockito.when(descriptor.getDefType()).thenReturn(DefType.APPLICATION);
-        Mockito.when(def.isAppcacheEnabled()).thenReturn(Boolean.TRUE);
-        Mockito.when(definitionService.getUnlinkedDefinition((DefDescriptor<ApplicationDef>)descriptor)).thenReturn(def);
-        Mockito.when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
+        when(contextService.getCurrentContext()).thenReturn(auraContext);
+        doReturn(TRUE).when(configAdapter).isClientAppcacheEnabled();
+        when(descriptor.getDefType()).thenReturn(DefType.APPLICATION);
+        when(def.isAppcacheEnabled()).thenReturn(Boolean.TRUE);
+        when(definitionService.getUnlinkedDefinition((DefDescriptor<ApplicationDef>)descriptor)).thenReturn(def);
+        when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
 
         boolean value = new ManifestUtil(definitionService, contextService, configAdapter).isManifestEnabled();
         Assert.assertTrue(value);
@@ -93,14 +97,14 @@ public class ManifestUtilTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testIsManifestEnabledWhenApplicationDisabled() throws Exception {
-        ApplicationDef def = Mockito.mock(ApplicationDef.class);
+        ApplicationDef def = mock(ApplicationDef.class);
 
-        Mockito.when(contextService.getCurrentContext()).thenReturn(auraContext);
-        Mockito.when(configAdapter.isClientAppcacheEnabled()).thenReturn(true);
-        Mockito.when(descriptor.getDefType()).thenReturn(DefType.APPLICATION);
-        Mockito.when(def.isAppcacheEnabled()).thenReturn(Boolean.FALSE);
-        Mockito.when(definitionService.getUnlinkedDefinition((DefDescriptor<ApplicationDef>)descriptor)).thenReturn(def);
-        Mockito.when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
+        when(contextService.getCurrentContext()).thenReturn(auraContext);
+        doReturn(TRUE).when(configAdapter).isClientAppcacheEnabled();
+        when(descriptor.getDefType()).thenReturn(DefType.APPLICATION);
+        when(def.isAppcacheEnabled()).thenReturn(Boolean.FALSE);
+        when(definitionService.getUnlinkedDefinition((DefDescriptor<ApplicationDef>)descriptor)).thenReturn(def);
+        when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
 
         boolean value = new ManifestUtil(definitionService, contextService, configAdapter).isManifestEnabled();
         Assert.assertFalse(value);
@@ -109,14 +113,14 @@ public class ManifestUtilTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testIsManifestEnabledWhenApplicationFlagNull() throws Exception {
-        ApplicationDef def = Mockito.mock(ApplicationDef.class);
+        ApplicationDef def = mock(ApplicationDef.class);
 
-        Mockito.when(contextService.getCurrentContext()).thenReturn(auraContext);
-        Mockito.when(configAdapter.isClientAppcacheEnabled()).thenReturn(true);
-        Mockito.when(descriptor.getDefType()).thenReturn(DefType.APPLICATION);
-        Mockito.when(def.isAppcacheEnabled()).thenReturn(null);
-        Mockito.when(definitionService.getUnlinkedDefinition((DefDescriptor<ApplicationDef>)descriptor)).thenReturn(def);
-        Mockito.when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
+        when(contextService.getCurrentContext()).thenReturn(auraContext);
+        doReturn(TRUE).when(configAdapter).isClientAppcacheEnabled();
+        when(descriptor.getDefType()).thenReturn(DefType.APPLICATION);
+        when(def.isAppcacheEnabled()).thenReturn(null);
+        when(definitionService.getUnlinkedDefinition((DefDescriptor<ApplicationDef>)descriptor)).thenReturn(def);
+        when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
 
         boolean value = new ManifestUtil(definitionService, contextService, configAdapter).isManifestEnabled();
         Assert.assertFalse(value);
@@ -125,14 +129,14 @@ public class ManifestUtilTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testIsManifestEnabledWhenApplicationNull() throws Exception {
-        ApplicationDef def = Mockito.mock(ApplicationDef.class);
+        ApplicationDef def = mock(ApplicationDef.class);
 
-        Mockito.when(contextService.getCurrentContext()).thenReturn(auraContext);
-        Mockito.when(configAdapter.isClientAppcacheEnabled()).thenReturn(true);
-        Mockito.when(descriptor.getDefType()).thenReturn(DefType.APPLICATION);
-        Mockito.when(def.isAppcacheEnabled()).thenReturn(Boolean.TRUE);
-        Mockito.when(definitionService.getUnlinkedDefinition((DefDescriptor<ApplicationDef>)descriptor)).thenReturn(def);
-        Mockito.when(auraContext.getApplicationDescriptor()).thenReturn(null);
+        when(contextService.getCurrentContext()).thenReturn(auraContext);
+        doReturn(TRUE).when(configAdapter).isClientAppcacheEnabled();
+        when(descriptor.getDefType()).thenReturn(DefType.APPLICATION);
+        when(def.isAppcacheEnabled()).thenReturn(Boolean.TRUE);
+        when(definitionService.getUnlinkedDefinition((DefDescriptor<ApplicationDef>)descriptor)).thenReturn(def);
+        when(auraContext.getApplicationDescriptor()).thenReturn(null);
 
         boolean value = new ManifestUtil(definitionService, contextService, configAdapter).isManifestEnabled();
         Assert.assertFalse(value);
@@ -141,13 +145,13 @@ public class ManifestUtilTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testIsManifestEnabledWhenComponent() throws Exception {
-        ComponentDef def = Mockito.mock(ComponentDef.class);
+        ComponentDef def = mock(ComponentDef.class);
 
-        Mockito.when(contextService.getCurrentContext()).thenReturn(auraContext);
-        Mockito.when(configAdapter.isClientAppcacheEnabled()).thenReturn(true);
-        Mockito.when(descriptor.getDefType()).thenReturn(DefType.COMPONENT);
-        Mockito.when(definitionService.getUnlinkedDefinition((DefDescriptor<ComponentDef>)descriptor)).thenReturn(def);
-        Mockito.when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
+        when(contextService.getCurrentContext()).thenReturn(auraContext);
+        doReturn(TRUE).when(configAdapter).isClientAppcacheEnabled();
+        when(descriptor.getDefType()).thenReturn(DefType.COMPONENT);
+        when(definitionService.getUnlinkedDefinition((DefDescriptor<ComponentDef>)descriptor)).thenReturn(def);
+        when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
 
         boolean value = new ManifestUtil(definitionService, contextService, configAdapter).isManifestEnabled();
         Assert.assertFalse(value);
@@ -156,11 +160,11 @@ public class ManifestUtilTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testCheckManifestCookie() {
-        Mockito.when(contextService.getCurrentContext()).thenReturn(auraContext);
-        Mockito.when(descriptor.getNamespace()).thenReturn("ns");
-        Mockito.when(descriptor.getName()).thenReturn("name");
-        Mockito.when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
-        Mockito.when(auraContext.getMode()).thenReturn(Mode.PROD);
+        when(contextService.getCurrentContext()).thenReturn(auraContext);
+        when(descriptor.getNamespace()).thenReturn("ns");
+        when(descriptor.getName()).thenReturn("name");
+        when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
+        when(auraContext.getMode()).thenReturn(Mode.PROD);
 
         boolean value = new ManifestUtil(definitionService, contextService, configAdapter).checkManifestCookie(request, response);
         Assert.assertTrue(value);
@@ -169,27 +173,15 @@ public class ManifestUtilTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testCheckManifestCookieWithErrorParam() {
-        Mockito.when(contextService.getCurrentContext()).thenReturn(auraContext);
-        Mockito.when(descriptor.getNamespace()).thenReturn("ns");
-        Mockito.when(descriptor.getName()).thenReturn("name");
-        Mockito.when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
-        Mockito.when(auraContext.getMode()).thenReturn(Mode.PROD);
+        when(contextService.getCurrentContext()).thenReturn(auraContext);
+        when(descriptor.getNamespace()).thenReturn("ns");
+        when(descriptor.getName()).thenReturn("name");
+        when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
+        when(auraContext.getMode()).thenReturn(Mode.PROD);
 
-        Mockito.when(request.getParameter("aura.error")).thenReturn("error");
+        when(request.getParameter("aura.error")).thenReturn("error");
         
-        DummyHttpServletResponse dummyResponse = new DummyHttpServletResponse() {
-            Cookie cookie;
-
-            @Override
-            public void addCookie(Cookie newCookie) {
-                this.cookie = newCookie;
-            }
-
-            @Override
-            public Cookie getCookie(String name) {
-                return cookie != null && cookie.getName().equals(name) ? cookie : null;
-            }
-        };
+        MockHttpServletResponse dummyResponse = new MockHttpServletResponse();
         
         ManifestUtil manifestUtil = new ManifestUtil(definitionService, contextService, configAdapter);
         boolean value = manifestUtil.checkManifestCookie(request, dummyResponse);
@@ -202,31 +194,19 @@ public class ManifestUtilTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testCheckManifestCookieWithErrorCookie() {
-        Mockito.when(contextService.getCurrentContext()).thenReturn(auraContext);
-        Mockito.when(descriptor.getNamespace()).thenReturn("ns");
-        Mockito.when(descriptor.getName()).thenReturn("name");
-        Mockito.when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
-        Mockito.when(auraContext.getMode()).thenReturn(Mode.PROD);
+        when(contextService.getCurrentContext()).thenReturn(auraContext);
+        when(descriptor.getNamespace()).thenReturn("ns");
+        when(descriptor.getName()).thenReturn("name");
+        when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
+        when(auraContext.getMode()).thenReturn(Mode.PROD);
 
         Cookie cookie = new Cookie("ns_name_lm", "error");
         Cookie [] cookies = new Cookie[1];
         cookies[0] = cookie;
 
-        Mockito.when(request.getCookies()).thenReturn(cookies);
+        when(request.getCookies()).thenReturn(cookies);
         
-        DummyHttpServletResponse dummyResponse = new DummyHttpServletResponse() {
-            Cookie cookie;
-
-            @Override
-            public void addCookie(Cookie newCookie) {
-                this.cookie = newCookie;
-            }
-
-            @Override
-            public Cookie getCookie(String name) {
-                return cookie != null && cookie.getName().equals(name) ? cookie : null;
-            }
-        };
+        MockHttpServletResponse dummyResponse = new MockHttpServletResponse();
 
         boolean value = new ManifestUtil(definitionService, contextService, configAdapter).checkManifestCookie(request, dummyResponse);
         Assert.assertFalse(value);

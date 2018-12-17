@@ -15,7 +15,14 @@
  */
 package org.auraframework.http.resource;
 
+import static java.lang.Boolean.TRUE;
 import static junit.framework.TestCase.assertEquals;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,7 +49,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(InlineJs.class)
 public class InlineJsUnitTest {
@@ -67,12 +73,12 @@ public class InlineJsUnitTest {
         AuraResource resource = new InlineJs();
         // mocking ServletUtilAdapterImpl.getContentType
         ServletUtilAdapter mockServletUtil = Mockito.mock(ServletUtilAdapter.class);
-        Mockito.when(mockServletUtil.getContentType(Format.JS)).thenReturn(expected);
+        doReturn(expected).when(mockServletUtil).getContentType(Format.JS);
         ((AuraResourceImpl)resource).setServletUtilAdapter(mockServletUtil);
 
-        HttpServletResponse mockResponse = Mockito.mock(HttpServletResponse.class);
+        HttpServletResponse mockResponse = mock(HttpServletResponse.class);
         resource.setContentType(mockResponse);
-        Mockito.verify(mockResponse, Mockito.times(1)).setContentType(expected);
+        verify(mockResponse, times(1)).setContentType(expected);
     }
 
     /**
@@ -81,20 +87,19 @@ public class InlineJsUnitTest {
     @Test
     public void testExceptionHandlingForValidate() throws Exception {
         // Arrange
-        ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
-        ContextService contextService = Mockito.mock(ContextService.class);
+        ServletUtilAdapter servletUtilAdapter = mock(ServletUtilAdapter.class);
+        ContextService contextService = mock(ContextService.class);
 
-        AuraContext auraContext = Mockito.mock(AuraContext.class);
-        @SuppressWarnings("unchecked")
-        DefDescriptor<ApplicationDef> appDesc = Mockito.mock(DefDescriptor.class);
-        Mockito.doReturn(appDesc).when(auraContext).getLoadingApplicationDescriptor();
+        AuraContext auraContext = mock(AuraContext.class);
+        DefDescriptor<ApplicationDef> appDesc = mock(DefDescriptor.class);
+        doReturn(appDesc).when(auraContext).getLoadingApplicationDescriptor();
 
-        ClientOutOfSyncException outOfSyncException = Mockito.mock(ClientOutOfSyncException.class);
+        ClientOutOfSyncException outOfSyncException = mock(ClientOutOfSyncException.class);
 
-        ExceptionAdapter exceptionAdapter = Mockito.mock(ExceptionAdapter.class);
+        ExceptionAdapter exceptionAdapter = mock(ExceptionAdapter.class);
 
-        ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
-        Mockito.when(configAdapter.validateBootstrap(Matchers.anyString())).thenReturn(true);
+        ConfigAdapter configAdapter = mock(ConfigAdapter.class);
+        doReturn(TRUE).when(configAdapter).validateBootstrap(Matchers.anyString());
 
         InlineJs inline = new InlineJs();
         inline.setServletUtilAdapter(servletUtilAdapter);
@@ -103,7 +108,7 @@ public class InlineJsUnitTest {
         inline.setConfigAdapter(configAdapter);
         inline.initManifest();
 
-        Mockito.doThrow(outOfSyncException).when(servletUtilAdapter).checkFrameworkUID(Matchers.same(auraContext));
+        doThrow(outOfSyncException).when(servletUtilAdapter).checkFrameworkUID(Matchers.same(auraContext));
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -112,12 +117,12 @@ public class InlineJsUnitTest {
         inline.write(request, response, auraContext);
 
         // Assert
-        Mockito.verify(servletUtilAdapter, Mockito.times(1)).handleServletException(outOfSyncException, false, auraContext, request, response, false);
-        Mockito.verify(servletUtilAdapter, Mockito.times(1)).checkFrameworkUID(Matchers.same(auraContext));
-        Mockito.verify(exceptionAdapter, Mockito.times(1)).handleException(Matchers.any(AuraResourceException.class));
+        verify(servletUtilAdapter, times(1)).handleServletException(outOfSyncException, false, auraContext, request, response, false);
+        verify(servletUtilAdapter, times(1)).checkFrameworkUID(Matchers.same(auraContext));
+        verify(exceptionAdapter, times(1)).handleException(Matchers.any(AuraResourceException.class));
 
-        Mockito.verifyNoMoreInteractions(servletUtilAdapter);
-        Mockito.verifyNoMoreInteractions(exceptionAdapter);
+        verifyNoMoreInteractions(servletUtilAdapter);
+        verifyNoMoreInteractions(exceptionAdapter);
     }
 
     /**
@@ -126,23 +131,22 @@ public class InlineJsUnitTest {
     @Test
     public void testExceptionHandlingInManifest() throws Exception {
         // Arrange
-        ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
-        ContextService contextService = Mockito.mock(ContextService.class);
+        ServletUtilAdapter servletUtilAdapter = mock(ServletUtilAdapter.class);
+        ContextService contextService = mock(ContextService.class);
 
-        AuraContext auraContext = Mockito.mock(AuraContext.class);
-        @SuppressWarnings("unchecked")
-        DefDescriptor<ApplicationDef> appDesc = Mockito.mock(DefDescriptor.class);
-        Mockito.doReturn(appDesc).when(auraContext).getLoadingApplicationDescriptor();
+        AuraContext auraContext = mock(AuraContext.class);
+        DefDescriptor<ApplicationDef> appDesc = mock(DefDescriptor.class);
+        doReturn(appDesc).when(auraContext).getLoadingApplicationDescriptor();
 
 
-        ExceptionAdapter exceptionAdapter = Mockito.mock(ExceptionAdapter.class);
+        ExceptionAdapter exceptionAdapter = mock(ExceptionAdapter.class);
 
-        ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
-        Mockito.when(configAdapter.validateBootstrap(Matchers.anyString())).thenReturn(true);
+        ConfigAdapter configAdapter = mock(ConfigAdapter.class);
+        doReturn(TRUE).when(configAdapter).validateBootstrap(Matchers.anyString());
 
         RuntimeException rte = new RuntimeException("test");
-        ManifestUtil manifestUtil = Mockito.mock(ManifestUtil.class);
-        Mockito.doThrow(rte).when(manifestUtil).isManifestEnabled();
+        ManifestUtil manifestUtil = mock(ManifestUtil.class);
+        doThrow(rte).when(manifestUtil).isManifestEnabled();
 
         InlineJs inline = new InlineJs(manifestUtil);
         inline.setServletUtilAdapter(servletUtilAdapter);
@@ -157,28 +161,28 @@ public class InlineJsUnitTest {
         inline.write(request, response, auraContext);
 
         // Assert
-        Mockito.verify(servletUtilAdapter, Mockito.times(1)).handleServletException(rte, false, auraContext, request, response, false);
-        Mockito.verify(exceptionAdapter, Mockito.times(1)).handleException(Matchers.any(AuraResourceException.class));
+        verify(servletUtilAdapter, times(1)).handleServletException(rte, false, auraContext, request, response, false);
+        verify(exceptionAdapter, times(1)).handleException(Matchers.any(AuraResourceException.class));
 
-        Mockito.verifyNoMoreInteractions(servletUtilAdapter);
-        Mockito.verifyNoMoreInteractions(exceptionAdapter);
+        verifyNoMoreInteractions(servletUtilAdapter);
+        verifyNoMoreInteractions(exceptionAdapter);
     }
 
     @Test
     public void testResponseWith404WhenNullDescriptor() throws Exception {
         // Arrange
-        ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
+        ServletUtilAdapter servletUtilAdapter = mock(ServletUtilAdapter.class);
 
-        ContextService contextService = Mockito.mock(ContextService.class);
+        ContextService contextService = mock(ContextService.class);
 
-        ManifestUtil manifestUtil = Mockito.mock(ManifestUtil.class);
-        Mockito.doReturn(true).when(manifestUtil).isManifestEnabled();
+        ManifestUtil manifestUtil = mock(ManifestUtil.class);
+        doReturn(TRUE).when(manifestUtil).isManifestEnabled();
 
-        ExceptionAdapter exceptionAdapter = Mockito.mock(ExceptionAdapter.class);
+        ExceptionAdapter exceptionAdapter = mock(ExceptionAdapter.class);
 
-        ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
+        ConfigAdapter configAdapter = mock(ConfigAdapter.class);
 
-        DefinitionService definitionService = Mockito.mock(DefinitionService.class);
+        DefinitionService definitionService = mock(DefinitionService.class);
 
         InlineJs inline = new InlineJs(manifestUtil);
         inline.setServletUtilAdapter(servletUtilAdapter);
@@ -187,14 +191,14 @@ public class InlineJsUnitTest {
         inline.setConfigAdapter(configAdapter);
         inline.setDefinitionService(definitionService);
 
-        AuraContext context = Mockito.mock(AuraContext.class);
-        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        AuraContext context = mock(AuraContext.class);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
 
         //Act
         inline.write(request, response, context);
 
-        Mockito.verify(servletUtilAdapter, Mockito.times(1)).send404(null, request, response);
-        Mockito.verifyNoMoreInteractions(servletUtilAdapter);
+        verify(servletUtilAdapter, times(1)).send404(null, request, response);
+        verifyNoMoreInteractions(servletUtilAdapter);
     }
 }

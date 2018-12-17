@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.auraframework.http.resource;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
-import org.auraframework.test.util.DummyHttpServletResponse;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 public class ResourceSvgTest {
 
-	/**
+    /**
      * Unit Test, Name is API!.
      */
     @Test
@@ -47,13 +48,12 @@ public class ResourceSvgTest {
      */
     @Test
     public void testSetContentType() {
-    	ResourceSvg resourceSvg = new ResourceSvg();
-    	ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
-    	resourceSvg.setServletUtilAdapter(servletUtilAdapter);
-    	Mockito.when(servletUtilAdapter.getContentType(AuraContext.Format.SVG))
-        .thenReturn("image/svg+xml");
-    	
-    	DummyHttpServletResponse response = new DummyHttpServletResponse() {
+        ResourceSvg resourceSvg = new ResourceSvg();
+        ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
+        resourceSvg.setServletUtilAdapter(servletUtilAdapter);
+        Mockito.when(servletUtilAdapter.getContentType(AuraContext.Format.SVG)).thenReturn("image/svg+xml");
+        
+        HttpServletResponse response = new MockHttpServletResponse() {
             String contentType = "defaultType";
 
             @Override
@@ -66,9 +66,9 @@ public class ResourceSvgTest {
                 this.contentType = contentType;
             }
         };
-    	
-    	resourceSvg.setContentType(response);
-    	
-    	Assert.assertEquals("image/svg+xml", response.getContentType());
+        
+        resourceSvg.setContentType(response);
+        
+        Assert.assertEquals("image/svg+xml", response.getContentType());
     }
 }

@@ -22,11 +22,10 @@ import org.auraframework.util.test.util.TestInventory;
 import org.auraframework.util.test.util.TestInventory.Type;
 
 public class AuraWebDriverTestSuite {
-    public static TestSuite suite() throws Exception {
+    public static TestSuite suite() {
         TestInventory inventory = ServiceLocator.get().get(TestInventory.class, "auraTestInventory");
         TestSuite suite = inventory.getTestSuite(Type.WEBDRIVER);
         suite.setName("aura webdriver tests");
         return suite;
     }
-
 }

@@ -15,40 +15,36 @@
  */
 package org.auraframework.http.resource;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static junit.framework.TestCase.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.javascript.PreInitJavascript;
 import org.auraframework.system.AuraContext;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Matchers;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static junit.framework.TestCase.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-
-
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(PreInitJavascriptJSAppender.class)
 public class PreInitJavascriptJSAppenderUnitTest {
 
     @Test
     public void testProgrammaticPreInitJavascriptInsertion() throws Exception {
-        AuraContext auraContext = PowerMockito.mock(AuraContext.class);
-        PowerMockito.when(auraContext.getLoadingApplicationDescriptor()).thenReturn(null);
-        PowerMockito.when(auraContext.isTestMode()).thenReturn(true);
+        AuraContext auraContext = mock(AuraContext.class);
+        doReturn(null).when(auraContext).getLoadingApplicationDescriptor();
+        doReturn(TRUE).when(auraContext).isTestMode();
 
         String expectedCode = "console.log('WOOHOO!');";
-        PreInitJavascript javascript = PowerMockito.mock(PreInitJavascript.class);
-        PowerMockito.when(javascript.shouldInsert(any(), any())).thenReturn(true);
-        PowerMockito.when(javascript.getJavascriptCode(any(), any())).thenReturn(expectedCode);
+        PreInitJavascript javascript = mock(PreInitJavascript.class);
+        doReturn(TRUE).when(javascript).shouldInsert(any(), any());
+        doReturn(expectedCode).when(javascript).getJavascriptCode(any(), any());
 
         List<PreInitJavascript> preInitJavascripts = new ArrayList<>();
         preInitJavascripts.add(javascript);
@@ -58,7 +54,7 @@ public class PreInitJavascriptJSAppenderUnitTest {
 
 
         StringBuilder out = new StringBuilder();
-        inlineJs.append(mock(BaseComponentDef.class),auraContext, out);
+        inlineJs.append(mock(BaseComponentDef.class), auraContext, out);
 
         String content = out.toString();
 
@@ -69,13 +65,13 @@ public class PreInitJavascriptJSAppenderUnitTest {
 
     @Test
     public void testNoInsertPreInitJavascriptInsertion() throws Exception {
-        AuraContext auraContext = PowerMockito.mock(AuraContext.class);
-        PowerMockito.when(auraContext.getLoadingApplicationDescriptor()).thenReturn(null);
-        PowerMockito.when(auraContext.isTestMode()).thenReturn(true);
+        AuraContext auraContext = mock(AuraContext.class);
+        doReturn(null).when(auraContext).getLoadingApplicationDescriptor();
+        doReturn(TRUE).when(auraContext).isTestMode();
 
         String expectedCode = "console.log('WOOHOO!');";
-        PreInitJavascript javascript = PowerMockito.mock(PreInitJavascript.class);
-        PowerMockito.when(javascript.shouldInsert(any(), any())).thenReturn(false);
+        PreInitJavascript javascript = mock(PreInitJavascript.class);
+        doReturn(FALSE).when(javascript).shouldInsert(any(), any());
 
         List<PreInitJavascript> preInitJavascripts = new ArrayList<>();
         preInitJavascripts.add(javascript);
@@ -84,7 +80,7 @@ public class PreInitJavascriptJSAppenderUnitTest {
         inlineJs.setPreInitJavascripts(preInitJavascripts);
 
         StringBuilder out = new StringBuilder();
-        inlineJs.append(mock(BaseComponentDef.class),auraContext,out);
+        inlineJs.append(mock(BaseComponentDef.class), auraContext,out);
         String content = out.toString();
 
         assertTrue("Response should not contain javascript", !content.contains(expectedCode));
@@ -92,13 +88,13 @@ public class PreInitJavascriptJSAppenderUnitTest {
 
     @Test
     public void testEmptyPreInitJavascriptInsertion() throws Exception {
-        AuraContext auraContext = PowerMockito.mock(AuraContext.class);
-        PowerMockito.when(auraContext.getLoadingApplicationDescriptor()).thenReturn(null);
-        PowerMockito.when(auraContext.isTestMode()).thenReturn(true);
+        AuraContext auraContext = mock(AuraContext.class);
+        doReturn(null).when(auraContext).getLoadingApplicationDescriptor();
+        doReturn(TRUE).when(auraContext).isTestMode();
 
-        PreInitJavascript javascript = PowerMockito.mock(PreInitJavascript.class);
-        PowerMockito.when(javascript.shouldInsert(any(), any())).thenReturn(true);
-        PowerMockito.when(javascript.getJavascriptCode(any(), any())).thenReturn("");
+        PreInitJavascript javascript = mock(PreInitJavascript.class);
+        doReturn(TRUE).when(javascript).shouldInsert(any(), any());
+        doReturn("").when(javascript).getJavascriptCode(any(), any());
 
         List<PreInitJavascript> preInitJavascripts = new ArrayList<>();
         preInitJavascripts.add(javascript);
@@ -114,12 +110,12 @@ public class PreInitJavascriptJSAppenderUnitTest {
         assertTrue("Response should not contain beforeFrameworkInit", !content.contains("beforeFrameworkInit"));
     }
 
-    private PreInitJavascriptJSAppender setupMockPreInitJavascriptAppender() throws Exception {
+    private static PreInitJavascriptJSAppender setupMockPreInitJavascriptAppender() {
         ConfigAdapter configAdapter = mock(ConfigAdapter.class);
-        Mockito.when(configAdapter.validateBootstrap(Matchers.anyString())).thenReturn(true);
+        doReturn(TRUE).when(configAdapter).validateBootstrap(Matchers.anyString());
 
         PreInitJavascriptJSAppender inline = new PreInitJavascriptJSAppender();
-        PreInitJavascriptJSAppender inlineSpy = PowerMockito.spy(inline);
+        PreInitJavascriptJSAppender inlineSpy = spy(inline);
 
         return inlineSpy;
     }

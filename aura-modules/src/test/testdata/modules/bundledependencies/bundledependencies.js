@@ -16,7 +16,7 @@ import designSystem from '@salesforce/designSystem/index.css';
 import accessCheck from '@salesforce/accessCheck/Record.recordDataInvalidation'; // will be module
 
 // I18N
-import i18N from '@salesforce/i18n/country';
+import i18N from '@salesforce/i18n/lang';
 
 // LABEL
 import label from '@salesforce/label/foo';
@@ -31,7 +31,7 @@ import schema from '@salesforce/schema/MyObject__c';
 import schemaNS from '@salesforce/schema/ns__MyObject__c';
 
 // USER
-import user from '@salesforce/user/id';
+import user from '@salesforce/user/Id';
 
 
 export default class GvpApp extends LightningElement {

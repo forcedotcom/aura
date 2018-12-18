@@ -70,7 +70,7 @@ import org.lwc.template.TemplateModuleDependencies;
  */
 public class ModuleDefImpl extends PlatformDefImpl<ModuleDef> implements ModuleDef {
 
-    private static final long serialVersionUID = -8466971123070388890L;
+    private static final long serialVersionUID = -8577082123070388890L;
 
     private final String path;
     private final Set<String> moduleDependencies;

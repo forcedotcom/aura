@@ -768,6 +768,8 @@ AuraComponentService.prototype.addModule = function(descriptor, name, dependenci
 
     // set both descriptor and module name entries into registry
     var entry = this.moduleDefRegistry[descriptor] || (this.moduleDefRegistry[descriptor] = this.moduleDefRegistry[name] = {});
+    // TODO: since "entry" is generated on the server, conflicts can happen between JSON keys
+    // and minified key vales from Closure Complier. The two systems can't mix
     entry[Json.ApplicationKey.DEPENDENCIES] = dependencies;
     entry.definition = exporterClass;
     entry.descriptor = descriptor;

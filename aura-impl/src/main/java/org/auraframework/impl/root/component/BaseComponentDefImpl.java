@@ -1026,13 +1026,13 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             json.writeMapEntry(ApplicationKey.FLAVOREDSTYLEDEF, flavoredStyle);
         }
     }
-    
+
     protected void serializeContextDependencies(AuraContext context, Json json) throws IOException {
         boolean preloading = context.isPreloading();
         if (preloading) {
             json.writeMapEntry(ApplicationKey.CSSPRELOADED, preloading);
         }
-        
+
         if(!context.getClientClassLoaded(descriptor)) {
             boolean minify = context.getMode().minify();
             String code = getCode(minify);
@@ -1143,6 +1143,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             json.writeMapEntry(ApplicationKey.REQUIRELOCKER, true);
         }
 
+        String apiVersion = getAPIVersion();
+        if (apiVersion != null && !apiVersion.isEmpty()) {
+            json.writeMapEntry(ApplicationKey.APIVERSION, apiVersion);
+        }
+
         if (serializedJSON == null) {
             synchronized (this) {
                 if (serializedJSON == null) {
@@ -1178,13 +1183,13 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 json.writeMapEntry(ApplicationKey.DESCRIPTOR, descriptor);
 
                 serializeVolatileEntries(json);
-                
+
                 serializeCacheableEntries(json);
 
                 serializeFields(json);
 
                 serializeContextDependencies(context, json);
-                
+
                 json.writeMapEnd();
                 serializationContext.setSerializing(false);
             }

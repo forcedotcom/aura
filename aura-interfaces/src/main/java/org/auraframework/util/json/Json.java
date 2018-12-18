@@ -102,6 +102,7 @@ public interface Json {
 //TODO: "descriptor" is hard coded in many place, this is a tough one to replace (TW)
 //        DESCRIPTOR("descriptor","de"),
         DESCRIPTOR("descriptor","descriptor"),
+        DEPENDENCIES("dependencies","dp"),
         DYNAMICALLYFLAVORABLE("dynamicallyFlavorable","dyf"),
         EVENTDEF("eventDef","ed"),
         EVENTS("events","e"),

@@ -32,6 +32,7 @@ import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 
 /**
  * TODO: these tests are kind of wack...
@@ -75,10 +76,10 @@ public class RegistrySerializerTest extends UnitTestCase {
     @Test
     public void testNullOutputDir() throws Exception {
         List<File> sources = Lists.newArrayList(createComponentSources());
-        File ouputDir = null;
+        File ouputDir = Files.createTempDir();
 
         RegistrySerializer rs = new RegistrySerializer(registryService, configAdapter,
-               sources, ouputDir, null, null, contextService);
+               sources, ouputDir, new String[0], null, contextService);
         try {
             rs.execute();
         } catch (RegistrySerializerException mee) {
@@ -93,7 +94,7 @@ public class RegistrySerializerTest extends UnitTestCase {
         file.createNewFile();
 
         RegistrySerializer rs = new RegistrySerializer(registryService, configAdapter,
-                ImmutableList.of(file), null, null, null, contextService);
+                ImmutableList.of(file), Files.createTempDir(), new String[0], null, contextService);
         try {
             rs.execute();
         } catch (RegistrySerializerException mee) {
@@ -111,7 +112,7 @@ public class RegistrySerializerTest extends UnitTestCase {
         file.createNewFile();
 
         RegistrySerializer rs = new RegistrySerializer(registryService, configAdapter,
-                sources, file, null, null, contextService);
+                sources, file, new String[0], null, contextService);
         try {
             rs.execute();
         } catch (RegistrySerializerException mee) {
@@ -125,7 +126,7 @@ public class RegistrySerializerTest extends UnitTestCase {
         TestLogger logger = new TestLogger();
         File compPath = createComponentSources();
         RegistrySerializer rs = new RegistrySerializer(registryService, configAdapter,
-                ImmutableList.of(compPath), compPath, null, logger, contextService);
+                ImmutableList.of(compPath), compPath, new String[0], logger, contextService);
         try {
             rs.execute();
         } catch (RegistrySerializerException mee) {
@@ -143,7 +144,7 @@ public class RegistrySerializerTest extends UnitTestCase {
         makeFile(new File(compPath, "testFail"), "broken", ".cmp",
                 "<aura;component><aura:IDontExistReallyReally /></aura:component>");
         RegistrySerializer rs = new RegistrySerializer(registryService, configAdapter,
-                ImmutableList.of(compPath), compPath, null, logger, contextService);
+                ImmutableList.of(compPath), compPath, new String[0], logger, contextService);
         RegistrySerializerException expected = null;
 
         try {
@@ -152,7 +153,7 @@ public class RegistrySerializerTest extends UnitTestCase {
             expected = mee;
         }
         assertNotNull("We should fail to execute with an error", expected);
-        assertEquals("one or more errors occurred during compile", expected.getMessage());
+        assertTrue(expected.getMessage().startsWith("one or more errors occurred during compile"));
         System.out.println(logger.getErrorLogEntries());
         assertEquals("There should be one error", 1, logger.getErrorLogEntries().size());
     }
@@ -167,7 +168,7 @@ public class RegistrySerializerTest extends UnitTestCase {
         List<File> sources = Lists.newArrayList(sourceDir1, sourceDir2);
 
         RegistrySerializer rs = new RegistrySerializer(registryService, configAdapter,
-                sources, sourceDir1, null, logger, contextService);
+                sources, sourceDir1, new String[0], logger, contextService);
         try {
             rs.execute();
         } catch (RegistrySerializerException mee) {

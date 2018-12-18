@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -50,6 +51,7 @@ import org.auraframework.system.BundleSource;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.FileSourceLocation;
 import org.auraframework.system.RegistrySet;
+import org.auraframework.throwable.AuraException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
@@ -199,16 +201,13 @@ public class RegistrySerializer {
     /**
      * A flag for an error occurring.
      */
-    private boolean error = false;
+    private List<Exception> errors = new ArrayList<>();
 
     /**
      * Create a compiler instance.
      *
      * This creates a compiler for the component and output directory specified.
      *
-     * @param componentDirectory the directory that we should use for components.
-     * @param outputDirectory the output directory where we should write the compiled component '.registry' file.
-     * @param excluded a set of excluded namespaces.
      */
     public RegistrySerializer(@Nonnull RegistryService registryService, @Nonnull ConfigAdapter configAdapter,
             @Nonnull List<File> sourceDirectories, @Nonnull File outputDirectory,
@@ -250,7 +249,7 @@ public class RegistrySerializer {
                 regs.add(reg);
             }
         }
-        if (error) {
+        if (!errors.isEmpty()) {
             return;
         }
 
@@ -264,7 +263,7 @@ public class RegistrySerializer {
             }
         } catch (IOException ioe) {
             logger.error("Unable to write out file", ioe);
-            error = true;
+            errors.add(ioe);
         }
     }
 
@@ -305,8 +304,9 @@ public class RegistrySerializer {
                 Definition def = master.getDef(desc);
                 logger.debug("ENTRY: " + desc + "@" + desc.getDefType().toString() + " in " + (System.nanoTime() - startNanos)/1000000 + " ms");
                 if (def == null) {
-                    logger.error("Unable to find " + desc + "@" + desc.getDefType());
-                    error = true;
+                    Exception e = new Exception("Unable to find " + desc + "@" + desc.getDefType());
+                    logger.error(e);
+                    errors.add(e);
                     continue;
                 }
                 types.add(desc.getDefType());
@@ -326,10 +326,10 @@ public class RegistrySerializer {
                 }
             } catch (QuickFixException qfe) {
                 logger.error(qfe);
-                error = true;
+                errors.add(qfe);
             }
         }
-        if (error) {
+        if (!errors.isEmpty()) {
             return null;
         }
         return new StaticDefRegistryImpl(types, prefixes, namespaces, filtered.values());
@@ -412,8 +412,17 @@ public class RegistrySerializer {
             } finally {
                 contextService.endContext();
             }
-            if (error) {
-                throw new RegistrySerializerException("one or more errors occurred during compile");
+            if (!errors.isEmpty()) {
+                throw new RegistrySerializerException(String.format("one or more errors occurred during compile - \n\n%s\n\n",
+                        errors.stream().map(e -> {
+                            if (e instanceof AuraException) {
+                                return String.format("[%s]:\n%s\n%s",
+                                        ((AuraException) e).getLocation(),
+                                        e.getMessage(),
+                                        ((AuraException) e).getExtraMessage());
+                            }
+                            return e.getMessage();}).collect(Collectors.joining("\n\n"))
+                        ));
             }
         } finally {
             try {

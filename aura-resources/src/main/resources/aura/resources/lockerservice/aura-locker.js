@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-12-13
- * Version: 0.6.10
+ * Generated: 2018-12-17
+ * Version: 0.6.12
  */
 
 (function (exports) {
@@ -10901,12 +10901,10 @@ function SecureAuraEvent(event, key) {
 }
 
 let getPublicMethodNames;
-let requireLocker;
 
 function registerAuraAPI(api) {
   if (api) {
     getPublicMethodNames = api.getPublicMethodNames;
-    requireLocker = api.requireLocker;
   }
 }
 
@@ -11091,7 +11089,7 @@ function SecureAuraComponentRef(component, key) {
     // If SecureAuraComponentRef is an unlockerized component, then let it
     // have access to raw arguments
     const methodOptions = {
-      unfilterEverything: !requireLocker(component)
+      unfilterEverything: !component.getDef().isLockerRequired()
         ? function(args) {
             return deepUnfilterMethodArguments$$1([], args);
           }
@@ -11471,7 +11469,7 @@ function wrapComponent(component) {
     return component;
   }
 
-  return requireLocker(component) ? SecureAuraComponent(component, key) : component;
+  return component.getDef().isLockerRequired() ? SecureAuraComponent(component, key) : component;
 }
 
 function wrapComponentEvent(component, event) {
@@ -11488,6 +11486,12 @@ function wrapComponentEvent(component, event) {
   return event instanceof AuraEvent ? SecureAuraEvent(event, key) : SecureDOMEvent(event, key);
 }
 
+/**
+ * Wrap an object from origin module(exporter) to be used in the destination module(importer).
+ * @param {*} thing Object being imported
+ * @param {*} metaFrom Metadata about origin of 'thing'
+ * @param {*} metaTo Metadata about destination where 'thing' is being used
+ */
 function wrap(thing, metaFrom, metaTo) {
   let toKey = getKeyForNamespace(metaTo.getNamespace());
 
@@ -11498,7 +11502,8 @@ function wrap(thing, metaFrom, metaTo) {
 
   // check against internalLibs that are whitelisted
   // they just need to be frozen
-  const lwcModuleName = `${metaFrom.getNamespace().toLowerCase()}/${metaFrom.getName()}`;
+  const fromNamespace = `${metaFrom.getNamespace().toLowerCase()}`;
+  const lwcModuleName = `${fromNamespace}/${metaFrom.getName()}`;
   if (internalLibs.includes(lwcModuleName)) {
     if (!frozenLibRegistry.has(thing)) {
       shallowFreeze(thing);
@@ -11518,14 +11523,15 @@ function wrap(thing, metaFrom, metaTo) {
     : systemKey;
   toKey = metaTo.requireLocker ? toKey : systemKey;
 
-  if (fromKey !== toKey && metaTo.depList && metaTo.depList[lwcModuleName] === 'module') {
-    // temporarily intercept cross namespace usage
-    // system -> Locker or Locker -> system is considered cross namespace
-    warn(
-      `Attempting cross-namespace import
-       from: ${metaFrom.getNamespace()} - ${metaFrom.getName()}
-       to:   ${metaTo.getNamespace()} - ${metaTo.getName()}
-      `
+  // Prevent cross namespace(custom ns to custom ns) references in html/js
+  if (
+    fromKey !== systemKey &&
+    fromKey !== toKey &&
+    !['lockerlwc', 'securemoduletest', 'secureothernamespace'].includes(fromNamespace)
+  ) {
+    // Cross namespace reference is prohobited currently
+    throw new error(
+      `Attempting to reference cross-namespace module ${metaFrom.getNamespace()}-${metaFrom.getName()} in ${metaTo.getNamespace()}-${metaTo.getName()}`
     );
   }
   // class imports

@@ -35,6 +35,7 @@ function InteropComponentDef(config) {
     this.elementName      = config.elementName;
     this.interopClassName = this.descriptor.getNamespace() + "$" + this.descriptor.getName();
     this.minVersion       = config.minVersion;
+    this.requireLocker    = config.requireLocker;
     this.attributeDefs    = new AttributeDefSet(config.attributeDefs, this.descriptor.getNamespace());
     this.requiredVersionDefs = new RequiredVersionDefSet(config[Json.ApplicationKey.REQUIREDVERSIONDEFS]);
     this.registerEventDefs = {};
@@ -650,6 +651,17 @@ InteropComponentDef.prototype.initSuperDef = function(config) {
     }
 
     return null;
+};
+
+/**
+ * Returns the status of Locker for the component.
+ *
+ * @public
+ * @return {boolean} True if Locker is enabled.
+ * @export
+ */
+InteropComponentDef.prototype.isLockerRequired = function() {
+    return this.requireLocker;
 };
 
 /**

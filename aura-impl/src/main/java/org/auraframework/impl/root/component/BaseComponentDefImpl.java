@@ -1139,6 +1139,10 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             json.writeMapEntry(ApplicationKey.MINVERSION, this.minVersion);
         }
 
+        if(isLockerRequired()) {
+            json.writeMapEntry(ApplicationKey.REQUIRELOCKER, true);
+        }
+
         if (serializedJSON == null) {
             synchronized (this) {
                 if (serializedJSON == null) {

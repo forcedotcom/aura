@@ -38,6 +38,7 @@ function ComponentDef(config) {
     this.methodDefs = config[Json.ApplicationKey.METHODDEFS] ? config[Json.ApplicationKey.METHODDEFS]: undefined;
     this.tokens = config[Json.ApplicationKey.TOKENS] ? config[Json.ApplicationKey.TOKENS] : undefined;
     this.minVersion = config[Json.ApplicationKey.MINVERSION] ? config[Json.ApplicationKey.MINVERSION] : undefined;
+    this.requireLocker = config[Json.ApplicationKey.REQUIRELOCKER] ? config[Json.ApplicationKey.REQUIRELOCKER] : undefined;
 
     this.interfaces = {};
     var intfConfig = config[Json.ApplicationKey.INTERFACES];
@@ -732,6 +733,17 @@ ComponentDef.prototype.getApiVersion = function() {
         var requiredVersionDef = this.getRequiredVersionDefs().getDef("aura");
         return requiredVersionDef ? requiredVersionDef.getVersion() : null;
     }
+};
+
+/**
+ * Returns the status of Locker for the component.
+ *
+ * @public
+ * @return {boolean} True if Locker is enabled.
+ * @export
+ */
+ComponentDef.prototype.isLockerRequired = function() {
+    return this.requireLocker;
 };
 
 Aura.Component.ComponentDef = ComponentDef;

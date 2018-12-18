@@ -60,6 +60,11 @@ Test.Aura.AuraComponentServiceTest = function(){
         "Aura": Aura,
         "Engine": Engine,
         "Proxy": {},
+        "Json": {
+            "ApplicationKey": {
+                "DEPENDENCIES": "dp"
+            }
+        }
     })(function(){
         [Import("aura-impl/src/main/resources/aura/component/ComponentDefStorage.js")]
         [Import("aura-impl/src/main/resources/aura/AuraComponentService.js")]
@@ -73,6 +78,11 @@ Test.Aura.AuraComponentServiceTest = function(){
         "Aura": Aura,
         "Engine": Engine,
         "Proxy": {},
+        "Json": {
+            "ApplicationKey": {
+                "DEPENDENCIES": "dp"
+            }
+        }
     });
 
     var targetService;

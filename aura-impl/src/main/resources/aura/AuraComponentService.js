@@ -768,7 +768,7 @@ AuraComponentService.prototype.addModule = function(descriptor, name, dependenci
 
     // set both descriptor and module name entries into registry
     var entry = this.moduleDefRegistry[descriptor] || (this.moduleDefRegistry[descriptor] = this.moduleDefRegistry[name] = {});
-    entry.dependencies = dependencies;
+    entry[Json.ApplicationKey.DEPENDENCIES] = dependencies;
     entry.definition = exporterClass;
     entry.descriptor = descriptor;
     entry.moduleName = name;
@@ -781,17 +781,18 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
     var exportns;
     var url;
     var REQUIRELOCKER = Json.ApplicationKey.REQUIRELOCKER;
+    var DEPENDENCIES = Json.ApplicationKey.DEPENDENCIES;
     var createLockerDescriptor = $A.lockerService.createDescriptor;
     var lockerWrap = $A.lockerService.wrap;
 
-    $A.assert(entry, "Failed to find definition for dependency: " + descriptor);    
+    $A.assert(entry, "Failed to find definition for dependency: " + descriptor);
 
     // If we have resolved already the exports (libraries case), return them
     if (entry.ns) {
         return entry.ns;
     }
 
-    if (!entry.dependencies) {
+    if (!entry[DEPENDENCIES]) {
         url = $A.clientService.getSourceMapsUrl(descriptor);
         factory = $A.util.globalEval(entry["exporter"], url);
         factory();
@@ -799,7 +800,7 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
 
     var namespaceAliases = $A.getContext().moduleNamespaceAliases;
 
-    var deps = entry.dependencies.map(function (name) {
+    var deps = entry[DEPENDENCIES].map(function (name) {
         if (name === 'exports') {
             exportns = {};
             return exportns;
@@ -839,9 +840,9 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
             depEntry = this.moduleDefRegistry[desc];
         }
 
-        if (depEntry && depEntry.dependencies) {
-            var dep = this.moduleDefRegistry[desc];            
-            
+        if (depEntry && depEntry[DEPENDENCIES]) {
+            var dep = this.moduleDefRegistry[desc];
+
             if (dep.ns) {
                 if (entry[REQUIRELOCKER] || depEntry[REQUIRELOCKER]) {
                     return lockerWrap(dep.ns, createLockerDescriptor(dep), createLockerDescriptor(entry));
@@ -860,14 +861,14 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
             }
         }
 
-        var resolved = this.evaluateModuleDef(desc);        
-        if (entry[REQUIRELOCKER]) {           
+        var resolved = this.evaluateModuleDef(desc);
+        if (entry[REQUIRELOCKER]) {
             return lockerWrap(resolved, createLockerDescriptor(depEntry), createLockerDescriptor(entry));
         }
         return resolved;
     }, this);
 
-    var Ctor;    
+    var Ctor;
     if (entry.definition && $A.util.isFunction(entry.definition)) {
         if (entry[REQUIRELOCKER]) {
             entry.definition = $A.lockerService.createForModule(entry.definition.toString(), createLockerDescriptor(entry));
@@ -887,7 +888,7 @@ AuraComponentService.prototype.createInteropComponentDef = function (descriptor)
     var Ctor = this.evaluateModuleDef(descriptor);
     var module = this.moduleDefRegistry[descriptor];
     var interOpCmpDef = new Aura.Component.InteropComponentDef({
-        dependencies : module.dependencies,
+        dependencies : module[Json.ApplicationKey.DEPENDENCIES],
         definition   : module.definition,
         descriptor   : module.descriptor,
         moduleName   : module.moduleName,
@@ -895,6 +896,7 @@ AuraComponentService.prototype.createInteropComponentDef = function (descriptor)
         access       : module[Json.ApplicationKey.ACCESS],
         minVersion   : module[Json.ApplicationKey.MINVERSION],
         attributeDefs: module[Json.ApplicationKey.ATTRIBUTEDEFS],
+        requireLocker: module[Json.ApplicationKey.REQUIRELOCKER],
         interopClass : Ctor
     });
 

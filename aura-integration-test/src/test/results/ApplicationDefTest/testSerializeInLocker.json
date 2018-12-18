@@ -4,6 +4,7 @@
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]]
   ],
+  "rl":true,
   "lc":{
     "descriptor":"markup://aura:locationChange"
   },

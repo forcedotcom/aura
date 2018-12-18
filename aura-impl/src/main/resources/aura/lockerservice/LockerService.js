@@ -26,7 +26,7 @@ function LockerService() {
         var DESCRIPTOR = Json.ApplicationKey.DESCRIPTOR;
         var REQUIRELOCKER = Json.ApplicationKey.REQUIRELOCKER;
         var LOCKER_REFERENCE_INFO = Json.ApplicationKey.LOCKER_REFERENCE_INFO;
-        
+
         var descriptor = new DefDescriptor(moduleDefinitionEntry[DESCRIPTOR] || moduleDefinitionEntry.descriptor);
         descriptor['requireLocker'] = moduleDefinitionEntry[REQUIRELOCKER];
         descriptor['depList'] = moduleDefinitionEntry[LOCKER_REFERENCE_INFO];
@@ -68,24 +68,6 @@ function LockerService() {
         service["runScript"]             = service.runScript;
         service["trust"]                 = service.trust;
         service["wrapComponent"]         = service.wrapComponent;
-    }
-
-    function requireLocker(component) {
-        var def = component.getDef();
-        var descriptor = def.getDescriptor();
-        var namespace = descriptor.getNamespace();
-        var isInternal = $A.clientService.isInternalNamespace(namespace);
-
-        // Lockerize if either of the following is true:
-        // 1. If component belongs to internal namespace and
-        //      implements the aura:requireLocker interface
-        // 2. If component does not belong to internal namespace and
-        //      API Version of component is API version v40 or after (Summer '17 release)
-        //      (file based components used for testing won't have an API version, so default it to 40 and lockerize)
-        if (isInternal) {
-            return def.isInstanceOf('aura:requireLocker');
-        }
-        return parseInt(def.getApiVersion() || 40) >= 40;
     }
 
     function getPublicMethodNames(component) {
@@ -137,7 +119,6 @@ function LockerService() {
                 // #end
 
                 "getPublicMethodNames": getPublicMethodNames,
-                "requireLocker": requireLocker,
                 "isStrictCSP": isStrictCSP,
                 "isFrozenRealm": isFrozenRealm,
                 "warn": warn,

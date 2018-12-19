@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.servlet.Filter;
@@ -38,6 +37,7 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.auraframework.AuraDeprecated;
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
@@ -57,6 +57,7 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
@@ -93,6 +94,7 @@ public class AuraContextFilter implements Filter {
     protected ConfigAdapter configAdapter;
     protected SerializationService serializationService;
     private BrowserCompatibilityService browserCompatibilityService;
+    private ServletUtilAdapter servletUtilAdapter;
 
     @Inject
     public void setContextService(ContextService service) {
@@ -136,6 +138,11 @@ public class AuraContextFilter implements Filter {
         this.testFilter = testFilter;
     }
 
+    @Inject
+    public void setServletUtilAdapter(ServletUtilAdapter servletUtilAdapter) {
+        this.servletUtilAdapter = servletUtilAdapter;
+    }
+
     public void setLocalizationAdapter(Object ignored) {
     }
 
@@ -175,12 +182,36 @@ public class AuraContextFilter implements Filter {
             } else {
                 chain.doFilter(req, res);
             }
-        } catch (InvalidParamException e) {
+        } catch (InvalidParamException ipe) {
             HttpServletResponse response = (HttpServletResponse) res;
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
-            @SuppressWarnings("resource")
+            response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache,no-store");
             Appendable out = response.getWriter();
-            out.append(e.getMessage());
+            if (getFormat((HttpServletRequest)req) == Format.JSON) {
+                out.append(String.format("{\"message\":\"%s\"}", AuraTextUtil.escapeForJSONString(ipe.getMessage())));
+            } else {
+                out.append(ipe.getMessage());
+            }
+        } catch (Exception e) {
+            try {
+                AuraContext context = contextService.getCurrentContext();
+                if (context != null) {
+                    servletUtilAdapter.handleServletException(e, false, context, (HttpServletRequest) req, (HttpServletResponse) res, false);
+                } else {
+                    throw new Exception();
+                }
+            } catch (Exception ignored) {
+                // something really bad happened. Fall back as best we can.
+                if (getFormat((HttpServletRequest)req) == Format.JSON) {
+                    HttpServletResponse response = (HttpServletResponse) res;
+                    response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+                    response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache,no-store");
+                    response.getWriter().append(String.format("{\"message\":\"%s\"}", AuraTextUtil.escapeForJSONString(e.getMessage())));
+                } else {
+                    // if we're not JSON, then the generic error handler can serialize as HTML
+                    throw e;
+                }
+            }
         } finally {
             try {
                 if (loggingService != null) {
@@ -198,31 +229,16 @@ public class AuraContextFilter implements Filter {
         }
     }
 
-    @SuppressWarnings("unused")
     protected AuraContext startContext(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
 
-        Format f = format.get(request);
+        Format f = getFormat(request);
         Authentication a = access.get(request, Authentication.AUTHENTICATED);
 
         Map<String, Object> configMap = getConfigMap(request);
         Mode m = getMode(request, configMap);
 
         DefDescriptor<? extends BaseComponentDef> appDesc = getAppParam(request, configMap);
-
-        //
-        // FIXME: our usage of format should be revisited. Most URLs have
-        // a fixed format, so we should have a way of getting that.
-        //
-        if (f == null) {
-            if (AuraComponentDefinitionServlet.URI_DEFINITIONS_PATH.equals(request.getServletPath())) {
-                f = Format.JSON;
-            } else if ("GET".equals(request.getMethod()) && !isActionParam.get(request, Boolean.FALSE).booleanValue()) {
-                f = Format.HTML;
-            } else {
-                f = Format.JSON;
-            }
-        }
 
         AuraContext context = contextService.startContext(m, f, a, appDesc);
 
@@ -262,7 +278,13 @@ public class AuraContextFilter implements Filter {
             Map<String, Object> gvp = (Map<String, Object>) configMap.get("globals");
             if (gvp != null) {
                 for (Map.Entry<String, Object> entry : gvp.entrySet()) {
-                    context.setGlobalValue(entry.getKey(), entry.getValue());
+                    try {
+                        context.setGlobalValue(entry.getKey(), entry.getValue());
+                    } catch (AuraRuntimeException are) {
+                        ClientOutOfSyncException coose = new ClientOutOfSyncException(are.getMessage());
+                        coose.initCause(are);
+                        throw coose;
+                    }
                 }
             }
 
@@ -276,6 +298,26 @@ public class AuraContextFilter implements Filter {
         }
 
         return context;
+    }
+
+    private Format getFormat(HttpServletRequest request) {
+        Format f = format.get(request);
+
+        //
+        // FIXME: our usage of format should be revisited. Most URLs have
+        // a fixed format, so we should have a way of getting that.
+        //
+        if (f == null) {
+            if (AuraComponentDefinitionServlet.URI_DEFINITIONS_PATH.equals(request.getServletPath())) {
+                f = Format.JSON;
+            } else if ("GET".equals(request.getMethod()) && !isActionParam.get(request, Boolean.FALSE).booleanValue()) {
+                f = Format.HTML;
+            } else {
+                f = Format.JSON;
+            }
+        }
+
+        return f;
     }
 
     /**
@@ -410,7 +452,6 @@ public class AuraContextFilter implements Filter {
      * @param mode Aura context mode
      * @return whether compat module should be served
      */
-    @SuppressWarnings({ "static-method", "boxing" })
     protected boolean forceCompat(HttpServletRequest request, Mode mode) {
         if (mode == Mode.DEV || mode == Mode.SELENIUM) {
             // DO NOT allow url param override in prod
@@ -435,7 +476,7 @@ public class AuraContextFilter implements Filter {
     /**
      * Retrieve the matching {@link ApplicationDef} from one of the following
      * <ol>
-     *   <li>"{@value AuraServlet.AURA_PREFIX}app" request parameter</li>
+     *   <li>"aura.app" request parameter</li>
      *   <li>"app" key in the passed in {@code configMap} map</li>
      * </ol>
      * or if the {@code ApplicationDef} is not present,

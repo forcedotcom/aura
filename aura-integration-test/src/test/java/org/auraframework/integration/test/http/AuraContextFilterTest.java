@@ -272,6 +272,7 @@ public class AuraContextFilterTest extends AuraTestCase {
     public void testModeHandleInvalidParamException() throws ServletException, IOException {
         // Arrange
         Mockito.when(request.getParameter(eq(AuraContextFilter.mode.name))).thenReturn("HAX0RED");
+        Mockito.when(request.getParameter("aura.format")).thenReturn("HTML");
         final MockHttpServletResponse resp = new MockHttpServletResponse();
         
         // Act

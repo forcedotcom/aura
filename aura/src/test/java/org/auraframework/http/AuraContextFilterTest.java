@@ -15,28 +15,27 @@
  */
 package org.auraframework.http;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
+import java.io.PrintWriter;
+import java.util.Collections;
+import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.http.RequestParam.InvalidParamException;
+import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.ClientOutOfSyncException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
@@ -46,6 +45,16 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit test for the {@link AuraContextFilter} class.
@@ -105,6 +114,7 @@ public class AuraContextFilterTest {
     public void testGetModeParamInvalidRequestParam() {
         // Arrange
         when(request.getParameter(eq(AuraContextFilter.mode.name))).thenReturn("HAX0R");
+        when(request.getParameter(eq("aura.format"))).thenReturn("HTML");
         
         // Act
         try {
@@ -203,7 +213,7 @@ public class AuraContextFilterTest {
     
     /**
      * Test for the
-     * {@link AuraContextFilter#getAppParam(HttpServletRequest, java.util.Map} method when a valid app
+     * {@link AuraContextFilter#getAppParam(HttpServletRequest, java.util.Map)} method when a valid app
      * parameter is in the request.
      */
     @Test
@@ -225,7 +235,7 @@ public class AuraContextFilterTest {
     
     /**
      * Test for the
-     * {@link AuraContextFilter#getAppParam(HttpServletRequest, java.util.Map} method when an invalid app
+     * {@link AuraContextFilter#getAppParam(HttpServletRequest, java.util.Map)} method when an invalid app
      * parameter is in the request.
      */
     @Test
@@ -271,7 +281,7 @@ public class AuraContextFilterTest {
     }
     
     /**
-     * Test for the {@link AuraContextFilter#getAppParam(HttpServletRequest, java.util.Map} method when a
+     * Test for the {@link AuraContextFilter#getAppParam(HttpServletRequest, java.util.Map)} method when a
      * valid app parameter is in the request.
      */
     @Test
@@ -293,7 +303,7 @@ public class AuraContextFilterTest {
     }
     
     /**
-     * Test for the {@link AuraContextFilter#getAppParam(HttpServletRequest, java.util.Map} method when a
+     * Test for the {@link AuraContextFilter#getAppParam(HttpServletRequest, java.util.Map)} method when a
      * valid cmp parameter is in the request.
      */
     @Test
@@ -370,5 +380,72 @@ public class AuraContextFilterTest {
         
         Mockito.verify(definitionService, Mockito.only()).getDefDescriptor(Matchers.eq(cmpValue), Matchers.eq(ComponentDef.class));
         Mockito.verify(loggingService, Mockito.only()).warn(Matchers.eq("Invalid parameter value for aura.context -> cmp"), Matchers.same(cause));
+    }
+
+    @Test
+    public void testInvalidGVPSentInActionRequestIsCOOSE() throws Exception {
+        // Arrange
+        HttpServletRequest mockServletRequest = Mockito.mock(HttpServletRequest.class);
+        Mockito.when(mockServletRequest.getParameter("aura.context")).thenReturn("{\"globals\":{\"bad_gvp\":\"test\"}}");
+        Mockito.when(mockServletRequest.getParameter("aura.format")).thenReturn("JSON");
+        Mockito.when(mockServletRequest.getLocales()).thenReturn(Collections.emptyEnumeration());
+
+        AuraContext mockContext = Mockito.mock(AuraContext.class);
+        Mockito.doThrow(new AuraRuntimeException("Attempt to set unknown $Global variable: bad_gvp")).when(mockContext).setGlobalValue("bad_gvp", "test");
+
+        ConfigAdapter mockConfigAdapter = Mockito.mock(ConfigAdapter.class);
+        Mockito.when(mockConfigAdapter.getAvailableModes()).thenReturn(Collections.emptySet());
+
+        HttpServletResponse mockServletResponse = Mockito.mock(HttpServletResponse.class);
+        FilterChain mockFilterChain = Mockito.mock(FilterChain.class);
+        ContextService mockContextService = Mockito.mock(ContextService.class);
+        Mockito.when(mockContextService.startContext(Matchers.any(), Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(mockContext);
+        Mockito.when(mockContextService.getCurrentContext()).thenReturn(mockContext);
+
+        ServletUtilAdapter mockServletUtilAdapater = Mockito.mock(ServletUtilAdapter.class);
+
+        AuraContextFilter auraContextFilter = new AuraContextFilter();
+        auraContextFilter.setContextService(mockContextService);
+        auraContextFilter.setConfigAdapter(mockConfigAdapter);
+        auraContextFilter.setServletUtilAdapter(mockServletUtilAdapater);
+
+        // Act
+        auraContextFilter.doFilter(mockServletRequest, mockServletResponse, mockFilterChain);
+
+        // Assert
+        Mockito.verify(mockServletUtilAdapater, Mockito.atLeastOnce())
+                .handleServletException(Matchers.any(ClientOutOfSyncException.class),
+                        Matchers.eq(false), Matchers.eq(mockContext), Matchers.eq(mockServletRequest),
+                        Matchers.eq(mockServletResponse), Matchers.eq(false));
+    }
+
+
+    @Test
+    public void testStartContextExceptionSerializesJSONMessage() throws Exception {
+        // Arrange
+        HttpServletRequest mockServletRequest = Mockito.mock(HttpServletRequest.class);
+        Mockito.when(mockServletRequest.getParameter("aura.format")).thenReturn("JSON");
+        Mockito.when(mockServletRequest.getLocales()).thenReturn(Collections.emptyEnumeration());
+
+        ConfigAdapter mockConfigAdapter = Mockito.mock(ConfigAdapter.class);
+        Mockito.when(mockConfigAdapter.getAvailableModes()).thenReturn(Collections.emptySet());
+
+        HttpServletResponse mockServletResponse = Mockito.mock(HttpServletResponse.class);
+        FilterChain mockFilterChain = Mockito.mock(FilterChain.class);
+        ContextService mockContextService = Mockito.mock(ContextService.class);
+        Mockito.when(mockContextService.startContext(Matchers.any(), Matchers.any(), Matchers.any(), Matchers.any())).thenThrow(Exception.class);
+
+        PrintWriter mockWriter = Mockito.mock(PrintWriter.class);
+        Mockito.when(mockServletResponse.getWriter()).thenReturn(mockWriter);
+
+        AuraContextFilter auraContextFilter = new AuraContextFilter();
+        auraContextFilter.setContextService(mockContextService);
+        auraContextFilter.setConfigAdapter(mockConfigAdapter);
+
+        // Act
+        auraContextFilter.doFilter(mockServletRequest, mockServletResponse, mockFilterChain);
+
+        // Assert
+        Mockito.verify(mockWriter, Mockito.atLeastOnce()).append("{\"message\":\"null\"}");
     }
 }

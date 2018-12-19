@@ -47,11 +47,6 @@ public class RegistryTrie implements RegistrySet {
     // a map of map of maps
     private final Map<DefType, Map<String, PrefixNode>> root = new EnumMap<>(DefType.class);
     
-    private static String getNamespaceKey(String namespace) {
-        // W-3676967: temporarily allow a case-sensitive "duplicate" namespace, should be lower-cased otherwise
-    	return ("SocialService".equals(namespace) || "ONE".equals(namespace)) ? namespace : namespace.toLowerCase();
-    }
-
     private void initializeHashes() {
         for (DefRegistry reg : this.allRegistries) {
             for (DefType defType : reg.getDefTypes()) {
@@ -141,6 +136,9 @@ public class RegistryTrie implements RegistrySet {
     public <T extends Definition> DefRegistry getRegistryFor(DefDescriptor<T> descriptor) {
         Map<String, PrefixNode> dt = this.root.get(descriptor.getDefType());
         if (dt != null) {
+            if (descriptor.getPrefix() == null) {
+                throw new RuntimeException("Invalid descriptor "+descriptor.toString()+"@"+descriptor.getDefType());
+            }
             PrefixNode pn = dt.get(descriptor.getPrefix().toLowerCase());
             if (pn != null) {
                 return pn.get(descriptor.getNamespace());
@@ -165,7 +163,15 @@ public class RegistryTrie implements RegistrySet {
         // registries to use for specific namespaces
         private final Map<String, DefRegistry> registries = new HashMap<>(8);
 
-        private void put(String namespace, DefRegistry registry) {
+        public PrefixNode() {
+        }
+
+        private String getNamespaceKey(String namespace) {
+            // W-3676967: temporarily allow a case-sensitive "duplicate" namespace, should be lower-cased otherwise
+            return ("SocialService".equals(namespace) || "ONE".equals(namespace)) ? namespace : namespace.toLowerCase();
+        }
+
+        public void put(String namespace, DefRegistry registry) {
             DefRegistry r = registries.put(getNamespaceKey(namespace), registry);
             if (r != null) { 
                 throw new AuraError(String.format(
@@ -177,7 +183,7 @@ public class RegistryTrie implements RegistrySet {
             }
         }
 
-        private DefRegistry get(String ns) {
+        public DefRegistry get(String ns) {
             DefRegistry reg = this.registries.get(ns != null ? getNamespaceKey(ns) : "*");
             if (reg == null) {
                 reg = this.catchAllRegistry;

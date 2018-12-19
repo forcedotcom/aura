@@ -78,11 +78,11 @@ public class LibraryDefRefHandlerTest extends AuraImplTestCase {
                 String.format("<%s library='%s' property='p'/>", LibraryDefRefHandler.TAG, expectedLibrary), "myModuleID", Format.XML);
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
         Mockito.doReturn(DefType.COMPONENT).when(parentDescriptor).getDefType();
-        DefinitionService definitionService = Mockito.mock(DefinitionService.class);
-        DefDescriptor<ModuleDef> expectedDescriptor = new DefDescriptorImpl<ModuleDef>("markup", "myModule", "Lib", ModuleDef.class, null);
-        Mockito.doReturn(expectedDescriptor).when(definitionService).getDefDescriptor(expectedLibrary, ModuleDef.class);
-        Mockito.doReturn(true).when(definitionService).exists(expectedDescriptor);
-        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source, definitionService);
+        DefinitionService mockDS = Mockito.mock(DefinitionService.class);
+        DefDescriptor<ModuleDef> expectedDescriptor = new DefDescriptorImpl<>("markup", "myModule", "Lib", ModuleDef.class, null);
+        Mockito.doReturn(expectedDescriptor).when(mockDS).getDefDescriptor(expectedLibrary, ModuleDef.class);
+        Mockito.doReturn(true).when(mockDS).exists(expectedDescriptor);
+        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source, mockDS);
 
         LibraryDefRef def = handler.getElement();
 
@@ -143,7 +143,7 @@ public class LibraryDefRefHandlerTest extends AuraImplTestCase {
     @Test
     public void testGetElementWithNonEmptyTag() throws Exception {
         StringSource<LibraryDefRef> source = new StringSource<>(descriptor, String.format(
-                "<%s library='l' property='p'>text</%1$s>", LibraryDefRefHandler.TAG), "myID", Format.XML);
+                "<%s library='l:foo' property='p'>text</%1$s>", LibraryDefRefHandler.TAG), "myID", Format.XML);
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
         Mockito.doReturn(DefType.COMPONENT).when(parentDescriptor).getDefType();
         LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source, definitionService);
@@ -161,7 +161,7 @@ public class LibraryDefRefHandlerTest extends AuraImplTestCase {
     public void testGetElementWithDescription() throws Exception {
         String expectedDescription = "needs to be included";
         StringSource<LibraryDefRef> source = new StringSource<>(descriptor, String.format(
-                "<%s library='l' property='p' description='%s'/>", LibraryDefRefHandler.TAG, expectedDescription), "myID", Format.XML);
+                "<%s library='l:foo' property='p' description='%s'/>", LibraryDefRefHandler.TAG, expectedDescription), "myID", Format.XML);
         Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
         Mockito.doReturn(DefType.COMPONENT).when(parentDescriptor).getDefType();
         LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source, definitionService);

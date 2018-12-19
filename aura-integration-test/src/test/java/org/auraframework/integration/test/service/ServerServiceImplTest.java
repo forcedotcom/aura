@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
@@ -41,13 +42,12 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.TypeDef;
 import org.auraframework.def.ValueDef;
-import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.AbstractActionImpl;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.ActionDelegate;
 import org.auraframework.instance.Component;
+import org.auraframework.integration.test.util.IntegrationTestCase;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.service.InstanceService;
 import org.auraframework.service.ServerService;
 import org.auraframework.service.ServerService.HYDRATION_TYPE;
 import org.auraframework.system.AuraContext;
@@ -67,16 +67,14 @@ import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.validation.ReferenceValidationContext;
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class ServerServiceImplTest extends AuraImplTestCase {
-
-    @Inject
-    private InstanceService instanceService;
+public class ServerServiceImplTest extends IntegrationTestCase {
 
     @Inject
     private ServerService serverService;
@@ -198,16 +196,17 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         private String returnValue = "";
         private Integer count = 0;
         private String parameter = "";
-        private DefinitionService definitionService;
+        private DefinitionService localDS;
 
-        public EmptyAction(StringWriter sw, String name, DefinitionService definitionService) {
+        public EmptyAction(StringWriter sw, String name, DefinitionService definitionService,
+                ConfigAdapter configAdapter) {
             super(null, new EmptyActionDef(sw, name), null, configAdapter);
-            this.definitionService = definitionService;
+            this.localDS = definitionService;
         }
 
-        public EmptyAction(DefinitionService definitionService) {
+        public EmptyAction(DefinitionService definitionService, ConfigAdapter configAdapter) {
             super(null, new EmptyActionDef(null, "simpleaction"), null, configAdapter);
-            this.definitionService = definitionService;
+            this.localDS = definitionService;
         }
 
         public Integer getCount() {
@@ -220,8 +219,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
         @Override
         public DefDescriptor<ActionDef> getDescriptor() {
-            return definitionService
-                    .getDefDescriptor("java://aura.empty/ACTION$emptyAction", ActionDef.class);
+            return localDS.getDefDescriptor("java://aura.empty/ACTION$emptyAction", ActionDef.class);
         }
 
         @Override
@@ -334,9 +332,9 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         Component sharedCmp = instanceService.getInstance("ifTest:testIfWithModel", ComponentDef.class,
                 attributes);
         StringWriter sw = new StringWriter();
-        Action a = new EmptyAction(sw, "first action", definitionService);
-        Action b = new EmptyAction(sw, "second action", definitionService);
-        Action c = new EmptyAction(sw, "third action", definitionService);
+        Action a = new EmptyAction(sw, "first action", definitionService, configAdapter);
+        Action b = new EmptyAction(sw, "second action", definitionService, configAdapter);
+        Action c = new EmptyAction(sw, "third action", definitionService, configAdapter);
         Action d = new ShareCmpAction("d", a, sharedCmp, attributesA);
         Action e = new ShareCmpAction("e", b, sharedCmp, attributesB);
         Action f = new ShareCmpAction("f", c, sharedCmp, attributesC);
@@ -373,8 +371,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         Map<String, Object> json = (Map<String, Object>) new JsonReader().read(serialized);
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> actions = (List<Map<String, Object>>) json.get("actions");
-        assertTrue(actions != null);
-        assertTrue("expected " + actionNumber + " action, but get " + actions.size(), actions.size() == actionNumber);
+        assertThat(actions, Matchers.hasSize(actionNumber));
         for (int i = 0; i < actionNumber; i++) {
             Map<String, Object> action = actions.get(i);
             assertEquals("didn't get expecting action on i:" + i,
@@ -401,9 +398,9 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     public void testMultipleActions() throws Exception {
         contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         StringWriter sw = new StringWriter();
-        Action a = new EmptyAction(sw, "first action", definitionService);
-        Action b = new EmptyAction(sw, "second action", definitionService);
-        Action c = new EmptyAction(sw, "third action", definitionService);
+        Action a = new EmptyAction(sw, "first action", definitionService, configAdapter);
+        Action b = new EmptyAction(sw, "second action", definitionService, configAdapter);
+        Action c = new EmptyAction(sw, "third action", definitionService, configAdapter);
         List<Action> actions = Lists.newArrayList(a, b, c);
         Message message = new Message(actions);
         // run the list of actions.
@@ -432,8 +429,8 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     public void testSameActionTwice() throws Exception {
         contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         StringWriter sw = new StringWriter();
-        Action a = new EmptyAction(sw, "first action", definitionService);
-        Action b = new EmptyAction(sw, "second action", definitionService);
+        Action a = new EmptyAction(sw, "first action", definitionService, configAdapter);
+        Action b = new EmptyAction(sw, "second action", definitionService, configAdapter);
         List<Action> actions = Lists.newArrayList(a, b, a, b);
         Message message = new Message(actions);
         serverService.run(message, contextService.getCurrentContext(), sw, null);
@@ -459,7 +456,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     public void testSimpleAction() throws Exception {
         contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
 
-        Action a = new EmptyAction(definitionService);
+        Action a = new EmptyAction(definitionService, configAdapter);
         List<Action> actions = Lists.newArrayList(a);
         Message message = new Message(actions);
         StringWriter sw = new StringWriter();
@@ -476,7 +473,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     public void testSimpleActionWithExtras() throws Exception {
         contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
 
-        Action a = new EmptyAction(definitionService);
+        Action a = new EmptyAction(definitionService, configAdapter);
         List<Action> actions = Lists.newArrayList(a);
         Map<String, String> extras = Maps.newHashMap();
         Message message = new Message(actions);
@@ -649,7 +646,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     @ThreadHostileTest("PRODUCTION")
     @Test
     public void testWriteDefinitionsMetricsWithDevMode() throws Exception {
-        Action action = new EmptyAction(definitionService);
+        Action action = new EmptyAction(definitionService, configAdapter);
         Message message = new Message(Lists.newArrayList(action));
         DefDescriptor<ComponentDef> cmpDesc = definitionService
                 .getDefDescriptor("lockerTest:basicTest", ComponentDef.class);
@@ -674,7 +671,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     @ThreadHostileTest("PRODUCTION")
     @Test
     public void testWriteDefinitionsNoMetricsWithProdMode() throws Exception {
-        Action action = new EmptyAction(definitionService);
+        Action action = new EmptyAction(definitionService, configAdapter);
         Message message = new Message(Lists.newArrayList(action));
         DefDescriptor<ComponentDef> cmpDesc = definitionService
                 .getDefDescriptor("lockerTest:basicTest", ComponentDef.class);

@@ -131,5 +131,20 @@ public class TypeParser {
         	this.nameParameters = nameParameters;
         }
 
+        public String getPrefix() {
+            return prefix;
+        }
+
+        public String getNamespace() {
+            return namespace;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getNameParameters() {
+            return nameParameters;
+        }
     }
 }

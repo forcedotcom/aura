@@ -17,12 +17,12 @@ package org.auraframework.impl.javascript.parser.handler;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
-import org.auraframework.impl.def.DefinitionTest;
+import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.source.StringSource;
 import org.junit.Test;
 import org.mockito.Mock;
 
-public class JavascriptIncludeDefHandlerTest extends DefinitionTest<IncludeDef> {
+public class JavascriptIncludeDefHandlerTest extends AuraImplTestCase {
     @Mock
     DefDescriptor<IncludeDef> descriptor;
     private String filename = "dummyPath";

@@ -22,6 +22,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
+import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.library.IncludeDefRefImpl;
 import org.auraframework.impl.root.library.IncludeDefRefImpl.Builder;
 import org.auraframework.impl.root.parser.handler.IncludeDefRefHandler;
@@ -37,7 +38,7 @@ import org.mockito.Mock;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
-public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
+public class IncludeDefRefTest extends AuraImplTestCase {
     @Mock(answer = Answers.RETURNS_MOCKS)
     DefDescriptor<IncludeDefRef> descriptor;
 

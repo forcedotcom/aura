@@ -18,20 +18,24 @@ package org.auraframework.integration.test.def;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.LibraryDef;
-import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.handler.LibraryDefRefHandler;
+import org.auraframework.integration.test.util.IntegrationTestCase;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 
-public class LibraryDefRefTest extends AuraImplTestCase {
+public class LibraryDefRefTest extends IntegrationTestCase {
+    public LibraryDefRefTest() {
+        setShouldSetupContext(true);
+    }
+
     /**
      * Test to ensure that the property attribute must be specified.
      */
     @Test
     public void testNoProperty() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
-                String.format(baseComponentTag, "", "<aura:import library='dummy'/>"));
+                String.format(baseComponentTag, "", "<aura:import library='dummy:dummy'/>"));
         try {
             definitionService.getDefinition(cmpDesc);
             fail("Import tag requires a Property attribute.");
@@ -48,7 +52,7 @@ public class LibraryDefRefTest extends AuraImplTestCase {
     public void testInvalidProperty() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "",
-                        "<aura:import library='dummy' property='not just anything you want'/>"));
+                        "<aura:import library='dummy:dummy' property='not just anything you want'/>"));
         try {
             definitionService.getDefinition(cmpDesc);
             fail("Import tag requires a Property attribute with a valid javascript identifier.");

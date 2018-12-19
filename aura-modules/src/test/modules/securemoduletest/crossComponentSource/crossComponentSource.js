@@ -7,7 +7,7 @@ export default class crossComponentSource extends LightningElement {
     testGetElementByIDCrossComponentSameNamespace() {
         let elementFound = false;
         for (let i = 0; i < 10; i++) {
-          if (document.getElementById(`same-namespace-target-${i}`) !== null) {
+          if (document.getElementById(`same-namespace-target-${i}`) !== null) { // eslint-disable-line lwc/no-document-query
               elementFound = true;
               break;
           }
@@ -21,7 +21,7 @@ export default class crossComponentSource extends LightningElement {
     testGetElementByIDComponentOtherNamespace() {
         let elementFound = false;
         for (let i = 0; i < 10; i++) {
-          if (document.getElementById(`other-namespace-target-${i}`) !== null) {
+          if (document.getElementById(`other-namespace-target-${i}`) !== null) { // eslint-disable-line lwc/no-document-query
               elementFound = true;
               break;
           }
@@ -33,7 +33,7 @@ export default class crossComponentSource extends LightningElement {
 
     @api
     testGetElementByClassNameCrossComponentSameNamespace() {
-        const elements = document.getElementsByClassName("same-namespace-target");
+        const elements = document.getElementsByClassName("same-namespace-target"); // eslint-disable-line lwc/no-document-query
         // Since document is patched to not allow access to shadow dom nodes
         testUtil.assertEquals(0, elements.length,
             "Expected no shadow dom element accessible from document.getElementsByClassName");
@@ -41,7 +41,7 @@ export default class crossComponentSource extends LightningElement {
 
     @api
     testGetElementByClassNameComponentOtherNamespace() {
-        const elements = document.getElementsByClassName("other-namespace-target");
+        const elements = document.getElementsByClassName("other-namespace-target"); // eslint-disable-line lwc/no-document-query
         testUtil.assertEquals(0, elements.length,
             "Expected no cross-namespace element accessible from document.getElementsByClassName");
     }
@@ -50,7 +50,7 @@ export default class crossComponentSource extends LightningElement {
     testQuerySelectorIDCrossComponentSameNamespace() {
         let count = 0;
         for (let i = 0; i < 10; i++) {
-          if (document.querySelector(`#same-namespace-target-${i}`) !== null) {
+          if (document.querySelector(`#same-namespace-target-${i}`) !== null) { // eslint-disable-line lwc/no-document-query
               count++;
           }
         }
@@ -64,7 +64,7 @@ export default class crossComponentSource extends LightningElement {
     testQuerySelectorIDCrossComponentOtherNamespace() {
         let count = 0;
         for (let i = 0; i < 10; i++) {
-            if (document.querySelector(`#other-namespace-target-${i}`) !== null) {
+            if (document.querySelector(`#other-namespace-target-${i}`) !== null) { // eslint-disable-line lwc/no-document-query
                 count++;
             }
         }
@@ -75,14 +75,14 @@ export default class crossComponentSource extends LightningElement {
 
     @api
     testQuerySelectorClassCrossComponentSameNamespace() {
-        const element = document.querySelector(".same-namespace-target");
+        const element = document.querySelector(".same-namespace-target"); // eslint-disable-line lwc/no-document-query
         // Since document is patched to not allow access to shadow dom nodes
         testUtil.assertNull(element, "Expected no shadow dom element accessible from document.querySelector");
     }
 
     @api
     testQuerySelectorClassCrossComponentOtherNamespace() {
-        const element = document.querySelector(".other-namespace-target");
+        const element = document.querySelector(".other-namespace-target"); // eslint-disable-line lwc/no-document-query
         // Since document is patched to not allow access to shadow dom nodes
         testUtil.assertNull(element, "Expected no cross-namespace dom element accessible from document.querySelector");
     }

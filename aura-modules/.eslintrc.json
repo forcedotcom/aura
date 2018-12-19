@@ -26,6 +26,8 @@
                             "**/aura-modules/src/test/modules/securemoduletest/simpleCmp/simpleCmp.js",
                             "**/aura-modules/src/test/modules/securemoduletest/componentLifecycleTester/componentLifecycleTester.js",
                             "**/aura-modules/src/test/modules/securemoduletest/testConstructor/testConstructor.js"],
+                        "lwc/no-document-query" : [ "**/aura-modules/src/test/modules/lockerlwc/domAccessRootNode/domAccessRootNode.js",
+                            "**/aura-modules/src/test/modules/securemoduletest/crossComponentSource/crossComponentSource.js"],
                         "no-undef" : [ "**/aura-modules/src/test/modules/securemoduletest/bootstrap/bootstrap.js",
                             "**/aura-modules/src/test/modules/securemoduletest/simpleCmp/simpleCmp.js",
                             "**/aura-modules/src/test/modules/securemoduletest/simpleLib/simpleLib.js"],

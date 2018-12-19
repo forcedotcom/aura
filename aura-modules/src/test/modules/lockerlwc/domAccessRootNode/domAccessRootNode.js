@@ -21,7 +21,7 @@ export default class RootNode extends LightningElement {
     @api
     documentQuerySelector() {
         testUtils.assertNull(
-            document.querySelector('.inTheShadow'),
+            document.querySelector('.inTheShadow'), // eslint-disable-line lwc/no-document-query
             'document.querySelector() leaks shadow dom elements in LWC component'
         );
     }
@@ -30,7 +30,7 @@ export default class RootNode extends LightningElement {
     documentQuerySelectorAll() {
         testUtils.assertEquals(
             0,
-            document.querySelectorAll('.inTheShadow').length,
+            document.querySelectorAll('.inTheShadow').length, // eslint-disable-line lwc/no-document-query
             'document.querySelectorAll() leaks shadow dom elements in LWC component'
         );
     }

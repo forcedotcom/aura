@@ -281,9 +281,7 @@ public class AuraContextFilter implements Filter {
                     try {
                         context.setGlobalValue(entry.getKey(), entry.getValue());
                     } catch (AuraRuntimeException are) {
-                        ClientOutOfSyncException coose = new ClientOutOfSyncException(are.getMessage());
-                        coose.initCause(are);
-                        throw coose;
+                        throw new ClientOutOfSyncException(are.getMessage());
                     }
                 }
             }

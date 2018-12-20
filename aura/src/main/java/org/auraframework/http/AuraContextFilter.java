@@ -194,25 +194,7 @@ public class AuraContextFilter implements Filter {
                 out.append(ipe.getMessage());
             }
         } catch (Throwable e) {
-            try {
-                AuraContext context = contextService.getCurrentContext();
-                if (context != null) {
-                    servletUtilAdapter.handleServletException(e, false, context, (HttpServletRequest) req, (HttpServletResponse) res, false);
-                } else {
-                    throw new Exception();
-                }
-            } catch (Throwable ignored) {
-                // something really bad happened. Fall back as best we can.
-                if (getFormat((HttpServletRequest)req) == Format.JSON) {
-                    HttpServletResponse response = (HttpServletResponse) res;
-                    response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-                    response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache,no-store");
-                    response.getWriter().append(String.format("{\"message\":\"%s\"}", AuraTextUtil.escapeForJSONString(e.getMessage())));
-                } else {
-                    // if we're not JSON, then the generic error handler can serialize as HTML
-                    throw e;
-                }
-            }
+            handleException(req, res, e);
         } finally {
             try {
                 if (loggingService != null) {
@@ -227,6 +209,33 @@ public class AuraContextFilter implements Filter {
             } finally {
                 endContext();
             }
+        }
+    }
+
+    protected void handleException(ServletRequest req, ServletResponse res, Throwable t) throws ServletException, IOException {
+        try {
+            AuraContext context = contextService.getCurrentContext();
+            if (context != null) {
+                servletUtilAdapter.handleServletException(t, false, context, (HttpServletRequest) req, (HttpServletResponse) res, false);
+                res.flushBuffer();
+            } else {
+                throw new Exception();
+            }
+        } catch (Throwable ignored) {
+            // something really bad happened. Fall back as best we can.
+            if (getFormat((HttpServletRequest)req) == Format.JSON) {
+                HttpServletResponse response = (HttpServletResponse) res;
+                response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+                response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache,no-store");
+                response.getWriter().append(String.format("{\"message\":\"%s\"}", AuraTextUtil.escapeForJSONString(t.getMessage())));
+                response.flushBuffer();
+            } else {
+                // if we're not JSON, then the generic error handler can serialize as HTML
+                throw new ServletException(t);
+            }
+        }
+        if (t instanceof Error) {
+            throw new ServletException(t);
         }
     }
 

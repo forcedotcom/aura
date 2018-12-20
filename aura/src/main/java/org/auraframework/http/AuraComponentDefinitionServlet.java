@@ -140,7 +140,7 @@ public class AuraComponentDefinitionServlet extends AuraBaseServlet {
                 String computedUID = allUIDs.toString();
     
                 int requestedHashCode = 0;
-                if (descriptors.size() > 1) {
+                if (descriptors.size() > 1 && StringUtils.isNotBlank(requestedUID) && !requestedUID.startsWith("LATEST")) {
                     try {
                         requestedHashCode = Integer.parseInt(requestedUID);
                     } catch (NumberFormatException nfe) {

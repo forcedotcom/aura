@@ -88,13 +88,13 @@ public class AuraContextFilter implements Filter {
 
     private AuraDeprecated auraDeprecated; // force initialization of Aura
 
-    private ContextService contextService;
+    protected ContextService contextService;
     private LoggingService loggingService;
     private DefinitionService definitionService;
     protected ConfigAdapter configAdapter;
     protected SerializationService serializationService;
     private BrowserCompatibilityService browserCompatibilityService;
-    private ServletUtilAdapter servletUtilAdapter;
+    protected ServletUtilAdapter servletUtilAdapter;
 
     @Inject
     public void setContextService(ContextService service) {
@@ -192,7 +192,7 @@ public class AuraContextFilter implements Filter {
             } else {
                 out.append(ipe.getMessage());
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             try {
                 AuraContext context = contextService.getCurrentContext();
                 if (context != null) {
@@ -200,7 +200,7 @@ public class AuraContextFilter implements Filter {
                 } else {
                     throw new Exception();
                 }
-            } catch (Exception ignored) {
+            } catch (Throwable ignored) {
                 // something really bad happened. Fall back as best we can.
                 if (getFormat((HttpServletRequest)req) == Format.JSON) {
                     HttpServletResponse response = (HttpServletResponse) res;
@@ -298,7 +298,7 @@ public class AuraContextFilter implements Filter {
         return context;
     }
 
-    private Format getFormat(HttpServletRequest request) {
+    protected Format getFormat(HttpServletRequest request) {
         Format f = format.get(request);
 
         //

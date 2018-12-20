@@ -846,6 +846,7 @@ public class ServerServiceImplTest extends IntegrationTestCase {
     }
 
     @Test
+    @ThreadHostileTest
     public void testWriteTemplateHasNoCsrfTokenIfAppcacheEnabledAndBootstrapNotInlined() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class,
                 String.format(baseApplicationTag, "useAppCache='true' render='client'", ""));
@@ -864,6 +865,7 @@ public class ServerServiceImplTest extends IntegrationTestCase {
     }
 
     @Test
+    @ThreadHostileTest("modifies mock config adapter")
     public void testWriteTemplateHasCsrfTokenIfBootstrapIsInlined() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class,
                 String.format(baseApplicationTag, "useAppCache='true' render='client'", ""));
@@ -922,6 +924,7 @@ public class ServerServiceImplTest extends IntegrationTestCase {
 
     /* Make sure we don't return a cached version of the CSS string when the setting changes */
     @Test
+    @ThreadHostileTest("modifies mock config adapter")
     public void testTurningOnCssVarsWritesCorrectCss() throws Exception {
         getMockConfigAdapter().setIsCssVarTransformEnabled(false);
         String withoutCssVars = writeCss(false);
@@ -934,6 +937,7 @@ public class ServerServiceImplTest extends IntegrationTestCase {
     }
 
     @Test
+    @ThreadHostileTest("modifies mock config adapter")
     public void testTurningOnCssVarsWritesCorrectCssForIE11() throws Exception {
         getMockConfigAdapter().setIsCssVarTransformEnabled(false);
         String withoutCssVars = writeCss(true);

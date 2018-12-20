@@ -38,6 +38,7 @@ import static org.auraframework.util.json.JsonConstant.OBJECT_START;
 import static org.auraframework.util.json.JsonConstant.STRING;
 import static org.auraframework.util.json.JsonConstant.WHITESPACE;
 
+import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,6 +50,8 @@ import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import org.auraframework.util.LimitedLengthInputStream;
 import org.auraframework.util.LimitedLengthInputStream.StreamFinishedListener;
 import org.auraframework.util.Utf8InputStreamReader;
@@ -56,8 +59,6 @@ import org.auraframework.util.json.JsonHandler.JsonValidationException;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
-import javax.annotation.Nonnull;
 
 /**
  * Reads a stream of json-formatted objects. Call next() to parse the next thing
@@ -106,7 +107,7 @@ import javax.annotation.Nonnull;
  * parsing into Maps and Lists, and lets you put the primitives directly into
  * your objects as they are parsed.
  */
-public class JsonStreamReader {
+public class JsonStreamReader implements Closeable {
 
     // When we JSON.parse, it needs to load all the bytes into memory. 
     // Allowing any amount of bytes would allow someone to compromise our servers.
@@ -998,6 +999,7 @@ public class JsonStreamReader {
         return c;
     }
 
+    @Override
     public void close() throws IOException {
         reader.close();
     }

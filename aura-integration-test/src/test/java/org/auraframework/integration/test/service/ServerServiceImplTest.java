@@ -15,6 +15,19 @@
  */
 package org.auraframework.integration.test.service;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static org.auraframework.impl.test.util.matcher.IsEqualIgnoringAllWhiteSpace.equalToIgnoringAllWhiteSpace;
+import static org.auraframework.impl.test.util.matcher.StringContainsIgnoringAllWhiteSpace.containsStringIgnoringAllWhiteSpace;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -25,11 +38,14 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -66,12 +82,13 @@ import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.validation.ReferenceValidationContext;
-import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class ServerServiceImplTest extends IntegrationTestCase {
@@ -84,13 +101,13 @@ public class ServerServiceImplTest extends IntegrationTestCase {
         setShouldSetupContext(false);
     }
 
-    private static final Set<String> GLOBAL_IGNORE = Sets.newHashSet("context", "actions", "perf", "perfSummary");
+    private static final Set<String> GLOBAL_IGNORE = ImmutableSet.of("context", "actions", "perf", "perfSummary");
 
     // Do not test for null message, it cannot legally be null.
     private static class EmptyActionDef implements ActionDef {
         private static final long serialVersionUID = 1L;
-        StringWriter sw;
-        String name;
+        final StringWriter sw;
+        final String name;
 
         protected EmptyActionDef(StringWriter sw, String name) {
             this.sw = sw;
@@ -154,11 +171,11 @@ public class ServerServiceImplTest extends IntegrationTestCase {
         }
 
         @Override
-        public void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException {
+        public void appendSupers(Set<DefDescriptor<?>> supers) {
         }
 
         @Override
-        public void serialize(Json json) throws IOException {
+        public void serialize(Json json) {
         }
 
         @Override
@@ -188,15 +205,15 @@ public class ServerServiceImplTest extends IntegrationTestCase {
 
         @Override
         public List<String> getLoggableParams() {
-            return Lists.newArrayList();
+            return new ArrayList<>();
         }
     }
 
-    private class EmptyAction extends AbstractActionImpl<EmptyActionDef> {
+    public static class EmptyAction extends AbstractActionImpl<EmptyActionDef> {
+        private final DefinitionService localDS;
         private String returnValue = "";
-        private Integer count = 0;
+        private int count = 0;
         private String parameter = "";
-        private DefinitionService localDS;
 
         public EmptyAction(StringWriter sw, String name, DefinitionService definitionService,
                 ConfigAdapter configAdapter) {
@@ -209,8 +226,9 @@ public class ServerServiceImplTest extends IntegrationTestCase {
             this.localDS = definitionService;
         }
 
+        @SuppressWarnings("unused") // Needed for reflection
         public Integer getCount() {
-            return this.count;
+            return Integer.valueOf(this.count);
         }
 
         public String getName() {
@@ -251,22 +269,20 @@ public class ServerServiceImplTest extends IntegrationTestCase {
 
         @Override
         public void serialize(Json json) throws IOException {
-            Map<String, String> value = Maps.newHashMap();
             String res = this.getName();
-            if (this.parameter != "") {
-                res = res.concat("{" + this.parameter + "}");
+            if (!"".equals(this.parameter)) {
+                res = res.concat('{' + this.parameter + '}');
             }
-            value.put("action", res);
-            json.writeValue(value);
+            json.writeValue(Collections.singletonMap("action", res));
         }
     }
 
     private static class ShareCmpAction extends ActionDelegate {
 
-        private Map<String, Object> componentAttributes = null;
-        private Component sharedCmp = null;
+        private final Map<String, Object> componentAttributes;
+        private final Component sharedCmp;
+        private final String name;
         private Object returnValue = null;
-        private String name = "ShareCmpAction";
 
         public ShareCmpAction(String name, Action originalAction, Component sharedCmp,
                 Map<String, Object> componentAttributes) {
@@ -281,7 +297,7 @@ public class ServerServiceImplTest extends IntegrationTestCase {
             try {
                 sharedCmp.getAttributes().set(componentAttributes);
             } catch (QuickFixException e) {
-                throw new AuraExecutionException(e.getMessage(), e.getLocation());
+                throw new AuraExecutionException(e.getMessage(), e.getLocation(), e);
             }
             super.run();
             String whatIsInResponse = (String) super.getReturnValue();
@@ -298,10 +314,7 @@ public class ServerServiceImplTest extends IntegrationTestCase {
 
         @Override
         public void serialize(Json json) throws IOException {
-            Map<String, Object> value = Maps.newHashMap();
-            value.put("shared_component", this.sharedCmp);
-            value.put("action", this.name);
-            json.writeValue(value);
+            json.writeValue(ImmutableMap.of("shared_component", this.sharedCmp, "action", this.name));
         }
     }
 
@@ -322,39 +335,35 @@ public class ServerServiceImplTest extends IntegrationTestCase {
     @Test
     public void testSharedCmp() throws Exception {
         contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
-        Map<String, Object> attributes = Maps.newHashMap();
-        Map<String, Object> attributesA = Maps.newHashMap();
-        attributesA.put("attr", "attrA");
-        Map<String, Object> attributesB = Maps.newHashMap();
-        attributesB.put("attr", "attrB");
-        Map<String, Object> attributesC = Maps.newHashMap();
-        attributesC.put("attr", "attrC");
-        Component sharedCmp = instanceService.getInstance("ifTest:testIfWithModel", ComponentDef.class,
-                attributes);
-        StringWriter sw = new StringWriter();
-        Action a = new EmptyAction(sw, "first action", definitionService, configAdapter);
-        Action b = new EmptyAction(sw, "second action", definitionService, configAdapter);
-        Action c = new EmptyAction(sw, "third action", definitionService, configAdapter);
-        Action d = new ShareCmpAction("d", a, sharedCmp, attributesA);
-        Action e = new ShareCmpAction("e", b, sharedCmp, attributesB);
-        Action f = new ShareCmpAction("f", c, sharedCmp, attributesC);
-        List<Action> actions = Lists.newArrayList(d, e, f);
-        Message message = new Message(actions);
-        // run the list of actions.
-        serverService.run(message, contextService.getCurrentContext(), sw, null);
+        Map<String, Object> attributes = new HashMap<>();
+        Map<String, Object> attributesA = Collections.singletonMap("attr", "attrA");
+        Map<String, Object> attributesB = Collections.singletonMap("attr", "attrB");
+        Map<String, Object> attributesC = Collections.singletonMap("attr", "attrC");
+        Component sharedCmp = instanceService.getInstance("ifTest:testIfWithModel", ComponentDef.class, attributes);
+        
+        Action e;
+        Action f;
+        try (StringWriter sw = new StringWriter()) {
+            Action a = new EmptyAction(sw, "first action",  definitionService, configAdapter);
+            Action b = new EmptyAction(sw, "second action", definitionService, configAdapter);
+            Action c = new EmptyAction(sw, "third action",  definitionService, configAdapter);
+            Action d = new ShareCmpAction("d", a, sharedCmp, attributesA);
+            e        = new ShareCmpAction("e", b, sharedCmp, attributesB);
+            f        = new ShareCmpAction("f", c, sharedCmp, attributesC);
+            List<Action> actions = Lists.newArrayList(d, e, f);
+            Message message = new Message(actions);
+            // run the list of actions.
+            serverService.run(message, contextService.getCurrentContext(), sw, null);
+        }
 
         // sanity check, sharedCmp should have the latest attribute value.
         // this has nothing to do with the fix though
-        assertEquals("attrC", sharedCmp.getAttributes().getValue("attr"));
+        assertThat(sharedCmp.getAttributes().getValue("attr"), equalTo("attrC"));
         // Here are the checks for fix
         // returnValue of action e is going to have shared component from action d in Json format
-        String returne = (String) e.getReturnValue();
-        assertTrue(returne.contains("markup://ifTest:testIfWithModel"));
-        assertTrue(returne.contains("\"attr\":\"attrA\""));
+        assertThat(e, hasProperty("returnValue", stringContainsInOrder("markup://ifTest:testIfWithModel", "\"attr\":\"attrA\"")));
         // returnValue of action f is going to have shared component from action e in Json format
-        String returnf = (String) f.getReturnValue();
-        assertTrue(returnf.contains("markup://ifTest:testIfWithModel"));
-        assertTrue(returnf.contains("\"attr\":\"attrB\""));
+        assertThat(f, hasProperty("returnValue", stringContainsInOrder("markup://ifTest:testIfWithModel", "\"attr\":\"attrB\"")));
 
     }
 
@@ -366,23 +375,19 @@ public class ServerServiceImplTest extends IntegrationTestCase {
     private static Map<String, Object> validateEmptyActionSerialization(String serialized, Set<String> ignore,
             List<String> actionNameList) {
         int actionNumber = actionNameList.size();
-        Set<String> extras = Sets.newHashSet();
+        
         @SuppressWarnings("unchecked")
         Map<String, Object> json = (Map<String, Object>) new JsonReader().read(serialized);
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> actions = (List<Map<String, Object>>) json.get("actions");
         assertThat(actions, Matchers.hasSize(actionNumber));
+        
         for (int i = 0; i < actionNumber; i++) {
-            Map<String, Object> action = actions.get(i);
-            assertEquals("didn't get expecting action on i:" + i,
-                    actionNameList.get(i), action.get("action"));
+            assertThat("didn't get expecting action on i:" + i, actions.get(i), hasEntry("action", actionNameList.get(i)));
         }
-        for (String key : json.keySet()) {
-            if (!GLOBAL_IGNORE.contains(key) && (ignore == null || !ignore.contains(key))) {
-                extras.add(key);
-            }
-        }
-        assertTrue("Expected no extra keys, found: " + extras + ", in: " + json, extras.isEmpty());
+        
+        Set<String> extras = json.keySet().stream().filter(key -> !GLOBAL_IGNORE.contains(key) && (ignore == null || !ignore.contains(key))).collect(Collectors.toSet());
+        assertThat("Expected no extra keys, found: " + extras + ", in: " + json, extras, empty());
         return json;
     }
 
@@ -397,27 +402,27 @@ public class ServerServiceImplTest extends IntegrationTestCase {
     @Test
     public void testMultipleActions() throws Exception {
         contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
-        StringWriter sw = new StringWriter();
-        Action a = new EmptyAction(sw, "first action", definitionService, configAdapter);
-        Action b = new EmptyAction(sw, "second action", definitionService, configAdapter);
-        Action c = new EmptyAction(sw, "third action", definitionService, configAdapter);
-        List<Action> actions = Lists.newArrayList(a, b, c);
-        Message message = new Message(actions);
-        // run the list of actions.
-        serverService.run(message, contextService.getCurrentContext(), sw, null);
-        String returnValuea = "{\"actions\":[";
-        String returnValueb = returnValuea + "{\"action\":\"firstaction\"}";
-        String returnValuec = returnValueb + ",{\"action\":\"secondaction\"}";
-
-        List<String> returnValueList = Arrays.asList(returnValuea, returnValueb, returnValuec);
-        for (int i = 0; i < actions.size(); i++) {
-            Action act = actions.get(i);
-            assertEquals("get different action return on i:" + i,
-                    returnValueList.get(i), ((String) act.getReturnValue()).replaceAll("\\s+", ""));
+        try (StringWriter sw = new StringWriter()) {
+            Action a = new EmptyAction(sw, "first action", definitionService, configAdapter);
+            Action b = new EmptyAction(sw, "second action", definitionService, configAdapter);
+            Action c = new EmptyAction(sw, "third action", definitionService, configAdapter);
+            List<Action> actions = Lists.newArrayList(a, b, c);
+            Message message = new Message(actions);
+            // run the list of actions.
+            serverService.run(message, contextService.getCurrentContext(), sw, null);
+            String returnValuea = "{\"actions\":[";
+            String returnValueb = returnValuea + "{\"action\":\"firstaction\"}";
+            String returnValuec = returnValueb + ",{\"action\":\"secondaction\"}";
+    
+            final String[] returnValueList = {returnValuea, returnValueb, returnValuec};
+            for (int i = 0; i < actions.size(); i++) {
+                Action act = actions.get(i);
+                assertThat("get different action return on i: " + i, act, hasProperty("returnValue", equalToIgnoringAllWhiteSpace(returnValueList[i])));
+            }
+    
+            validateEmptyActionSerialization(sw.toString(), null,
+                    Arrays.asList("first action", "second action", "third action"));
         }
-
-        validateEmptyActionSerialization(sw.toString(), null,
-                Arrays.asList("first action", "second action", "third action"));
     }
 
     /**
@@ -428,22 +433,23 @@ public class ServerServiceImplTest extends IntegrationTestCase {
     @Test
     public void testSameActionTwice() throws Exception {
         contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
-        StringWriter sw = new StringWriter();
-        Action a = new EmptyAction(sw, "first action", definitionService, configAdapter);
-        Action b = new EmptyAction(sw, "second action", definitionService, configAdapter);
-        List<Action> actions = Lists.newArrayList(a, b, a, b);
-        Message message = new Message(actions);
-        serverService.run(message, contextService.getCurrentContext(), sw, null);
-        assertTrue(((EmptyAction) a).getCount() == 2);
-        assertTrue(((EmptyAction) b).getCount() == 2);
-        // in the old way since we output action info into response after all actions finish running, the previous run's
-        // info will get overwrited
-        // but this is not the case now
-        // we need to verify when same action run twice, and something about the action changed between the two runs
-        // --like the parameter,
-        // the response has the action info for both times.
-        validateEmptyActionSerialization(sw.toString(), null,
-                Arrays.asList("first action", "second action", "first action{#2}", "second action{#2}"));
+        try (StringWriter sw = new StringWriter()) {
+            Action a = new EmptyAction(sw, "first action", definitionService, configAdapter);
+            Action b = new EmptyAction(sw, "second action", definitionService, configAdapter);
+            List<Action> actions = ImmutableList.of(a, b, a, b);
+            Message message = new Message(actions);
+            serverService.run(message, contextService.getCurrentContext(), sw, null);
+            assertThat(a, hasProperty("count", equalTo(Integer.valueOf(2))));
+            assertThat(b, hasProperty("count", equalTo(Integer.valueOf(2))));
+            // in the old way since we output action info into response after all actions finish running, the previous run's
+            // info will get overwrited
+            // but this is not the case now
+            // we need to verify when same action run twice, and something about the action changed between the two runs
+            // --like the parameter,
+            // the response has the action info for both times.
+            validateEmptyActionSerialization(sw.toString(), null,
+                    Arrays.asList("first action", "second action", "first action{#2}", "second action{#2}"));
+        }
 
     }
 
@@ -457,11 +463,12 @@ public class ServerServiceImplTest extends IntegrationTestCase {
         contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
 
         Action a = new EmptyAction(definitionService, configAdapter);
-        List<Action> actions = Lists.newArrayList(a);
+        List<Action> actions = Collections.singletonList(a);
         Message message = new Message(actions);
-        StringWriter sw = new StringWriter();
-        serverService.run(message, contextService.getCurrentContext(), sw, null);
-        validateEmptyActionSerialization(sw.toString(), null, Arrays.asList("simpleaction"));
+        try (StringWriter sw = new StringWriter()) {
+            serverService.run(message, contextService.getCurrentContext(), sw, null);
+            validateEmptyActionSerialization(sw.toString(), null, Collections.singletonList("simpleaction"));
+        }
     }
 
     /**
@@ -474,16 +481,16 @@ public class ServerServiceImplTest extends IntegrationTestCase {
         contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
 
         Action a = new EmptyAction(definitionService, configAdapter);
-        List<Action> actions = Lists.newArrayList(a);
-        Map<String, String> extras = Maps.newHashMap();
+        List<Action> actions = Collections.singletonList(a);
+        Map<String, String> extras = Collections.singletonMap("this", "that");
         Message message = new Message(actions);
-        StringWriter sw = new StringWriter();
-        extras.put("this", "that");
-        serverService.run(message, contextService.getCurrentContext(), sw, extras);
-
-        Map<String, Object> json = validateEmptyActionSerialization(sw.toString(), Sets.newHashSet("this"),
-                Arrays.asList("simpleaction"));
-        assertEquals("Expected extras to be in " + json, "that", json.get("this"));
+        try (StringWriter sw = new StringWriter()) {
+            serverService.run(message, contextService.getCurrentContext(), sw, extras);
+    
+            Map<String, Object> json = validateEmptyActionSerialization(sw.toString(), Collections.singleton("this"),
+                    Collections.singletonList("simpleaction"));
+            assertThat("Expected extras to be in " + json, json, hasEntry("this", "that"));
+        }
     }
 
     /**
@@ -502,18 +509,19 @@ public class ServerServiceImplTest extends IntegrationTestCase {
 
         Set<DefDescriptor<?>> dependencies = definitionService.getDependencies(uid);
 
-        StringWriter output = new StringWriter();
-        serverService.writeAppCss(dependencies, output);
-
-        // A snippet of component css
-        String cssPiece = "AuraResourceServletTest-testWriteCssWithoutDupes";
-        Pattern pattern = Pattern.compile(cssPiece);
-        Matcher matcher = pattern.matcher(output.toString());
-        int count = 0;
-        while (matcher.find() && count < 3) {
-            count++;
+        try (StringWriter output = new StringWriter()) {
+            serverService.writeAppCss(dependencies, output);
+    
+            // A snippet of component css
+            String cssPiece = "AuraResourceServletTest-testWriteCssWithoutDupes";
+            Pattern pattern = Pattern.compile(cssPiece);
+            Matcher matcher = pattern.matcher(output.toString());
+            int count = 0;
+            while (matcher.find() && count < 3) {
+                count++;
+            }
+            assertThat("Component CSS repeated", Integer.valueOf(count), equalTo(Integer.valueOf(1)));
         }
-        assertEquals("Component CSS repeated", 1, count);
     }
 
     /**
@@ -534,27 +542,28 @@ public class ServerServiceImplTest extends IntegrationTestCase {
         contextService.startContext(Mode.DEV, Format.CSS,
                 Authentication.AUTHENTICATED, appDesc);
 
-        Set<DefDescriptor<?>> writable = Sets.newLinkedHashSet();
+        Set<DefDescriptor<?>> writable = Sets.newLinkedHashSetWithExpectedSize(4);
 
         writable.add(definitionService.getDefinition(child1).getStyleDef().getDescriptor());
         writable.add(definitionService.getDefinition(grandparent).getStyleDef().getDescriptor());
         writable.add(definitionService.getDefinition(parent).getStyleDef().getDescriptor());
         writable.add(definitionService.getDefinition(child2).getStyleDef().getDescriptor());
 
-        StringWriter output = new StringWriter();
-        serverService.writeAppCss(writable, output);
-        String css = output.toString();
-
-        //
-        // order should be exactly that above.
-        // child1, grandparent, parent, child2
-        //
-        assertTrue("child CSS should be written before grandparent CSS in: " + css,
-                css.indexOf(".setAttributesTestChild") < css.indexOf(".setAttributesTestGrandparent"));
-        assertTrue("grandparent CSS should be written before parent CSS in: " + css,
-                css.indexOf(".setAttributesTestGrandparent") < css.indexOf(".setAttributesTestParent"));
-        assertTrue("parent CSS should be written before another child CSS in: " + css,
-                css.indexOf(".setAttributesTestParent") < css.indexOf(".setAttributesTestAnotherChild"));
+        try (StringWriter output = new StringWriter()) {
+            serverService.writeAppCss(writable, output);
+            String css = output.toString();
+    
+            //
+            // order should be exactly that above.
+            // child1, grandparent, parent, child2
+            //
+            assertThat("child CSS should be written before grandparent CSS in: " + css, css,
+                    stringContainsInOrder(".setAttributesTestChild", ".setAttributesTestGrandparent"));
+            assertThat("grandparent CSS should be written before parent CSS in: " + css, css,
+                    stringContainsInOrder(".setAttributesTestGrandparent", ".setAttributesTestParent"));
+            assertThat("parent CSS should be written before another child CSS in: " + css, css,
+                    stringContainsInOrder(".setAttributesTestParent", ".setAttributesTestAnotherChild"));
+        }
     }
 
     @Test
@@ -568,14 +577,15 @@ public class ServerServiceImplTest extends IntegrationTestCase {
 
         Set<DefDescriptor<?>> dependencies = definitionService.getDependencies(uid);
 
-        StringWriter output = new StringWriter();
-        serverService.writeAppCss(dependencies, output);
-
-        String sourceNoWhitespace = output.toString().replaceAll("\\s", "");
-        String preloaded1 = ".clientApiTestCssStyleTest{background-color:#eee}";
-        String preloaded2 = ".testTestValidCSS{color:#1797c0";
-        assertTrue("Does not have preloaded css (1) in " + output, sourceNoWhitespace.contains(preloaded1));
-        assertTrue("Does not have preloaded css (2) in " + output, sourceNoWhitespace.contains(preloaded2));
+        try (StringWriter output = new StringWriter()) {
+            serverService.writeAppCss(dependencies, output);
+    
+            String source = output.toString();
+            String preloaded1 = ".clientApiTestCssStyleTest{background-color:#eee}";
+            String preloaded2 = ".testTestValidCSS{color:#1797c0";
+            assertThat("Does not have preloaded css (1) in " + source, source, containsStringIgnoringAllWhiteSpace(preloaded1));
+            assertThat("Does not have preloaded css (2) in " + source, source, containsStringIgnoringAllWhiteSpace(preloaded2));
+        }
     }
 
     /**
@@ -592,21 +602,20 @@ public class ServerServiceImplTest extends IntegrationTestCase {
 
         Set<DefDescriptor<?>> dependencies = definitionService.getDependencies(uid);
 
-        // prime def cache
-        StringWriter output = new StringWriter();
-        serverService.writeDefinitions(dependencies, output, false, -1, HYDRATION_TYPE.all);
-        String text = output.toString();
         final String dupeCheck = "$A.clientService.initDefs(";
-        if (text.indexOf(dupeCheck) != text.lastIndexOf(dupeCheck)) {
-            fail("found duplicated code in: " + text);
+        
+        // prime def cache
+        try (StringWriter output = new StringWriter()) {
+            serverService.writeDefinitions(dependencies, output, false, -1, HYDRATION_TYPE.all);
+            String text = output.toString();
+            assertThat("found duplicated code in: " + text, Integer.valueOf(text.indexOf(dupeCheck)), equalTo(Integer.valueOf(text.lastIndexOf(dupeCheck))));
         }
 
         // now check that defs not re-written with unempty cache
-        output = new StringWriter();
-        serverService.writeDefinitions(dependencies, output, false, -1, HYDRATION_TYPE.all);
-        text = output.toString();
-        if (text.indexOf(dupeCheck) != text.lastIndexOf(dupeCheck)) {
-            fail("found duplicated code in: " + text);
+        try (StringWriter output = new StringWriter()) {
+            serverService.writeDefinitions(dependencies, output, false, -1, HYDRATION_TYPE.all);
+            String text = output.toString();
+            assertThat("found duplicated code in: " + text, Integer.valueOf(text.indexOf(dupeCheck)), equalTo(Integer.valueOf(text.lastIndexOf(dupeCheck))));
         }
     }
 
@@ -626,18 +635,22 @@ public class ServerServiceImplTest extends IntegrationTestCase {
 
         // get defs with LockerService enabled
         getMockConfigAdapter().setLockerServiceEnabled(true);
-        StringWriter output = new StringWriter();
-        serverService.writeDefinitions(dependencies, output, false, -1, HYDRATION_TYPE.all);
-        String firstOutput = output.toString();
-
+        String firstOutput;
+        try (StringWriter output = new StringWriter()) {
+            serverService.writeDefinitions(dependencies, output, false, -1, HYDRATION_TYPE.all);
+            firstOutput = output.toString();
+        }
+        
         // now get defs with LockerService disabled
         getMockConfigAdapter().setLockerServiceEnabled(false);
-        output = new StringWriter();
-        serverService.writeDefinitions(dependencies, output, false, -1, HYDRATION_TYPE.all);
-        String secondOutput = output.toString();
-
-        assertFalse("Expected writeDefinitions output to change after modifying LockerService cache buster",
-                firstOutput.equals(secondOutput));
+        
+        String secondOutput;
+        try (StringWriter output = new StringWriter()) {
+            serverService.writeDefinitions(dependencies, output, false, -1, HYDRATION_TYPE.all);
+            secondOutput = output.toString();
+        }
+        assertThat("Expected writeDefinitions output to change after modifying LockerService cache buster",
+                firstOutput, not(equalTo(secondOutput)));
     }
 
     /**
@@ -647,22 +660,23 @@ public class ServerServiceImplTest extends IntegrationTestCase {
     @Test
     public void testWriteDefinitionsMetricsWithDevMode() throws Exception {
         Action action = new EmptyAction(definitionService, configAdapter);
-        Message message = new Message(Lists.newArrayList(action));
+        Message message = new Message(Collections.singletonList(action));
         DefDescriptor<ComponentDef> cmpDesc = definitionService
                 .getDefDescriptor("lockerTest:basicTest", ComponentDef.class);
         AuraContext context = contextService
                 .startContext(Mode.DEV, Format.JS, Authentication.AUTHENTICATED, cmpDesc);
 
         // get defs with LockerService enabled
-        getMockConfigAdapter().setIsProduction(false);
-        StringWriter output = new StringWriter();
-        serverService.run(message, context, output, null);
-        String outputStr = output.toString();
-        JsonStreamReader reader = new JsonStreamReader(new ByteArrayInputStream(outputStr.getBytes()));
-        reader.next();
-        Map<String,Object> outputObj = reader.getObject();
-        assertNotNull(outputObj);
-        assertNotNull(outputObj.get("perf"));
+        getMockConfigAdapter().setIsProduction(FALSE);
+        try (final StringWriter output = new StringWriter()) {
+            serverService.run(message, context, output, null);
+            String outputStr = output.toString();
+            try (final JsonStreamReader reader = new JsonStreamReader(new ByteArrayInputStream(outputStr.getBytes()))) {
+                reader.next();
+                Map<String,Object> outputObj = reader.getObject();
+                assertThat(outputObj, hasEntry(equalTo("perf"), notNullValue()));
+            }
+        }
     }
 
     /**
@@ -672,22 +686,23 @@ public class ServerServiceImplTest extends IntegrationTestCase {
     @Test
     public void testWriteDefinitionsNoMetricsWithProdMode() throws Exception {
         Action action = new EmptyAction(definitionService, configAdapter);
-        Message message = new Message(Lists.newArrayList(action));
+        Message message = new Message(Collections.singletonList(action));
         DefDescriptor<ComponentDef> cmpDesc = definitionService
                 .getDefDescriptor("lockerTest:basicTest", ComponentDef.class);
         AuraContext context = contextService
                 .startContext(Mode.PROD, Format.JS, Authentication.AUTHENTICATED, cmpDesc);
         
         // get defs with LockerService enabled
-        getMockConfigAdapter().setIsProduction(true);
-        StringWriter output = new StringWriter();
-        serverService.run(message, context, output, null);
-        String outputStr = output.toString();
-        JsonStreamReader reader = new JsonStreamReader(new ByteArrayInputStream(outputStr.getBytes()));
-        reader.next();
-        Map<String,Object> outputObj = reader.getObject();
-        assertNotNull(outputObj);
-        assertNull(outputObj.get("perf"));
+        getMockConfigAdapter().setIsProduction(TRUE);
+        try (StringWriter output = new StringWriter()) {
+            serverService.run(message, context, output, null);
+            String outputStr = output.toString();
+            try (JsonStreamReader reader = new JsonStreamReader(new ByteArrayInputStream(outputStr.getBytes()))) {
+                reader.next();
+                Map<String,Object> outputObj = reader.getObject();
+                assertThat(outputObj, not(hasKey("perf")));
+            }
+        }
     }
 
     @Test
@@ -702,21 +717,22 @@ public class ServerServiceImplTest extends IntegrationTestCase {
         Set<DefDescriptor<?>> dependencies = definitionService.getDependencies(uid);
         definitionService.getDefinition(appDesc);
 
-        StringWriter output = new StringWriter();
-        serverService.writeDefinitions(dependencies, output, false, -1, HYDRATION_TYPE.all);
-
-        String sourceNoWhitespace = output.toString().replaceAll("\\s", "");
-
-        String[] preloads = new String[] {
+        try (StringWriter output = new StringWriter()) {
+            serverService.writeDefinitions(dependencies, output, false, -1, HYDRATION_TYPE.all);
+    
+            String source = output.toString();
+    
+            String[] preloads = new String[] {
                 "\"descriptor\":\"markup://aura:placeholder\"",
                 "\"descriptor\":\"markup://ui:input\"",
                 "\"descriptor\":\"markup://ui:inputText\"",
                 "\"descriptor\":\"markup://ui:outputText\"",
                 "\"descriptor\":\"markup://test:testValidCSS\""
-        };
-
-        for (String preload : preloads) {
-            assertTrue("Does not have preloaded component: (" + preload + ")", sourceNoWhitespace.contains(preload));
+            };
+    
+            for (String preload : preloads) {
+                assertThat("Does not have preloaded component: (" + preload + ")", source, containsStringIgnoringAllWhiteSpace(preload));
+            }
         }
     }
 
@@ -743,9 +759,9 @@ public class ServerServiceImplTest extends IntegrationTestCase {
 //                js.contains("There are errors preventing this file from being minimized!"));
     }
 
-    /**
-     * When we write out the application javascript we should only include component classes once per component.
-     */
+    ///**
+    // * When we write out the application javascript we should only include component classes once per component.
+    // */
     // @Test
     // public void testNoComponentClassDuplicate() throws Exception {
     //     Object componentClass = null;
@@ -785,8 +801,8 @@ public class ServerServiceImplTest extends IntegrationTestCase {
         String source = "<aura:application template=\"auradocs:template\"></aura:application>";
         String js = getDefinitionsOutput(source.toString(), Mode.PROD);
 
-        assertFalse("auradocs:template or its base aura:template was present in app.js",
-                    js.contains(":template"));
+        assertThat("auradocs:template or its base aura:template was present in app.js", js,
+                    not(containsString(":template")));
     }
 
     /**
@@ -801,12 +817,12 @@ public class ServerServiceImplTest extends IntegrationTestCase {
         contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         try (final Writer writer = mock(Writer.class)) {
             when(writer.append('{')).thenThrow(new IOException(exceptionMessage));
-            Message message = new Message(new ArrayList<Action>());
+            Message message = new Message(Collections.emptyList());
             try {
                 serverService.run(message, contextService.getCurrentContext(), writer, null);
                 fail("Exception should be thrown from method run().");
-            } catch(IOException e) {
-                assertEquals(exceptionMessage, e.getMessage());
+            } catch (IOException e) {
+                assertThat(e, hasProperty("message", equalTo(exceptionMessage)));
             }
         }
     }
@@ -822,10 +838,11 @@ public class ServerServiceImplTest extends IntegrationTestCase {
         context.addLoaded(appDesc, uid);
         Set<DefDescriptor<?>> dependencies = definitionService.getDependencies(uid);
 
-        StringWriter output = new StringWriter();
-        serverService.writeDefinitions(dependencies, output, false, -1, HYDRATION_TYPE.all);
-
-        return output.toString();
+        try (StringWriter output = new StringWriter()) {
+            serverService.writeDefinitions(dependencies, output, false, -1, HYDRATION_TYPE.all);
+    
+            return output.toString();
+        }
     }
 
     @Test
@@ -842,7 +859,7 @@ public class ServerServiceImplTest extends IntegrationTestCase {
         @SuppressWarnings("unchecked")
         Map<String,Object> initMap = (Map<String, Object>) new JsonReader().read(init);
 
-        assertEquals("Token should be sent if appcache is not enabled", "aura", initMap.get("token"));
+        assertThat("Token should be sent if appcache is not enabled", initMap, hasEntry("token", "aura"));
     }
 
     @Test
@@ -861,7 +878,7 @@ public class ServerServiceImplTest extends IntegrationTestCase {
         @SuppressWarnings("unchecked")
         Map<String,Object> initMap = (Map<String, Object>) new JsonReader().read(init);
 
-        assertEquals("Token should not be sent if appcache is enabled", false, initMap.containsKey("token"));
+        assertThat("Token should not be sent if appcache is enabled", initMap, not(hasKey("token")));
     }
 
     @Test
@@ -880,7 +897,7 @@ public class ServerServiceImplTest extends IntegrationTestCase {
         @SuppressWarnings("unchecked")
         Map<String,Object> initMap = (Map<String, Object>) new JsonReader().read(init);
 
-        assertEquals("Token should be sent if bootstrap inlining is enabled", "aura", initMap.get("token"));
+        assertThat("Token should be sent if bootstrap inlining is enabled", initMap, hasEntry("token", "aura"));
     }
 
     @Test
@@ -899,7 +916,7 @@ public class ServerServiceImplTest extends IntegrationTestCase {
 
         // Assert
         String actual = template.getAttributes().getValue("prefetchTags").toString();
-        assertThat(actual, CoreMatchers.containsString("ckeditor.js"));
+        assertThat(actual, containsString("ckeditor.js"));
     }
     
 
@@ -919,34 +936,40 @@ public class ServerServiceImplTest extends IntegrationTestCase {
 
         // Assert
         String actual = template.getAttributes().getValue("prefetchTags").toString();
-        assertThat(actual, CoreMatchers.not(CoreMatchers.containsString("ckeditor.js")));
+        assertThat(actual, not(containsString("ckeditor.js")));
     }
 
     /* Make sure we don't return a cached version of the CSS string when the setting changes */
     @Test
     @ThreadHostileTest("modifies mock config adapter")
     public void testTurningOnCssVarsWritesCorrectCss() throws Exception {
-        getMockConfigAdapter().setIsCssVarTransformEnabled(false);
-        String withoutCssVars = writeCss(false);
-        assertFalse(withoutCssVars.contains("var(--lwc-color,red)"));
-
-        getMockConfigAdapter().setIsCssVarTransformEnabled(true);
-        String withCssVars = writeCss(false);
-        assertTrue(withCssVars.contains("var(--lwc-color,red)"));
-        resetMocks();
+        try {
+            getMockConfigAdapter().setIsCssVarTransformEnabled(false);
+            String withoutCssVars = writeCss(false);
+            assertThat(withoutCssVars, not(containsString("var(--lwc-color,red)")));
+    
+            getMockConfigAdapter().setIsCssVarTransformEnabled(true);
+            String withCssVars = writeCss(false);
+            assertThat(withCssVars, containsString("var(--lwc-color,red)"));
+        } finally {
+            resetMocks();
+        }
     }
 
     @Test
     @ThreadHostileTest("modifies mock config adapter")
     public void testTurningOnCssVarsWritesCorrectCssForIE11() throws Exception {
-        getMockConfigAdapter().setIsCssVarTransformEnabled(false);
-        String withoutCssVars = writeCss(true);
-        assertFalse(withoutCssVars.contains("var(--lwc-color,red)"));
-
-        getMockConfigAdapter().setIsCssVarTransformEnabled(true);
-        String withCssVars = writeCss(true);
-        assertFalse(withCssVars.contains("var(--lwc-color,red)"));
-        resetMocks();
+        try {
+            getMockConfigAdapter().setIsCssVarTransformEnabled(false);
+            String withoutCssVars = writeCss(true);
+            assertFalse(withoutCssVars.contains("var(--lwc-color,red)"));
+    
+            getMockConfigAdapter().setIsCssVarTransformEnabled(true);
+            String withCssVars = writeCss(true);
+            assertFalse(withCssVars.contains("var(--lwc-color,red)"));
+        } finally {
+            resetMocks();
+        }
     }
     
 
@@ -963,8 +986,9 @@ public class ServerServiceImplTest extends IntegrationTestCase {
 
         Set<DefDescriptor<?>> dependencies = definitionService.getDependencies(uid);
 
-        StringWriter output = new StringWriter();
-        serverService.writeAppCss(dependencies, output);
-        return output.toString();
+        try (StringWriter output = new StringWriter()) {
+            serverService.writeAppCss(dependencies, output);
+            return output.toString();
+        }
     }
 }

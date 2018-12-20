@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.servlet.Filter;
@@ -281,7 +282,7 @@ public class AuraContextFilter implements Filter {
                     try {
                         context.setGlobalValue(entry.getKey(), entry.getValue());
                     } catch (AuraRuntimeException are) {
-                        throw new ClientOutOfSyncException(are.getMessage());
+                        throw new ClientOutOfSyncException(are.getMessage(), are);
                     }
                 }
             }

@@ -59,7 +59,12 @@ public class AuraRuntimeException extends RuntimeException implements AuraExcept
     }
 
     public AuraRuntimeException(String message, Location location, Throwable cause, String extraMessage) {
-        super(message, cause);
+        super(message);
+        // If the exception's "cause" is set to null then it will prevent developers from calling the initCause method
+        // after the exception is instantiated.
+        if (cause != null) {
+            initCause(cause);
+        }
 
         List<String> componentStack;
 

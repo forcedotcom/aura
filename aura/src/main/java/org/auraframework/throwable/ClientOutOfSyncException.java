@@ -31,9 +31,21 @@ public class ClientOutOfSyncException extends ClientSideEventException {
      * This is a special case for no client out of sync.
      * 
      * @param message the message.
+     * @see #ClientOutOfSyncException(String, Throwable)
      */
     public ClientOutOfSyncException(String message) {
         super(message);
+    }
+    
+    /**
+     * This is a special case for no client out of sync.
+     * 
+     * @param message the message for the client side.
+     * @param cause the cause (usually logged).
+     * @see #ClientOutOfSyncException(String)
+     */
+    public ClientOutOfSyncException(String message, Throwable cause) {
+        super(message, cause);
     }
 
     @Override

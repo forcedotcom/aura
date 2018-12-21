@@ -777,8 +777,6 @@
                             <aura.home>${aura.home}</aura.home>
                             <user.timezone>GMT</user.timezone>
                         </systemPropertyVariables>
-                        <parallel>none</parallel>
-                        <threadCount>10</threadCount>
                     </configuration>
                     <dependencies>
                         <dependency>

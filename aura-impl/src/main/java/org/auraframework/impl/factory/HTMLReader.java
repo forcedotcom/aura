@@ -32,13 +32,18 @@ import java.io.StringReader;
  */
 public class HTMLReader extends FilterReader {
 
-    private static final String dtd = "<!DOCTYPE Aura[" +
-
+    private static final String DTD = "<!DOCTYPE Aura[" +      
+    
     // This section could be replaced with the following, if caching proves to
     // be reasonable
+    // <!-- Portions (C) International Organization for Standardization 1986
+    //      Permission to copy in any form is granted for use with
+    //      conforming SGML systems and applications as defined in
+    //      ISO 8879, provided this notice is included in all copies.
+    // -->
     // <!ENTITY % HTMLlat1 PUBLIC
-    // "-//W3C//ENTITIES Latin 1 for XHTML//EN"
-    // "http://www.w3.org/TR/xhtml1/DTD/xhtml-lat1.ent">
+    //  "-//W3C//ENTITIES Latin 1 for XHTML//EN"
+    //  "http://www.w3.org/TR/xhtml1/DTD/xhtml-lat1.ent">
             "<!ENTITY nbsp   \"&#160;\">" + // no-break space = non-breaking
                                             // space, U+00A0 ISOnum
             "<!ENTITY iexcl  \"&#161;\">" + // inverted exclamation mark, U+00A1
@@ -535,13 +540,13 @@ public class HTMLReader extends FilterReader {
     /**
      * @param in
      */
-    protected HTMLReader(Reader in) {
+    public HTMLReader(final Reader in) {
         super(createDtdReader());
         realReader = in;
     }
 
     private static Reader createDtdReader() {
-        return new StringReader(dtd);
+        return new StringReader(DTD);
     }
 
     @Override

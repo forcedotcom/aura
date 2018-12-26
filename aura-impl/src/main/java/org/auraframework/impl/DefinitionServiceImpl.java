@@ -33,6 +33,7 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.cache.Cache;
 import org.auraframework.def.ActionDef;
@@ -111,6 +112,8 @@ public class DefinitionServiceImpl implements DefinitionService {
     private AccessChecker accessChecker;
 
     private AuraGlobalControllerDefRegistry globalControllerDefRegistry;
+
+    private ExceptionAdapter exceptionAdapter;
 
     @Override
     public <T extends Definition> DefDescriptor<T> getDefDescriptor(String qualifiedName, Class<T> defClass) {
@@ -746,6 +749,14 @@ public class DefinitionServiceImpl implements DefinitionService {
     }
 
     /**
+     * @param exceptionAdapter the exceptionAdapter to set
+     */
+    @Inject
+    public void setExceptionAdapter(ExceptionAdapter exceptionAdapter) {
+        this.exceptionAdapter = exceptionAdapter;
+    }
+
+    /**
      * @return the configAdapter
      */
     public ConfigAdapter getConfigAdapter() {
@@ -1012,7 +1023,7 @@ public class DefinitionServiceImpl implements DefinitionService {
 
         linker = new AuraLinker(descriptor, defsCache,
                 loggingService, configAdapter, accessChecker, context.getAuraLocalStore(), context.getAccessCheckCache(),
-                context.getRegistries(), context.getJsonSerializationContext());
+                context.getRegistries(), context.getJsonSerializationContext(), exceptionAdapter);
 
         threadLinker.set(linker);
         try {
@@ -1180,7 +1191,7 @@ public class DefinitionServiceImpl implements DefinitionService {
         AuraLinker linker = new AuraLinker(null, defsCache,
                 loggingService, configAdapter, accessChecker, context.getAuraLocalStore(),
                 context.getAccessCheckCache(), context.getRegistries(),
-                context.getJsonSerializationContext());
+                context.getJsonSerializationContext(), exceptionAdapter);
         linker.addMap(globalControllerDefRegistry.getAll());
         long startTime = System.currentTimeMillis();
         long incremental;

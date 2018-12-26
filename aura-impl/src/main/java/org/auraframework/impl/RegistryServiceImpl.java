@@ -36,21 +36,18 @@ import javax.inject.Inject;
 
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.cache.Cache;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
-import org.auraframework.impl.compound.controller.CompoundControllerDefFactory;
 import org.auraframework.impl.controller.AuraGlobalControllerDefRegistry;
 import org.auraframework.impl.java.JavaSourceLoader;
 import org.auraframework.impl.source.file.FileBundleSourceLoader;
 import org.auraframework.impl.source.file.FileSourceLocationImpl;
 import org.auraframework.impl.system.BundleAwareDefRegistry;
 import org.auraframework.impl.system.CompilingDefRegistry;
-import org.auraframework.impl.system.NonCachingDefRegistryImpl;
 import org.auraframework.impl.system.PassThroughDefRegistry;
 import org.auraframework.impl.system.RegistryTrie;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
@@ -94,8 +91,6 @@ public class RegistryServiceImpl implements RegistryService, SourceListener, App
     private DefinitionService definitionService;
 
     private ConfigAdapter configAdapter;
-
-    private ExceptionAdapter exceptionAdapter;
 
     private LoggingService loggingService;
 
@@ -460,9 +455,6 @@ public class RegistryServiceImpl implements RegistryService, SourceListener, App
                 }
             }
         }
-        regBuild.add(new NonCachingDefRegistryImpl(new CompoundControllerDefFactory(exceptionAdapter),
-                DefType.CONTROLLER, DefDescriptor.COMPOUND_PREFIX));
-
         regBuild.add(new PassThroughDefRegistry(new JavaSourceLoader(),
                 Sets.newHashSet(DefType.CONTROLLER, DefType.RENDERER, DefType.TYPE, DefType.MODEL,
                         DefType.PROVIDER, DefType.TOKEN_DESCRIPTOR_PROVIDER, DefType.TOKEN_MAP_PROVIDER),
@@ -626,11 +618,6 @@ public class RegistryServiceImpl implements RegistryService, SourceListener, App
     @Inject
     public void setAuraGlobalControllerDefRegistry(AuraGlobalControllerDefRegistry globalControllerDefRegistry) {
         this.globalControllerDefRegistry = globalControllerDefRegistry;
-    }
-
-    @Inject
-    public void setExceptionAdapter(ExceptionAdapter exceptionAdapter) {
-        this.exceptionAdapter = exceptionAdapter;
     }
 
     @Inject

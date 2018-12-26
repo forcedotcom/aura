@@ -26,6 +26,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.cache.Cache;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BundleDef;
@@ -42,6 +43,7 @@ import org.auraframework.system.RegistrySet;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.validation.ErrorAccumulator.Warning;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
 import org.auraframework.validation.ReferenceValidationContext;
@@ -73,6 +75,7 @@ public class AuraLinker {
     private final Map<DefDescriptor<? extends Definition>, Definition> subDefinitions = Maps.newHashMap();
 
     private final AccessChecker accessChecker;
+    private final ExceptionAdapter exceptionAdapter;
 
     /**
      * The 'level' in the dependency tree.
@@ -91,7 +94,8 @@ public class AuraLinker {
                       LoggingService loggingService, ConfigAdapter configAdapter,
                       AccessChecker accessChecker, AuraLocalStore localStore,
                       Map<String, String> accessCheckCache,
-                      RegistrySet registrySet, JsonSerializationContext jsonSerializationContext) {
+                      RegistrySet registrySet, JsonSerializationContext jsonSerializationContext,
+                      ExceptionAdapter exceptionAdapter) {
 
         this.clientLibs = Lists.newArrayList();
         this.level = 0;
@@ -106,6 +110,7 @@ public class AuraLinker {
         this.accessCheckCache = accessCheckCache;
         this.registries = registrySet;
         this.jsonSerializationContext = jsonSerializationContext;
+        this.exceptionAdapter = exceptionAdapter;
     }
 
     public DefDescriptor<?> getTopLevel() {
@@ -397,6 +402,16 @@ public class AuraLinker {
                     linkingDef.validated = true;
                 }
             }
+            if (exceptionAdapter != null) {
+                for (Throwable t : validationContext.getWarningExceptions()) {
+                    exceptionAdapter.handleException(t);
+                }
+            }
+            if (loggingService != null) {
+                for (Warning w : validationContext.getWarnings()) {
+                    loggingService.warn(w.message + " : " + w.location);
+                }
+            }
             iteration += 1;
         } while (compiling.size() < linked.size());
 
@@ -415,7 +430,7 @@ public class AuraLinker {
                             try {
                                 JsonEncoder json = new JsonEncoder(new StringBuilder(), false);
                                 json.writeMapBegin();
-                                ((BaseComponentDefImpl) linkingDef.def).serializeCacheableEntries(json);
+                                ((BaseComponentDefImpl<?>) linkingDef.def).serializeCacheableEntries(json);
                             } catch (IOException io) {
                                 // ignored, StringBuilder shouldn't ever throw an IO exception when writing to it
                                 // if it does, then, we don't care either way and we'll serialize again later anyways

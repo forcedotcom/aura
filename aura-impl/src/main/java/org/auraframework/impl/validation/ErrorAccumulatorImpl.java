@@ -28,6 +28,7 @@ import org.auraframework.validation.ErrorAccumulator;
  * An accumulator for errors.
  */
 public class ErrorAccumulatorImpl implements ErrorAccumulator {
+    private final List<Throwable> exceptionWarnings = new ArrayList<>();
     private final List<Warning> warnings = new ArrayList<>();
     private final List<QuickFixException> errors = new ArrayList<>();
 
@@ -35,6 +36,12 @@ public class ErrorAccumulatorImpl implements ErrorAccumulator {
     public void addError(QuickFixException qfe) {
         errors.add(qfe);
     }
+
+    @Override
+    public void addWarning(Throwable exception) {
+        exceptionWarnings.add(exception);
+    }
+
 
     @Override
     public void addWarning(String message, Location location) {
@@ -49,5 +56,10 @@ public class ErrorAccumulatorImpl implements ErrorAccumulator {
     @Override
     public Collection<Warning> getWarnings() {
         return Collections.unmodifiableList(warnings);
+    }
+
+    @Override
+    public Collection<Throwable> getWarningExceptions() {
+        return Collections.unmodifiableList(exceptionWarnings);
     }
 }

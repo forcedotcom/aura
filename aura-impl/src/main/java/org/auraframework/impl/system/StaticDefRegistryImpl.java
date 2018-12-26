@@ -24,6 +24,9 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
@@ -105,7 +108,7 @@ public class StaticDefRegistryImpl extends DefRegistryImpl {
 
     @Override
     public <D extends Definition> boolean exists(DefDescriptor<D> descriptor) {
-        return defs.containsKey(descriptor);
+        return defs.containsKey(descriptor) || getDef(descriptor) != null;
     }
 
     @Override

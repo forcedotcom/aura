@@ -29,7 +29,6 @@ import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.EventDef;
@@ -285,6 +284,11 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         return Boolean.FALSE;
     }
 
+    /**
+     * Returns any configured public cache expiration (in seconds) for bootstrap.js, or null if not set.
+     *
+     * This is an anti-pattern. Kill it please.
+     */
     @Override
     public List<String> getAdditionalAppCacheURLs() throws QuickFixException {
         List<String> urls = Collections.emptyList();
@@ -300,8 +304,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
             PropertyReference ref = (PropertyReference) expression;
             ref = ref.getStem();
 
-            ControllerDef controllerDef = getControllerDef();
-            ActionDef actionDef = controllerDef.getSubDefinition(ref.toString());
+            ActionDef actionDef = getServerActionByName(ref.toString());
             Action action = Aura.getInstanceService().getInstance(actionDef);
 
             AuraContext context = Aura.getContextService().getCurrentContext();
@@ -329,6 +332,8 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
     /**
      * Returns any configured public cache expiration (in seconds) for bootstrap.js, or null if not set.
+     *
+     * This is an anti-pattern. Kill it please.
      */
     @Override
     public Integer getBootstrapPublicCacheExpiration() throws QuickFixException {
@@ -346,8 +351,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
                 if (AuraValueProviderType.CONTROLLER.getPrefix().equals(ref.getRoot())) {
                     ref = ref.getStem();
 
-                    ControllerDef controllerDef = getControllerDef();
-                    ActionDef actionDef = controllerDef.getSubDefinition(ref.toString());
+                    ActionDef actionDef = getServerActionByName(ref.toString());
                     Action action = Aura.getInstanceService().getInstance(actionDef);
         
                     AuraContext context = Aura.getContextService().getCurrentContext();

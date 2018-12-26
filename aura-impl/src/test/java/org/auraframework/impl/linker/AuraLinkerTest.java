@@ -72,7 +72,7 @@ public class AuraLinkerTest {
         MockDefDescriptor desc1 = new MockDefDescriptor("markup", "b", "b");
         MockDefDescriptor desc2 = new MockDefDescriptor("markup", "b", "B");
 
-        AuraLinker linker = new AuraLinker(desc1, null, null, null, null, null, null, registries, null);
+        AuraLinker linker = new AuraLinker(desc1, null, null, null, null, null, null, registries, null, null);
         LinkingDefinition<Definition> ld1 = linker.getLinkingDef(desc1);
         LinkingDefinition<Definition> ld2 = linker.getLinkingDef(desc2);
         Assert.assertSame("Definitions should be the same", ld1, ld2);
@@ -86,7 +86,7 @@ public class AuraLinkerTest {
         MockDefDescriptor desc2 = new MockDefDescriptor("markup", "a", "b");
         MockDefinition def2 = new MockDefinition(desc1);
 
-        AuraLinker linker = new AuraLinker(desc1, null, null, null, null, null, null, registries, null);
+        AuraLinker linker = new AuraLinker(desc1, null, null, null, null, null, null, registries, null, null);
 
         LinkingDefinition<Definition> ld = linker.getLinkingDef(desc1);
         ld.def = def1;
@@ -112,7 +112,7 @@ public class AuraLinkerTest {
         MockDefDescriptor desc2 = new MockDefDescriptor("markup", "a", "b");
         MockDefinition def2 = new MockDefinition(desc1);
 
-        AuraLinker linker = new AuraLinker(desc1, null, null, null, null, null, null, registries, null);
+        AuraLinker linker = new AuraLinker(desc1, null, null, null, null, null, null, registries, null, null);
 
         LinkingDefinition<Definition> ld = linker.getLinkingDef(desc1);
         ld.def = def1;
@@ -129,7 +129,7 @@ public class AuraLinkerTest {
         Assert.assertSame(def1, ordered.get(1).def);
     }
 
-    private static SecureRandom random = new SecureRandom();
+    static SecureRandom random = new SecureRandom();
 
     @SuppressWarnings("serial")
     private static class TestDef implements Definition {
@@ -389,7 +389,7 @@ public class AuraLinkerTest {
         @SuppressWarnings("unchecked")
         Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache = Mockito.mock(Cache.class);
         return new AuraLinker(root.getDescriptor(), defsCache,
-                loggingService, configAdapter, accessChecker, localStore, null, registries, null);
+                loggingService, configAdapter, accessChecker, localStore, null, registries, null, null);
     }
 
     // This is here to allow tests to be run easily, it does a random set of dependencies and
@@ -433,8 +433,8 @@ public class AuraLinkerTest {
     /**
      * Test one of our pathological cases.
      *
-     * appplication -> template -> html -> component
-     *              -> component -> template -> html
+     * application -> template -> html -> component
+     *             -> component -> template -> html
      */
     @Test
     public void testLinkOrderConsistencyFixedForName() throws Exception {

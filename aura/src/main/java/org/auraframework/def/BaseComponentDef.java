@@ -105,8 +105,6 @@ public interface BaseComponentDef extends RootDefinition {
 
     ModelDef getModelDef() throws QuickFixException;
 
-    ControllerDef getControllerDef() throws QuickFixException;
-
     HelperDef getHelperDef() throws QuickFixException;
 
     /**
@@ -118,6 +116,8 @@ public interface BaseComponentDef extends RootDefinition {
 
     @Override
     ProviderDef getProviderDef() throws QuickFixException;
+
+    DefDescriptor<ControllerDef> getLocalControllerDescriptor();
 
     ControllerDef getLocalControllerDef() throws QuickFixException;
 

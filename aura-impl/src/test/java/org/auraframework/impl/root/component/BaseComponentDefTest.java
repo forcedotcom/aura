@@ -1092,33 +1092,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends A
     }
 
     /**
-     * Test method for {@link BaseComponentDef#getControllerDef()}.
-     */
-    @Test
-    public void testGetControllerDefWithoutControllers() throws QuickFixException {
-        ControllerDef d = define(baseTag, "", "").getControllerDef();
-        assertNull(d);
-    }
-
-    /**
-     * Test method for {@link BaseComponentDef#getControllerDef()}.
-     */
-    @Test
-    public void testGetControllerDef() throws QuickFixException {
-        DefDescriptor<? extends BaseComponentDef> ddParent = define(baseTag,
-                "extensible='true' controller='java://org.auraframework.components.test.java.controller.TestController'", "")
-                        .getDescriptor();
-        ControllerDef d = define(
-                baseTag,
-                "controller='java://org.auraframework.components.test.java.controller.TestController' extends='"
-                        + ddParent.getNamespace() + ":" + ddParent.getName() + "'",
-                "").getControllerDef();
-        assertNotNull(d);
-        String name = d.getDescriptor().getQualifiedName();
-        assertTrue("Unexpected name: " + name, name.matches("compound://string\\..*"));
-    }
-
-    /**
      * Test method for {@link BaseComponentDef#getRendererDescriptor()}.
      */
     @Test
@@ -1316,11 +1289,11 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends A
      * InvalidDefinitionException if render is empty.
      */
     @Test
-    public void testRenderEmpty() throws QuickFixException {
+    public void testRenderEmpty() throws Exception {
         try {
             define(baseTag, "render=''", "");
             fail("Should not be able to load component with empty render value");
-        } catch (Exception e) {
+        } catch (InvalidDefinitionException e) {
             checkExceptionRegex(e, InvalidDefinitionException.class,
                     "No enum const(ant)? (class )?org\\.auraframework\\.def\\.BaseComponentDef.RenderType\\.");
         }
@@ -1330,11 +1303,11 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends A
      * InvalidDefinitionException if render is invalid.
      */
     @Test
-    public void testRenderInvalid() throws QuickFixException {
+    public void testRenderInvalid() throws Exception {
         try {
             define(baseTag, "render='typo'", "");
             fail("Should not be able to load component with invalid render value");
-        } catch (Exception e) {
+        } catch (InvalidDefinitionException e) {
             checkExceptionRegex(e, InvalidDefinitionException.class,
                     "No enum const(ant)? (class )?org\\.auraframework\\.def\\.BaseComponentDef.RenderType\\.TYPO");
         }
@@ -1644,7 +1617,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends A
         DefDescriptor<T> extendsSelf = addSourceAutoCleanup(getDefClass(), "");
         getAuraTestingUtil().updateSource(extendsSelf, String.format(baseTag,
                     "extensible='true' extends='" + extendsSelf.getDescriptorName() + "'", ""));
-        DefType defType = DefType.getDefType(this.getDefClass());
         try {
             definitionService.getDefinition(extendsSelf);
             fail(defType + " should not be able to extend itself.");
@@ -1660,8 +1632,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends A
                 String.format(baseTag, "", ""));
         DefDescriptor<T> extendsCmp = addSourceAutoCleanup(getDefClass(),
                 String.format(baseTag, "extends='" + nonExtensible.getDescriptorName() + "'", ""));
-
-        DefType defType = DefType.getDefType(this.getDefClass());
         try {
             definitionService.getDefinition(extendsCmp);
             fail(defType + " should not be able to extend a non-extensible component");
@@ -1679,8 +1649,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends A
     public void testExtendsNonExistent() {
         DefDescriptor<T> cmp = addSourceAutoCleanup(getDefClass(),
                 String.format(baseTag, "extends='aura:iDontExist'", ""));
-
-        DefType defType = DefType.getDefType(this.getDefClass());
         try {
             definitionService.getDefinition(cmp);
             fail(defType + " should throw Exception when extending non-existent component");
@@ -1698,8 +1666,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends A
     public void testExtendsEmpty() {
         DefDescriptor<T> cmp = addSourceAutoCleanup(getDefClass(),
                 String.format(baseTag, "extends=''", ""));
-
-        DefType defType = DefType.getDefType(this.getDefClass());
         try {
             definitionService.getDefinition(cmp);
             fail(defType + " should throw Exception when extends is empty");
@@ -1851,8 +1817,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends A
         DefDescriptor<T> dd = addSourceAutoCleanup(getDefClass(),
                 String.format(baseTag, "", "<aura:registerEvent name='dupeAttrEvent' type='test:parentEvent'/>"
                         + "<aura:attribute name='dupeAttrEvent' type='String'/>"));
-
-        DefType defType = DefType.getDefType(this.getDefClass());
         try {
             definitionService.getDefinition(dd);
             fail(defType + " should not be able to have attribute and event with same name");

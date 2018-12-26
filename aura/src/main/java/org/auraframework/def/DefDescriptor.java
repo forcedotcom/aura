@@ -45,7 +45,6 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
     static final String TEMPLATE_CSS_PREFIX = "templateCss";
     static final String CUSTOM_FLAVOR_PREFIX = "customFlavorCss";
     static final String JAVASCRIPT_PREFIX = "js";
-    static final String COMPOUND_PREFIX = "compound";
     static final String JAVA_PREFIX = "java";
 
     /**

@@ -15,15 +15,16 @@
  */
 package org.auraframework.impl.root.component;
 
+import java.util.Collection;
+import java.util.Map;
+
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RootDefinition;
-import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.instance.ComponentConfig;
@@ -35,9 +36,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Serialization;
 import org.auraframework.util.json.Serialization.ReferenceType;
-
-import java.util.Collection;
-import java.util.Map;
 
 /**
  * The real runtime component thing that sits in the tree.
@@ -63,8 +61,8 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
         if (!remoteProvider) {
             DefDescriptor<ComponentDef> superDefDescriptor = def.getExtendsDescriptor();
             if (superDefDescriptor != null) {
-            	Aura.getDefinitionService().assertAccess(descriptor, superDefDescriptor);
-            	
+                Aura.getDefinitionService().assertAccess(descriptor, superDefDescriptor);
+
                 Component concrete = concreteComponent == null ? this : concreteComponent;
                 superComponent = new ComponentImpl(superDefDescriptor, this, this, concrete);
             }
@@ -116,12 +114,6 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
                             if (c.isAbstract()) {
                                 throw new AuraRuntimeException(String.format("%s cannot be instantiated directly.",
                                         descriptor));
-                            }
-                            
-                            // new component may have its own controllerdef so add that one
-                            ControllerDef cd = c.getControllerDef();
-                            if (cd != null) {
-                                this.valueProviders.put(AuraValueProviderType.CONTROLLER.getPrefix(), cd);
                             }
                         } catch (DefinitionNotFoundException dnfe) {
                             throw new AuraRuntimeException(String.format("%s did not provide a valid component",

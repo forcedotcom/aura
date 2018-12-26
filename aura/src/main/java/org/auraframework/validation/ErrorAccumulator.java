@@ -45,6 +45,11 @@ public interface ErrorAccumulator {
     /**
      * Add a warning message with location.
      */
+    void addWarning(Throwable exception);
+
+    /**
+     * Add a warning message with location.
+     */
     void addWarning(String message, Location location);
 
     /**
@@ -56,4 +61,9 @@ public interface ErrorAccumulator {
      * Get the {@link Collection} of warnings.
      */
     Collection<Warning> getWarnings();
+
+    /**
+     * Get the collection of exceptions as warnings.
+     */
+    Collection<Throwable> getWarningExceptions();
 }

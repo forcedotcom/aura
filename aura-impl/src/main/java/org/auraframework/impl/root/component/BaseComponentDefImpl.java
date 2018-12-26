@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -71,10 +72,13 @@ import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.root.intf.InterfaceDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.impl.validation.ReferenceValidationContextImpl;
 import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraUnhandledException;
+import org.auraframework.throwable.quickfix.ActionNameConflictException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -87,9 +91,6 @@ import org.auraframework.util.json.JsonSerializationContext;
 import org.auraframework.validation.ReferenceValidationContext;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
@@ -107,7 +108,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     private final DefDescriptor<T> extendsDescriptor;
     private final DefDescriptor<ComponentDef> templateDefDescriptor;
-    private final DefDescriptor<ControllerDef> compoundControllerDescriptor;
+    private List<ActionDef> serverActions;
     private final Set<DefDescriptor<InterfaceDef>> interfaces;
 
     private final DefDescriptor<RendererDef> rendererDescriptor;
@@ -213,12 +214,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         this.classCode = builder.classCode;
         this.minifiedClassCode = builder.minifiedClassCode;
 
-        if (getDescriptor() != null) {
-            this.compoundControllerDescriptor = DefDescriptorImpl.getAssociateDescriptor(getDescriptor(),
-                    ControllerDef.class, DefDescriptor.COMPOUND_PREFIX);
-        } else {
-            this.compoundControllerDescriptor = null;
-        }
         this.hashCode = AuraUtil.hashCode(super.hashCode(), events, controllerDescriptor, modelDescriptor,
                         extendsDescriptor, interfaces, methodDefs, providerDescriptor, rendererDescriptor, helperDescriptor,
                         imports, externalModelDescriptor, externalRendererDescriptor, externalControllerDescriptor,
@@ -325,7 +320,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     @Override
     public boolean hasLocalDependencies() throws QuickFixException {
         if (localDeps == null) {
-            hasLocalDependencies(Sets.newHashSet());
+            hasLocalDependencies(new HashSet<>());
         }
         return localDeps == Boolean.TRUE;
     }
@@ -573,7 +568,92 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             }
             buildClass();
         }
+        this.serverActions = buildCompoundController(validationContext);
+    }
 
+    protected ActionDef getServerActionByName(String name) {
+        // FIXME This means that we have not validated our definitions.
+        if (this.serverActions == null) {
+            buildCompoundController();
+        }
+        for (ActionDef action : this.serverActions) {
+            if (action.getName().equals(name)) {
+                return action;
+            }
+        }
+        return null;
+    }
+
+    private void buildCompoundController() {
+        // FIXME this should never happen, but it does.
+        try {
+            HashMap<DefDescriptor<? extends Definition>, Definition> definitionMap = new HashMap<>();
+            DefinitionService definitionService = org.auraframework.Aura.getDefinitionService();
+            BaseComponentDef loop = this;
+            while (loop != null) {
+                DefDescriptor<?> tmp;
+
+                tmp = loop.getLocalControllerDescriptor();
+                if (tmp != null) {
+                    definitionMap.put(tmp, definitionService.getDefinition(tmp));
+                }
+                DefDescriptor<? extends BaseComponentDef> loopDesc = loop.getExtendsDescriptor();
+                if (loopDesc != null) {
+                    loop = definitionService.getDefinition(loopDesc);
+                    definitionMap.put(tmp, loop);
+                } else {
+                    loop = null;
+                }
+            }
+            ReferenceValidationContext vc = new ReferenceValidationContextImpl(definitionMap);
+            this.serverActions = buildCompoundController(vc);
+        } catch (QuickFixException qfe) {
+            this.serverActions = new ArrayList<>();
+        }
+    }
+
+    private List<ActionDef> buildCompoundController(ReferenceValidationContext validationContext) {
+        Map<String, ActionDef> flattened = new HashMap<>();
+
+        List<ControllerDef> defs = new ArrayList<>();
+        BaseComponentDef loop = this;
+        while (loop != null) {
+            if (loop.getLocalControllerDescriptor() != null) {
+                defs.add(validationContext.getAccessibleDefinition(loop.getLocalControllerDescriptor()));
+            }
+            if (loop.getRemoteControllerDef() != null) {
+                defs.add(loop.getRemoteControllerDef());
+            }
+            if (loop.getExtendsDescriptor() != null) {
+                loop = validationContext.getAccessibleDefinition(loop.getExtendsDescriptor());
+            } else {
+                loop = null;
+            }
+        }
+        for (ControllerDef c : defs) {
+            for (Map.Entry<String, ? extends ActionDef> e : c.getActionDefs().entrySet()) {
+                ActionDef a = flattened.get(e.getKey());
+                if (a != null) {
+                    // server and client actions have name conflict
+                    if (a.getActionType() != e.getValue().getActionType()) {
+                        String cmpDescriptor = getDescriptor().getQualifiedName();
+                        String message = String.format("Component '%s' has server and client action name conflits: %s - %s",
+                                cmpDescriptor, e.getValue().getDescriptor().getQualifiedName(), a.getDescriptor().getQualifiedName());
+                        validationContext.addWarning(new ActionNameConflictException(cmpDescriptor, message,
+                                    e.getValue().getLocation()));
+                    }
+                } else {
+                    flattened.put(e.getKey(), e.getValue());
+                }
+            }
+        }
+        List<ActionDef> filteredList = new ArrayList<>();
+        for (ActionDef actionDef : flattened.values()) {
+            if (actionDef.getActionType() == ActionType.SERVER) {
+                filteredList.add(actionDef);
+            }
+        }
+        return filteredList;
     }
 
     /**
@@ -850,7 +930,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     @Override
     public List<DefDescriptor<ControllerDef>> getControllerDefDescriptors() throws QuickFixException {
-        List<DefDescriptor<ControllerDef>> ret = Lists.newArrayList();
+        List<DefDescriptor<ControllerDef>> ret = new ArrayList<>();
         if (controllerDescriptor != null) {
             ret.add(controllerDescriptor);
         }
@@ -877,18 +957,9 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     @Override
-    public ControllerDef getControllerDef() throws QuickFixException {
-        if (controllerDescriptor == null && clientControllerDef == null) {
-            if (extendsDescriptor != null) {
-                return getSuperDef().getControllerDef();
-            } else {
-                return null;
-            }
-        } else {
-            return compoundControllerDescriptor.getDef();
-        }
+    public DefDescriptor<ControllerDef> getLocalControllerDescriptor() {
+        return controllerDescriptor;
     }
-
 
     @Override
     public ControllerDef getLocalControllerDef() throws QuickFixException {
@@ -956,7 +1027,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     private Set<DefDescriptor<InterfaceDef>> getAllInterfaces() throws QuickFixException {
-        Set<DefDescriptor<InterfaceDef>> interfaceDefs = Sets.newLinkedHashSet();
+        Set<DefDescriptor<InterfaceDef>> interfaceDefs = new LinkedHashSet<>();
         for (DefDescriptor<InterfaceDef> interfaceDef : interfaces) {
             addAllInterfaces(interfaceDef, interfaceDefs);
         }
@@ -1049,23 +1120,33 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             indent = json.getIndent();
         }
 
-        if (serializedJSON != null && serializedJSON.containsKey(indent) && StringUtils.isNotEmpty(serializedJSON.get(indent))) {
+        if (serializedJSON != null && serializedJSON.containsKey(indent)
+                && StringUtils.isNotEmpty(serializedJSON.get(indent))) {
             if (!serializedJSON.get(indent).startsWith(",")) {
                 json.writeComma();
             }
             json.writeLiteral(serializedJSON.get(indent));
             return;
         }
+        if (serverActions == null) {
+            buildCompoundController();
+        } 
 
         json.startCapturing();
-        ControllerDef controllerDef = getControllerDef();
-        if (controllerDef != null && hasServerAction(controllerDef)) {
-            json.writeMapEntry(ApplicationKey.CONTROLLERDEF, controllerDef);
+        if (!serverActions.isEmpty()) {
+            json.writeMapKey(ApplicationKey.CONTROLLERDEF);
+            json.writeMapBegin();
+            json.writeMapEntry(ApplicationKey.DESCRIPTOR,
+                               new DefDescriptorImpl<>("compound", descriptor.getNamespace(),
+                                   descriptor.getName(), ControllerDef.class));
+            json.writeMapEntry(ApplicationKey.ACTIONDEFS, serverActions);
+            json.writeMapEnd();
         }
 
         json.writeMapEntry(ApplicationKey.MODELDEF, getModelDef());
 
-        if (getSuperDef() != null && !AURA_COMPONENT_DESCRIPTOR.equals(getSuperDef().getDescriptor().getQualifiedName())) {
+        if (getSuperDef() != null
+                && !AURA_COMPONENT_DESCRIPTOR.equals(getSuperDef().getDescriptor().getQualifiedName())) {
             json.writeMapEntry(ApplicationKey.SUPERDEF, getSuperDef().getDescriptor());
         }
 
@@ -1421,7 +1502,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
         public Builder(Class<T> defClass) {
             super(defClass);
-            methodDefs=Maps.newLinkedHashMap();
+            methodDefs = new LinkedHashMap<>();
         }
 
         public boolean isAbstract;
@@ -1443,13 +1524,13 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         private ProviderDef clientProviderDef;
         public List<DefDescriptor<RendererDef>> rendererDescriptors;
         public List<DefDescriptor<HelperDef>> helperDescriptors;
-        public List<AttributeDefRef> facets = Lists.newArrayList();
+        public List<AttributeDefRef> facets = new ArrayList<>();
 
         public Set<DefDescriptor<InterfaceDef>> interfaces;
         public List<DefDescriptor<ControllerDef>> controllerDescriptors;
         private Map<DefDescriptor<MethodDef>, MethodDef> methodDefs;
-        public Map<String, RegisterEventDef> events = Maps.newHashMap();
-        public List<EventHandlerDef> eventHandlers = Lists.newArrayList();
+        public Map<String, RegisterEventDef> events = new HashMap<>();
+        public List<EventHandlerDef> eventHandlers = new ArrayList<>();
         private List<LibraryDefRef> imports;
         public Map<String, LocatorDef> locatorDefs;
 
@@ -1482,7 +1563,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         @Override
         public Builder<T> setFacet(String key, Object value) {
             if (facets == null) {
-                facets = Lists.newArrayList();
+                facets = new ArrayList<>();
             }
             AttributeDefRefImpl.Builder atBuilder = new AttributeDefRefImpl.Builder();
             atBuilder.setDescriptor(key);
@@ -1496,7 +1577,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         @Override
         public Builder<T> addRendererDescriptor(DefDescriptor<RendererDef> descriptor) {
             if (this.rendererDescriptors == null) {
-                this.rendererDescriptors = Lists.newArrayList();
+                this.rendererDescriptors = new ArrayList<>();
             }
             this.rendererDescriptors.add(descriptor);
             return this;
@@ -1505,7 +1586,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         @Override
         public Builder<T> addHelperDescriptor(DefDescriptor<HelperDef> helperDesc) {
             if (this.helperDescriptors == null) {
-                this.helperDescriptors = Lists.newArrayList();
+                this.helperDescriptors = new ArrayList<>();
             }
             this.helperDescriptors.add(helperDesc);
             return this;
@@ -1514,7 +1595,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         @Override
         public Builder<T> addControllerDescriptor(DefDescriptor<ControllerDef> controllerDesc) {
             if (this.controllerDescriptors == null) {
-                this.controllerDescriptors = Lists.newArrayList();
+                this.controllerDescriptors = new ArrayList<>();
             }
             this.controllerDescriptors.add(controllerDesc);
             return this;
@@ -1523,7 +1604,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         @Override
         public Builder<T> addInterfaceDescriptor(DefDescriptor<InterfaceDef> interfaceDesc) {
             if (this.interfaces == null) {
-                this.interfaces = Sets.newHashSet();
+                this.interfaces = new HashSet<>();
             }
             this.interfaces.add(interfaceDesc);
             addTarget(interfaceDesc.getDescriptorName());
@@ -1616,7 +1697,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         @Override
         public Builder<T> addClientLibrary(ClientLibraryDef clientLibrary) {
             if (this.clientLibraries == null) {
-                this.clientLibraries = Lists.newArrayList();
+                this.clientLibraries = new ArrayList<>();
             }
             this.clientLibraries.add(clientLibrary);
             return this;
@@ -1625,7 +1706,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         @Override
         public Builder<T> addLibraryImport(LibraryDefRef library) {
             if (this.imports == null) {
-                this.imports = Lists.newArrayList();
+                this.imports = new ArrayList<>();
             }
             this.imports.add(library);
             return this;
@@ -1868,7 +1949,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     @Override
     public List<DefDescriptor<?>> getBundle() {
-        List<DefDescriptor<?>> ret = Lists.newArrayList();
+        List<DefDescriptor<?>> ret = new ArrayList<>();
         if (controllerDescriptor != null) {
             ret.add(controllerDescriptor);
         }
@@ -1926,7 +2007,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
      */
     @Override
     public boolean isLocallyRenderable() throws QuickFixException {
-        return isLocallyRenderable(Sets.<DefDescriptor<?>> newLinkedHashSet());
+        return isLocallyRenderable(new LinkedHashSet<>());
     }
 
     /**

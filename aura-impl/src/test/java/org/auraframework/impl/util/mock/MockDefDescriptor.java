@@ -114,9 +114,4 @@ public class MockDefDescriptor implements DefDescriptor<Definition> {
     public Definition getDef() throws QuickFixException {
         return def;
     }
-
-    @Override
-    public boolean exists() {
-        return def != null;
-    }
 }

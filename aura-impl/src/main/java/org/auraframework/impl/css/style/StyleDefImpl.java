@@ -18,7 +18,6 @@ package org.auraframework.impl.css.style;
 import java.io.IOException;
 import java.util.Set;
 
-import org.auraframework.Aura;
 import org.auraframework.builder.StyleDefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
@@ -46,7 +45,8 @@ public class StyleDefImpl extends AbstractStyleDef<StyleDef> implements StyleDef
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         if (!getExpressions().isEmpty()) {
             DefDescriptor<TokensDef> namespaceTokens = Tokens.namespaceDefaultDescriptor(descriptor);
-            if (namespaceTokens.exists()) {
+            // FIXME: This will be fixed when we finish the conversion of appendDependencies.
+            if (org.auraframework.Aura.getDefinitionService().exists(namespaceTokens)) {
                 dependencies.add(namespaceTokens);
             }
         }
@@ -54,7 +54,7 @@ public class StyleDefImpl extends AbstractStyleDef<StyleDef> implements StyleDef
 
     @Override
     public void serialize(Json json) throws IOException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = org.auraframework.Aura.getContextService().getCurrentContext();
         json.writeMapBegin();
         json.writeMapEntry(Json.ApplicationKey.DESCRIPTOR, descriptor);
 

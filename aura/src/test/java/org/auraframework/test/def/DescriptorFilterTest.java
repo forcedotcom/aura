@@ -377,11 +377,6 @@ public class DescriptorFilterTest {
         }
 
         @Override
-        public boolean exists() {
-            return true;
-        }
-
-        @Override
         public String toString() {
             return this.prefix + "://" + this.namespace + ":" + this.name + "(" + this.defType.toString() + ")";
         }

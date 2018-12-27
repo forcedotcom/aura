@@ -45,7 +45,7 @@ public class DesignTemplateRegionDefHandlerTest extends AuraImplTestCase {
 
         for (DefDescriptor<InterfaceDef> intf : element.getAllowedInterfaces()) {
             assertEquals("markup://test:fakeInterface", intf.getQualifiedName());
-            assertTrue(intf.exists());
+            assertTrue(definitionService.exists(intf));
         }
     }
 

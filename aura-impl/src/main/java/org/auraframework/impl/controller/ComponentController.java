@@ -113,7 +113,7 @@ public class ComponentController implements GlobalController {
                                  @Key("attributes") Map<String, Object> attributes,
                                  @Key(value = "chainLoadLabels", loggable = true) Boolean loadLabels) throws QuickFixException {
             DefDescriptor<ModuleDef> moduleDesc = definitionService.getDefDescriptor(name, ModuleDef.class);
-        if (moduleDesc.exists()) {
+        if (definitionService.exists(moduleDesc)) {
             definitionService.updateLoaded(moduleDesc);
             return instanceService.getInstance(moduleDesc, attributes);
         }

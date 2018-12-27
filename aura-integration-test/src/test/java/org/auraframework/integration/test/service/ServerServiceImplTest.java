@@ -84,6 +84,7 @@ import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.validation.ReferenceValidationContext;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.junit.Ignore;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -624,6 +625,7 @@ public class ServerServiceImplTest extends IntegrationTestCase {
      */
     @ThreadHostileTest("Modifies if locker service is enabled")
     @Test
+    @Ignore // Deprecated test: definitions are now immutable.
     public void testWriteDefinitionsLockerServiceCacheBuster() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = definitionService
                 .getDefDescriptor("lockerTest:basicTest", ComponentDef.class);
@@ -691,7 +693,7 @@ public class ServerServiceImplTest extends IntegrationTestCase {
                 .getDefDescriptor("lockerTest:basicTest", ComponentDef.class);
         AuraContext context = contextService
                 .startContext(Mode.PROD, Format.JS, Authentication.AUTHENTICATED, cmpDesc);
-        
+
         // get defs with LockerService enabled
         getMockConfigAdapter().setIsProduction(TRUE);
         try (StringWriter output = new StringWriter()) {
@@ -918,7 +920,7 @@ public class ServerServiceImplTest extends IntegrationTestCase {
         String actual = template.getAttributes().getValue("prefetchTags").toString();
         assertThat(actual, containsString("ckeditor.js"));
     }
-    
+
 
     @Test
     public void testWriteTemplateExcludesPrefetchFalseTagsForClientLibraries() throws Exception {
@@ -971,7 +973,7 @@ public class ServerServiceImplTest extends IntegrationTestCase {
             resetMocks();
         }
     }
-    
+
 
     private String writeCss(boolean isIE11) throws Exception {
         DefDescriptor<ApplicationDef> appDesc = definitionService

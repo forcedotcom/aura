@@ -85,6 +85,6 @@
       }
     ],
     "hs":true,
-    "cc":"$A.componentService.addComponentClass(\"markup://test:text\",function() {\nreturn {\n  \"meta\":{\n    \"name\":\"test$text\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\n});\n"
+    "cc":"({\n  \"meta\":{\n    \"name\":\"test$text\",\n    \"extends\":\"markup://aura:component\"\n  }\n})"
   }
 }

@@ -9,5 +9,5 @@
   "lc":{
     "descriptor":"markup://aura:locationChange"
   },
-  "cc":"$A.componentService.addComponentClass(\"markup://aura:test\",function() {\nreturn {\n  \"meta\":{\n    \"name\":\"aura$test\",\n    \"extends\":\"markup://aura:application\"\n  }\n};\n});\n"
+  "cc":"({\n  \"meta\":{\n    \"name\":\"aura$test\",\n    \"extends\":\"markup://aura:application\"\n  }\n})"
 }

@@ -451,7 +451,7 @@ AuraClientService.prototype.uncommentExporter = function (exporter) {
  * @private
  */
 AuraClientService.prototype.evalExporter = function(script, descriptor, type) {
-    return $A.util.globalEval("function () {" + script + " }", this.getSourceMapsUrl(descriptor, type));
+    return $A.util.globalEval(script, this.getSourceMapsUrl(descriptor, type));
 };
 
 /**

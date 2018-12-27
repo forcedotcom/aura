@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-12-17
- * Version: 0.6.12
+ * Generated: 2018-12-27
+ * Version: 0.6.13
  */
 
 (function (exports) {
@@ -11151,8 +11151,8 @@ function registerAuraTypes(types) {
 /**
  * Create a wrapped library
  * @param {Object} lib Library being imported
- * @param {Object} key Locker key of the module importing the library
- * @param {Boolean} requireLocker Should the library being imported be lockeried
+ * @param {Object} fromKey Locker key of the library
+ * @param {Object} toKey Locker key of the module importing the library
  */
 function SecureLib(lib, fromKey, toKey) {
   if (isPrimitive(lib)) {
@@ -11340,32 +11340,18 @@ function createForClass(src, defDescriptor) {
   const sourceURL = `components/${namespace}/${name}.js`;
   const key = getKeyForNamespace(namespace);
 
-  const returnValue = evaluate(src, key, sourceURL);
-  // Key this def so we can transfer the key to component instances
-  setKey(returnValue, key);
-  return returnValue;
-}
-
-// @deprecated
-function createForDef(src, def) {
-  const defDescriptor = def.getDescriptor();
-  const namespace = defDescriptor.getNamespace();
-  const name = defDescriptor.getName();
-  const sourceURL = `components/${namespace}/${name}.js`;
-  const key = getKeyForNamespace(namespace);
-
-  // Key this def so we can transfer the key to component instances
-  setKey(def, key);
-
   // Accelerate the reference to $A
   src = `(function() {
   const {$A} = window;
 
-  ${src}
+  return ${src}
 
 }())`;
 
-  return evaluate(src, key, sourceURL);
+  const returnValue = evaluate(src, key, sourceURL);
+  // Key this class so we can transfer the key to component instances
+  setKey(returnValue, key);
+  return returnValue;
 }
 
 function createForModule(src, defDescriptor) {
@@ -11555,7 +11541,6 @@ function wrap(thing, metaFrom, metaTo) {
 exports.create = create$$1;
 exports.getKeyForNamespace = getKeyForNamespace;
 exports.createForClass = createForClass;
-exports.createForDef = createForDef;
 exports.createForModule = createForModule;
 exports.getEnv = getEnv$$1;
 exports.getEnvForSecureObject = getEnvForSecureObject;

@@ -27,6 +27,7 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptWriter;
+import org.springframework.util.StringUtils;
 
 public abstract class BaseJavascriptClass implements Serializable {
     private static final long serialVersionUID = 7445974179103021929L;
@@ -98,28 +99,24 @@ public abstract class BaseJavascriptClass implements Serializable {
         protected void finish() throws QuickFixException {
             code = generate();
             if (minify && hasCode()) {
+                StringWriter sw = new StringWriter();
                 try {
-                    StringWriter sw = new StringWriter();
                     List<JavascriptProcessingError> codeErrors = JavascriptWriter.CLOSURE_SIMPLE.compress(code, sw,
                             getFilename());
                     validateCodeErrors(codeErrors);
-                    minifiedCode = sw.toString();
-                    // only do this for PROD as other modes would be taken care of in the client
-                    minifiedCode = writeSourceUrl(minifiedCode);
                 } catch (IOException e) {
                     // There is no IO in this scenario. The JavascriptWriter API requires
                     // this catch, even if it's never called when reading from a string.
                     throw new AuraRuntimeException(e.getMessage());
                 }
+                minifiedCode = sw.toString();
+                // Closure adds a semicolon to JavaScript expressions: remove the semicolon
+                // when we detect an expression in order to allow its eval() on the client.
+                if (minifiedCode.startsWith("(")) {
+                	minifiedCode = StringUtils.trimTrailingWhitespace(minifiedCode);
+                	minifiedCode = StringUtils.trimTrailingCharacter(minifiedCode, ';');
+                }
             }
-        }
-
-        protected String writeSourceUrl(String codeToWrite) {
-            StringBuilder sb = new StringBuilder();
-            int lastCurlyPos = codeToWrite.lastIndexOf('}');
-            sb.append(codeToWrite.substring(0, lastCurlyPos));
-            sb.append(codeToWrite.substring(lastCurlyPos));
-            return sb.toString();
         }
 
         protected void validateCodeErrors(List<JavascriptProcessingError> codeErrors)

@@ -4,5 +4,5 @@
   "ad":[
     ["body","aura://Aura.Component[]","G",false,[]]
   ],
-  "cc":"$A.componentService.addComponentClass(\"markup://aura:test\",function() {\nreturn {\n  \"meta\":{\n    \"name\":\"aura$test\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\n});\n"
+  "cc":"({\n  \"meta\":{\n    \"name\":\"aura$test\",\n    \"extends\":\"markup://aura:component\"\n  }\n})"
 }

@@ -474,7 +474,7 @@ public class ServerServiceImpl implements ServerService {
         final String lockerService = configAdapter.isLockerServiceEnabled() ? ":ls" : "";
         final String compat = context.useCompatSource() ? ":c" : "";
         final String debug = jsMode == JavascriptGeneratorMode.PRODUCTIONDEBUG || jsMode == JavascriptGeneratorMode.PERFORMANCEDEBUG ? ":DEBUG" : "";
-        final String key = "JS:" + mKey + uid + (hasParts ? ":" + partIndex : "") + ":" + lockerService + compat + debug + dependencySetUid;
+        final String key = "JS:" + mKey + uid + (hasParts ? ":" + partIndex : "") + lockerService + compat + debug + ":" + dependencySetUid;
 
         final Callable<String> buildFunction = () -> {
             String res = getDefinitionsString(dependencies, hydrationType);
@@ -543,28 +543,36 @@ public class ServerServiceImpl implements ServerService {
             if (hydrationEnabled) {
                 sb.append("$A.componentService.addComponent(\"")
                     .append(def.getDescriptor())
-                    .append("\", ")
-                    .append("(function (){/*");
+                    .append("\",(function(){/*");
 
                 // Mark class as loaded in the client
                 context.setClientClassLoaded(def.getDescriptor(), true);
 
+                // Component definition
+                JsonEncoder.serialize(def, escapedHydrationFunctionStringBuilder, context.getJsonSerializationContext());
+
+                sb.append("*/}),(function(){/*");
+
                 // Component Class
                 escapedHydrationFunctionStringBuilder.append(def.getCode(minify));
 
-                // Component definition
-                sb.append("return ");
-                JsonEncoder.serialize(def, escapedHydrationFunctionStringBuilder, context.getJsonSerializationContext());
-                sb.append(";");
-
                 sb.append("*/}));\n");
+
             } else {
                 sb.append(def.getCode(minify));
 
                 sb.append("$A.componentService.addComponent(\"")
-                        .append(def.getDescriptor())
-                        .append("\", ");
+                    .append(def.getDescriptor())
+                    .append("\",");
+
+                // Component definition
                 JsonEncoder.serialize(def, sb, context.getJsonSerializationContext());
+
+                sb.append(",");
+
+                // Component Class
+                sb.append(def.getCode(minify));
+
                 sb.append(");\n");
             }
         }

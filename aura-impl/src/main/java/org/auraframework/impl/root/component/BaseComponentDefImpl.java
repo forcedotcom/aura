@@ -1285,6 +1285,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     @Override
     public String getCode(boolean minify) {
         String js = null;
+        
         if (minify) {
             js = minifiedClassCode;
         }
@@ -1293,72 +1294,19 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             js = classCode;
         }
 
-        if (isLockerRequired()) {
-            js = convertToLocker(js);
-        }
-
         return js;
     }
 
     /**
      * Return true if the definition is a component that needs to be locked.
+     * This status depends solely on the definition, not on whether or not 
+     * Locker is enabled globally.
      */
     private boolean isLockerRequired() {
-        boolean requireLocker = false;
-
         ConfigAdapter configAdapter = Aura.getConfigAdapter();
-        if (configAdapter.isLockerServiceEnabled()) {
-            requireLocker = configAdapter.requireLocker(this);
-        }
-
-        return requireLocker;
+        return configAdapter.requireLocker(this);
     }
 
-    private static final Pattern COMPONENT_CLASS_PATTERN = Pattern.compile("^\\$A\\.componentService\\.addComponentClass\\(\"([^\"]*)\",\\s*function\\s*\\(\\s*\\)\\s*\\{\\n*(.*)\\}\\);\\s*$",
-            Pattern.DOTALL | Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-
-    public static String convertToLocker(String code) {
-
-        if (StringUtils.isBlank(code)) {
-            return code;
-        }
-
-        Matcher matcher = COMPONENT_CLASS_PATTERN.matcher(code);
-
-        if (!matcher.matches()) {
-            return null;
-        }
-
-        String clientDescriptor = matcher.group(1);
-        String objectVariable = matcher.group(2);
-
-        return makeLockerizedClass(clientDescriptor, objectVariable);
-    }
-
-    private static String makeLockerizedClass(String clientDescriptor, String objectVariable) {
-
-        StringBuilder out = new StringBuilder();
-
-        out.append("$A.componentService.addComponentClass(");
-        out.append('"').append(clientDescriptor).append('"');
-        out.append(',');
-
-        // Key the def so we can transfer the key to component instances
-        // and escape the class objects for JavaScript strings
-        out.append("function() {\n");
-
-        out.append("  var def = $A.componentService.getDef(");
-        out.append('"').append(clientDescriptor).append('"');
-        out.append(");");
-
-        out.append("  return $A.lockerService.createForDef(\n\"");
-        out.append(AuraTextUtil.escapeForJavascriptString(objectVariable));
-        out.append("\", def);\n");
-
-        out.append("});\n");
-
-        return out.toString();
-    }
     /**
      * @see ComponentDef#getRendererDescriptor()
      */

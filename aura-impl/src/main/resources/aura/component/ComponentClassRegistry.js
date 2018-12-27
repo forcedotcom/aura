@@ -20,8 +20,8 @@
  */
 function ComponentClassRegistry () {
     // We delay the creation of the definition of a class till it's requested.
-    // The function that creates the component class is a classExporter.
-    this.classExporter = {};
+    // The object used to create the component class is a classLiteral object.
+    this.classLiterals = {};
 
     // Collection of all the component classes we generate for
     // proper stack traces and proper use of prototypical inheritance
@@ -49,20 +49,20 @@ ComponentClassRegistry.prototype.customConstructorMap = {
  * @param {String} descriptor The qualified name of the component in the form markup://namespace:component
  */
 ComponentClassRegistry.prototype.hasComponentClass = function(descriptor) {
-    return descriptor in this.classExporter || descriptor in this.classConstructors;
+    return descriptor in this.classLiterals || descriptor in this.classConstructors;
 };
 
 /**
  * The function that handles definitions of component classes.
  * @param {String} descriptor in the form markup://namespace:component
- * @param {Function} exporter A function that when executed will return the component object litteral.
+ * @param {Object} classLiteral The pre-built component literal.
  * @export
  */
-ComponentClassRegistry.prototype.addComponentClass = function(descriptor, exporter){
+ComponentClassRegistry.prototype.addComponentClass = function(descriptor, classLiteral){
     $A.assert($A.util.isString(descriptor), "Component class descriptor is invalid: " + descriptor);
-    $A.assert($A.util.isFunction(exporter), "Component class exporter is not a function: " + descriptor);
+    $A.assert($A.util.isObject(classLiteral), "Component class literal is invalid: " + descriptor);
     if (!this.hasComponentClass(descriptor)) {
-        this.classExporter[descriptor] = exporter;
+        this.classLiterals[descriptor] = classLiteral;
     }
 };
 
@@ -75,13 +75,12 @@ ComponentClassRegistry.prototype.addComponentClass = function(descriptor, export
 ComponentClassRegistry.prototype.getComponentClass = function(descriptor, def) {
     var storedConstructor = this.classConstructors[descriptor];
     if (!storedConstructor) {
-        var exporter = this.classExporter[descriptor];
-        if (exporter) {
-            var componentProperties = exporter();
-            storedConstructor = this.buildComponentClass(componentProperties);
+        var classLiteral = this.classLiterals[descriptor];
+        if (classLiteral) {
+            storedConstructor = this.buildComponentClass(classLiteral);
             this.classConstructors[descriptor] = storedConstructor;
-            // No need to keep the exporter in memory.
-            this.classExporter[descriptor] = null;
+            // No need to keep the classLiteral in memory.
+            this.classLiterals[descriptor] = null;
         } else if (def && def.interop) {
             return this.buildInteropComponentClass(descriptor, def);
         }
@@ -107,14 +106,14 @@ ComponentClassRegistry.prototype.buildInteropComponentClass = function(descripto
  * Build the class for the specified component.
  * This process is broken into subroutines for clarity and maintainabiity,
  * and those are all combined into one single scope by the compiler.
- * @param {Object} componentProperties The pre-built component properties.
+ * @param {Object} classLiteral The pre-built component properties.
  * @returns {Function} The component class.
  */
-ComponentClassRegistry.prototype.buildComponentClass = function(componentProperties) {
+ComponentClassRegistry.prototype.buildComponentClass = function(classLiteral) {
 
-    this.buildInheritance(componentProperties);
-    this.buildLibraries(componentProperties);
-    var componentConstructor = this.buildConstructor(componentProperties);
+    this.buildInheritance(classLiteral);
+    this.buildLibraries(classLiteral);
+    var componentConstructor = this.buildConstructor(classLiteral);
 
     return componentConstructor;
 };
@@ -123,30 +122,30 @@ ComponentClassRegistry.prototype.buildComponentClass = function(componentPropert
 /**
  * Augment the component class properties with their respective inheritance. The
  * inner classes are "static" classes. Currently, only the helper is inherited.
- * @param {Object} componentProperties The pre-built component properties.
+ * @param {Object} classLiteral The pre-built component properties.
  */
-ComponentClassRegistry.prototype.buildInheritance = function(componentProperties) {
+ComponentClassRegistry.prototype.buildInheritance = function(classLiteral) {
 
-    var superDescriptor = componentProperties["meta"]["extends"];
+    var superDescriptor = classLiteral["meta"]["extends"];
     var superConstructor = this.getComponentClass(superDescriptor);
 
-    componentProperties["controller"] = componentProperties["controller"] || {};
+    classLiteral["controller"] = classLiteral["controller"] || {};
     var superController = superConstructor && superConstructor.prototype["controller"];
 
     if (superController) {
-        componentProperties["controller"] = Object.assign(
+        classLiteral["controller"] = Object.assign(
             Object.create(superController),
-            componentProperties["controller"]
+            classLiteral["controller"]
         );
     }
 
-    componentProperties["helper"] = componentProperties["helper"] || {};
+    classLiteral["helper"] = classLiteral["helper"] || {};
     var superHelper = superConstructor && superConstructor.prototype["helper"];
 
     if (superHelper) {
-        componentProperties["helper"] = Object.assign(
+        classLiteral["helper"] = Object.assign(
             Object.create(superHelper),
-            componentProperties["helper"]
+            classLiteral["helper"]
         );
     }
 };
@@ -154,13 +153,13 @@ ComponentClassRegistry.prototype.buildInheritance = function(componentProperties
 /**
  * Augment the component class properties with the component libraries. This method
  * attached the component imports (a.k.a. "libraries") on the properties.
- * @param {Object} componentProperties The pre-built component properties.
+ * @param {Object} classLiteral The pre-built component properties.
  */
-ComponentClassRegistry.prototype.buildLibraries = function(componentProperties) {
+ComponentClassRegistry.prototype.buildLibraries = function(classLiteral) {
 
-    var componentImports = componentProperties["meta"]["imports"];
+    var componentImports = classLiteral["meta"]["imports"];
     if (componentImports) {
-        var helper = componentProperties["helper"];
+        var helper = classLiteral["helper"];
         for (var property in componentImports) {
             var descriptor = componentImports[property];
             var library = $A.componentService.getLibrary(descriptor);
@@ -173,23 +172,23 @@ ComponentClassRegistry.prototype.buildLibraries = function(componentProperties) 
             }
             helper[property] = library;
         }
-        componentProperties["helper"] = helper;
+        classLiteral["helper"] = helper;
     }
 };
 
 /**
  * Build the class constructor for the specified component.
- * @param {Object} componentProperties The pre-built component properties.
+ * @param {Object} classLiteral The pre-built component properties.
  * @returns {Function} The component class.
  */
 
-ComponentClassRegistry.prototype.buildConstructor = function(componentProperties, name, Ctor) {
+ComponentClassRegistry.prototype.buildConstructor = function(classLiteral, name, Ctor) {
     // Create a named function dynamically to use as a constructor.
     // TODO: Update to the following line when all browsers have support for dynamic function names.
     // (only supported in IE11+).
     // var componentConstructor = function [className](){ Component.apply(this, arguments); };
     var componentConstructor;
-    var className = name || componentProperties["meta"]["name"];
+    var className = name || classLiteral["meta"]["name"];
     Ctor = Ctor || this.customConstructorMap[className] || Component;
 
     //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG", "PERFORMANCEDEBUG"]}
@@ -210,9 +209,9 @@ ComponentClassRegistry.prototype.buildConstructor = function(componentProperties
     // Mixin inner classes (controller, helper, renderer, provider) and meta properties.
     // Some components will already have this defined in their Component class, so don't overwrite if it is already defined.
     var constructorPrototype = componentConstructor.prototype;
-    for(var key in componentProperties) {
+    for(var key in classLiteral) {
         if(constructorPrototype[key] === undefined){
-            constructorPrototype[key] = componentProperties[key];
+            constructorPrototype[key] = classLiteral[key];
         }
     }
 

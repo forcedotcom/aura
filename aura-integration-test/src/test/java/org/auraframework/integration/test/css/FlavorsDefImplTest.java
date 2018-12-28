@@ -41,7 +41,7 @@ public class FlavorsDefImplTest extends StyleTestCase {
     public void testLoadsIndependently() throws QuickFixException {
         // flavor assortments can be placed independently in their own bundles
         DefDescriptor<FlavorsDef> fa = addFlavorAssortment("<aura:flavors></aura:flavors>");
-        assertTrue(definitionService.exists(fa));
+        assertTrue(fa.exists());
         definitionService.getDefinition(fa).validateDefinition(); // no errors
     }
 
@@ -54,7 +54,7 @@ public class FlavorsDefImplTest extends StyleTestCase {
                 DefDescriptor.MARKUP_PREFIX);
         addSourceAutoCleanup(app, String.format("<aura:application></aura:application>"));
 
-        assertTrue(definitionService.exists(fa));
+        assertTrue(fa.exists());
         definitionService.getDefinition(fa).validateDefinition(); // no errors
     }
 

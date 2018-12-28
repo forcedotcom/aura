@@ -151,21 +151,21 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
     public void testExists() {
         String markup = "<aura:component></aura:component>";
         DefDescriptor<ComponentDef> dd = addSourceAutoCleanup(ComponentDef.class, markup);
-        assertTrue("Failed to find an existing def.", definitionService.exists(dd));
+        assertTrue("Failed to find an existing def.", dd.exists());
 
         // The value should be cached
-        assertTrue("Should have fetched the def from the cache.", definitionService.exists(dd));
+        assertTrue("Should have fetched the def from the cache.", dd.exists());
 
         // Create a descriptor but do not add it.
         DefDescriptor<ComponentDef> nonExisting = getAuraTestingUtil().createStringSourceDescriptor(
                 "nonExisting", ComponentDef.class, null);
         definitionService.getDefDescriptor(nonExisting.getDescriptorName(), ComponentDef.class);
-        assertFalse("How can a non existing def exist?", definitionService.exists(nonExisting));
+        assertFalse("How can a non existing def exist?", nonExisting.exists());
         /*
          * The cached value. Well, this test cannot really guarantee that the exists() really returned the value from
          * the cache. It does verify that the CachingDefRegsitryImpl is returning the right value. and that's the
          * functionality the unit test cares
          */
-        assertFalse("How can a non existing def exist in the cache?", definitionService.exists(nonExisting));
+        assertFalse("How can a non existing def exist in the cache?", nonExisting.exists());
     }
 }

@@ -86,12 +86,12 @@ public final class StyleController implements GlobalController {
         if (extraStyles != null) {
             for (String name : extraStyles) {
                 DefDescriptor<StyleDef> styleDesc = definitionService.getDefDescriptor (DefDescriptor.CSS_PREFIX + "://" + name, StyleDef.class);
-                if (definitionService.exists(styleDesc)) {
+                if (styleDesc.exists()) {
                     extraStyleDescs.add(styleDesc);
                 }
 
                 DefDescriptor<FlavoredStyleDef> flavorDesc = definitionService.getDefDescriptor(DefDescriptor.CSS_PREFIX + "://" + name, FlavoredStyleDef.class);
-                if (definitionService.exists(flavorDesc)) {
+                if (flavorDesc.exists()) {
                     extraStyleDescs.add(flavorDesc);
                 }
             }

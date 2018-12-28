@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
+import org.auraframework.Aura;
 import org.auraframework.builder.FlavoredStyleDefBuilder;
 import org.auraframework.css.FlavorAnnotation;
 import org.auraframework.def.ComponentDef;
@@ -66,7 +67,7 @@ public final class FlavoredStyleDefImpl extends AbstractStyleDef<FlavoredStyleDe
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         if (!getExpressions().isEmpty()) {
             DefDescriptor<TokensDef> namespaceTokens = Tokens.namespaceDefaultDescriptor(descriptor);
-            if (org.auraframework.Aura.getDefinitionService().exists(namespaceTokens)) {
+            if (namespaceTokens.exists()) {
                 dependencies.add(namespaceTokens);
             }
         }
@@ -77,7 +78,7 @@ public final class FlavoredStyleDefImpl extends AbstractStyleDef<FlavoredStyleDe
     @Override
     public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         DefDescriptor<ComponentDef> desc = Flavors.toComponentDescriptor(getDescriptor());
-        ComponentDef def = org.auraframework.Aura.getDefinitionService().getDefinition(desc);
+        ComponentDef def = Aura.getDefinitionService().getDefinition(desc);
         if (!def.hasFlavorableChild() && !def.inheritsFlavorableChild() && !def.isDynamicallyFlavorable()) {
             throw new InvalidDefinitionException(
                     String.format("%s must contain at least one aura:flavorable element: ", desc), getLocation());
@@ -89,7 +90,7 @@ public final class FlavoredStyleDefImpl extends AbstractStyleDef<FlavoredStyleDe
         json.writeMapBegin();
         json.writeMapEntry(Json.ApplicationKey.DESCRIPTOR, descriptor);
 
-        AuraContext context = org.auraframework.Aura.getContextService().getCurrentContext();
+        AuraContext context = Aura.getContextService().getCurrentContext();
         if (!context.isPreloading() && !context.isPreloaded(getDescriptor())) {
             json.writeMapEntry(Json.ApplicationKey.CODE, getCode());
         }

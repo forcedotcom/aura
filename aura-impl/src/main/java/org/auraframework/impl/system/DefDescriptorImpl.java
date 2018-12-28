@@ -92,10 +92,10 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             throw new AuraRuntimeException("QualifiedName is required for descriptors");
         }
 
-        String tPrefix = null;
-        String tNamespace = null;
-        String tName = null;
-        String tNameParameters = null;
+        String prefix = null;
+        String namespace = null;
+        String name = null;
+        String nameParameters = null;
         String realQN = qualifiedName;
 
         // Beware, here be dragons!
@@ -115,14 +115,14 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case INCLUDE:
                 Type clazz = TypeParser.parseClass(qualifiedName);
                 if (clazz != null) {
-                    tPrefix = clazz.prefix;
-                    tNamespace = clazz.namespace;
-                    tName = clazz.name;
+                    prefix = clazz.prefix;
+                    namespace = clazz.namespace;
+                    name = clazz.name;
 
                     if (clazz.nameParameters != null
                         && defType == org.auraframework.def.DefDescriptor.DefType.TYPE) {
 
-                        tNameParameters = clazz.nameParameters;
+                        nameParameters = clazz.nameParameters;
                     }
                 } else {
                     throw new AuraRuntimeException(String.format("Invalid Descriptor Format: %s[%s]", qualifiedName, defType.toString()));
@@ -146,7 +146,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case INCLUDE_REF:
             case FLAVOR_INCLUDE:
             case FLAVOR_DEFAULT:
-                tName = qualifiedName;
+                name = qualifiedName;
                 break;
             case APPLICATION:
             case COMPONENT:
@@ -163,10 +163,10 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                 Type tag = TypeParser.parseTag(qualifiedName);
                 if (tag != null) {
                     // default the prefix to 'markup'
-                    tPrefix = tag.prefix != null ? tag.prefix : MARKUP_PREFIX;
-                    tNamespace = tag.namespace;
-                    tName = tag.name;
-                    realQN = buildQualifiedName(tPrefix, tNamespace, tName);
+                    prefix = tag.prefix != null ? tag.prefix : MARKUP_PREFIX;
+                    namespace = tag.namespace;
+                    name = tag.name;
+                    realQN = buildQualifiedName(prefix, namespace, name);
                 } else {
                     throw new AuraRuntimeException(String.format("Invalid Descriptor Format: %s[%s]", qualifiedName, defType.toString()));
                 }
@@ -174,19 +174,19 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                 break;
         }
 
-        if (StringUtils.isBlank(tPrefix)) {
-            tPrefix = configAdapter.getDefaultPrefix(defType);
-            if (tPrefix != null) {
-                realQN = buildQualifiedName(tPrefix, tNamespace, tName);
+        if (StringUtils.isBlank(prefix)) {
+            prefix = configAdapter.getDefaultPrefix(defType);
+            if (prefix != null) {
+                realQN = buildQualifiedName(prefix, namespace, name);
             }
         }
         this.qualifiedName = realQN;
-        this.descriptorName = buildDescriptorName(tPrefix, tNamespace, tName);
-        this.prefix = tPrefix;
-        this.namespace = tNamespace;
-        this.name = tName;
+        this.descriptorName = buildDescriptorName(prefix, namespace, name);
+        this.prefix = prefix;
+        this.namespace = namespace;
+        this.name = name;
         this.hashCode = createHashCode();
-        this.nameParameters = tNameParameters;
+        this.nameParameters = nameParameters;
     }
 
     public static String buildQualifiedName(String prefix, String namespace, String name) {
@@ -270,7 +270,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
 
     private int createHashCode() {
         return (bundle == null ? 0 : bundle.hashCode())
-                + AuraUtil.hashCodeLowerCase(name, namespace, prefix, Integer.valueOf(defType.ordinal()));
+                + AuraUtil.hashCodeLowerCase(name, namespace, prefix, defType.ordinal());
     }
 
     @Override
@@ -355,6 +355,15 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             throw new AuraRuntimeException("descriptor is null");
         }
         return new DefDescriptorImpl<>(desc, defClass, newPrefix);
+    }
+
+    /**
+     * @see DefDescriptor#exists()
+     */
+    @Override
+    @Deprecated
+    public boolean exists() {
+        return org.auraframework.Aura.getDefinitionService().exists(this);
     }
 
     /**

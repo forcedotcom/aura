@@ -53,7 +53,7 @@ public class TopicPanelProvider implements ComponentDescriptorProvider {
                 }
                 DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("auradocs:" + topic,
                         ComponentDef.class);
-                if (definitionService.exists(desc)) {
+                if (desc.exists()) {
                     return desc;
                 }
             }

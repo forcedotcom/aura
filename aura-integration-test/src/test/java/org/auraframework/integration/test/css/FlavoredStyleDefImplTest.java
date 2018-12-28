@@ -47,7 +47,7 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
     public void testLoadStandardFlavor() throws Exception {
         DefDescriptor<ComponentDef> component = definitionService.getDefDescriptor("flavorTest:x_sample", ComponentDef.class);
         DefDescriptor<FlavoredStyleDef> flavor = Flavors.standardFlavorDescriptor(component);
-        assertTrue("expected to find bundle flavor def", definitionService.exists(flavor));
+        assertTrue("expected to find bundle flavor def", flavor.exists());
         definitionService.getDefinition(flavor); // no errors with loading
     }
 
@@ -56,7 +56,7 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
     public void testLoadCustomFlavor() throws Exception {
         DefDescriptor<ComponentDef> component = definitionService.getDefDescriptor("flavorTest:x_sample", ComponentDef.class);
         DefDescriptor<FlavoredStyleDef> flavor = Flavors.customFlavorDescriptor(component, "flavorTestAlt", "flavors");
-        assertTrue("expected to find namespace flavor def", definitionService.exists(flavor));
+        assertTrue("expected to find namespace flavor def", flavor.exists());
         definitionService.getDefinition(flavor); // no errors with loading
     }
 

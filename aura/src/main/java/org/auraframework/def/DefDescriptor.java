@@ -109,6 +109,11 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
     @Deprecated
     T getDef() throws QuickFixException;
 
+    /**
+     * @return true if the definition represented by this descriptor exists at all. does not compile the definition
+     */
+    boolean exists();
+
     enum DefType {
         ATTRIBUTE(AttributeDef.class), //
         APPLICATION(ApplicationDef.class, true), //

@@ -114,6 +114,11 @@ public class AuraLocalStoreImplTest {
         public Definition getDef() throws QuickFixException {
             return null;
         }
+
+        @Override
+        public boolean exists() {
+            return false;
+        }
     }
 
     @SuppressWarnings("serial")

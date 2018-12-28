@@ -48,9 +48,7 @@ public class DemoPanelProvider implements ComponentDescriptorProvider {
             }
             DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("auradocs:" + demo,
                     ComponentDef.class);
-            if (definitionService.exists(desc)) {
-                return desc;
-            }
+            if (desc.exists()) { return desc; }
         }
         return definitionService.getDefDescriptor("auradocs:demos", ComponentDef.class);
     }

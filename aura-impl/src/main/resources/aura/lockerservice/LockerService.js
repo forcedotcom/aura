@@ -32,14 +32,13 @@ function LockerService() {
         descriptor['depList'] = moduleDefinitionEntry[LOCKER_REFERENCE_INFO];
         return descriptor;
     };
-
     var service = {};
 
     function selectLib(lib) {
         // API For Aura Framework (will be obfuscated by Closure Compiler).
 
         service.create                = lib["create"];
-        service.createForClass        = lib["createForClass"];
+        service.createForDef          = lib["createForDef"];
         service.createForModule       = lib["createForModule"];
         service.getEnv                = lib["getEnv"];
         service.getEnvForSecureObject = lib["getEnvForSecureObject"];
@@ -62,6 +61,7 @@ function LockerService() {
         // API for file-based components (will not be obfuscated by Closure Compiler).
 
         service["create"]                = service.create;
+        service["createForDef"]          = service.createForDef;
         service["getEnv"]                = service.getEnv;
         service["getEnvForSecureObject"] = service.getEnvForSecureObject;
         service["getKeyForNamespace"]    = service.getKeyForNamespace;

@@ -467,15 +467,12 @@ Test.Aura.AuraComponentServiceTest = function(){
                 targetService.componentClassRegistry = {
                     "classConstructors": {
                         "test": true
-                    },
-                     "hasComponentClass": function(descriptor) {
-                        return descriptor === "test";
                     }
-               };
+                };
                 targetService.componentDefRegistry = {};
                 targetService.getDescriptorFromConfig = function() {return descriptor;};
 
-                targetService.createFromSavedComponentConfigs(descriptor);
+                targetService.createFromSavedComponentConfigs();
             });
 
             Assert.True(actual);
@@ -504,17 +501,14 @@ Test.Aura.AuraComponentServiceTest = function(){
                     "classConstructors": {
                         "test": false
                     },
-                    "classLiterals": {
+                    "classExporter": {
                         "test": false
-                    },
-                     "hasComponentClass": function(descriptor) {
-                        return descriptor === "test";
                     }
                 };
                 targetService.componentDefRegistry = {};
                 targetService.getDescriptorFromConfig = function() {return descriptor;};
 
-                targetService.createFromSavedComponentConfigs(descriptor);
+                targetService.createFromSavedComponentConfigs();
             });
 
             Assert.True(actual);
@@ -541,17 +535,14 @@ Test.Aura.AuraComponentServiceTest = function(){
                     "classConstructors": {
                         "test": false
                     },
-                    "classLiterals": {
+                    "classExporter": {
                         "test": true
-                    },
-                     "hasComponentClass": function(descriptor) {
-                        return descriptor === "test";
                     }
                 };
                 targetService.componentDefRegistry = {};
                 targetService.getDescriptorFromConfig = function() {return descriptor;};
 
-                targetService.createFromSavedComponentConfigs(descriptor);
+                targetService.createFromSavedComponentConfigs();
             });
 
             Assert.True(actual);
@@ -563,29 +554,20 @@ Test.Aura.AuraComponentServiceTest = function(){
         [Fact]
         function callsComponentDefCtorWhenComponentClassExists() {
             var actual;
-            var descriptor = "test2";
-            var mock = Mocks.GetMocks(Object.Global(), {
-                "ComponentDef": function() {
+            var descriptor = "test";
+            var mock = Mocks.GetMock(Object.Global(), "ComponentDef", function() {
                     actual = true;
-                },
-                "Json": {
-                    "ApplicationKey": {
-                        "COMPONENTCLASS": "cc"
-                    }
-                }
-            });
+                });
 
             mock(function() {
                 targetService.componentClassRegistry = {
                     "classConstructors": {
-                        "test2": true
-                    },
-                    "hasComponentClass": function(descriptor) {
-                        return descriptor === "test2";
+                        "test": true
                     }
                 };
                 targetService.componentDefRegistry = {};
                 targetService.getDescriptorFromConfig = function() {return descriptor;};
+
                 targetService.createComponentDef();
             });
 
@@ -595,28 +577,18 @@ Test.Aura.AuraComponentServiceTest = function(){
         [Fact]
         function callsComponentDefCtorWhenComponentExporterExists() {
             var actual;
-            var descriptor = "test3";
-            var mock = Mocks.GetMocks(Object.Global(), {
-                "ComponentDef": function() {
+            var descriptor = "test";
+            var mock = Mocks.GetMock(Object.Global(), "ComponentDef", function() {
                     actual = true;
-                },
-                "Json": {
-                    "ApplicationKey": {
-                        "COMPONENTCLASS": "cc"
-                    }
-                }
-            });
+                });
 
             mock(function() {
                 targetService.componentClassRegistry = {
                     "classConstructors": {
-                                "test3": false
+                                "test": false
                     },
-                    "classLiterals": {
-                        "test3": true
-                    },
-                     "hasComponentClass": function(descriptor) {
-                        return descriptor === "test3";
+                    "classExporter": {
+                        "test": true
                     }
                 };
                 targetService.componentDefRegistry = {};

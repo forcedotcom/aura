@@ -8,5 +8,5 @@
   "lc":{
     "descriptor":"markup://aura:locationChange"
   },
-  "cc":"({\n  \"meta\":{\n    \"name\":\"nonInternal$component\",\n    \"extends\":\"markup://aura:application\"\n  }\n})"
+  "cc":"$A.componentService.addComponentClass(\"markup://nonInternal:component\",function() {\n  var def = $A.componentService.getDef(\"markup://nonInternal:component\");  return $A.lockerService.createForDef(\n\"return {\\n  \\\"meta\\\":{\\n    \\\"name\\\":\\\"nonInternal$component\\\",\\n    \\\"extends\\\":\\\"markup://aura:application\\\"\\n  }\\n};\\n\", def);\n});\n"
 }

@@ -121,7 +121,7 @@ LibraryIncludeRegistry.prototype.getLibraryInclude = function(descriptor) {
 LibraryIncludeRegistry.prototype.hydrateLibrary = function(descriptor, exporter) {
 
     var script = $A.clientService.uncommentExporter(exporter);
-    exporter = $A.clientService.evalExporter("function() {\n" + script + "\n}", descriptor, 'lib');
+    exporter = $A.clientService.evalExporter(script, descriptor, 'lib');
 
     if(!exporter) {
         var defDescriptor = new Aura.System.DefDescriptor(descriptor);

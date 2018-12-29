@@ -61,15 +61,8 @@ function ComponentDef(config) {
     // Initialize the concrete component class if provided
     if (config.hasOwnProperty(Json.ApplicationKey.COMPONENTCLASS)) {
         try {
-            var cmpClass = config[Json.ApplicationKey.COMPONENTCLASS];
-            var cmpLiteral;
-            if (this.requireLocker) {
-                cmpLiteral = $A.lockerService.createForClass(cmpClass, descriptor);
-                $A.lockerService.trust(cmpLiteral, this);
-            } else {
-                cmpLiteral = $A.clientService.evalExporter(cmpClass, descriptor.toString());
-            }
-            $A.componentService.addComponentClass(descriptor.toString(), cmpLiteral);
+            var componentClass = $A.clientService.evalExporter(config[Json.ApplicationKey.COMPONENTCLASS], descriptor.toString());
+            componentClass();
         } catch (e) {
             var auraError = new $A.auraError("ComponentDef initialization error", e);
             auraError.setComponent(descriptor.getQualifiedName());

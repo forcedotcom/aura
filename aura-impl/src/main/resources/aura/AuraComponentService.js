@@ -44,7 +44,6 @@ function AuraComponentService() {
     this.descriptorCasingMap    = {};
 
     // holds ComponentDef configs to be created
-    this.savedComponentLiteral = {};
     this.savedComponentConfigs = {};
 
     // references ControllerDef descriptor to its ComponentDef descriptor
@@ -712,11 +711,11 @@ AuraComponentService.prototype.createComponentInstance = function(config, localC
  * Use the specified constructor as the definition of the class descriptor.
  * We store them for execution later so we do not load definitions into memory unless they are utilized in getComponentClass.
  * @param {String} descriptor Uses the pattern of namespace:componentName.
- * @param {Object} classLiteral The pre-built component literal.
+ * @param {Function} exporter A function that when executed will return the component object litteral.
  * @export
  */
-AuraComponentService.prototype.addComponentClass = function(descriptor, classLiteral){
-    return this.componentClassRegistry.addComponentClass(descriptor, classLiteral);
+AuraComponentService.prototype.addComponentClass = function(descriptor, exporter){
+    return this.componentClassRegistry.addComponentClass(descriptor, exporter);
 };
 
 /**
@@ -1424,7 +1423,7 @@ AuraComponentService.prototype.getComponentDef = function(config) {
     var definition = this.componentDefRegistry[descriptor];
 
     if (!definition && this.savedComponentConfigs[descriptor]) {
-        return this.createFromSavedComponentConfigs(descriptor);
+        return this.createFromSavedComponentConfigs(config);
     } else if (!definition && this.moduleDefRegistry[descriptor]) {
         return this.createInteropComponentDef(descriptor);
     }
@@ -1486,43 +1485,31 @@ AuraComponentService.prototype.getDef = function(descriptor) {
  * Add a component to the registry
  * We store them for execution later so we do not load definitions into memory unless they are utilized in getComponent.
  * @param {String} descriptor Uses the pattern of namespace:componentName.
- * @param {Function} configExporter A function that contains a commented component config.
- * @param {Function} literalExporter A function that contains a commented component class literal.
+ * @param {Function} exporter A function that when executed will return the component object litteral.
  * @export
  */
-AuraComponentService.prototype.addComponent = function(descriptor, configExporter, literalExporter) {
-    this.savedComponentConfigs[descriptor] = configExporter;
-    this.savedComponentLiteral[descriptor] = literalExporter;
+AuraComponentService.prototype.addComponent = function(descriptor, exporter) {
+    this.savedComponentConfigs[descriptor] = exporter;
 };
 
-AuraComponentService.prototype.hydrateComponent = function(descriptor, cmpConfig, cmpLiteral) {
 
-    if (typeof cmpConfig === 'function') {
-        cmpConfig = $A.clientService.uncommentExporter(cmpConfig);
-    }
-    if (typeof cmpConfig === 'string') {
-        cmpConfig = JSON.parse(cmpConfig);
-    }
+AuraComponentService.prototype.hydrateComponent = function(descriptor, exporter) {
 
-    if (typeof cmpLiteral === 'function') {
-        cmpLiteral = $A.clientService.uncommentExporter(cmpLiteral);
-    }
-    if (typeof cmpLiteral === 'string') {
-        cmpConfig[Json.ApplicationKey.COMPONENTCLASS] = cmpLiteral;
-    }
+    var script = $A.clientService.uncommentExporter(exporter);
+    exporter = $A.clientService.evalExporter(script, descriptor);
 
-    if(!cmpConfig) {
+    if(!exporter) {
         var defDescriptor = new Aura.System.DefDescriptor(descriptor);
         var includeComponentSource = defDescriptor.getPrefix() === "layout" || $A.clientService.isInternalNamespace(defDescriptor.getNamespace());
         var errorMessage = (!includeComponentSource) ?
             "Hydrating the component" + descriptor + " failed." :
-            "Hydrating the component" + descriptor + " failed.\n Exporter code: " + this.savedComponentConfigs[descriptor];
+            "Hydrating the component" + descriptor + " failed.\n Exporter code: " + script;
         var auraError = new $A.auraError(errorMessage, null, $A.severity.QUIET);
         auraError.setComponent(descriptor);
         throw auraError;
     }
 
-    return cmpConfig;
+    return exporter();
 };
 
 /**
@@ -1532,20 +1519,19 @@ AuraComponentService.prototype.hydrateComponent = function(descriptor, cmpConfig
  * @return {ComponentDef} component definition if config available
  * @private
  */
-AuraComponentService.prototype.createFromSavedComponentConfigs = function(descriptor) {
+AuraComponentService.prototype.createFromSavedComponentConfigs = function(config) {
+    var descriptor = this.getDescriptorFromConfig(config);
     var cmpConfig = this.savedComponentConfigs[descriptor];
-    var cmpLiteral = this.savedComponentLiteral[descriptor];
-    var config = cmpConfig && this.hydrateComponent(descriptor, cmpConfig, cmpLiteral);
+    var definition = typeof cmpConfig === 'function' ? this.hydrateComponent(descriptor, cmpConfig) : cmpConfig;
     // should only allow new ComponentDef when we are sure exporter or component class exists
-    var alreadyHasConstructor = this.hasComponentClass(descriptor);
+    var alreadyHasConstructor = this.componentClassRegistry.classConstructors[descriptor] || this.componentClassRegistry.classExporter[descriptor];
 
     // Definitions that come back from the server in the context have their component class on the definition.
-    var hasBuiltInConstructor = config && config.hasOwnProperty(Json.ApplicationKey.COMPONENTCLASS);
+    var hasBuiltInConstructor = cmpConfig && cmpConfig.hasOwnProperty(Json.ApplicationKey.COMPONENTCLASS);
     if (alreadyHasConstructor || hasBuiltInConstructor) {
-        var def = new ComponentDef(config);
+        var def = new ComponentDef(definition);
         this.componentDefRegistry[descriptor] = def;
         delete this.savedComponentConfigs[descriptor];
-        delete this.savedComponentLiteral[descriptor];
         return def;
     }
 
@@ -1564,10 +1550,11 @@ AuraComponentService.prototype.createComponentDef = function(config) {
 
     if (!definition) {
         if (this.savedComponentConfigs[descriptor]) {
-            definition = this.createFromSavedComponentConfigs(descriptor);
+            definition = this.createFromSavedComponentConfigs(config);
         } else {
             // should only allow new ComponentDef when we are sure exporter or component class exists
-            if (this.hasComponentClass(descriptor)) {
+            if (!!this.componentClassRegistry.classConstructors[descriptor] ||
+                !!this.componentClassRegistry.classExporter[descriptor]) {
                 definition = new ComponentDef(config);
                 this.componentDefRegistry[descriptor] = definition;
             }
@@ -2036,10 +2023,10 @@ AuraComponentService.prototype.createComponentPriv = function (config, callback)
             var classConstructor = this.getComponentClass(descriptor, def);
 
             if (!classConstructor) {
-                var errorMessage = $A.util.format("Component class not found: {0}\n hasClassConstructor: {1}\n hasclassLiteral: {2}\n hasSavedComponentConfigs: {3}\n hasComponentDefCreated: {4}",
+                var errorMessage = $A.util.format("Component class not found: {0}\n hasClassConstructor: {1}\n hasClassExporter: {2}\n hasSavedComponentConfigs: {3}\n hasComponentDefCreated: {4}",
                     descriptor,
                     !!$A.componentService.componentClassRegistry.classConstructors[descriptor],
-                    !!$A.componentService.componentClassRegistry.classLiterals[descriptor],
+                    !!$A.componentService.componentClassRegistry.classExporter[descriptor],
                     !!$A.componentService.savedComponentConfigs[descriptor],
                     !!$A.componentService.componentDefRegistry[descriptor]);
                 var auraError = new $A.auraError(errorMessage, null, $A.severity.QUIET);

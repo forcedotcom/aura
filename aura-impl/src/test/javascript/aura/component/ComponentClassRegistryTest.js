@@ -45,12 +45,11 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
         "IterationComponent": function() {},
         "TextComponent": function() {},
         "$A": {
-            "assert": function(condition, message){ if (!condition) { throw message }},
+            "assert": function(condition, message){ if (!condition) { throw new message }},
             "util": {
                 "isString": function(obj){ return typeof obj === 'string' },
-                "isObject": function(obj){ return typeof obj === 'object' },
                 "isFunction": function(obj){ return typeof obj === 'function' },
-                "globalEval": function(src){
+                "globalEval": function(src){ 
                     var returnableEx = /^(\s*)([{(["']|function\s*\()/;
                     var match = src.match(returnableEx);
                     if (match) src = src.replace(match[1], 'return ');
@@ -73,9 +72,11 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
         [Fact]
         function ReturnsComponentClassConstructor() {
             // Arrange
-            var classLiteral = {
-                "meta": {
-                    "name": "componentClassName"
+            var exporter = function() {
+                return {
+                    "meta": {
+                        "name": "componentClassName"
+                    }
                 }
             };
 
@@ -83,7 +84,7 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
             var actual;
             mockFramework(function(){
                 var target = new Aura.Component.ComponentClassRegistry();
-                target.addComponentClass("testDescriptor", classLiteral);
+                target.addComponentClass("testDescriptor", exporter);
                 actual = target.getComponentClass("testDescriptor");
             });
 
@@ -95,9 +96,11 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
         function ConstructorNameIsComponentClassName() {
             // Arrange
             var expected = "componentClassName";
-            var classLiteral = {
-                "meta": {
-                    "name": "componentClassName"
+            var exporter = function() {
+                return {
+                    "meta": {
+                        "name": "componentClassName"
+                    }
                 }
             };
 
@@ -105,7 +108,7 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
             var actual;
             mockFramework(function(){
                 var target = new Aura.Component.ComponentClassRegistry();
-                target.addComponentClass("testDescriptor", classLiteral);
+                target.addComponentClass("testDescriptor", exporter);
                 var componentClass = target.getComponentClass("testDescriptor");
                 actual = componentClass.prototype.meta["name"];
             });
@@ -132,12 +135,14 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
         [Fact]
         function ControllerExistsInComponentClassPrototype() {
             // Arrange
-            var classLiteral = {
-                "meta": {
-                    "name": "componentClassName"
-                },
-                "controller":{
-                    "controllerFunction": function(cmp) {}
+            var exporter = function() {
+                return {
+                    "meta": {
+                        "name": "componentClassName"
+                    },
+                    "controller":{
+                        "controllerFunction": function(cmp) {}
+                    }
                 }
             };
 
@@ -145,7 +150,7 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
             var actual;
             mockFramework(function(){
                 var target = new Aura.Component.ComponentClassRegistry();
-                target.addComponentClass("testDescriptor", classLiteral);
+                target.addComponentClass("testDescriptor", exporter);
                 var componentClass = target.getComponentClass("testDescriptor");
                 actual = componentClass.prototype.controller["controllerFunction"];
             });
@@ -157,12 +162,14 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
         [Fact]
         function HelperExistsInComponentClassPrototype() {
             // Arrange
-            var classLiteral = {
-                "meta": {
-                    "name": "componentClassName"
-                },
-                "helper":{
-                    "helperFunction": function(cmp) {}
+            var exporter = function() {
+                return {
+                    "meta": {
+                        "name": "componentClassName"
+                    },
+                    "helper":{
+                        "helperFunction": function(cmp) {}
+                    }
                 }
             };
 
@@ -170,7 +177,7 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
             var actual;
             mockFramework(function(){
                 var target = new Aura.Component.ComponentClassRegistry();
-                target.addComponentClass("testDescriptor", classLiteral);
+                target.addComponentClass("testDescriptor", exporter);
                 var componentClass = target.getComponentClass("testDescriptor");
                 actual = componentClass.prototype.helper["helperFunction"];
             });
@@ -182,12 +189,14 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
         [Fact]
         function RendererExistsInComponentClassPrototype() {
             // Arrange
-            var classLiteral = {
-                "meta": {
-                    "name": "componentClassName"
-                },
-                "renderer": {
-                    "afterRender": function(cmp) {}
+            var exporter = function() {
+                return {
+                    "meta": {
+                        "name": "componentClassName"
+                    },
+                    "renderer": {
+                        "afterRender": function(cmp) {}
+                    }
                 }
             };
 
@@ -195,7 +204,7 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
             var actual;
             mockFramework(function(){
                 var target = new Aura.Component.ComponentClassRegistry();
-                target.addComponentClass("testDescriptor", classLiteral);
+                target.addComponentClass("testDescriptor", exporter);
                 var componentClass = target.getComponentClass("testDescriptor");
                 actual = componentClass.prototype.renderer["afterRender"];
             });
@@ -207,12 +216,14 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
         [Fact]
         function ProviderExistsInComponentClassPrototype() {
             // Arrange
-            var classLiteral = {
-                "meta": {
-                    "name": "componentClassName"
-                },
-                "provider": {
-                    "provide": function(cmp) {}
+            var exporter = function() {
+                return {
+                    "meta": {
+                        "name": "componentClassName"
+                    },
+                    "provider": {
+                        "provide": function(cmp) {}
+                    }
                 }
             };
 
@@ -220,7 +231,7 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
             var actual;
             mockFramework(function(){
                 var target = new Aura.Component.ComponentClassRegistry();
-                target.addComponentClass("testDescriptor", classLiteral);
+                target.addComponentClass("testDescriptor", exporter);
                 var componentClass = target.getComponentClass("testDescriptor");
                 actual = componentClass.prototype.provider["provide"];
             });
@@ -232,27 +243,31 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
         [Fact]
         function InheritedHelperExistsInComponentClassPrototype() {
             // Arrange
-            var mockSuperClassLiteral = {
-                "meta": {
-                    "name": "superComponentClassName"
-                },
-                "helper": {
-                    "superHelperFunction": function() {}
-                }
+            var mockSuperExporter = function() {
+                return {
+                    "meta": {
+                        "name": "superComponentClassName"
+                    },
+                    "helper": {
+                        "superHelperFunction": function() {}
+                    }
+                };
             };
-            var classLiteral = {
-                "meta": {
-                    "name": "componentClassName",
-                    "extends": "superTestDecriptor"
-                }
+            var exporter = function() {
+                return {
+                    "meta": {
+                        "name": "componentClassName",
+                        "extends": "superTestDecriptor"
+                    }
+                };
             };
 
             // Act
             var actual;
             mockFramework(function(){
                 var target = new Aura.Component.ComponentClassRegistry();
-                target.addComponentClass("superTestDecriptor", mockSuperClassLiteral);
-                target.addComponentClass("testDescriptor", classLiteral);
+                target.addComponentClass("superTestDecriptor", mockSuperExporter);
+                target.addComponentClass("testDescriptor", exporter);
                 var componentClass = target.getComponentClass("testDescriptor");
                 actual = componentClass.prototype.helper["superHelperFunction"];
             });
@@ -264,27 +279,31 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
         [Fact]
         function InheritedControllerExistsInComponentClassPrototype() {
             // Arrange
-            var mockSuperClassLiteral = {
-                "meta": {
-                    "name": "superComponentClassName"
-                },
-                "controller": {
-                    "superControllerFunction": function() {}
-                }
+            var mockSuperExporter = function() {
+                return {
+                    "meta": {
+                        "name": "superComponentClassName"
+                    },
+                    "controller": {
+                        "superControllerFunction": function() {}
+                    }
+                };
             };
-            var classLiteral = {
-                "meta": {
-                    "name": "componentClassName",
-                    "extends": "superComponentDecriptor"
-                }
+            var exporter = function() {
+                return {
+                    "meta": {
+                        "name": "componentClassName",
+                        "extends": "superComponentDecriptor"
+                    }
+                };
             };
 
             // Act
             var actual;
             mockFramework(function(){
                 var target = new Aura.Component.ComponentClassRegistry();
-                target.addComponentClass("superComponentDecriptor", mockSuperClassLiteral);
-                target.addComponentClass("testDescriptor", classLiteral);
+                target.addComponentClass("superComponentDecriptor", mockSuperExporter);
+                target.addComponentClass("testDescriptor", exporter);
                 var componentClass = target.getComponentClass("testDescriptor");
                 actual = componentClass.prototype.controller["superControllerFunction"];
             });
@@ -297,11 +316,13 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
         function ImportedLibraryExistsInHelper() {
             // Arrange
             var expected = "test:libName";
-            var classLiteral = {
-                "meta": {
-                    "name": "componentClassName",
-                    "imports": {
-                        "testLib": "test:libName"
+            var exporter = function() {
+                return {
+                    "meta": {
+                        "name": "componentClassName",
+                        "imports": {
+                            "testLib": "test:libName"
+                        }
                     }
                 }
             };
@@ -310,7 +331,7 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
             var actual;
             mockFramework(function(){
                 var target = new Aura.Component.ComponentClassRegistry();
-                target.addComponentClass("testDescriptor", classLiteral);
+                target.addComponentClass("testDescriptor", exporter);
                 var componentClass = target.getComponentClass("testDescriptor");
                 actual = componentClass.prototype.helper["testLib"];
             });

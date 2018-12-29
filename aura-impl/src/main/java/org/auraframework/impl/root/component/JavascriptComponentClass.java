@@ -152,29 +152,39 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
                         null);
             }
 
-            String output;
+            StringBuilder out = new StringBuilder();
 
-            try {
-                StringBuilder sb = new StringBuilder();
-                // Wrap the object literal with parentheses to turn it
-                // into an expression and allow parsing by the minifier.
-                sb.append('(');
-                writeObjectLiteral(sb);
-                sb.append(')');
-                output = sb.toString();
-            } catch (IOException ioe) {
-                // Do nothing, just avoid generating
-                // a partial definition.
-                output = "";
-            }
+            out.append("$A.componentService.addComponentClass(\"" + descriptor.getQualifiedName() + "\",");
+            writeExporter(out);
+            out.append(");\n");
 
-            return output;
+            return out.toString();
         }
 
         @Override
         public JavascriptComponentClass build() throws QuickFixException {
             finish();
             return new JavascriptComponentClass(this);
+        }
+
+        private void writeExporter(StringBuilder out) throws QuickFixException {
+
+            out.append("function() {\n");
+            try {
+                StringBuilder sb = new StringBuilder();
+                writeObjectVariable(sb);
+                out.append(sb);
+            } catch (IOException ioe) {
+                // Do nothing, just avoid generating
+                // a partial definition;
+            }
+            out.append("}");
+        }
+
+        private void writeObjectVariable(StringBuilder out) throws IOException, QuickFixException {
+            out.append("return ");
+            writeObjectLiteral(out);
+            out.append(";\n");
         }
 
         private void writeObjectLiteral(StringBuilder out) throws IOException, QuickFixException {
@@ -247,7 +257,7 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
                 hasCode = true;
             }
 
-            json.writeMapEnd();
+            out.append("\n}");
         }
     }
 }

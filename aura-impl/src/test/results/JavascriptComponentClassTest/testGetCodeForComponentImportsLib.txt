@@ -1,4 +1,5 @@
-({
+$A.componentService.addComponentClass("markup://test:testComponent",function() {
+return {
   "meta":{
     "name":"string$testComponent",
     "extends":"markup://aura:component",
@@ -6,4 +7,5 @@
 
     }
   }
-})
+};
+});

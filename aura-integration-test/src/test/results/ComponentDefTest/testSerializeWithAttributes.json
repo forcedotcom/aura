@@ -5,5 +5,5 @@
     ["body","aura://Aura.Component[]","G",false,[]],
     ["testAttributeDescriptorName","aura://String",null,false,"testValue"]
   ],
-  "cc":"({\n  \"meta\":{\n    \"name\":\"aura$test\",\n    \"extends\":\"markup://aura:component\"\n  }\n})"
+  "cc":"$A.componentService.addComponentClass(\"markup://aura:test\",function() {\nreturn {\n  \"meta\":{\n    \"name\":\"aura$test\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\n});\n"
 }

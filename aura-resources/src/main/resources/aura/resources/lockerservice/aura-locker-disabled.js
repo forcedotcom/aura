@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-12-27
- * Version: 0.6.13
+ * Generated: 2018-12-17
+ * Version: 0.6.12
  */
 
 (function (exports) {
@@ -468,6 +468,11 @@ function createForClass(src, defDescriptor) {
   return evaluate('return (\n' + src + '\n)');
 }
 
+// @deprecated
+function createForDef(src, def) {
+  return evaluate(src);
+}
+
 function createForModule(src, defDescriptor) {
   return evaluate('return (\n' + src + '\n)');
 }
@@ -527,6 +532,7 @@ function wrap(thing, metaFrom, metaTo) {
 
 exports.create = create;
 exports.createForClass = createForClass;
+exports.createForDef = createForDef;
 exports.createForModule = createForModule;
 exports.getEnv = getEnv;
 exports.getEnvForSecureObject = getEnvForSecureObject;

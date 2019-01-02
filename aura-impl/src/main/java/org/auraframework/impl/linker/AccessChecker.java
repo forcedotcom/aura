@@ -20,6 +20,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
+import org.auraframework.def.LibraryDefRef;
 import org.auraframework.def.ParentedDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.throwable.NoAccessException;
@@ -96,9 +97,15 @@ public class AccessChecker {
             throw new RuntimeException("Missing access declaration for " + def.getDescriptor()
                     + " of type "+def.getClass().getSimpleName());
         }
-
+        
         DefDescriptor<?> desc = def.getDescriptor();
 
+        // It's possible to have this return null. 
+        // For Example LibraryDefRefs dont have a descriptor, so they return null.
+        if (desc == null) {
+            return null;
+        }
+        
         if (desc.getDefType() == DefType.MODULE) {
             return computeModuleAccess(referencingDescriptor, (ModuleDef) def);
         }

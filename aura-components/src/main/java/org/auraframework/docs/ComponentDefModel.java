@@ -20,6 +20,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
 import org.auraframework.def.ApplicationDef;
@@ -47,8 +49,6 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
-
-import com.google.common.collect.Lists;
 
 /**
  * @since 0.0.196
@@ -309,7 +309,7 @@ public class ComponentDefModel implements ModelInstance {
             this.description = def.getDescription();
             this.type = def.getTypeDef().getName().toLowerCase();
             this.required = def.isRequired();
-            if (def.getDefaultValue() != null) {
+            if (def.getDefaultValue() != null && def.getDefaultValue().getValue() != null) {
                 this.defaultValue = def.getDefaultValue().getValue().toString();
             } else {
                 this.defaultValue = null;
@@ -407,7 +407,7 @@ public class ComponentDefModel implements ModelInstance {
         return definitionService.getDefDescriptor(String.format("%s:application", defaultNamespace),
                 ApplicationDef.class);
     }
-	
+
     public boolean hasAccess(Definition def) throws QuickFixException {
         return definitionService.hasAccess(getReferencingDescriptor(), def);
     }

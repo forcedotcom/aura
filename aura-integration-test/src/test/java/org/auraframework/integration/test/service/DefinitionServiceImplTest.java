@@ -19,6 +19,11 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
 import org.auraframework.Aura;
 import org.auraframework.cache.Cache;
 import org.auraframework.def.ActionDef;
@@ -32,13 +37,18 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.LibraryDefRef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.def.TypeDef;
+import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.DefinitionServiceImpl;
 import org.auraframework.impl.context.AbstractRegistryAdapterImpl;
+import org.auraframework.impl.root.library.LibraryDefRefImpl;
+import org.auraframework.impl.root.parser.handler.LibraryDefRefHandler;
+import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefFactoryImpl;
 import org.auraframework.impl.system.DefinitionImpl;
@@ -63,11 +73,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Test;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  * Tests for DefinitionServiceImpl.
@@ -1083,6 +1088,26 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         assertNotSame(String.format("App uid should be updated when dependent component is changed. Previous '%s' Current '%s'", appUid, newAppUid),
                 appUid, newAppUid);
 
+    }
+
+    @Test
+    public void testCheckingAccessOnModule() throws Exception {
+        contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, laxSecurityApp);
+
+        DefDescriptor<ModuleDef> module = definitionService.getDefDescriptor("moduletest:simpleLib", ModuleDef.class);
+        LibraryDefRefImpl.Builder builder = new LibraryDefRefImpl.Builder();
+        builder.setModuleDescriptor(module);
+        builder.setProperty("lib");
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PRIVATE));
+        LibraryDefRef libraryDefRef = builder.build();
+
+        DefDescriptor<?> app = addSourceAutoCleanup(ApplicationDef.class, "<aura:application><aura:import library='moduletest:simpleLib' property='lib'/></aura:application>");
+
+        boolean hasAccess = definitionService.hasAccess(app, libraryDefRef);
+
+        contextService.endContext();
+
+        assertTrue(hasAccess);
     }
 
     public static class AuraTestRegistryProviderWithNulls extends AbstractRegistryAdapterImpl {

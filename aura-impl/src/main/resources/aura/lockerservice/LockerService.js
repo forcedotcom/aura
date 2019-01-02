@@ -16,7 +16,7 @@
 
 // This class is responsible for creating and returning the
 // instance of LockerService. It hides the mechanism used to
-// select the implementaion to the rest of Aura client code.
+// select the implementation to the rest of Aura client code.
 function LockerService() {
     "use strict";
 
@@ -56,6 +56,7 @@ function LockerService() {
         service.isAllowedSvgTag       = lib["isAllowedSvgTag"];
         service.sanitizeSvgElement    = lib["sanitizeSvgElement"];
         service.sanitizeElement       = lib["sanitizeElement"];
+        service.getMethodUsageMetrics = lib["getMethodUsageMetrics"];
         service.createDescriptor      = createDescriptor;
 
         // API for file-based components (will not be obfuscated by Closure Compiler).
@@ -69,7 +70,7 @@ function LockerService() {
         service["trust"]                 = service.trust;
         service["wrapComponent"]         = service.wrapComponent;
     }
-
+    
     function getPublicMethodNames(component) {
         var methodsNames = [];
         if (component instanceof Aura.Component.InteropComponent) {
@@ -110,7 +111,7 @@ function LockerService() {
             };
 
             // We expose a custom API to Locker with methods that aren't
-            // avaiable with the current API on Aura Objects. This reduces the
+            // available with the current API on Aura Objects. This reduces the
             // complexity of what is passed to Aura.
             var api = {
 

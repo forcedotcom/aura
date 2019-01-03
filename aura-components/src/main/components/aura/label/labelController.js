@@ -48,7 +48,7 @@
         // Replace as many indexes as we can find, or as many body components, whichever comes first
         var body=[];
         var startIndex=0;
-        value.replace(formatRegex, function(match, position, index) {
+        value.replace(formatRegex, function replace(match, position, index) {
             var substitution = template[position];
             if (substitution !== undefined) {
                 // JBUCH: CHANGE TO $A.createComponent ONCE COMPONENTCONFIGS ARE AVAILABLE

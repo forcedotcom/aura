@@ -52,8 +52,8 @@
         var maxSize = storage.getMaxSize();
 
         var status;
-        storage.getSize().then(function(size) {
-            $A.run(function() {
+        storage.getSize().then(function proccessStorageSizeWrapper(size) {
+            $A.run(function proccessStorageSize() {
                 if (size < maxSize / 2) {
                     status = "Ok";
                 } else if (size < maxSize) {

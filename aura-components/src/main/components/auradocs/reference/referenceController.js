@@ -20,7 +20,7 @@
         var sidebar = cmp.find("sidebar");
         var sidebarBody = sidebar.get("v.body");
         if(sidebarBody.length === 0) {
-            $A.createComponent("markup://auradocs:referenceTree", {}, function(referenceTreeCmp, status){
+            $A.createComponent("markup://auradocs:referenceTree", {}, function createReferenceTreeCallback(referenceTreeCmp, status){
             	if (status === "SUCCESS") {
             	    sidebar.set("v.body", referenceTreeCmp);
                 }
@@ -31,7 +31,7 @@
         getReference.setStorable();
         getReference.setParams(event.getParams());
 
-        getReference.setCallback(this, function(action) {
+        getReference.setCallback(this, function getReferenceCallback(action) {
             var state = action.getState();
             if (state === "SUCCESS") {
                 var ret = action.getReturnValue();

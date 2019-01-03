@@ -21,17 +21,15 @@
              * Test that img tags lose event handlers
              */
             // Set
-            function(cmp) {
+            function set(cmp) {
                 cmp.set("v.description", "<img src='doesnotexist.png' onerror='window.testXSSRawHtml=1'/>");
             },
             // Verify
-            function(cmp) {
+            function verify(cmp) {
                 var img = cmp.getElement().querySelector("img");
                 
                 $A.test.assertFalse(img.hasAttribute("onerror"), "onerror attribute was present on the inserted img element");
             }
         ]
     }
-
-
  })

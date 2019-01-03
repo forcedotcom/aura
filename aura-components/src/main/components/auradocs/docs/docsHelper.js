@@ -42,7 +42,7 @@
         action.setStorable();
         action.setParams(parameters);
 
-        action.setCallback(this, function(action) {
+        action.setCallback(this, function proccessResults(action) {
             var state = action.getState();
             if (state === "SUCCESS") {
                 var ret = action.getReturnValue();
@@ -55,7 +55,7 @@
                     if(layout === "reference") {
                         var sidebar = cmp.find("sidebar");
                         if(sidebar.get("v.body").length === 0) {
-                            $A.createComponent("markup://auradocs:referenceTree", {}, function(referenceTree, status, messages) {
+                            $A.createComponent("markup://auradocs:referenceTree", {}, function referenceTreeCreatedCallback(referenceTree, status, messages) {
                             	if (status === "SUCCESS") {
                             		sidebar.set("v.body", referenceTree);
                             	}

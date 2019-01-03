@@ -20,7 +20,7 @@
             {
                 topic : topic
             },
-            function(topicPanel, status) {
+            function createTopicPanelCallback(topicPanel, status) {
                 console.log('XXXXXXXXXXXXXXXXXXXXXXXX helpPanelTopic');
                 try {
                     if (status === "SUCCESS") {

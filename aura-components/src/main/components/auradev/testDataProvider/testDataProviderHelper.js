@@ -25,7 +25,7 @@
             action.setParams({
                 "keyword": keyword
             });
-            action.setCallback(this, function(act) {
+            action.setCallback(this, function getItemsCallback(act) {
             	var state = act.getState();
                 if (state === "SUCCESS") {
                     var result = act.getReturnValue();                    

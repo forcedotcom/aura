@@ -18,7 +18,7 @@
         var action = cmp.get("c.getDependencyMetrics");
         action.setParam("component", cmp.get("v.def"));
 
-        action.setCallback(this, function () {
+        action.setCallback(this, function getDependencyMetricsCallback() {
             var defs = action.getReturnValue();
             var namespaceMetrics = {};
             if(defs && defs.dependencies) {
@@ -33,7 +33,7 @@
                     }
                 }
                 var namespaces = Object.keys(namespaceMetrics).map(function(key) { return {namespace: key, size: namespaceMetrics[key]}; });
-                namespace = namespaces.sort(function(a, b) {
+                namespace = namespaces.sort(function sizeComparitor(a, b) {
                     return b.size - a.size;
                 });
                 cmp.set("v.dependencies", dependencies);

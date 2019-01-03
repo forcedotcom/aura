@@ -46,7 +46,7 @@
         }
         var avp = cmp.getAttributeValueProvider();
 
-        action.setCallback(this, function(a){
+        action.setCallback(this, function getComponentCallback(a){
             var newBody;
             if(!cmp.isValid()){
                 return;

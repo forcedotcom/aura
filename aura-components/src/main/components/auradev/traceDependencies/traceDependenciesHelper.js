@@ -18,7 +18,7 @@
         var action = cmp.get("c.getDependenciesWithHashCodes");
         action.setParam("component", cmp.get("v.def"));
 
-        action.setCallback(this, function () {
+        action.setCallback(this, function getDependenciesWithHashCodesCallback() {
             var defs = action.getReturnValue();
             if(defs && defs.dependencies) {
                 var dependencies = defs.dependencies.sort(this.dependencySorter);

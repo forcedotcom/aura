@@ -56,7 +56,7 @@
 
         action.setParam("app", app);
 
-        action.setCallback(this, function (result) {
+        action.setCallback(this, function createGraphCallback(result) {
             var nodes = result.getReturnValue();
 
             if(!nodes || Object.keys(nodes).length < 2) {
@@ -97,7 +97,7 @@
         var onlyUniqueDep = cmp.find("uniqDepsOnly").get("v.value");
 
         var uniqueDeps = helper.findDependencies(cmp, onlyUniqueDep);
-        uniqueDeps.sort(function(a, b) {
+        uniqueDeps.sort(function uniqDepsSizeComparitor(a, b) {
             return b["uniqDepsSize"] - a["uniqDepsSize"];
         });
 

@@ -16,9 +16,9 @@
 ({
     init: function (component, event, helper) {
         var descriptor = component.get('v.descriptor');
-        $A.getDefinition(descriptor, function(foundDefinition){
+        $A.getDefinition(descriptor, function processDefinition(foundDefinition){
             if (foundDefinition){
-                $A.createComponent('auradocs:viewer', {descriptor: descriptor}, function(body, status) {
+                $A.createComponent('auradocs:viewer', {descriptor: descriptor}, function createViewerCallback(body, status) {
                     if (status === "SUCCESS") {
                         component.set('v.body', [body]);
                     }

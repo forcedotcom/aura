@@ -21,7 +21,7 @@
             $A.eventService.addHandler({
                 "event": "markup://auraStorage:modified",
                 "globalId": cmp.getGlobalId(),
-                "handler": $A.getCallback(function(e) {
+                "handler": $A.getCallback(function auraStorageModifiedHandler(e) {
                     if (!cmp.isValid()) {
                         return;
                     }
@@ -50,8 +50,8 @@
 
         storage.getSize().then(
             undefined,
-            function() { return "unknown"; }
-        ).then($A.getCallback(function(size) {
+            function getStorageSizeErrorHandler() { return "unknown"; }
+        ).then($A.getCallback(function storageSizeHandler(size) {
             var message = $A.util.format("Storage name: {0}\nAdapter: {1}\nSize: {2} of {3} KB\n\nPress OK to clear ALL storages or cancel to abort.",
                 cmp.get("v.storageName"),
                 storage.getName(),
@@ -66,9 +66,9 @@
                 for (var name in storages) {
                     promises.push(storages[name].clear());
                 }
-                Promise.all(promises).then(function() {
+                Promise.all(promises).then(function storageClearedCallback() {
                     $A.log("All storages cleared");
-                }, function(e) {
+                }, function storageClearedErrorCallback(e) {
                     $A.warning("Error while clearing storages: ", e);
                 });
             }

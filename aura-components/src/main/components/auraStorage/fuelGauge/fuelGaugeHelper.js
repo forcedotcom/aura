@@ -30,7 +30,7 @@
         var storage = this.getStorage(cmp);
         var maxSize = storage.getMaxSize();
 
-        storage.getSize().then($A.getCallback(function(size) {
+        storage.getSize().then($A.getCallback(function storageSizeHandler(size) {
             var severity;
             if (size < maxSize / 2) {
                 severity = "success";

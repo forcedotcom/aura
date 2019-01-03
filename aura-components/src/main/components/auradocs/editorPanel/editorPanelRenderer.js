@@ -18,7 +18,7 @@
         if (!cmp.codeMirror) {
         	if (!window.CodeMirror) {
         		$A.util.includeScript("/auraFW/resources/codemirror/lib/codemirror.js",
-        				function () {
+        				function createCodeMirrorCmp () {
         					cmp.getDef().getHelper().createCodeMirror(cmp);
         				});
         	} else {

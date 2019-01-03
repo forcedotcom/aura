@@ -35,7 +35,7 @@
         }
     
         var action = component.get("c.dummy");
-        action.setCallback(this, function(action) {
+        action.setCallback(this, function fireDataChangeEventWrapper(action) {
             // TODO: figure out why this server hit is necessary to get the parent scroller to refresh...
             // we don't actually care--we just want the action lifecycle to fire so the scroller will refresh...
             helper.fireDataChangeEvent(component, data); 

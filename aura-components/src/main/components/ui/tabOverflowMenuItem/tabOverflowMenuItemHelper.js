@@ -23,7 +23,7 @@
 			count = newMenuItems.length,
 			menuItemCache = this.getMenuItemCache(cmp);
 
-		var callback = function(newMenuItem, status) {
+		var callback = function createActionMenuItemCallback(newMenuItem, status) {
 			if (!cmp.isValid()) {
 				return;
 			}

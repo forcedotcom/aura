@@ -46,7 +46,7 @@
 		var cmLib = this.cmLib;
 		var compDef = {};
 		if(component._tooltip) {
-			setTimeout($A.getCallback(function () {
+			setTimeout($A.getCallback(function cbWrapper() {
 				cb(component._tooltip);
 			}, 0));
 		} else {
@@ -62,13 +62,13 @@
 				'fadeOutDuration',
 				'fadeInDuration',
 				'boundingElementSelector',
-				'delay'].forEach(function(attr) {
+				'delay'].forEach(function setAttr(attr) {
 					compDef[attr] = component.get('v.' + attr);
 				});
 			
 			compDef.target = component.getGlobalId();
 
-			$A.createComponent('markup://ui:tooltipAdvanced', compDef, function(tt, status){
+			$A.createComponent('markup://ui:tooltipAdvanced', compDef, function createTooltipAdvancedCallback(tt, status) {
 				if (status === "SUCCESS") {
 					cmLib.containerManager.getSharedInstance().renderContainer(tt);
 	                component._tooltip = tt;
@@ -92,12 +92,12 @@
 		var self = this;
 		component._toggleGuard = true;
 
-		setTimeout(function() {
+		setTimeout(function toggleGuard() {
 			component._toggleGuard = false;
 		}, 500);
 		
 		component.set('v.isVisible', false);
-		this.buildTooltip(component, $A.getCallback(function(tt) {
+		this.buildTooltip(component, $A.getCallback(function buildTooltipCallback(tt) {
 			if (tt && tt.isValid()) {
 				tt.set('v.isVisible', true);
 				self.smLib.stackManager.bringToFront(tt);
@@ -113,7 +113,7 @@
 		clearTimeout(component._tHandle);
 
 		if(async) {
-			component._tHandle = setTimeout(function() {
+			component._tHandle = setTimeout(function doUpdatePosition() {
 				self._doUpdatePosition(component);
 			}, 10);
 		} else {
@@ -123,7 +123,7 @@
 
 	hide: function(component) {
 
-		this.buildTooltip(component, $A.getCallback(function(tt){
+		this.buildTooltip(component, $A.getCallback(function hide(tt){
 			//Race condition causes tt to be null
 			if(tt && tt.isValid()) {
 				tt.set('v.isVisible', false);
@@ -170,10 +170,10 @@
 		var focusHandled = false;
 
 		
-		var showComponent = $A.getCallback(function() {
+		var showComponent = $A.getCallback(function showComponent() {
 			self.show(component);
 		});
-		var hideComponent = $A.getCallback(function() {
+		var hideComponent = $A.getCallback(function hideComponent() {
 			self.hide(component);
 		});
 

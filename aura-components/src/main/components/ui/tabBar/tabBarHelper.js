@@ -54,7 +54,7 @@
         if ($A.util.isNumber(index) && index >= 0 && index <= items.length) {
             tab.localId = "tabItem";
             var tabValues = [tab];
-            this.createComponents(cmp, tabValues, function (newItems) {
+            this.createComponents(cmp, tabValues, function afterCreateTab(newItems) {
                 items.splice.apply(items, [index, 0].concat(newItems));
                 cmp.set("v.tabHeaders", items);
                 if (newItems[0].get("v.active")) {
@@ -77,7 +77,7 @@
 
         //Prioritize finding a tab by name rather than index
         if(name) {
-            existingTab = tabs.filter(function(tabHeader) {
+            existingTab = tabs.filter(function nameComparitor(tabHeader) {
                 return tabHeader.get("v.name") === name;
             })[0];
         } else if($A.util.isNumber(index) && index >= 0 && index < tabs.length) {
@@ -192,7 +192,7 @@
      * @private
      */
     setTabItems: function (cmp) {
-        this.createComponents(cmp, cmp.get("v.tabs"), function (items) {
+        this.createComponents(cmp, cmp.get("v.tabs"), function setTabHeaders(items) {
             cmp.set("v.tabHeaders", items);
         });
     },
@@ -205,7 +205,7 @@
         var len = tabValues.length;
         var counter = len;
 
-        var fn = function (newCmp) {
+        var fn = function fn(newCmp) {
             counter--;
             items.push(newCmp);
             
@@ -402,7 +402,7 @@
         var barWidth = this.getBarWidth(cmp);
         if (barWidth > 0 && overflowData.barWidth !== barWidth) {
             var helper = this;
-            requestAnimationFrame($A.getCallback(function () {
+            requestAnimationFrame($A.getCallback(function onRequestAnimationFrame() {
                 if (cmp.isValid()) {
                     helper.adjustOverflow(cmp);
                 }
@@ -451,7 +451,7 @@
             var menuList = overflowMenu.get("v.menuItems");
             var sourceTabName = this.getTabName(sourceTab);
             //remove the menu item to swap
-            menuList = menuList.filter(function(menuItem) {
+            menuList = menuList.filter(function idComparitor(menuItem) {
                 return menuItem.id !== sourceTabName;
             });
             delete tabCache[sourceTabName];

@@ -8766,7 +8766,7 @@ return {
 			count = newMenuItems.length,
 			menuItemCache = this.getMenuItemCache(cmp);
 
-		var callback = function(newMenuItem, status) {
+		var callback = function createActionMenuItemCallback(newMenuItem, status) {
 			if (!cmp.isValid()) {
 				return;
 			}
@@ -9971,7 +9971,7 @@ return {
         if ($A.util.isNumber(index) && index >= 0 && index <= items.length) {
             tab.localId = "tabItem";
             var tabValues = [tab];
-            this.createComponents(cmp, tabValues, function (newItems) {
+            this.createComponents(cmp, tabValues, function afterCreateTab(newItems) {
                 items.splice.apply(items, [index, 0].concat(newItems));
                 cmp.set("v.tabHeaders", items);
                 if (newItems[0].get("v.active")) {
@@ -9990,7 +9990,7 @@ return {
 
         
         if(name) {
-            existingTab = tabs.filter(function(tabHeader) {
+            existingTab = tabs.filter(function nameComparitor(tabHeader) {
                 return tabHeader.get("v.name") === name;
             })[0];
         } else if($A.util.isNumber(index) && index >= 0 && index < tabs.length) {
@@ -10089,7 +10089,7 @@ return {
         return index;
     },
     "setTabItems":function(cmp) {
-        this.createComponents(cmp, cmp.get("v.tabs"), function (items) {
+        this.createComponents(cmp, cmp.get("v.tabs"), function setTabHeaders(items) {
             cmp.set("v.tabHeaders", items);
         });
     },
@@ -10098,7 +10098,7 @@ return {
         var len = tabValues.length;
         var counter = len;
 
-        var fn = function (newCmp) {
+        var fn = function fn(newCmp) {
             counter--;
             items.push(newCmp);
             
@@ -10272,7 +10272,7 @@ return {
         var barWidth = this.getBarWidth(cmp);
         if (barWidth > 0 && overflowData.barWidth !== barWidth) {
             var helper = this;
-            requestAnimationFrame($A.getCallback(function () {
+            requestAnimationFrame($A.getCallback(function onRequestAnimationFrame() {
                 if (cmp.isValid()) {
                     helper.adjustOverflow(cmp);
                 }
@@ -10314,7 +10314,7 @@ return {
             var menuList = overflowMenu.get("v.menuItems");
             var sourceTabName = this.getTabName(sourceTab);
             
-            menuList = menuList.filter(function(menuItem) {
+            menuList = menuList.filter(function idComparitor(menuItem) {
                 return menuItem.id !== sourceTabName;
             });
             delete tabCache[sourceTabName];
@@ -12665,7 +12665,7 @@ return {
     },
     "removeTab":function(cmp, index) {
         var self = this, e = cmp.find('tabBar').get('e.closeTab');
-        var callback = function (succeed) {
+        var callback = function removeTabBodyWrapper(succeed) {
             if (succeed) {
                 self.removeTabBody(cmp, index);
             }
@@ -12678,7 +12678,7 @@ return {
     "fireBeforeActiveEvent":function(cmp, params, target) {
         var activate = true;
         target = target || cmp;
-        var callback = function (doActivate) {
+        var callback = function setActive(doActivate) {
             activate = doActivate;
         };
         var tab = typeof params.index === "number" ? cmp._tabCollection.getTab(params.index) : params.tab;
@@ -12769,7 +12769,7 @@ return {
             lazyRendering = $A.util.getBooleanValue(cmp.get("v.lazyRenderTabs")),
             count = 0, total = tabConfigs.length - 1;
 
-        var callback = function (newTab) {
+        var callback = function createTabCallback(newTab) {
             var id = newTab.getGlobalId(),
                 name = newTab.get("v.name");
 
@@ -12861,7 +12861,7 @@ return {
 
         
         var attrDefs = compService.getDef(tabItemDef).getAttributeDefs();
-        attrDefs.each(function (def) {
+        attrDefs.each(function processAttrDef(def) {
             var name = def.getDescriptor().getName();
             
             if (name !== "body") {

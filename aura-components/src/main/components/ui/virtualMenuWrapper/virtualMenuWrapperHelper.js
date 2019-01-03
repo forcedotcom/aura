@@ -43,7 +43,7 @@
         menuCmp.get("e.popupTriggerPress").fire();
 
         // make sure the trigger element is focused
-        window.requestAnimationFrame($A.getCallback(function () {
+        window.requestAnimationFrame($A.getCallback(function onRequestAnimationFrame() {
             // if autofocus is true, focus on the first menuitem otherwise focus on menu trigger item.
             var selector = autofocus ? "a[role=menuitem]" : "a[role=button]";
             var trigger = container.querySelector(selector);

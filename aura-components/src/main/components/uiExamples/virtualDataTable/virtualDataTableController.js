@@ -71,7 +71,7 @@
 	            label : "Header " + i,
 	            sortable: true,
 	            resizable: true
-	        }, function(header, status) {
+	        }, function afterCreateDataTableHeaderComponent(header, status) {
 	        	if (status === "SUCCESS") {
 	        	    headers.push(header);
 	    	    }

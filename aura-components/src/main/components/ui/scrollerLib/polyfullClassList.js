@@ -55,7 +55,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
       }
     };
 
-    var setToClassName = function (el, classes) {
+    var setToClassName = function setToClassName(el, classes) {
       el.className = classes.join(' ');
     };
 
@@ -97,7 +97,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
 
     window.DOMTokenList = DOMTokenList;
 
-    var defineElementGetter = function (obj, prop, getter) {
+    var defineElementGetter = function defineElementGetter(obj, prop, getter) {
       if (Object.defineProperty) {
         Object.defineProperty(obj, prop,{
           get : getter
@@ -107,7 +107,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
       }
     };
 
-    defineElementGetter(Element.prototype, 'classList', function () {
+    defineElementGetter(Element.prototype, 'classList', function getDOMTokenList() {
       return new DOMTokenList(this);                        
     });
   }

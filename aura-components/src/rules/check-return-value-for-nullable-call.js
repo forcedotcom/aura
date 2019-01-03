@@ -7,7 +7,7 @@ function toMessage(name) {
 }
 
 function isNullableCall(funcName) {
-    return funcName && FUNC_NAMES.some(function (name) { return name === funcName; });
+    return funcName && FUNC_NAMES.some(function isMatchingFunctionName(name) { return name === funcName; });
 }
 
 function isValidPattern(left, right) {

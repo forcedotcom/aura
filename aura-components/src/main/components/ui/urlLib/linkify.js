@@ -92,7 +92,7 @@ function lib() { //eslint-disable-line no-unused-vars
             }
 
             var regex = new RegExp(whitelistedTagsMatchingRegex + "|" + linksMatchingRegex, "gi");
-            return text.replace(regex, function(match, tagMatch, hrefMatch, emailMatch) {
+            return text.replace(regex, function replacer(match, tagMatch, hrefMatch, emailMatch) {
                 if (tagMatch) {
                     // if a tag with href was found, don't linkify it.
                     return tagMatch;

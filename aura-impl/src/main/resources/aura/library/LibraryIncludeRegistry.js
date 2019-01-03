@@ -22,7 +22,7 @@
  * @constructor
  */
 function LibraryIncludeRegistry() {
-    // A map of Function that holds a preproccessed (commented) instance.
+    // A map of Function that holds a preprocessed (commented) instance.
     this.libExporter = {};
     // A map of Function[] that each return a library include instance.
     this.exporter = {};

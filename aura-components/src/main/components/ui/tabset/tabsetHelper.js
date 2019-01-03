@@ -105,7 +105,7 @@
      */
     removeTab: function (cmp, index) {
         var self = this, e = cmp.find('tabBar').get('e.closeTab');
-        var callback = function (succeed) {
+        var callback = function removeTabBodyWrapper(succeed) {
             if (succeed) {
                 self.removeTabBody(cmp, index);
             }
@@ -122,7 +122,7 @@
     fireBeforeActiveEvent: function (cmp, params, target) {
         var activate = true;
         target = target || cmp;
-        var callback = function (doActivate) {
+        var callback = function setActive(doActivate) {
             activate = doActivate;
         };
         var tab = typeof params.index === "number" ? cmp._tabCollection.getTab(params.index) : params.tab;
@@ -231,7 +231,7 @@
             lazyRendering = $A.util.getBooleanValue(cmp.get("v.lazyRenderTabs")),
             count = 0, total = tabConfigs.length - 1;
 
-        var callback = function (newTab) {
+        var callback = function createTabCallback(newTab) {
             var id = newTab.getGlobalId(),
                 name = newTab.get("v.name");
 
@@ -334,7 +334,7 @@
 
         // Iterate all the attributes ui:tabItem and find the values in ui:tab component
         var attrDefs = compService.getDef(tabItemDef).getAttributeDefs();
-        attrDefs.each(function (def) {
+        attrDefs.each(function processAttrDef(def) {
             var name = def.getDescriptor().getName();
             //don't want to pass the body to tabItems
             if (name !== "body") {

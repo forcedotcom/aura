@@ -52,7 +52,7 @@
 
 	swapShowMore: function (cmp) {
 		// Timeout to allow for rendering of new element.
-		setTimeout(function () {
+		setTimeout(function setPullUpEl() {
 			cmp._pullUpEl = cmp.find('pullUp').getElement();
 		}, 100);
 	},
@@ -292,7 +292,7 @@
 							if (pullToRefreshAction && canRefresh) {
 								if ($A.util.hasClass(pullDownEl, 'pullFlip')) {
 									$A.util.swapClass(pullDownEl, 'pullFlip', 'pullLoading');
-									setTimeout(function() {
+									setTimeout(function runPullToShowMoreAction() {
 										pullToRefreshAction.runDeprecated();
 									}, 1);
 
@@ -302,7 +302,7 @@
 							if (pullToShowMoreAction && component.get('v.canShowMore')) {
 								if ($A.util.hasClass(component._pullUpEl, 'pullFlip')) {
 									$A.util.swapClass(component._pullUpEl, 'pullFlip', 'pullLoading');
-									setTimeout(function() {
+									setTimeout(function runPullToShowMoreAction() {
 										pullToShowMoreAction.runDeprecated();
 									}, 1);
 
@@ -327,7 +327,7 @@
 							if (pullToRefreshAction && canRefresh) {
 								// keep the "loading" styling as it animates up
 								// then replace with the "pull down" styling
-								setTimeout(function() {
+								setTimeout(function swapClass() {
 									$A.util.swapClass(pullDownEl, 'pullLoading', 'pullDown');
 								}, 50);
 							}
@@ -335,7 +335,7 @@
 							if (pullToShowMoreAction && component.get('v.canShowMore')) {
 								// keep the "loading" styling as it animates up
 								// then replace with the "pull down" styling
-								setTimeout(function() {
+								setTimeout(function swapClass() {
 									$A.util.swapClass(component._pullUpEl, 'pullLoading', 'pullDown');
 								}, 50);
 
@@ -399,7 +399,7 @@
 			var images = content.getElementsByTagName("img");
 			var that = this;
 			if (images.length > 0) {
-				var imageLoadTimeoutCallback = $A.util.createTimeoutCallback(function() {
+				var imageLoadTimeoutCallback = $A.util.createTimeoutCallback(function imageLoadTimeoutCallback() {
 				    if (component.isValid()) {
 				        that.refreshScroller(component);
 				    }
@@ -495,11 +495,11 @@
 		 * ! iScroll v4.2.5 ~ Copyright (c) 2012 Matteo Spinelli,
 		 * http://cubiq.org Released under MIT license, http://cubiq.org/license
 		 */
-		(function(window, doc) {
+		(function initIScrollClosure(window, doc) {
 
 			var m = Math, 
                 dummyStyle = doc.createElement('div').style, 
-                vendor = (function() {
+                vendor = (function getVendor() {
                     var vendors = 't,webkitT,MozT,msT,OT'.split(','), t, i = 0, l = vendors.length;
 
                     for (; i < l; i++) {
@@ -532,7 +532,7 @@
 			has3d = prefixStyle('perspective') in dummyStyle, hasTouch = 'ontouchstart' in window && !isTouchPad, hasTransform = vendor !== false, hasTransitionEnd = prefixStyle('transition') in dummyStyle,
 
 			RESIZE_EV = 'onorientationchange' in window ? 'orientationchange' : 'resize', START_EV = hasTouch ? 'touchstart' : 'mousedown', MOVE_EV = hasTouch ? 'touchmove'
-					: 'mousemove', END_EV = hasTouch ? 'touchend' : 'mouseup', CANCEL_EV = hasTouch ? 'touchcancel' : 'mouseup', TRNEND_EV = (function() {
+					: 'mousemove', END_EV = hasTouch ? 'touchend' : 'mouseup', CANCEL_EV = hasTouch ? 'touchcancel' : 'mouseup', TRNEND_EV = (function getTransitionEnd() {
 				if (vendor === false) {
 					return false;
 				}
@@ -548,12 +548,12 @@
 				return transitionEnd[vendor];
 			})(),
 
-			nextFrame = (function() {
+			nextFrame = (function getNextFrame() {
 				return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame
-						|| window.msRequestAnimationFrame || function(callback) {
+						|| window.msRequestAnimationFrame || function nextFrame(callback) {
 							return setTimeout(callback, 1);
 						};
-			})(), cancelFrame = (function() {
+			})(), cancelFrame = (function getCancelFrame() {
 				return window.cancelRequestAnimationFrame || window.webkitCancelAnimationFrame || window.webkitCancelRequestAnimationFrame
 						|| window.mozCancelRequestAnimationFrame || window.oCancelRequestAnimationFrame || window.msCancelRequestAnimationFrame || clearTimeout;
 			})(),
@@ -683,7 +683,7 @@
 				}
 
 				if (that.options.checkDOMChanges) {
-					that.checkDOMTime = setInterval(function() {
+					that.checkDOMTime = setInterval(function checkDOMChanges() {
 						that._checkDOMChanges();
 					}, 500);
 				}
@@ -814,7 +814,7 @@
 
 				_resize : function() {
 					var that = this;
-					setTimeout(function() {
+					setTimeout(function refreshWrapper() {
 						that.refresh();
 					}, isAndroid ? 200 : 0);
 				},
@@ -1124,12 +1124,12 @@
 								}
 								that.zoom(that.pointX, that.pointY, that.scale === 1 ? that.options.doubleTapZoom : 1);
 								if (that.options.onZoomEnd) {
-									setTimeout(function() {
+									setTimeout(function doubleTap() {
 										that.options.onZoomEnd.call(that, e);
 									}, 200); // 200 is default zoom duration
 								}
 							} else if (this.options.handleClick) {
-								that.doubleTapTimer = setTimeout(function() {
+								that.doubleTapTimer = setTimeout(function doubleTap() {
 									that.doubleTapTimer = null;
 
 									// Find the last touched element
@@ -1304,7 +1304,7 @@
 
 							that.zoom(e.pageX, e.pageY, deltaScale, 400);
 
-							setTimeout(function() {
+							setTimeout(function onZoomEnd() {
 								that.wheelZoomCount--;
 								if (!that.wheelZoomCount && that.options.onZoomEnd) {
 									that.options.onZoomEnd.call(that, e);

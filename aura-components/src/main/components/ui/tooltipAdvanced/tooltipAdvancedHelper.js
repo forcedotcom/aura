@@ -41,7 +41,7 @@
 
 		cmp.set('v.classList', classList.join(' '));
 		var isValidPosition = this.position(cmp);
-		requestAnimationFrame($A.getCallback(function() {
+		requestAnimationFrame($A.getCallback(function onRequestAnimationFrame() {
 			if(!cmp.isValid() || isValidPosition === false) {
 				return;
 			}
@@ -104,7 +104,7 @@
 		}
 
 
-		classArr = classArr.filter(function(item) {
+		classArr = classArr.filter(function isDirection(item) {
 			if(item.match(/north|east|west|south/)) {
 				return false;
 			} else {
@@ -263,7 +263,7 @@
 
 		component.set('v.direction', direction);
 
-		['north', 'south', 'west' , 'east'].forEach(function(directions) {
+		['north', 'south', 'west' , 'east'].forEach(function processDirection(directions) {
 			component.constraints[directions].disable();
 			component.constraints[directions + '_pointer'].disable();
 			component.constraints[directions + 'pointerBox'].disable();

@@ -82,7 +82,7 @@
 		
 		$A.newCmpAsync(
 				this, 
-				function(newCmp) {
+				function setheaderColumns(newCmp) {
 					headers[4] = newCmp;
 					grid.set("v.headerColumns", headers);
 				},

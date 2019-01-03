@@ -249,7 +249,7 @@
     createEventDelegates: function (cmp, container) {
         var self     = this,
             events   = this.DELEGATED_EVENTS,
-            delegate = function (e) {
+            delegate = function delegate(e) {
                 self._eventDelegator(cmp, e);
             };
         
@@ -370,7 +370,7 @@
                 shape = templateData.shape,
                 ptv = templateData.ptv,
                 ref = cmp.get('v.itemVar'),
-                getElmt   = function (t) { return t; },
+                getElmt   = function getElement(t) { return t; },
                 actionHandlerScope;
                 
             // Setting up the event with some custom properties

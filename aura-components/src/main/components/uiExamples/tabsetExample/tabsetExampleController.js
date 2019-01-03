@@ -18,7 +18,7 @@
     onPrevious: function(cmp, evt) {
         var tabset = cmp.find("navigationTabset");
         var e = tabset.get("e.getActiveTab");
-        e.setParams({callback: function(result) {
+        e.setParams({callback: function fireActivateTabEvent(result) {
             var index = result.index;
             tabset.get("e.activateTab").setParams({"index": --index}).fire();
         }}).fire();
@@ -27,7 +27,7 @@
     onNext: function(cmp, evt) {
         var tabset = cmp.find("navigationTabset");
         var e = tabset.get("e.getActiveTab");
-        e.setParams({callback: function(result) {
+        e.setParams({callback: function fireActivateTabEvent(result) {
             var index = result.index;
             tabset.get("e.activateTab").setParams({"index": ++index}).fire();
         }}).fire();
@@ -45,7 +45,7 @@
             {
                 "value" : "New tab content"
             },
-            function(newCmp, status){
+            function afterTextComponentCreate(newCmp, status){
             	if (status === "SUCCESS") {
             	    tab.set("v.body", [newCmp]);
                 }

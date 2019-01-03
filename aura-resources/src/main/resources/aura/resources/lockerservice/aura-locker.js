@@ -10169,7 +10169,7 @@ function getFilteredValue(cmp, rawValue) {
 
 /**
  * This method accept a value from a lockerized component and provides system mode with raw access.
- * All public properties and methods of an LWC custom element get proccessed by this method.
+ * All public properties and methods of an LWC custom element get processed by this method.
  * 1. If the value returned is a data proxy(@api, @track) that is its own,
  *    we create an unfiltering proxy and return that
  * 2. if the value returned is a data proxy that it received from another component,

@@ -231,7 +231,7 @@
             },
             onCreate: function (panel) {
                 //simulating panel content has server dependencies and updates panel after content is loaded
-                setTimeout(function() {
+                setTimeout(function updatePanelBody() {
                     var body = $A.createComponentFromConfig({descriptor: 'markup://uiExamples:modalContent'});
                     panel.update({ body : body });
                 }, 1000);

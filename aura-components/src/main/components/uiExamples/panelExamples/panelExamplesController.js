@@ -122,8 +122,8 @@
                     },
                     onCreate: function (panel) {
                         //simulating panel content has server dependencies and updates panel after content is loaded
-                        setTimeout(function() {
-                            $A.componentService.createComponent('markup://uiExamples:modalContent', null, function(body){
+                        setTimeout(function createModalContentComponent() {
+                            $A.componentService.createComponent('markup://uiExamples:modalContent', null, function updatePanelBody(body){
                                 panel.update({body:body});
                             });
                         }, 1000);
@@ -137,7 +137,7 @@
     	$A.componentService.createComponent(
             'ui:outputText', 
     		{value: 'This is a dynamically registered panel type'}, 
-            function(textCmp, status){
+            function afterCreateOutputText(textCmp, status){
     			if (status === 'SUCCESS') {
     				$A.get('e.ui:createPanel').setParams({
         	            panelType   :'customPanel',

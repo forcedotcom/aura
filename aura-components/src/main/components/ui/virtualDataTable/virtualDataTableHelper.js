@@ -176,7 +176,7 @@
     createEventDelegates: function (cmp, container) {
         var self     = this,
             events   = cmp.get("v.delegatedEvents"),
-            delegate = function (e) {
+            delegate = function delegate(e) {
                 self._eventDelegator(cmp, e);
             };
         
@@ -218,7 +218,7 @@
             templates = cmp._templates,
             handlers  = [],
             ptv       = cmp._ptv,
-            getElmt   = function (t) { return t; },
+            getElmt   = function getElement(t) { return t; },
             position,
             item, targetCmp, actionHandler, actionHandlerScope;
             
@@ -599,7 +599,7 @@
     attachColResizerHandlers: function(cmp, resizer) {  
         
         // Attach event handlers
-        resizer.on('resize', $A.getCallback(function(resizeData) {
+        resizer.on('resize', $A.getCallback(function onResizeSet(resizeData) {
             if (cmp.isValid()) {
                 var header = cmp.get("v.headerColumns")[resizeData.index];
                 if (header) {
@@ -608,7 +608,7 @@
             }
         }));
         
-        resizer.on('resize', $A.getCallback(function () {
+        resizer.on('resize', $A.getCallback(function onResizeFireEvent() {
             if (cmp.isValid()) {
                 var resizeData = arguments[0];
                 cmp.getEvent("onColumnResize").setParams({

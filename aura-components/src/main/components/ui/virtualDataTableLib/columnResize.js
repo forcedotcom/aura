@@ -55,9 +55,9 @@ function lib(w) { //eslint-disable-line no-unused-vars
             // and divider is not visible when init the VDT, so we can delay the _setDividerHeight.
             // Wrap the call into promise, then we can chain each column call together.
             var that = this;
-            return new Promise($A.getCallback(function(resolve) {
+            return new Promise($A.getCallback(function setTimoutWrapper(resolve) {
                 setTimeout(resolve, that.DIVIDER_RELAYOUT_DELAY);
-            })).then($A.getCallback(function(){
+            })).then($A.getCallback(function setDividerHeight() {
                 var viewportHeight = window.innerHeight;
                 var divider = indicator.querySelector('.' + DIVIDER_CLASS);
                 if (indicator.parentNode) {
@@ -196,14 +196,14 @@ function lib(w) { //eslint-disable-line no-unused-vars
             var that = this;
             for (i = 0; i < columns.length; i++) {
                 promise = this._calculateWidthAsync(promise, columns[i], initialWidths[i])
-                    .then(function(col) {
+                    .then(function setTotalWidth(col) {
                         totalWidth += col.clientWidth;
                     });
             }
 
-            promise = promise.then($A.getCallback(function (){
+            promise = promise.then($A.getCallback(function setDividerHeight() {
                 return that._setDividerHeight(that.indicator);
-            })).then($A.getCallback(function (){
+            })).then($A.getCallback(function setWidth(){
                 // Fix the table's width so that the browser doesn't try to resize columns by itself
                 table.style.width = totalWidth + 'px';
                 that.tableWidth = totalWidth;
@@ -217,7 +217,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 this._attachHandle(column, handle);
 
                 // Chain each setDividerHeight for each column into async sequence.
-                promise = promise.then($A.getCallback(function(){
+                promise = promise.then($A.getCallback(function setInitialWidth(){
                     // If the column already has a width style, default to that.
                     // Otherwise, use the specified initialWidth or the column's actual width.
                     if (column.style.width) {
@@ -229,16 +229,16 @@ function lib(w) { //eslint-disable-line no-unused-vars
                         }
                     }
 
-                    return that._setDividerHeight(handle).then(function(){
+                    return that._setDividerHeight(handle).then(function getInitialWidth(){
                         return initialWidth;
                     });
-                })).then($A.getCallback(function(width) {
+                })).then($A.getCallback(function resizeAndUpdateRange(width) {
                     that._resize(column, width);
                     that._resize(column.firstChild, width);
                     that._updateRange(that._findRangeElement(column), column.clientWidth);
                 }));
             }
-            return promise.then(function() {
+            return promise.then(function getColumn() {
                 return column;
             });
         },
@@ -333,7 +333,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             range.setAttribute('max', this.config.maxWidth);
             range.setAttribute('class', INPUT_RANGE_CLASS);
             range.value = value;
-            range.addEventListener('focus', function(e) {
+            range.addEventListener('focus', function onFocus(e) {
                 var handle = e.target.parentNode.querySelector('.' + HANDLE_CLASS);
                 if(handle) {
                     this._setDividerHeight(handle);

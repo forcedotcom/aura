@@ -33,7 +33,7 @@
 		
 		$A.newCmpAsync(
 				this,
-				function(newCmp) {
+				function setColumns(newCmp) {
 					grid.set("v.columns", [newCmp]);
 				},
 				{
@@ -60,7 +60,7 @@
 		
 		$A.newCmpAsync(
 				this,
-				function(newCmp) {
+				function setColumns(newCmp) {
 					var cols = grid.get("v.columns");
 					cols.push(newCmp);
 					grid.set("v.columns", cols);
@@ -98,7 +98,7 @@
 		if (column.get("v.name") === "activityDate") {
 			$A.newCmpAsync(
 					this, 
-					function(newCmp) {
+					function setColumns(newCmp) {
 						var oldCmp = columns[5];
 						columns[5] = newCmp;
 						grid.set("v.columns", columns);
@@ -117,7 +117,7 @@
 		} else {
 			$A.newCmpAsync(
 					this, 
-					function(newCmp) {
+					function setColumns(newCmp) {
 						var oldCmp = columns[5];
 						columns[5] = newCmp;
 						grid.set("v.columns", columns);

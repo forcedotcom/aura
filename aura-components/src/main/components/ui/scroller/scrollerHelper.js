@@ -183,7 +183,7 @@
         var context = this,
             xArgs = Array.prototype.slice.call(arguments, 1);
 
-        return function () {
+        return function bindedMethod() {
             method.apply(context, xArgs.concat(Array.prototype.slice.call(arguments)));
         };
     },
@@ -350,9 +350,9 @@
         // Users of this component need to call the event/callback that gets passed
         // on to onPullToRefresh and onPullToRefresh with error or success arguments
         // for the scroller to update its 'loading' state.
-        $A.run(function () {
+        $A.run(function callbackWrapperWrapper() {
             if (component.isValid()) {
-                auraAction.run(function () {
+                auraAction.run(function callbackWrapper() {
                     callback.apply(this, arguments);
                 });
             }
@@ -363,7 +363,7 @@
             action = component.get("v." + attrActionName);
 
         if (action) {
-            scrollerInstance.on(actionName, $A.getCallback(function () {
+            scrollerInstance.on(actionName, $A.getCallback(function runAction() {
                 action.run.apply(action, arguments);
             }));
         }

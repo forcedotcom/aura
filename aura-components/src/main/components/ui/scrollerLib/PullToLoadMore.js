@@ -97,7 +97,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             ptl_container.appendChild(HELPERS.createLabel(CLASS_SUBTITLE, subtitleLabel));
 
             if (this._nativePTL) {
-                ptl_container.addEventListener('click', function () {
+                ptl_container.addEventListener('click', function onClick() {
                     self.triggerPTL();
                 });
             }
@@ -145,7 +145,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 scrollerContainer = this.scroller,
                 ptlContainer = this.ptlSpacer;
 
-            items.forEach(function (i) {
+            items.forEach(function appendChild(i) {
                 docfrag.appendChild(i);
             });
 
@@ -235,14 +235,14 @@ function lib(w) { //eslint-disable-line no-unused-vars
         _ptlExecTrigger: function () {
             var self = this,
                 ptrDataProvider = this.opts.onPullToLoadMore,
-                callback = function () {
+                callback = function ptlExecTriggerCallback() {
                     self._ptlExecTriggerCallback.apply(self, arguments);
                 };
 
             if (ptrDataProvider) {
                 ptrDataProvider(callback);
             } else {
-                w.setTimeout(function (){
+                w.setTimeout(function ptlExecTriggerCallbackWrapper() {
                     self._ptlExecTriggerCallback('no fnc');
                 }, 600);
             }
@@ -252,7 +252,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             if (err) {
                 this._setPTLErrorState(err);
                 this._ptlTriggered = false;
-                w.setTimeout(function () {
+                w.setTimeout(function resetPositionOnError() {
                     self._resetPosition(self._ptlSnapTime);
                     self._setPTLErrorState(false);
                 }, ERROR_TIMEOUT);
@@ -261,7 +261,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 this._ptlTriggered = false;
                 this._setPTLLoadingState(false);
 
-                RAF(function() {
+                RAF(function resetPosition() {
                     self._resetPosition(self._ptlSnapTime);
                 });
             }

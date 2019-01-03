@@ -108,7 +108,7 @@
 			
 			if (!component.$dragOperation$.$dragOverTimeout$) {
 				component.$dragOperation$.$dragOverTimeout$ = true;
-				setTimeout(function() {
+				setTimeout(function setDragOverTimeout() {
 					component.$dragOperation$.$dragOverTimeout$ = false;
 				}, dragOverInterval);
 				this.fireDragOver(component, event.target);

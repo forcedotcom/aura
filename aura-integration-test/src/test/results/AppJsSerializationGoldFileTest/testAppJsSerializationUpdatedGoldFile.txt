@@ -649,7 +649,7 @@ $A.componentService.addLibraryExporter("js://ui.panelPositioningLib.positioningU
     lib._dispatchAction(undefined, event, htmlCmp, component, helper);
     if(event.type === "click" && component.isInstanceOf("ui:doubleClicks") && component.get("v.disableDoubleClicks")) {
       component._recentlyClicked = true;
-      window.setTimeout(function() {
+      window.setTimeout(function recentlyClickedWrapper() {
         component._recentlyClicked = false
       }, 350)
     }
@@ -1694,7 +1694,7 @@ return {
 
         if (event.type === "click" && component.isInstanceOf("ui:doubleClicks") && component.get("v.disableDoubleClicks")) {
         	component._recentlyClicked = true;
-        	window.setTimeout(function() { component._recentlyClicked = false; }, 350);
+        	window.setTimeout(function setRecentlyClicked() { component._recentlyClicked = false; }, 350);
         }
     },
     "fireEvent":function(component, event, helper) {
@@ -3097,7 +3097,7 @@ return {
         } else {
             var element = component.find("popupTarget").getElement();
             element.classList.remove("positioned");
-            window.requestAnimationFrame($A.getCallback(function () {
+            window.requestAnimationFrame($A.getCallback(function onRequestAnimationFrame() {
                 if (!component.isValid()) {
                     return;
                 }
@@ -3159,7 +3159,7 @@ return {
                 element.classList.remove("positioned");
                 
                 
-                window.requestAnimationFrame($A.getCallback(function () {
+                window.requestAnimationFrame($A.getCallback(function onRequestAnimationFrame() {
                     if (!component.isValid()) {
                         return;
                     }
@@ -3186,12 +3186,12 @@ return {
                     
                     
                     
-                    setTimeout($A.getCallback(function () {
-                        this.lib.panelPositioning.reposition(function () {
+                    setTimeout($A.getCallback(function setCssWrapper() {
+                        this.lib.panelPositioning.reposition(function setCss() {
                             element.classList.add("positioned");
                             element.style.opacity = 1;
                         });
-                    }).bind(this),50);
+                    }).bind(this), 50);
                     
                 }.bind(this)));
             }
@@ -3239,7 +3239,7 @@ return {
 
         
         
-        hideFunc = function () {
+        hideFunc = function hide() {
             $A.util.addClass(elements.targetElement, component.get('v.preTransitionClass'));
             $A.util.removeOn(elements.targetElement, transitionEndEventName, hideFunc);
         };
@@ -3247,7 +3247,7 @@ return {
         
         
         
-        setTimeout(function () {
+        setTimeout(function defer() {
             if (!elements.target.isValid()) {
                 return;
             }
@@ -3287,7 +3287,7 @@ return {
         var func;
 
         if ($A.util.isUndefined(component._onClickStartFunc)) {
-            func = function (event) {
+            func = function onClickStart(event) {
                 component._onStartX = event.clientX;
                 component._onStartY = event.clientY;
             };
@@ -3303,7 +3303,7 @@ return {
 
         if ($A.util.isUndefined(component._onClickEndFunc)) {
             helper = this;
-            func = function (event) {
+            func = function onClickEnd(event) {
                 
                 var elements = helper.getElementCache(component),
                     doIf = {
@@ -5238,10 +5238,10 @@ return {
             
             
             
-            setTimeout($A.getCallback(function () {
+            setTimeout($A.getCallback(function setFocus() {
                 menuItem.setFocus();
                 this.fireMenuFocusChangeEvent(component, null, menuItem);
-            }).bind(this),5);
+            }).bind(this), 5);
         }
     },
     "setKeyboardEventHandlers":function(component) {
@@ -5377,7 +5377,7 @@ return {
             }
         }
 
-        component._clearBufferId = setTimeout(function() {
+        component._clearBufferId = setTimeout(function clearKeyBuffer() {
         	component._keyBuffer = [];
         }, 700);
     },
@@ -5966,7 +5966,7 @@ return {
 
         if ($A.util.getBooleanValue(component.get("v.disableDoubleClicks"))) {
             component._recentlyClicked = true;
-            window.setTimeout($A.getCallback(function() { component._recentlyClicked = false; }), 350);
+            window.setTimeout($A.getCallback(function recentlyClicked() { component._recentlyClicked = false; }), 350);
         }
     },
     "focus":function(component) {
@@ -7226,7 +7226,7 @@ return {
                     tag: wrapperTag,
                     "class": "form-element"
                 },
-                function (wrapperComponent) {
+                function afterWrapperComponentCreate(wrapperComponent) {
                     body.push(wrapperComponent);
                     component.set("v.body", body);
                 }
@@ -7252,7 +7252,7 @@ return {
             labelDisplay: labelDisplay,
             title: component.get("v.labelTitle"),
             requiredIndicator: requiredIndicator
-        }, function(labelComponent) {
+        }, function afterLabelComponentCreate(labelComponent) {
             
             if (labelPositionAttribute === 'left' || labelPositionAttribute === 'top') {
                 innerBody.unshift(labelComponent);
@@ -7280,7 +7280,7 @@ return {
             labelDisplay: labelDisplay,
             title: component.get("v.labelTitle"),
             requiredIndicator: requiredIndicator
-        }, function(legendComponent) {
+        }, function afterLegendComponentCreate(legendComponent) {
             
             if (labelPositionAttribute === "bottom") {
                 innerBody.push(legendComponent);
@@ -7310,7 +7310,7 @@ return {
             labelDisplay: labelDisplay,
             title: component.get("v.labelTitle"),
             requiredIndicator: requiredIndicator
-        }, function (picklistLabelComponent) {
+        }, function afterPicklistLabelComponentCreate(picklistLabelComponent) {
             
             if (labelPositionAttribute === "bottom") {
                 innerBody.push(picklistLabelComponent);
@@ -7496,7 +7496,7 @@ return {
             {
                 "errors": errors
             },
-            function (errorCmp, status) {
+            function afterErrorCmpCreate(errorCmp, status) {
                 if (status === "SUCCESS") {
                     cmp.set("v.errorComponent", errorCmp);
                     var concreteCmpHelper = cmp.getConcreteComponent().getDef().getHelper();
@@ -8051,10 +8051,10 @@ return {
             resizer._resizerComponentSet = {};
             resizer._resizing = false;
 
-            resizer._resizer = $A.getCallback(function() {
+            resizer._resizer = $A.getCallback(function updateComponentsWrapper() {
                 if (!resizer._resizing) {
                     resizer._resizing = true;
-                    setTimeout(function() {
+                    setTimeout(function updateComponents() {
                         try {
                             if (resizer._resizerComponentSet) {
                                 for (var n in resizer._resizerComponentSet) {
@@ -12419,13 +12419,13 @@ return {
             "title": cmp.get("v.title")
         });
 
-        image["onerror"] = $A.getCallback(function () {
+        image["onerror"] = $A.getCallback(function onerror() {
             if (cmp.isValid()) {
                 cmp.get("e.onerror").fire();
             }
         });
 
-        image["onload"] = $A.getCallback(function () {
+        image["onload"] = $A.getCallback(function onload() {
             if (cmp.isValid()) {
                 cmp.get("e.onload").setParams({"value": image}).fire();
             }

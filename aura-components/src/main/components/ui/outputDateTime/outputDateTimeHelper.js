@@ -57,7 +57,7 @@
         }
 
         var timezone = _helper.getTimeZone(concreteCmp);
-        $A.localizationService.UTCToWallTime(d, timezone, function(walltime) {
+        $A.localizationService.UTCToWallTime(d, timezone, function uTCToWallTimeCallback(walltime) {
             try {
                 walltime = $A.localizationService.translateToOtherCalendar(walltime);
                 var displayValue = $A.localizationService.formatDateTimeUTC(walltime, format, langLocale);

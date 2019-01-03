@@ -94,7 +94,7 @@
      */
     initEditor : function(cmp, callback) {
         if ($A.util.getBooleanValue(cmp.get('v.isRichText'))) {
-            $A.clientService.loadClientLibrary('CKEditor', function () {
+            $A.clientService.loadClientLibrary('CKEditor', function whenCKEditorLoaded() {
 
                 var editorInstance = this.getEditorInstance(cmp);
                 if (!editorInstance) {
@@ -103,7 +103,7 @@
                 }
 
                 if(editorInstance && $A.util.isFunction(editorInstance.on)) {
-                    editorInstance.on("loaded", $A.getCallback(function() {
+                    editorInstance.on("loaded", $A.getCallback(function onLoaded() {
                         if (cmp.isValid()) {
                             cmp.getEvent("editorInstanceReady").fire();
                         }

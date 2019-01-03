@@ -42,12 +42,12 @@
         var accept = cmp.get('v.accept');
         var size   = Number(cmp.get('v.maxSizeAllowed')) || Infinity;
         var myContentType = new ContentType(accept);
-        return  this._getFileArr(event).every(function (file) {
+        return this._getFileArr(event).every(function processFile(file) {
             return myContentType.accept(file) && this._fileMeetsSize(file,size);
         }.bind(this));
     },
     _getFileArr : function (dragEvent) {
-        return Object.keys(dragEvent.dataTransfer.files).map(function (index) {
+        return Object.keys(dragEvent.dataTransfer.files).map(function fileMapper(index) {
             return dragEvent.dataTransfer.files[index];
         });
     },

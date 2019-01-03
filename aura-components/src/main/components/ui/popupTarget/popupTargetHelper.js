@@ -81,7 +81,7 @@
         } else {
             var element = component.find("popupTarget").getElement();
             element.classList.remove("positioned");
-            window.requestAnimationFrame($A.getCallback(function () {
+            window.requestAnimationFrame($A.getCallback(function onRequestAnimationFrame() {
                 if (!component.isValid()) {
                     return;
                 }
@@ -145,7 +145,7 @@
                 element.classList.remove("positioned");
                 // make sure reposition happens outside the render cycle,
                 // and that the panel is not visible until it is in position.
-                window.requestAnimationFrame($A.getCallback(function () {
+                window.requestAnimationFrame($A.getCallback(function onRequestAnimationFrame() {
                     if (!component.isValid()) {
                         return;
                     }
@@ -172,12 +172,12 @@
                     // Adding a small timeout so that the positioning calculation
                     // happens after the pop up have been attached to the DOM
                     // browsers like IE11 were getting the wrong position due to a race rendering condition
-                    setTimeout($A.getCallback(function () {
-                        this.lib.panelPositioning.reposition(function () {
+                    setTimeout($A.getCallback(function setCssWrapper() {
+                        this.lib.panelPositioning.reposition(function setCss() {
                             element.classList.add("positioned");
                             element.style.opacity = 1;
                         });
-                    }).bind(this),50);
+                    }).bind(this), 50);
                     
                 }.bind(this)));
             }
@@ -234,7 +234,7 @@
 
         // this function is called when css transitions are completed on target
         // it is stored in a variable since $A.util.removeOn requires that you pass the attached function as 3rd param
-        hideFunc = function () {
+        hideFunc = function hide() {
             $A.util.addClass(elements.targetElement, component.get('v.preTransitionClass'));
             $A.util.removeOn(elements.targetElement, transitionEndEventName, hideFunc);
         };
@@ -242,7 +242,7 @@
         // setTimeout is so we can wait for the next life cycle to apply visible classes
         // or else CSS transitions will not work when the target is appended to the body
         // at the same time the visible property is changed
-        setTimeout(function () {
+        setTimeout(function defer() {
             if (!elements.target.isValid()) {
                 return;
             }
@@ -284,7 +284,7 @@
         var func;
 
         if ($A.util.isUndefined(component._onClickStartFunc)) {
-            func = function (event) {
+            func = function onClickStart(event) {
                 component._onStartX = event.clientX;
                 component._onStartY = event.clientY;
             };
@@ -301,7 +301,7 @@
 
         if ($A.util.isUndefined(component._onClickEndFunc)) {
             helper = this;
-            func = function (event) {
+            func = function onClickEnd(event) {
                 // ignore gestures/swipes; only run the click handler if it's a click or tap
                 var elements = helper.getElementCache(component),
                     doIf = {

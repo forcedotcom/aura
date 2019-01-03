@@ -381,7 +381,7 @@
                 config.minutes = 0;
             }
 
-            var setValue = function (isoValue) {
+            var setValue = function setValue(isoValue) {
                 this.setComponentValue(component, isoValue, dateTimeParams.ignoreChange);
             }.bind(this);
 

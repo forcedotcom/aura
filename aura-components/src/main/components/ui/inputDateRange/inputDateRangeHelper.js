@@ -60,8 +60,8 @@
     },
 
     hideDatePicker: function(datePicker, timeout) {
-        window.setTimeout(function () {
-            $A.run(function () {
+        window.setTimeout(function setVisibleWrapper() {
+            $A.run(function setVisible() {
                 datePicker.set("v.visible", false);
             });
         }, timeout);

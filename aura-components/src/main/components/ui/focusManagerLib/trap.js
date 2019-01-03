@@ -90,7 +90,7 @@ function lib(focusUtil) { //eslint-disable-line no-unused-vars
         }
 
         if (!config.keyboardOnly) {
-            setTimeout(function() {
+            setTimeout(function setPreviouslyFocusedFocus() {
                 previouslyFocused.focus();
             }, 0);
         }
@@ -110,7 +110,7 @@ function lib(focusUtil) { //eslint-disable-line no-unused-vars
 
         updateTabbableNodes();
 
-        var focusNode = (function() {
+        var focusNode = (function focusNodeClojure() {
             var node;
             if (!config.initialFocus) {
                 node = tabbableNodes[0];

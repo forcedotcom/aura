@@ -102,10 +102,10 @@ function lib() { //eslint-disable-line no-unused-vars
         }
 
         var tabbableNodes = orderedTabbables
-            .sort(function(a, b) {
+            .sort(function tabIndexComparitor(a, b) {
                 return a.tabIndex - b.tabIndex;
             })
-            .map(function(a) {
+            .map(function nodeMapper(a) {
                 return a.node;
             });
 

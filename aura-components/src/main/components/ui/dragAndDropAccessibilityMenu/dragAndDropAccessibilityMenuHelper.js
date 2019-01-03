@@ -29,7 +29,7 @@
 			// calculate dropzoneMenu
 			var dropzoneMenu = [];
 			var self = this;
-			$A.util.forEach(dropzones, function(dropzone, index) {
+			$A.util.forEach(dropzones, function addDropzoneMenuItem(dropzone, index) {
 				if (!self.areInSameContext(draggables, dropzone)) {
 					var label = dropzone.get("v.label");
 					dropzoneMenu.push({

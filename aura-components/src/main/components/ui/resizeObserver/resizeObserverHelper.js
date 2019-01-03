@@ -31,10 +31,10 @@
             resizer._resizerComponentSet = {};
             resizer._resizing = false;
 
-            resizer._resizer = $A.getCallback(function() {
+            resizer._resizer = $A.getCallback(function updateComponentsWrapper() {
                 if (!resizer._resizing) {
                     resizer._resizing = true;
-                    setTimeout(function() {
+                    setTimeout(function updateComponents() {
                         try {
                             if (resizer._resizerComponentSet) {
                                 for (var n in resizer._resizerComponentSet) {

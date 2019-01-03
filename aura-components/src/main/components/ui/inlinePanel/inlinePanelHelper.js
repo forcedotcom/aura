@@ -40,7 +40,7 @@
             conf = {closeOnEsc: true, closeOnTabOut: true, trapFocus: trapFocus};
         } else if (type === 'mouse') {
             conf = {closeOnClickOut: true};
-            closeAction = function(panelCmp, action) {
+            closeAction = function closeAction(panelCmp, action) {
                 if (panelCmp.get('v.closeOnClickOut')) {
                     var callback = panelCmp.get("v.closeAction");
                     if ($A.util.isFunction(callback)) {
@@ -99,7 +99,7 @@
         keyhandler = this._getHandler(cmp, 'key');
         el.addEventListener('keydown', keyhandler);
 
-        setTimeout($A.getCallback(function(){
+        setTimeout($A.getCallback(function afterTimeout() {
             document.addEventListener('click', mouseHandler);
             self.lib.panelLibCore.setFocus(cmp);
         }), 10);
@@ -116,7 +116,7 @@
             document.removeEventListener('click', handler);
         }
 
-        cmp.hide(function () {
+        cmp.hide(function onHide() {
             if (!cmp.isValid()) {
                 return;
             }

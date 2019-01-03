@@ -35,7 +35,7 @@
         var template=cmp.get("v.template");
         if(!template||!template.length||!formatRegex.test(value)){
             cmp.set("v.updating",true);
-            $A.createComponent("aura:text",{"value":value},function(valueText){
+            $A.createComponent("aura:text", {"value": value}, function setBody(valueText) {
                 cmp.getSuper().set("v.body",[valueText]);
             });
             return;
@@ -45,7 +45,7 @@
         var texts=[];
         var body=[];
         var startIndex=0;
-        value.replace(formatRegex,function(match,position,index){
+        value.replace(formatRegex, function replace(match, position, index) {
             var substitution=template[position];
             if(substitution!==undefined){
                 texts.push(["aura:text",{"value":value.substring(startIndex,index)}]);
@@ -60,7 +60,7 @@
             body.push(null);
         }
         cmp.set("v.updating",true);
-        $A.createComponents(texts,function(valueTexts){
+        $A.createComponents(texts, function setBody(valueTexts) {
             for(var i=0;i<body.length;i++){
                 if(body[i]===null){
                     body[i]=valueTexts.shift();

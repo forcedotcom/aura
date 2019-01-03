@@ -308,7 +308,7 @@
                 }
 
                 var self = this;
-                this.setCheckedTimeout(cmp, function () {
+                this.setCheckedTimeout(cmp, function afterTimeout() {
                     cmp._isSnapping = false;
                     swipe.body.style.transition = '';
                     $A.util.removeClass(swipe.row, 'swiping');
@@ -367,7 +367,7 @@
     },
 
     setCheckedTimeout: function(cmp, code, delay) {
-        setTimeout(function() {
+        setTimeout(function codeWrapper() {
             if (cmp && cmp.isValid() && code) {
                 code();
             }
@@ -420,7 +420,7 @@
 
         var self = this;
 
-        this.setCheckedTimeout(cmp, function () {
+        this.setCheckedTimeout(cmp, function afterTimeout() {
             if (useTransition && body) {
                 body.style.transition = '';
             }
@@ -481,7 +481,7 @@
                 animate(row);
             }
 
-            this.setCheckedTimeout(component, function () {
+            this.setCheckedTimeout(component, function rmWrapper() {
                 rm();
 
                 if (callback) {

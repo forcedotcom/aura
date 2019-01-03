@@ -81,7 +81,7 @@ function lib() { // eslint-disable-line no-unused-vars
                     Number(numberOnlyPart);
 
             // find if contains kmtb.
-            var exponentKey = Object.keys(exponentByPrefix).find(function(abbreviation) {
+            var exponentKey = Object.keys(exponentByPrefix).find(function checkAbbr(abbreviation) {
                 // currencySymbol could be null or undefined or ''
                 var currencyExp =  (typeof currencySymbol === "string" && currencySymbol.length > 0) ? '|(\\' + currencySymbol + ')' : '';            
                 var regExp = new RegExp('[^a-zA-Z]' + abbreviation + '(?:\\)' + currencyExp + ' ?(?:\\))?)?$', 'i');

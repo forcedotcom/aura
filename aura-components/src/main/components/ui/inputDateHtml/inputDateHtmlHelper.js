@@ -22,7 +22,7 @@
             ignoreThaiYearTranslation: true
         };
 
-        var displayValue = function (returnValue) {
+        var displayValue = function displayValue(returnValue) {
             this.setInputValue(component, returnValue.isoString);
         }.bind(this);
 

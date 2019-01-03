@@ -19,7 +19,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
     w || (w = window);
     
     var SCROLLER = w.__S || (w.__S = {}), //NAMESPACE
-        NOW      = Date.now || function () { return new Date().getTime(); },
+        NOW      = Date.now || function now() { return new Date().getTime(); },
         RAF      = w.requestAnimationFrame,
         STYLES   = SCROLLER.styles,
         HELPERS  = SCROLLER.helpers,
@@ -219,7 +219,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             y = this.scrollVertical  ? Math.round(y / this.sizeRatioY) : this.scroller.y;
 
             if (!this._rafPos) {
-                this._rafPos = RAF(function () {
+                this._rafPos = RAF(function posRAFWrapper() {
                     self._posRAF(x, y);
                 });
             }
@@ -389,7 +389,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 this._createDefaultScrollbars(this.opts.scrollbars);
             }
             if (this.opts.indicators) {
-                this.opts.indicators.forEach(function (i) {
+                this.opts.indicators.forEach(function addIndicatorWrapper(i) {
                     self.addIndicator(i.el, i.config);
                 });
             }
@@ -401,7 +401,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 virtualSize   = this.scrollVertical ? 'virtualSizeY'  : 'virtualSizeX',
                 virtualScroll = hasScroll ? this._virtualScroll : 0;
 
-            this._indicators.forEach(function (i) {
+            this._indicators.forEach(function setAndRefresh(i) {
                 i[virtualSize] = virtualScroll;
                 i.refresh();
             });
@@ -413,26 +413,26 @@ function lib(w) { //eslint-disable-line no-unused-vars
 
             if (virtualScroll > this._virtualScroll) {
                 this._virtualScroll = virtualScroll;
-                this._indicators.forEach(function (i) {
+                this._indicators.forEach(function setAndRefresh(i) {
                     i[virtualSize] = virtualScroll;
                     i.refresh();
                 });
             }
         },
         _updateIndicators: function () {
-            this._indicators.forEach(function (i) {i.updatePosition();});
+            this._indicators.forEach(function updatePosition(i) {i.updatePosition();});
         },
         _refreshIndicators: function () {
-            this._indicators.forEach(function (i) {
+            this._indicators.forEach(function refresh(i) {
                 i.refresh();
             });
         },
         _transitionTimeIndicators: function (time) {
             time || (time = 0);
-            this._indicators.forEach(function (i) {i.transitionTime(time);});
+            this._indicators.forEach(function transitionTime(i) {i.transitionTime(time);});
         },
         _transitionEasingIndicators: function (easing) {
-            this._indicators.forEach(function (i) {i.transitionEasing(easing);});
+            this._indicators.forEach(function transitionEasing(i) {i.transitionEasing(easing);});
         },
         _createDefaultScrollbars: function () {
             var interactive = true,  // TODO:

@@ -67,13 +67,13 @@
             "title": cmp.get("v.title")
         });
 
-        image["onerror"] = $A.getCallback(function () {
+        image["onerror"] = $A.getCallback(function onerror() {
             if (cmp.isValid()) {
                 cmp.get("e.onerror").fire();
             }
         });
 
-        image["onload"] = $A.getCallback(function () {
+        image["onload"] = $A.getCallback(function onload() {
             if (cmp.isValid()) {
                 cmp.get("e.onload").setParams({"value": image}).fire();
             }

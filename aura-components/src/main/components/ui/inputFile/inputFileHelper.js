@@ -30,7 +30,7 @@
         return cmp.get('v.body').length > 0;
     },
     findAllHelperCmps : function (body) {
-        return body.reduce(function (prev, cmp) {
+        return body.reduce(function reduce(prev, cmp) {
             if (cmp.meta.name === 'aura$text') { return prev; }
             if (cmp.meta.name === 'aura$html') {
                 return prev.concat(this.findAllHelperCmps(cmp.get('v.body')));
@@ -73,13 +73,13 @@
     },
     updateHelperCmpContext : function (cmp) {
         var helperCmpRefs = cmp.get('v.privateHelperCmpRefs');
-        helperCmpRefs.forEach(function (cmpHelper) {
+        helperCmpRefs.forEach(function forEachCmpHelper(cmpHelper) {
             this.setCmpContext(cmp, cmpHelper);
         }.bind(this));
     },
     getMappedFiles : function (cmp) {
         var files  = cmp.get('v.files');
-        return Object.keys(files).map(function (index) {
+        return Object.keys(files).map(function getFile(index) {
             return files[index];
         });
     },

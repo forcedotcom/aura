@@ -22,7 +22,7 @@
 	getDropzoneComponents: function(type) {
 		var components = $A.dragAndDropService.getDropzoneComponents(type);
 		var dropZones = [];
-		$A.util.forEach(components,function(component) {
+		$A.util.forEach(components, function getVisibleDropZone(component) {
 			if(window.getComputedStyle(component.getElement()).visibility !== "hidden" ) {
 				dropZones.push(component);
 			}
@@ -35,7 +35,7 @@
 	 * @param {Aura.Component[]} dropzones - the ui:dropzone's
 	 */
 	enterDragOperation: function(dropzones) {
-		$A.util.forEach(dropzones, function(dropzone) {
+		$A.util.forEach(dropzones, function enterDragOperationEvent(dropzone) {
 			dropzone.enterDragOperation();
 		});
 	},
@@ -45,7 +45,7 @@
 	 * @param {Aura.Component[]} dropzones - the ui:dropzone's
 	 */
 	exitDragOperation: function(dropzones) {
-		$A.util.forEach(dropzones, function(dropzone) {
+		$A.util.forEach(dropzones, function exitDragOperationEvent(dropzone) {
 			dropzone.exitDragOperation();
 		});
 	},
@@ -61,7 +61,7 @@
 			isValid = false;
 		}
 		
-		$A.util.forEach(draggables, function(draggable) {
+		$A.util.forEach(draggables, function fireDragEndEvent(draggable) {
 			draggable.fireDragEnd(target, isValid, true);
 		});
 	},
@@ -72,7 +72,7 @@
 	 * @param {HTMLElement} target - the event target for dragenter event
 	 */
 	fireDragEnter: function(dropzones, target) {
-		$A.util.forEach(dropzones, function(dropzone) {
+		$A.util.forEach(dropzones, function fireDragEnterEvent(dropzone) {
 			dropzone.fireDragEnter(target, true);
 		});
 	},
@@ -83,7 +83,7 @@
 	 * @param {HTMLElement} target - the event target for dragleave event
 	 */
 	fireDragLeave: function(dropzones, target) {
-		$A.util.forEach(dropzones, function(dropzone) {
+		$A.util.forEach(dropzones, function fireDragLeaveEvent(dropzone) {
 			dropzone.fireDragLeave(target, true);
 		});
 	},
@@ -95,7 +95,7 @@
 	 * @param {HTMLElement} target - the event target for drop event
 	 */
 	fireDrop: function(dropzones, draggables, target) {
-		$A.util.forEach(dropzones, function(dropzone) {
+		$A.util.forEach(dropzones, function fireDropEvent(dropzone) {
 			dropzone.fireDrop(target, draggables, true);
 		});
 	}

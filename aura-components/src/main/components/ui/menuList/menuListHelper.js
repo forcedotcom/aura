@@ -77,10 +77,10 @@
             // We have to set a timeout here, so that
             // the menu items get positioned before we set focus.
             // for more info see : W-4319141
-            setTimeout($A.getCallback(function () {
+            setTimeout($A.getCallback(function setFocus() {
                 menuItem.setFocus();
                 this.fireMenuFocusChangeEvent(component, null, menuItem);
-            }).bind(this),5);
+            }).bind(this), 5);
         }
     },
     
@@ -236,7 +236,7 @@
             }
         }
 
-        component._clearBufferId = setTimeout(function() {
+        component._clearBufferId = setTimeout(function clearKeyBuffer() {
         	component._keyBuffer = [];
         }, 700);
     },

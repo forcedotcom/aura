@@ -16,19 +16,19 @@
 
 function lib() { //eslint-disable-line no-unused-vars
 
-    var convertToTimezone = function(isoString, timezone, callback) {
+    var convertToTimezone = function convertToTimezone(isoString, timezone, callback) {
         var date = $A.localizationService.parseDateTimeISO8601(isoString);
         if (!$A.util.isUndefinedOrNull(date)) {
             $A.localizationService.UTCToWallTime(date, timezone, callback);
         }
     };
 
-    var convertFromTimezone = function(date, timezone, callback) {
+    var convertFromTimezone = function convertFromTimezone(date, timezone, callback) {
         var localDate = new Date(date);
         $A.localizationService.WallTimeToUTC(localDate, timezone, callback);
     };
     
-    var getImperialYearLabel = function(data, useKey) {
+    var getImperialYearLabel = function getImperialYearLabel(data, useKey) {
         return useKey ? data.key : data.label;
     };
 
@@ -41,7 +41,7 @@ function lib() { //eslint-disable-line no-unused-vars
         {key: "M", year: 1868, label: "明治"}  // Meiji:   1/1/1868
     ];
 
-    var getImperialYear = function(year) {
+    var getImperialYear = function getImperialYear(year) {
         var langLocale = $A.get("$Locale.langLocale");
         var useShortName = langLocale !== "ja";
         for (var i = 0; i < imperialYear.length; i++) {
@@ -99,7 +99,7 @@ function lib() { //eslint-disable-line no-unused-vars
                 hasTime = false;
             }
 
-            var displayValue = function (convertedDate) {
+            var displayValue = function displayValue(convertedDate) {
                 if (!$A.util.getBooleanValue(config.ignoreThaiYearTranslation)) {
                     convertedDate = $A.localizationService.translateToOtherCalendar(convertedDate);
                 }
@@ -142,7 +142,7 @@ function lib() { //eslint-disable-line no-unused-vars
                     minutes);
             }
 
-            var isoValue = function (convertedDate) {
+            var isoValue = function isoValue(convertedDate) {
                 var translatedDate = $A.localizationService.translateFromOtherCalendar(convertedDate);
                 var isoString = translatedDate.toISOString();
 

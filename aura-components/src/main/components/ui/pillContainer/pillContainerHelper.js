@@ -29,8 +29,8 @@
             var itemsLength = cmp.get("v.items").length;
             var maxAllowed = cmp.get("v.maxAllowed");
             if (itemsLength >= maxAllowed) {
-                window.setTimeout(function () {
-                    $A.run(function () {
+                window.setTimeout(function setFocusWrapper() {
+                    $A.run(function setFocus() {
                         if (cmp.isValid()) {
                             var pillItems = cmp.find("pill");
                             if (!$A.util.isEmpty(pillItems)) {
@@ -117,8 +117,8 @@
             // There is domEventHandlers attached to the pills that are invoked on afterRender and rerender.
             // Need to let aura run its course so that lingering handlers are invoked before its safe to update the list.
             var that = this;
-            window.setTimeout(function () {
-                $A.run(function () {
+            window.setTimeout(function deleteThatItemWrapper() {
+                $A.run(function deleteThatItem() {
                     if (cmp.isValid()) {
                         that._deleteItem(cmp, data, fireRemovedEvent);
                     }

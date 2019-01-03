@@ -23,7 +23,7 @@
         if (!$A.util.isEmpty(value)) {
             var isoDate = $A.localizationService.parseDateTimeISO8601(value);
 
-            $A.localizationService.UTCToWallTime(isoDate, timezone, function (walltime) {
+            $A.localizationService.UTCToWallTime(isoDate, timezone, function uTCToWallTimeCallback(walltime) {
                 this.setInputValue(inputElement, walltime);
             }.bind(this));
         } else {
@@ -62,7 +62,7 @@
             this.setValue(component, date);
         } else {
             date = $A.localizationService.parseDateTimeUTC(value);
-            $A.localizationService.WallTimeToUTC(date, timezone, function (utcDate) {
+            $A.localizationService.WallTimeToUTC(date, timezone, function wallTimeToUTCCallback(utcDate) {
                 this.setValue(component, utcDate);
             }.bind(this));
         }

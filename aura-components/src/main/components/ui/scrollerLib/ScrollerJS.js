@@ -19,7 +19,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
     w || (w = window);
     
     // GLOBALS UTILS
-    var NOW            = Date.now || function () { return new Date().getTime(); },
+    var NOW            = Date.now || function now() { return new Date().getTime(); },
         RAF            = w.requestAnimationFrame,
         CAF            = w.cancelAnimationFrame,
 
@@ -346,7 +346,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             }
 
             if (userPlugins) {
-                userPlugins.forEach(function (plugin) {
+                userPlugins.forEach(function plugWrapper(plugin) {
                     this.plug(plugin);
                 }, this);
             }
@@ -361,7 +361,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
         _destroyPlugins: function() {
             var userPlugins = this.opts.plugins;
             if (userPlugins) {
-                userPlugins.forEach(function (plugin) {
+                userPlugins.forEach(function unplugWrapper(plugin) {
                     this.unplug(plugin);
                 }, this);
             }
@@ -388,7 +388,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
         _initializeDOMObserver: function () {
             var self     = this,
                 config   = this.opts.observeDomConfig,
-                observer = this.observer = new MutationObserver(function () {
+                observer = this.observer = new MutationObserver(function observedDOMChange() {
                     self._observedDOMChange.apply(self, arguments);
                 });
 
@@ -1198,7 +1198,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             this.y = newY;
 
             if (!this._rafWheel) {
-                this._rafWheel = RAF(function () {
+                this._rafWheel = RAF(function rafWheel() {
                     self._isScrolling = true;
                     self.distY = wheelDeltaY;
                     self.distX = wheelDeltaX;
@@ -1607,7 +1607,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 scrollerContainer = this.scroller,
                 ptrContainer = scrollerContainer.firstChild;
 
-            items.forEach(function (i) {
+            items.forEach(function appendChild(i) {
                 docfrag.appendChild(i);
             });
 
@@ -1815,7 +1815,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
         */
         resize: function () {
             var self = this;
-            RAF(function () {
+            RAF(function resizeHandler() {
                 // don't resize if the scroller is hidden via a display:none declaration on an ancestor
                 if(self._isScrollerVisible()) {
                     // update size
@@ -1836,7 +1836,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
         refresh: function () {
             var self = this;
             if (!this._rafRefresh) {
-                this._rafRefresh = RAF(function () { // debounce the refresh
+                this._rafRefresh = RAF(function debounce() { // debounce the refresh
                     // only refresh when scroller is visible and occupying space
                     if (self._isScrollerVisible()) {
 

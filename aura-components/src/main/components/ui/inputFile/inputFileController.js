@@ -23,7 +23,7 @@
         // Storing helper component list, then we don't have traverse the body more than one
         helper.storeHelperCmpRefs(cmp, helperCmpList);
 
-        helperCmpList.forEach(function (helperCmp) {
+        helperCmpList.forEach(function forEachHelperCmp(helperCmp) {
             helperCmp.setAttributeValueProvider(cmp);
             helper.setCmpContext(cmp, helperCmp);
         });

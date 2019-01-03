@@ -24,7 +24,7 @@
         fileSelector.setAttribute('accept',   cmp.get('v.accept'));
 
         // setting listen input change event
-        setTimeout(function () {
+        setTimeout(function addEventListener() {
             fileSelector.addEventListener('change', this.handleChangeEvent.bind(this,cmp));
         }.bind(this),0);
 
@@ -41,12 +41,12 @@
     },
     _meetsSizeConditions : function (cmp, files) {
         var size = cmp.get('v.maxSizeAllowed') || Infinity;
-        return this._getFilesArr(files).every(function (file) {
+        return this._getFilesArr(files).every(function testFile(file) {
             return file.size <= size;
         });
     },
     _getFilesArr : function (files) {
-        return Object.keys(files).map(function (index) {
+        return Object.keys(files).map(function fileMapper(index) {
             return files[index];
         });
     }

@@ -41,7 +41,7 @@
 
         if ($A.util.getBooleanValue(component.get("v.disableDoubleClicks"))) {
             component._recentlyClicked = true;
-            window.setTimeout($A.getCallback(function() { component._recentlyClicked = false; }), 350);
+            window.setTimeout($A.getCallback(function recentlyClicked() { component._recentlyClicked = false; }), 350);
         }
     },
 

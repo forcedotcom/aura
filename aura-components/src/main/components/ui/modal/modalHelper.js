@@ -34,7 +34,7 @@
                     'press': cmp.getReference("c.onCloseBtnPressed"),
                     'label': cmp.get('v.closeDialogLabel'),
                     'labelDisplay': "false"
-                }, function(button, status){
+                }, function onButtonComponentCreate(button, status){
                 	if (status === "SUCCESS") {
                 		cmp.set('v.closeButton', button);
                 	}
@@ -97,7 +97,7 @@
         };
 
         if(useTransition) {
-            setTimeout($A.getCallback(function() {
+            setTimeout($A.getCallback(function transition() {
                 panel.style.opacity = 1;
                 self.lib.panelLibCore.show(cmp, config);
             }), 50);
@@ -189,14 +189,14 @@
     },
 
     _setMaskOpacity: function(mask, value, delay) {
-        var setOpacity = function (target, opacity) {
+        var setOpacity = function setOpacity(target, opacity) {
             if (target && target.style) {
                 target.style.opacity = opacity;
             } 
         };
 
         if (delay > 0) {
-            setTimeout(function() {
+            setTimeout(function setOpacityWrapper() {
                 setOpacity(mask, value);
             }, delay);
         } else {

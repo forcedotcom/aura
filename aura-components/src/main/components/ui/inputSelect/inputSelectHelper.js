@@ -80,7 +80,7 @@
     menuOptionSelected: function(cmp) {
         var menuItems = cmp.find("options").get("v.body");
 
-        var buildAListOfSelectedOptions = function(accumulator, menuItem) {
+        var buildAListOfSelectedOptions = function buildAListOfSelectedOptions(accumulator, menuItem) {
             if (menuItem.get("v.selected")) {
                 accumulator.push({label: menuItem.get("v.label"), value: menuItem.get("v.value")});
             }
@@ -88,8 +88,8 @@
         };
         var selectedOptions = menuItems.reduce(buildAListOfSelectedOptions, []);
 
-        var newSelectedLabel = selectedOptions.map(function(value) { return value.label; }).join(this.optionSeparator);
-        var newValue = selectedOptions.map(function(value) { return value.value; }).join(this.optionSeparator);
+        var newSelectedLabel = selectedOptions.map(function getLabel(value) { return value.label; }).join(this.optionSeparator);
+        var newValue = selectedOptions.map(function getValue(value) { return value.value; }).join(this.optionSeparator);
 
         if (cmp.get("v.selectedLabel") === newSelectedLabel) {
             return;
@@ -106,7 +106,7 @@
         var options = cmp.get("v.options");
         var menuItems = [];
 
-        var handleCreatedMenuItem = function(menuItem, status) {
+        var handleCreatedMenuItem = function handleCreatedMenuItem(menuItem, status) {
         	if (status === "SUCCESS") {
         		menuItems.push(menuItem);
                 if (menuItems.length === options.length) {
@@ -117,7 +117,7 @@
         var multiSelect = cmp.get("v.multiple");
         var menuItemComponentName = multiSelect ? "ui:checkboxMenuItem" : "ui:radioMenuItem";
 
-        $A.getDefinition(menuItemComponentName, function() {
+        $A.getDefinition(menuItemComponentName, function createMenuItemComponent() {
             for (var i = 0; i < options.length; i++) {
                 $A.createComponent(menuItemComponentName, {
                     "class": options[i].class,
@@ -133,8 +133,8 @@
     updateMenuLabel: function(cmp) {
         var options = cmp.get("v.options");
 
-        var newLabel = options.filter(function(option) { return option.selected; })
-            .map(function(option) { return option.label; })
+        var newLabel = options.filter(function isSelected(option) { return option.selected; })
+            .map(function getLabel(option) { return option.label; })
             .join(this.optionSeparator);
 
         // If nothing was selected, just default the label to the first item

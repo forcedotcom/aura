@@ -163,7 +163,7 @@
 	createDragImage: function(element, cssClasses, x, y, offsetX, offsetY) {
 		// Clone a copy of original draggable element and use it as a dragImage
 		var dragImage = document.createElement("div");
-		$A.util.forEach(cssClasses, function(cssClass) {
+		$A.util.forEach(cssClasses, function addDragImageClass(cssClass) {
 			$A.util.addClass(dragImage, cssClass);
 		});
 		
@@ -180,7 +180,7 @@
 		// In order for dragImage to render properly, dragImage must be visible 
 		// to use (i.e. putting it off the screen won't work). But we can remove 
 		// the dragImage element right after the dragImage is rendered.
-		setTimeout(function() {
+		setTimeout(function removeDragImage() {
 			dragImage.parentNode.removeChild(dragImage);
 		});
 		

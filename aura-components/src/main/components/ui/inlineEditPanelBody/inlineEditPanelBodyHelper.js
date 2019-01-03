@@ -20,7 +20,7 @@
 			document.activeElement && document.activeElement.blur();
 		}
 		// we give the browser enough time to set the focus on another element and fire the change event
-		window.requestAnimationFrame($A.getCallback(function() {
+		window.requestAnimationFrame($A.getCallback(function onRequestAnimationFrame() {
 			// now we finally have the new value!
 			this._submit(cmp);
 		}.bind(this)));

@@ -98,7 +98,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             ptr_container.className = 'pullToRefresh';
 
             if (this._nativePTR) {
-                ptr_container.addEventListener('click', function () {
+                ptr_container.addEventListener('click', function onClick() {
                     self.triggerPTR();
                 });
             }
@@ -122,14 +122,14 @@ function lib(w) { //eslint-disable-line no-unused-vars
         _bindTouchEventsIOS: function () {
             this.on('scrollEnd', this._onScrollEndPTR);
 
-            HELPERS.bind(this.wrapper, 'touchstart', function (e) {
+            HELPERS.bind(this.wrapper, 'touchstart', function touchstart(e) {
                 if (this.y >= 0) {
                     this._start(e);
                     this.forceTranslate = true;
                 }
             }.bind(this));
 
-            HELPERS.bind(this.wrapper, 'touchmove', function (e) {
+            HELPERS.bind(this.wrapper, 'touchmove', function touchmove(e) {
                 var point = e.touches ? e.touches[0] : e,
                     y     = point.pageY - this.pointY;
 
@@ -141,7 +141,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 }
             }.bind(this));
 
-            HELPERS.bind(this.wrapper, 'touchend', function (e) {
+            HELPERS.bind(this.wrapper, 'touchend', function touchend(e) {
                 this._iosTouching = false;
                 this._end(e);
             }.bind(this));
@@ -295,14 +295,14 @@ function lib(w) { //eslint-disable-line no-unused-vars
         _ptrExecTrigger: function () {
             var self = this,
                 ptrDataProvider = this.opts.onPullToRefresh,
-                callback = function () {
+                callback = function ptrExecTriggerCallback() {
                     self._ptrExecTriggerCallback.apply(self, arguments);
                 };
 
             if (ptrDataProvider) {
                 ptrDataProvider(callback);
             } else {
-                w.setTimeout(function (){
+                w.setTimeout(function ptrExecTriggerCallbackWrapper() {
                     self._ptrExecTriggerCallback('handler not defined');
                 }, 600);
             }
@@ -312,7 +312,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             if (err) {
                 this._setPTRErrorState(err);
                 this._ptrTriggered = false;
-                w.setTimeout(function () {
+                w.setTimeout(function resetPositionOnError() {
                     self._resetPosition(self._ptrSnapTime);
                     self._setPTRErrorState(false);
                 }, ERROR_TIMEOUT);
@@ -321,7 +321,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 this._ptrTriggered = false;
                 this._setPTRLoadingState(false);
 
-                RAF(function() {
+                RAF(function resetPosition() {
                     self._resetPosition(self._ptrSnapTime);
                 });
             }

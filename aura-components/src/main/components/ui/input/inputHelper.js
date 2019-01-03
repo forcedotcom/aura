@@ -47,7 +47,7 @@
                     tag: wrapperTag,
                     "class": "form-element"
                 },
-                function (wrapperComponent) {
+                function afterWrapperComponentCreate(wrapperComponent) {
                     body.push(wrapperComponent);
                     component.set("v.body", body);
                 }
@@ -74,7 +74,7 @@
             labelDisplay: labelDisplay,
             title: component.get("v.labelTitle"),
             requiredIndicator: requiredIndicator
-        }, function(labelComponent) {
+        }, function afterLabelComponentCreate(labelComponent) {
             // Inserting label inside of innerBody
             if (labelPositionAttribute === 'left' || labelPositionAttribute === 'top') {
                 innerBody.unshift(labelComponent);
@@ -103,7 +103,7 @@
             labelDisplay: labelDisplay,
             title: component.get("v.labelTitle"),
             requiredIndicator: requiredIndicator
-        }, function(legendComponent) {
+        }, function afterLegendComponentCreate(legendComponent) {
             // Inserting legend inside of innerBody
             if (labelPositionAttribute === "bottom") {
                 innerBody.push(legendComponent);
@@ -134,7 +134,7 @@
             labelDisplay: labelDisplay,
             title: component.get("v.labelTitle"),
             requiredIndicator: requiredIndicator
-        }, function (picklistLabelComponent) {
+        }, function afterPicklistLabelComponentCreate(picklistLabelComponent) {
             // Inserting legend inside of innerBody
             if (labelPositionAttribute === "bottom") {
                 innerBody.push(picklistLabelComponent);
@@ -394,7 +394,7 @@
             {
                 "errors": errors
             },
-            function (errorCmp, status) {
+            function afterErrorCmpCreate(errorCmp, status) {
                 if (status === "SUCCESS") {
                     cmp.set("v.errorComponent", errorCmp);
                     var concreteCmpHelper = cmp.getConcreteComponent().getDef().getHelper();

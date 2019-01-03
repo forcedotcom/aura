@@ -149,7 +149,7 @@
 
         if (event.type === "click" && component.isInstanceOf("ui:doubleClicks") && component.get("v.disableDoubleClicks")) {
         	component._recentlyClicked = true;
-        	window.setTimeout(function() { component._recentlyClicked = false; }, 350);
+        	window.setTimeout(function setRecentlyClicked() { component._recentlyClicked = false; }, 350);
         }
     },
 

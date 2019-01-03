@@ -100,7 +100,7 @@
 
         var calendarBody = [];
 
-        var f = function (createdComponents) {
+        var f = function addRowComponentsWrapper(createdComponents) {
             this.addRowComponents(component, createdComponents, calendarBody);
         }.bind(this);
 
@@ -470,7 +470,7 @@
 
     createCalendar: function (component) {
         component._calendarCreated = false;
-        $A.localizationService.getToday($A.get("$Locale.timezone"), function (dateString) {
+        $A.localizationService.getToday($A.get("$Locale.timezone"), function getTodayCallback(dateString) {
             if (component.isValid()) {
                 this.initializeGrid(component, dateString);
                 this.createCalendarBody(component);

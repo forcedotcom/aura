@@ -69,7 +69,7 @@
                 align: horizontalAlign + " " + elementVerticalAlign,
                 targetAlign: horizontalAlign + " " + referenceVerticalAlign
             });
-            this.lib.panelPositioning.reposition($A.getCallback(function () {
+            this.lib.panelPositioning.reposition($A.getCallback(function scrollToSelectedTimeWrapper() {
                 self.scrollToSelectedTime(component);
             }));
         } else {
@@ -195,7 +195,7 @@
     },
 
     getOnClickFunction: function (component) {
-        var f = function (event) {
+        var f = function onClick(event) {
             if (!this.isElementInComponent(component, event.target)) {
                 this.hide(component, false);
             }
@@ -235,7 +235,7 @@
 
     scrollToSelectedTime: function (component) {
         var helper = this;
-        window.requestAnimationFrame($A.getCallback(function () {
+        window.requestAnimationFrame($A.getCallback(function onRequestAnimationFrame() {
             var hours = component.get("v.hours"),
                 minutes = component.get("v.minutes"),
                 interval = component.get("v.interval"),

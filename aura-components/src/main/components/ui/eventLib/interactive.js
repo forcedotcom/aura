@@ -187,7 +187,7 @@ function lib() { //eslint-disable-line no-unused-vars
 
             if (event.type === "click" && component.isInstanceOf("ui:doubleClicks") && component.get("v.disableDoubleClicks")) {
                 component._recentlyClicked = true;
-                window.setTimeout(function() { component._recentlyClicked = false; }, 350);
+                window.setTimeout(function recentlyClickedWrapper() { component._recentlyClicked = false; }, 350);
             }
         },
 

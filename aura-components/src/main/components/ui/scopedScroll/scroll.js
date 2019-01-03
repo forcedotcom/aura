@@ -23,7 +23,7 @@ function lib() { //eslint-disable-line no-unused-vars
         return isShadowRoot(parent) ? parent.host : parent;
     }
  
-    var getSrollerWrapper = function (element) {
+    var getSrollerWrapper = function getSrollerWrapper(element) {
         var parent = element;
         while (parent && !parent._scopedScroll) {
             parent = getParentNode(parent);
@@ -31,7 +31,7 @@ function lib() { //eslint-disable-line no-unused-vars
         return parent;
     };
 
-    var hasNonScopedScrollingWrapper = function (element) {
+    var hasNonScopedScrollingWrapper = function hasNonScopedScrollingWrapper(element) {
         var parent = element;
         while (parent && !parent._scopedScroll) {
             if (parent.scrollHeight !== parent.clientHeight) {
@@ -43,7 +43,7 @@ function lib() { //eslint-disable-line no-unused-vars
         return false;
     };
 
-    var mouseWheelHandler = function (e) {
+    var mouseWheelHandler = function mouseWheelHandler(e) {
         if (e.scopedScroll) {
             return;
         }

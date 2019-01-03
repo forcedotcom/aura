@@ -52,7 +52,7 @@
 	
 	fireDrop: function (component, event, helper) {
 		var params = event.getParam("arguments");
-		$A.util.forEach(params.dragComponents, function(dragComponent) {
+		$A.util.forEach(params.dragComponents, function fireDropEvent(dragComponent) {
 			if (dragComponent.isValid()) {
 				var dataTransfer = dragComponent.getConcreteComponent().getDef().getHelper().getDataTransfer(dragComponent, event);
 				var target = $A.util.isUndefinedOrNull(params.target) ? component.getElement() : params.target;

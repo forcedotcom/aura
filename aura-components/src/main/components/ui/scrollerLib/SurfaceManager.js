@@ -73,7 +73,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
         _destroySurfaceManager: function () {
             var docfrag = w.document.createDocumentFragment();
 
-            this.items.forEach(function (i) {docfrag.appendChild(i.dom);});
+            this.items.forEach(function appendChild(i) {docfrag.appendChild(i.dom);});
             // destroy current html
             while (this.scroller.firstChild) {
                 this.scroller.removeChild(this.scroller.firstChild);
@@ -437,7 +437,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                         this._isAnimating  = false;
                         this._isScrolling  = false;
                         this._stopMomentum();
-                        RAF(function () {
+                        RAF(function resetPosition() {
                             self._resetPosition(self.opts.bounceTime);
                         });
                     }
@@ -564,7 +564,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
         resize: function () {
             var self = this;
             this._stopMomentum();
-            RAF(function () {
+            RAF(function refreshAndScroll() {
                 self._setWrapperSize();
                 self.refresh();
                 self._scrollTo(0, 0);

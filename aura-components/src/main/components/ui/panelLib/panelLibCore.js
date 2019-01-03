@@ -59,7 +59,7 @@ function lib(scrollUtil, focusUtil) { //eslint-disable-line no-unused-vars
         if (isButton && cmp && cmp.get("v.showCloseButton")) {
             var closeButtons = cmp.get("v.closeButton") ? cmp.get("v.closeButton") : [];
             closeButtons = Array.isArray(closeButtons) ? closeButtons : [closeButtons];
-            var isSameButton = function(button) {
+            var isSameButton = function isSameButton(button) {
                 return el === button;
             };
             for (var i = 0; i < closeButtons.length; i++) {
@@ -146,7 +146,7 @@ function lib(scrollUtil, focusUtil) { //eslint-disable-line no-unused-vars
         getKeyEventListener: function(cmp, conf, closeAction) {
             var me = this, config = conf || {};
 
-            return function(e) {
+            return function keyEventListener(e) {
                 var el;
                 
                 if (!cmp.isValid()) {
@@ -271,7 +271,7 @@ function lib(scrollUtil, focusUtil) { //eslint-disable-line no-unused-vars
             createTransitionEvent(cmp).fireBeginEvent(true);
 
             //endAnimationHandler: cleanup all classes and events
-            var endAnimationHandler = $A.getCallback(function () {
+            var endAnimationHandler = $A.getCallback(function endAnimationHandlerFunc() {
                 if(!cmp.isValid()) {
                     return;
                 }
@@ -308,7 +308,7 @@ function lib(scrollUtil, focusUtil) { //eslint-disable-line no-unused-vars
             if (useTransition) {
                 animEl.addEventListener(animEnd, endAnimationHandler, false);
 
-                setTimeout(function() {
+                setTimeout(function addOpenClass() {
                      $A.util.addClass(panel, 'open');
                  },10);
                 $A.util.addClass(animEl, 'transitioning ' + animName);
@@ -341,7 +341,7 @@ function lib(scrollUtil, focusUtil) { //eslint-disable-line no-unused-vars
             createTransitionEvent(cmp).fireBeginEvent(false);
 
             //endAnimationHandler: cleanup all classes and events
-            var endAnimationHandler = $A.getCallback(function () {
+            var endAnimationHandler = $A.getCallback(function endAnimationHandlerFunc() {
                 // make sure the compoment is valid before  
                 // doing anything with it, because
                 // this is asynchronous
@@ -360,7 +360,7 @@ function lib(scrollUtil, focusUtil) { //eslint-disable-line no-unused-vars
 
                 config.onFinish && config.onFinish();
 
-                setTimeout(function() {
+                setTimeout(function removeClasses() {
                     $A.util.removeClass(panel, 'open');
                     $A.util.removeClass(panel, 'active');
                     $A.util.removeClass(animEl, 'transitioning ' + animName);
@@ -568,7 +568,7 @@ function lib(scrollUtil, focusUtil) { //eslint-disable-line no-unused-vars
             // watch for changes to the subtree so that scroll can
             // be re-scoped
             if(!cmp._observer && !$A.util.isUndefinedOrNull(window.MutationObserver)) { //phantomjs check
-                cmp._observer = new MutationObserver($A.getCallback(function() {
+                cmp._observer = new MutationObserver($A.getCallback(function scopeScrollables() {
                     if(cmp.isValid()) {
                         self.scopeScrollables(cmp);
                     } 

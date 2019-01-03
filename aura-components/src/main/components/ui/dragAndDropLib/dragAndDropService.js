@@ -36,7 +36,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
     	
     	if (ns) {
     		var globalId = component.getGlobalId();
-    		$A.util.forEach(types, function(type) {
+    		$A.util.forEach(types, function registerType(type) {
     			if (this.$dndTypeMap$[type] === undefined) {
     				this.$dndTypeMap$[type] = {
     					"ui:draggable": [],
@@ -63,7 +63,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
     	
     	if (ns) {
     		var globalId = component.getGlobalId();
-    		$A.util.forEach(types, function(type) {
+    		$A.util.forEach(types, function deregisterType(type) {
     			var removeIndex = this.$dndTypeMap$[type][ns].indexOf(globalId);
     			if (removeIndex > -1) {
     				this.$dndTypeMap$[type][ns].splice(removeIndex, 1);
@@ -79,7 +79,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
     DragAndDropService.prototype.getDropzoneComponents = function(type) {
     	var globalIds = this.$dndTypeMap$[type]["ui:dropzone"];
     	var components = [];
-    	$A.util.forEach(globalIds, function(globalId) {
+    	$A.util.forEach(globalIds, function getDropzoneComponent(globalId) {
     		components.push($A.componentService.get(globalId));
     	});
     	return components;

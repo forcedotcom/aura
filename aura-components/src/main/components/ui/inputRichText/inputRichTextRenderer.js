@@ -17,7 +17,7 @@
 ({
 
 	afterRender: function (cmp, helper) {
-		helper.initEditor(cmp, function () {
+		helper.initEditor(cmp, function setContent() {
 			var value = cmp.get('v.value');
 			// only set value if it is not empty
 			if(!$A.util.isEmpty(value)) {
@@ -34,7 +34,7 @@
 		}
 		var shouldRender = false;
 		var attributes = cmp.getDef().getAttributeDefs();
-		attributes.each(function (attributeDef) {
+		attributes.each(function processAttr(attributeDef) {
 			var name = attributeDef.getDescriptor().getName();
 			if (name !== "value" && cmp.isDirty("v." + name)) {
 				shouldRender = true;

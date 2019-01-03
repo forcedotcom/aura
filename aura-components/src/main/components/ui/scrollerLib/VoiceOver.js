@@ -46,18 +46,18 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 target         = this.wrapper;
 
             if (this.scrollVertical) {
-                prevBtn = this._createButton(config.labelUp, 'top upButton', function(){self._pageUp();});
-                nextBtn = this._createButton(config.labelDown, 'bottom downButton', function(){self._pageDown();});
+                prevBtn = this._createButton(config.labelUp, 'top upButton', function upButton() {self._pageUp();});
+                nextBtn = this._createButton(config.labelDown, 'bottom downButton', function downButtonListener() {self._pageDown();});
                 if (this.opts.pullToRefresh) {
-                    this._ptrBtn  = this._createButton(this.opts.pullToRefreshConfig.labelPull, 'top ptrButton', function(){self.triggerPTR();});
+                    this._ptrBtn  = this._createButton(this.opts.pullToRefreshConfig.labelPull, 'top ptrButton', function ptrButtonListener() {self.triggerPTR();});
                 }
                 if (this.opts.pullToLoadMore) {
                     //using page down label for ptl button according to accessibility spec
-                	this._ptlBtn  = this._createButton(config.labelDown, 'bottom downButton', function(){self.triggerPTL();});
+                	this._ptlBtn  = this._createButton(config.labelDown, 'bottom downButton', function downButtonListener() {self.triggerPTL();});
                 }
             } else {
-                prevBtn = this._createButton(config.labelLeft, 'leftButton', function(){self._pageLeft();});
-                nextBtn = this._createButton(config.labelRight, 'rightButton', function(){self._pageRight();});
+                prevBtn = this._createButton(config.labelLeft, 'leftButton', function leftButtonListener() {self._pageLeft();});
+                nextBtn = this._createButton(config.labelRight, 'rightButton', function rightButtonListener() {self._pageRight();});
             }
 
             this._enableVoiceOver = config.enable;

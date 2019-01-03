@@ -93,7 +93,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 this._itemsThreshold = this.items && this.items.length || 10;
             }
             else if (ilConfig.hasTemplate) {
-                ilConfig.templateSetManualTriggerFn(function() {
+                ilConfig.templateSetManualTriggerFn(function triggerInfiniteLoadingDataProvider() {
                     this._triggerInfiniteLoadingDataProvider();
                 }.bind(this));
             }
@@ -147,7 +147,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 scrollerContainer = this.scroller,
                 container = this.ilDOM;
 
-            items.forEach(function (i) {
+            items.forEach(function appendChild(i) {
                 docfrag.appendChild(i);
             });
 
@@ -159,7 +159,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
         _triggerInfiniteLoadingDataProvider: function () {
             var self            = this,
                 ilDataProvider  = this.opts.infiniteLoadingConfig.dataProvider,
-                callback        = function() {
+                callback        = function infiniteLoadingTriggerCallback() {
                     self._infiniteLoadingTriggerCallback.apply(self, arguments);
                     Logger.log('InfiniteLoading callback called');
                 };
@@ -198,7 +198,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             }
 
             this._setState(false/*loading*/);
-            w.requestAnimationFrame(function() {
+            w.requestAnimationFrame(function onRequestAnimationFrame() {
                 this._ilFetchingData = false;
             }.bind(this));
         },

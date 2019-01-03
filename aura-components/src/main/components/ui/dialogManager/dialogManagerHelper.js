@@ -113,9 +113,9 @@
         var self          = this,
             oldFocus      = document.activeElement,
             newFocus      = this.getFirstFocusableElement(dialog),
-            keydown       = $A.getCallback(function(event) { self.getKeydownHandler(dialog, isModal, newFocus, event); }),
-            click         = $A.getCallback(function(event) { self.getClickHandler(dialog, clickOutToClose, event); }),
-            resize        = $A.getCallback(function() { self.getResizeHandler(dialog, isModal); });
+            keydown       = $A.getCallback(function getKeydownHandlerWrapper(event) { self.getKeydownHandler(dialog, isModal, newFocus, event); }),
+            click         = $A.getCallback(function getClickHandlerWrapper(event) { self.getClickHandler(dialog, clickOutToClose, event); }),
+            resize        = $A.getCallback(function getResizeHandlerWrapper() { self.getResizeHandler(dialog, isModal); });
 
         return {
             oldFocus       : oldFocus,
@@ -309,14 +309,14 @@
                 inner.style.maxHeight = this.getContentMaxHeight(dialog) + "px";
                 $A.util.removeClass(mask, "hidden");
                 // delay the application of animation classes by just a hair ... webkit/ffx rendering bug
-                window.setTimeout(function() { $A.util.addClass(mask, "fadeIn"); }, flickerDelay);
-                window.setTimeout(function() { $A.util.addClass(outer, "slideUp"); }, flickerDelay);
+                window.setTimeout(function fadeInMask() { $A.util.addClass(mask, "fadeIn"); }, flickerDelay);
+                window.setTimeout(function slideUpOuter() { $A.util.addClass(outer, "slideUp"); }, flickerDelay);
             }
             // apply proper element focus if necessary
             if ((autoFocus || isModal) && config.newFocus) {
                 if (isModal) {
                     // delay focus until the modal slides into place, otherwise the scroll jumps
-                    window.setTimeout(function() { config.newFocus.focus(); }, flickerDelay + focusDelay);
+                    window.setTimeout(function setNewFocusFocus() { config.newFocus.focus(); }, flickerDelay + focusDelay);
                 } else {
                     config.newFocus.focus();
                 }
@@ -327,8 +327,8 @@
                 // remove the animation classes immediately, but delay adding 'hidden' back until animation completes
                 $A.util.removeClass(mask, "fadeIn");
                 $A.util.removeClass(outer, "slideUp");
-                window.setTimeout(function() { $A.util.addClass(mask, "hidden"); }, hideDelay);
-                window.setTimeout(function() { $A.util.addClass(outer, "hidden"); }, hideDelay);
+                window.setTimeout(function hideMask() { $A.util.addClass(mask, "hidden"); }, hideDelay);
+                window.setTimeout(function hideOuter() { $A.util.addClass(outer, "hidden"); }, hideDelay);
             } else {
                 // if not a modal, then just hide the dialog immediately
                 $A.util.addClass(outer, "hidden");

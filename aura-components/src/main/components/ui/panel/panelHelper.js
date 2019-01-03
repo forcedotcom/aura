@@ -121,7 +121,7 @@
                 'label': cmp.get('v.closeDialogLabel'),
                 'buttonTitle': cmp.get('v.closeDialogLabel'),
                 'labelDisplay': "false"
-            }, function(button, status){
+            }, function onButtonCreateComponent(button, status){
                 if (status === "SUCCESS") {
                     cmp.set('v.closeButton', button);
                 }
@@ -213,7 +213,7 @@
                     //if the click is outside of the panel
                     var mouseHandler = self._getMouseHandler(cmp);
                     if ($A.util.isFunction(mouseHandler)) {
-                        window.setTimeout(function () {
+                        window.setTimeout(function setOnClick() {
                             $A.util.on(document, 'click', mouseHandler);
                         }, 0);
                     }
@@ -222,7 +222,7 @@
                 if(referenceEl) {
                     panelEl.style.visibility = 'hidden';
 
-                    requestAnimationFrame($A.getCallback(function() {
+                    requestAnimationFrame($A.getCallback(function onRequestAnimationFrame() {
                         panelEl.style.visibility = 'visible';
                         //need to set focus after animation frame
                         if (autoFocus) {
@@ -244,10 +244,10 @@
         if (referenceEl) {
             panelEl.style.opacity = '0';
             panelEl.style.display = 'block';
-            this.position(cmp, referenceEl, $A.getCallback(function() {
+            this.position(cmp, referenceEl, $A.getCallback(function positionCallback() {
                 self.positioningLib.panelPositioning.reposition();
                 cmp.positioned = true;
-                requestAnimationFrame($A.getCallback(function() {
+                requestAnimationFrame($A.getCallback(function onRequestAnimationFrame() {
                     self._showPanel(cmp, panelEl, conf);
                 }));
             }));
@@ -329,7 +329,7 @@
         }
         var self = this;
         cmp._closing = true;
-        cmp.getConcreteComponent().hide(function () {
+        cmp.getConcreteComponent().hide(function onHide() {
             if (!cmp.isValid()) {
                 return;
             }
@@ -353,7 +353,7 @@
 
     cleanPositioning: function(cmp) {
         if(cmp.constraints) {
-            cmp.constraints.forEach(function(constraint) {
+            cmp.constraints.forEach(function destroy(constraint) {
                 constraint.destroy();
             });
 

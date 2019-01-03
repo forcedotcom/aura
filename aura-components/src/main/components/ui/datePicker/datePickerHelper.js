@@ -39,7 +39,7 @@
 
     focusDate: function (component) {
         //TODO make sure the datepicker is actually visible
-        window.requestAnimationFrame($A.getCallback(function () {
+        window.requestAnimationFrame($A.getCallback(function onRequestAnimationFrame() {
         	if (!component.find("grid").isValid()) {
                 return;
             }
@@ -88,7 +88,7 @@
     },
 
     getOnClickFunction: function (component) {
-        var f = function (event) {
+        var f = function onClick(event) {
             if (!this.isElementInComponent(component, event.target)) {
                 this.hide(component);
             }
@@ -308,7 +308,7 @@
 
     toggleVisibility: function (component) {
         if (component.get("v.visible") === true) {
-            window.requestAnimationFrame($A.getCallback(function () {
+            window.requestAnimationFrame($A.getCallback(function onRequestAnimationFrame() {
                 if (!component.isValid()) {
                     return;
                 }

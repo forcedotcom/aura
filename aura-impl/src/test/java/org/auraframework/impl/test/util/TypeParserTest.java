@@ -177,7 +177,7 @@ public class TypeParserTest {
         Assert.assertThat(actual, Matchers.allOf(Matchers.hasProperty("prefix", Matchers.equalTo("prefixValue")),
                                                  Matchers.hasProperty("namespace", Matchers.equalTo("a.b")),
                                                  Matchers.hasProperty("name", Matchers.equalTo("c<d,e>")),
-                                                 /* Matchers.hasProperty("subName", Matchers.nullValue()), */
+                                                 Matchers.hasProperty("subName", Matchers.nullValue()),
                                                  Matchers.hasProperty("nameParameters", Matchers.equalTo("<d,e>"))));
     }
 
@@ -188,7 +188,7 @@ public class TypeParserTest {
         Assert.assertThat(actual, Matchers.allOf(Matchers.hasProperty("prefix", Matchers.equalTo("prefixValue")),
                                                  Matchers.hasProperty("namespace", Matchers.equalTo("a.b")),
                                                  Matchers.hasProperty("name", Matchers.equalTo("c")),
-                                                 /* Matchers.hasProperty("subName", Matchers.nullValue()), */
+                                                 Matchers.hasProperty("subName", Matchers.nullValue()),
                                                  Matchers.hasProperty("nameParameters", Matchers.nullValue())));
     }
 
@@ -205,7 +205,7 @@ public class TypeParserTest {
         Assert.assertThat(actual, Matchers.allOf(Matchers.hasProperty("prefix", Matchers.equalTo("prefixValue")),
                                                  Matchers.hasProperty("namespace", Matchers.nullValue()),
                                                  Matchers.hasProperty("name", Matchers.equalTo("c")),
-                                                 /* Matchers.hasProperty("subName", Matchers.nullValue()), */
+                                                 Matchers.hasProperty("subName", Matchers.nullValue()),
                                                  Matchers.hasProperty("nameParameters", Matchers.nullValue())));
     }
 
@@ -215,7 +215,7 @@ public class TypeParserTest {
         Assert.assertThat(actual, Matchers.allOf(Matchers.hasProperty("prefix", Matchers.nullValue()),
                                                  Matchers.hasProperty("namespace", Matchers.nullValue()),
                                                  Matchers.hasProperty("name", Matchers.equalTo("c")),
-                                                 /* Matchers.hasProperty("subName", Matchers.nullValue()), */
+                                                 Matchers.hasProperty("subName", Matchers.nullValue()),
                                                  Matchers.hasProperty("nameParameters", Matchers.nullValue())));
     }
 
@@ -225,13 +225,81 @@ public class TypeParserTest {
         Assert.assertThat(actual, Matchers.allOf(Matchers.hasProperty("prefix", Matchers.nullValue()),
                                                  Matchers.hasProperty("namespace", Matchers.equalTo("a")),
                                                  Matchers.hasProperty("name", Matchers.equalTo("c")),
-                                                 /* Matchers.hasProperty("subName", Matchers.nullValue()), */
+                                                 Matchers.hasProperty("subName", Matchers.nullValue()),
                                                  Matchers.hasProperty("nameParameters", Matchers.nullValue())));
     }
 
     public void testClassInvalidSep_Negative() {
         String input = "a:c";
         Type actual = TypeParser.parseClass(input);
+        Assert.assertThat(actual, Matchers.nullValue());
+    }
+
+    //****************** Triple (Library) *********************
+    @Test
+    public void testTripleFull() {
+        String input = "namespaceValue:nameValue:subNameValue";
+        Type actual = TypeParser.parseTagTriple(input);
+        Assert.assertThat(actual, Matchers.allOf(Matchers.hasProperty("prefix", Matchers.nullValue()),
+                                                 Matchers.hasProperty("namespace", Matchers.equalTo("namespaceValue")),
+                                                 Matchers.hasProperty("name", Matchers.equalTo("nameValue")),
+                                                 Matchers.hasProperty("subName", Matchers.equalTo("subNameValue"))));
+    }
+
+    @Test
+    public void testTripleFullWithDash() {
+        String input = "namespaceValue:nameValue:subName-Value";
+        Type actual = TypeParser.parseTagTriple(input);
+        Assert.assertThat(actual, Matchers.allOf(Matchers.hasProperty("prefix", Matchers.nullValue()),
+                                                 Matchers.hasProperty("namespace", Matchers.equalTo("namespaceValue")),
+                                                 Matchers.hasProperty("name", Matchers.equalTo("nameValue")),
+                                                 Matchers.hasProperty("subName", Matchers.equalTo("subName-Value"))));
+    }
+
+    @Test
+    public void testTripleFullWithBadNameDash() {
+        String input = "namespaceValue:name-Value:subNameValue";
+        Type actual = TypeParser.parseTagTriple(input);
+        Assert.assertThat(actual, Matchers.nullValue());
+    }
+
+    @Test
+    public void testTripleFullWithBadNamespaceDash() {
+        String input = "namespace-Value:nameValue:subNameValue";
+        Type actual = TypeParser.parseTagTriple(input);
+        Assert.assertThat(actual, Matchers.nullValue());
+    }
+
+    @Test
+    public void testTripleSingle() {
+        String input = "nameValue";
+        Type actual = TypeParser.parseTagTriple(input);
+        Assert.assertThat(actual, Matchers.allOf(Matchers.hasProperty("prefix", Matchers.nullValue()),
+                                                 Matchers.hasProperty("namespace", Matchers.nullValue()),
+                                                 Matchers.hasProperty("name", Matchers.equalTo("nameValue")),
+                                                 Matchers.hasProperty("subName", Matchers.nullValue())));
+    }
+
+    @Test
+    public void testTripleSingleWithDash() {
+        String input = "name-Value";
+        Type actual = TypeParser.parseTagTriple(input);
+        Assert.assertThat(actual, Matchers.allOf(Matchers.hasProperty("prefix", Matchers.nullValue()),
+                                                 Matchers.hasProperty("namespace", Matchers.nullValue()),
+                                                 Matchers.hasProperty("name", Matchers.equalTo("name-Value")),
+                                                 Matchers.hasProperty("subName", Matchers.nullValue())));
+    }
+    @Test
+    public void testTripleDouble_Negative() {
+        String input = "namespaceValue:nameValue";
+        Type actual = TypeParser.parseTagTriple(input);
+        Assert.assertThat(actual, Matchers.nullValue());
+    }
+
+    @Test
+    public void testTripleFullSpaces_Negative() {
+        String input = "namespaceValue nameValue subNameValue";
+        Type actual = TypeParser.parseTagTriple(input);
         Assert.assertThat(actual, Matchers.nullValue());
     }
 }

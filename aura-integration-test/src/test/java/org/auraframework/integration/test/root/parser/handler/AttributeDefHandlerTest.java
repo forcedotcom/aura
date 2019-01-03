@@ -31,8 +31,8 @@ import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.factory.XMLParserBase;
+import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.parser.handler.AttributeDefHandler;
 import org.auraframework.impl.root.parser.handler.ComponentDefHandler;
 import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
@@ -57,7 +57,7 @@ public class AttributeDefHandlerTest extends AuraImplTestCase {
         desc = definitionService.getDefDescriptor("mystring", AttributeDef.class);
         componentSource = new StringSource<>(desc, "<aura:component/>", "myID", Format.XML);
         componentXmlReader = getXmlReader(componentSource);
-        cdh = new ComponentDefHandler(null, componentSource, componentXmlReader, true, definitionService, contextService,
+        cdh = new ComponentDefHandler(null, componentSource, componentXmlReader, true, definitionService,
                 configAdapter, definitionParserAdapter);
     }
 

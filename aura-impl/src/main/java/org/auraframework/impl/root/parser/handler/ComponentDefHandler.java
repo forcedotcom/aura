@@ -27,7 +27,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.root.component.ComponentDefImpl;
-import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -62,9 +61,8 @@ public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef, C
 
     public ComponentDefHandler(DefDescriptor<ComponentDef> componentDefDescriptor, TextSource<?> source,
                                XMLStreamReader xmlReader, boolean isInInternalNamespace, DefinitionService definitionService,
-                               ContextService contextService,
                                ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(componentDefDescriptor, source, xmlReader, isInInternalNamespace, definitionService, contextService, configAdapter, definitionParserAdapter, new ComponentDefImpl.Builder());
+        super(componentDefDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter, new ComponentDefImpl.Builder());
     }
 
     @Override

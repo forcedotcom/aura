@@ -15,16 +15,14 @@
  */
 package org.auraframework.impl.factory;
 
-import javax.inject.Inject;
-
 import java.util.EnumSet;
+
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.builder.BaseComponentDefBuilder;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.root.parser.handler.RootTagHandler;
 import org.auraframework.impl.service.CompilerServiceImpl;
-import org.auraframework.service.ContextService;
 import org.auraframework.system.ApiVersioned;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.BundleSourceOption;
@@ -33,10 +31,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 @ServiceComponent
 public abstract class BaseComponentDefFactory<T extends BaseComponentDef> extends BundleBaseFactory<T> {
-
-    @Inject
-    protected ContextService contextService;
-
     @Override
     public T getDefinition(DefDescriptor<T> descriptor, BundleSource<T> source) throws QuickFixException {
         return this.getDefinition(descriptor, source, CompilerServiceImpl.DEFAULT_COMPILE_OPTIONS);

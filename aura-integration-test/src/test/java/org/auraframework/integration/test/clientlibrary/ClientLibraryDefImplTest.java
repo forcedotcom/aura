@@ -191,7 +191,7 @@ public class ClientLibraryDefImplTest extends AuraImplTestCase {
         StringSource<ClientLibraryDef> componentSource = new StringSource<>(null, "<aura:component/>", "myID", Format.XML);
         XMLStreamReader componentXmlReader = getXmlReader(componentSource);
         ComponentDefHandler cdh = new ComponentDefHandler(null, componentSource, componentXmlReader, true,
-                definitionService, contextService, configAdapter, definitionParserAdapter);
+                definitionService, configAdapter, definitionParserAdapter);
 
         StringSource<ClientLibraryDef> clientLibrarySource = new StringSource<>(null, clMarkup,
                 "myID", Format.XML);

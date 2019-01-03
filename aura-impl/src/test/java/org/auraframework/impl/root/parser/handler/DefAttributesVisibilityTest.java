@@ -16,6 +16,9 @@
 package org.auraframework.impl.root.parser.handler;
 
 import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
@@ -27,8 +30,6 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.test.source.StringSourceLoader;
 import org.junit.Before;
 import org.junit.Test;
-
-import javax.inject.Inject;
 
 import com.google.common.collect.Sets;
 
@@ -95,7 +96,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         protected XMLHandler<?> getHandler(boolean internal) {
             return new ApplicationDefHandler(getDescriptor(internal, ApplicationDef.class), null, null, internal,
-                    definitionService, contextService, configAdapter, definitionParserAdapter);
+                    definitionService, configAdapter, definitionParserAdapter);
         }
     }
 
@@ -114,7 +115,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         protected XMLHandler<?> getHandler(boolean internal) {
             return new ComponentDefHandler(getDescriptor(internal, ComponentDef.class), null, null, internal,
-                    definitionService, contextService, configAdapter, definitionParserAdapter);
+                    definitionService, configAdapter, definitionParserAdapter);
         }
     }
 
@@ -163,7 +164,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         protected XMLHandler<?> getHandler(boolean internal) {
             ApplicationDefHandler parentHandler;
             parentHandler = new ApplicationDefHandler(getDescriptor(internal, ApplicationDef.class), null, null,
-                    internal, definitionService, contextService, configAdapter, definitionParserAdapter);
+                    internal, definitionService, configAdapter, definitionParserAdapter);
             return new AttributeDefHandler<>(parentHandler, null, null, internal, definitionService, configAdapter,
                     definitionParserAdapter);
         }
@@ -182,7 +183,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         protected XMLHandler<?> getHandler(boolean internal) {
             ApplicationDefHandler parentHandler;
             parentHandler = new ApplicationDefHandler(getDescriptor(internal, ApplicationDef.class), null, null,
-                    internal, definitionService, contextService, configAdapter, definitionParserAdapter);
+                    internal, definitionService, configAdapter, definitionParserAdapter);
             return new RegisterEventHandler<>(parentHandler, null, null, internal, definitionService, configAdapter,
                     definitionParserAdapter);
         }
@@ -201,7 +202,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         protected XMLHandler<?> getHandler(boolean internal) {
             ApplicationDefHandler parentHandler;
             parentHandler = new ApplicationDefHandler(getDescriptor(internal, ApplicationDef.class), null, null,
-                    internal, definitionService, contextService, configAdapter, definitionParserAdapter);
+                    internal, definitionService, configAdapter, definitionParserAdapter);
             return new AttributeDefRefHandler<>(parentHandler, null, null, internal, definitionService,
                     configAdapter, definitionParserAdapter);
         }
@@ -220,7 +221,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         protected XMLHandler<?> getHandler(boolean internal) {
             ApplicationDefHandler parentHandler;
             parentHandler = new ApplicationDefHandler(getDescriptor(internal, ApplicationDef.class), null, null,
-                    internal, definitionService, contextService, configAdapter, definitionParserAdapter);
+                    internal, definitionService, configAdapter, definitionParserAdapter);
             return new EventHandlerDefHandler(parentHandler, null, null, definitionService);
         }
     }

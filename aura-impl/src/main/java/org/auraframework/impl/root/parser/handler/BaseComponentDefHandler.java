@@ -57,7 +57,6 @@ import org.auraframework.impl.root.component.DefRefDelegate;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.impl.util.TextTokenizer;
-import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.SubDefDescriptor;
@@ -102,8 +101,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
     private final List<DefinitionReference> body = Lists.newArrayList();
     protected B builder;
 
-    private ContextService contextService;
-
     public BaseComponentDefHandler() {
         super();
     }
@@ -111,7 +108,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
     public BaseComponentDefHandler(DefDescriptor<T> componentDefDescriptor, TextSource<?> source,
                                    XMLStreamReader xmlReader,
                                    boolean isInInternalNamespace, DefinitionService definitionService,
-                                   ContextService contextService,
                                    ConfigAdapter configAdapter,
                                    DefinitionParserAdapter definitionParserAdapter,
                                    B builder) {
@@ -122,7 +118,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
         if (source != null) {
             builder.setOwnHash(source.getHash());
         }
-        this.contextService = contextService;
     }
 
     @Override
@@ -291,9 +286,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
     @SuppressWarnings("unchecked")
     @Override
     protected void readAttributes() throws QuickFixException {
-        AuraContext context = contextService.getCurrentContext();
-        context.pushCallingDescriptor(builder.getDescriptor());
-        try {
             super.readAttributes();
 
             //
@@ -409,9 +401,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             if (getBooleanAttributeValue(ATTRIBUTE_DYNAMICALLY_FLAVORABLE)) {
                 builder.setDynamicallyFlavorable(true);
             }
-        } finally {
-            context.popCallingDescriptor();
-        }
     }
 
     public void setRender(String val) {

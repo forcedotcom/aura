@@ -34,7 +34,6 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
-import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -43,7 +42,6 @@ import org.auraframework.util.AuraTextUtil;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDef, ApplicationDefImpl.Builder> {
 
@@ -79,9 +77,8 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
 
     public ApplicationDefHandler(DefDescriptor<ApplicationDef> applicationDefDescriptor, TextSource<ApplicationDef> source,
                                  XMLStreamReader xmlReader, boolean isInInternalNamespace, DefinitionService definitionService,
-                                 ContextService contextService,
                                  ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(applicationDefDescriptor, source, xmlReader, isInInternalNamespace, definitionService, contextService, configAdapter, definitionParserAdapter, new ApplicationDefImpl.Builder());
+        super(applicationDefDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter, new ApplicationDefImpl.Builder());
     }
 
     @Override

@@ -17,7 +17,6 @@ package org.auraframework.impl.factory;
 
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.ConfigAdapter;
@@ -29,9 +28,9 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.root.parser.handler.ComponentDefHandler;
 import org.auraframework.impl.root.parser.handler.RootTagHandler;
-import org.auraframework.impl.source.*;
+import org.auraframework.impl.source.AbstractSourceImpl;
+import org.auraframework.impl.source.CopiedTextSourceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.Source;
@@ -42,10 +41,6 @@ import com.google.common.collect.Maps;
 
 @ServiceComponent
 public class ComponentDefFactory extends BaseComponentDefFactory<ComponentDef> {
-
-    @Inject
-    protected ContextService contextService;
-
     @Override
     public Class<ComponentDef> getDefinitionClass() {
         return ComponentDef.class;
@@ -63,7 +58,7 @@ public class ComponentDefFactory extends BaseComponentDefFactory<ComponentDef> {
                                              ConfigAdapter configAdapter,
                                              DefinitionParserAdapter definitionParserAdapter) {
         return new ComponentDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,
-                contextService, configAdapter, definitionParserAdapter);
+                configAdapter, definitionParserAdapter);
     }
 
     private class TemplateCallbackImpl implements ComponentDefHandler.TemplateCallback {
@@ -80,14 +75,14 @@ public class ComponentDefFactory extends BaseComponentDefFactory<ComponentDef> {
             Map<DefDescriptor<?>, Source<?>> newSourceMap = source.getBundledParts();
             if (isTemplate) {
                 DefDescriptor<ComponentDef> descriptor = source.getDescriptor();
-                DefDescriptor<StyleDef> oldDesc = new DefDescriptorImpl<StyleDef>("css", descriptor.getNamespace(),
+                DefDescriptor<StyleDef> oldDesc = new DefDescriptorImpl<>("css", descriptor.getNamespace(),
                             descriptor.getName(), StyleDef.class);
                 @SuppressWarnings("unchecked")
                 TextSource<StyleDef> cssSource = (TextSource<StyleDef>)newSourceMap.get(
-                        new DefDescriptorImpl<StyleDef>("css", descriptor.getNamespace(),
+                        new DefDescriptorImpl<>("css", descriptor.getNamespace(),
                             descriptor.getName(), StyleDef.class));
                 if (cssSource != null) {
-                    DefDescriptor<StyleDef> newDesc = new DefDescriptorImpl<StyleDef>("templateCss",
+                    DefDescriptor<StyleDef> newDesc = new DefDescriptorImpl<>("templateCss",
                             descriptor.getNamespace(), descriptor.getName(), StyleDef.class);
                     cssSource = new CopiedTextSourceImpl<>(newDesc, cssSource, AbstractSourceImpl.MIME_TEMPLATE_CSS);
 

@@ -18,7 +18,7 @@
     load: function (cmp) {
         var imageElement = cmp.getElement().getElementsByTagName("img")[0];
         imageElement.src = cmp.get("v.actualImageSrc");
-        var callback = $A.getCallback(function () {
+        var callback = $A.getCallback(function actualImageSrcCallback() {
             if (cmp && cmp.isValid()) {
                 $A.getEvt("markup://ui:asyncComponentLoaded").fire({"asyncComponent": cmp});
             }

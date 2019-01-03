@@ -29,8 +29,8 @@ function StampSVG() { //eslint-disable-line no-unused-vars
         }
     }
 
-    var fetchSVG = function (url) {
-        return new Promise(function (resolve, reject) {
+    var fetchSVG = function fetchSVG(url) {
+        return new Promise(function fetchSVGRun(resolve, reject) {
             var xhr = new XMLHttpRequest();
             xhr.open("GET", url);
             xhr.send();
@@ -54,10 +54,10 @@ function StampSVG() { //eslint-disable-line no-unused-vars
     };
 
     var requests = {};
-    var polyfill = function (svgElement) {
+    var polyfill = function polyfill(svgElement) {
         var uses = Array.prototype.slice.call(svgElement.getElementsByTagName("use"));
 
-        uses.forEach(function (use) {
+        uses.forEach(function processSvg(use) {
             var src = use.getAttribute("href");
             if (src) {
                 var srcSplit = src.split("#");
@@ -67,7 +67,7 @@ function StampSVG() { //eslint-disable-line no-unused-vars
                 if (url.length) {
 
                     (requests[url] || (requests[url] = fetchSVG(url)))
-                        .then(function (svgSpriteElement) {
+                        .then(function onSuccess(svgSpriteElement) {
                             var svgFragment = svgSpriteElement.getElementById(id);
 
                             embed(svgElement, svgFragment, use);
@@ -78,14 +78,14 @@ function StampSVG() { //eslint-disable-line no-unused-vars
     };
 
     var svgTagName = /svg/i;
-    var isValidSVG = function (svgElement) {
+    var isValidSVG = function isValidSVG(svgElement) {
         return svgElement && svgTagName.test(svgElement.nodeName);
     };
 
     var newerIEUA = /\bTrident\/[567]\b|\bMSIE (?:9|10)\.0\b/;
     var webkitUA = /\bAppleWebKit\/(\d+)\b/;
     var olderEdgeUA = /\bEdge\/12\.(\d+)\b/;
-    var isIE = function () {
+    var isIE = function isIE() {
         return (
             newerIEUA.test(navigator.userAgent) ||
             (navigator.userAgent.match(olderEdgeUA) || [])[1] < 10547 ||

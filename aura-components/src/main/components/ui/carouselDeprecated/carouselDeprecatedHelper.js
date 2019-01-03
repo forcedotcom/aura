@@ -245,7 +245,7 @@
 					cmp._scrollToTimeout = null;
 				}
 				//need to wait for scroller to finish refreshing
-				cmp._scrollToTimeout = window.setTimeout(function(){
+				cmp._scrollToTimeout = window.setTimeout(function scrollToWrapper(){
 					var curPage = me.getSelectedPage(cmp);
 					if (curPage === selectedPage) {
 						scroller.scrollToPage(--selectedPage, null, 0);
@@ -368,7 +368,7 @@
     		// When coming from a key event, wait a second to commit to the page
     		// selection
             var me = this;
-    		cmp._keyPageSelectionTimeout = window.setTimeout(function() {
+    		cmp._keyPageSelectionTimeout = window.setTimeout(function selectPageWrapper() {
     			cmp._keyPageSelectionTimeout = null;
     			me.selectPage(cmp, pageIndex);
     		}, this.KEY_PAGE_SELECTION_TIMEOUT_DURATION);
@@ -662,7 +662,7 @@
 	delayHideAllUnselectedPages : function(cmp) {
 		if (!cmp._delayHidePagesTimer) {
 			var that = this;
-			cmp._delayHidePagesTimer = window.setTimeout(function(){that.hideAllUnselectedPages(cmp);}, 500);
+			cmp._delayHidePagesTimer = window.setTimeout(function hideAllUnselectedPagesWrapper(){that.hideAllUnselectedPages(cmp);}, 500);
 		}
 	},
 

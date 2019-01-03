@@ -55,7 +55,7 @@
     },
     attachHandlers: function (cmp, root) {
         var self = this,
-            handler = function (e) {
+            handler = function onEvent(e) {
                 self._handleEvent(cmp, e);
             };
             
@@ -65,7 +65,7 @@
             root.addEventListener('MSPointerDown', handler, false);
         } else {
             root.addEventListener('click', handler, false);
-            root.addEventListener('keyup', function(e){
+            root.addEventListener('keyup', function onKeyup(e){
                 self._handleKeyEvent(cmp, e);
             }, false);
         }

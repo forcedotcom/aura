@@ -20,7 +20,7 @@
             var frame = document.createElement("iframe");
             frame.src = cmp.get("v.url") + "&aura.nonce=" + new Date().getTime();
             frame.scrolling = "auto";
-            $A.util.on(frame, "load", function () {
+            $A.util.on(frame, "load", function runTestOnLoad() {
                 cmp.getDef().getHelper().runTest(cmp);
             });
             var content = cmp.find("content");
@@ -40,7 +40,7 @@
         if (!root) {
             if(!win.$A || !win.$A.test || !win.$A.test.isComplete()){
                 cmp.set("v.status", "spin");
-                setTimeout(function () {
+                setTimeout(function runTestWrapper() {
                     cmp.getDef().getHelper().runTest(cmp);
                 }, 10);
                 return;
@@ -52,7 +52,7 @@
 
     displayResults : function(cmp, win){
         if(!win.$A || !win.$A.test || !win.$A.test.isComplete()){
-            setTimeout(function(){
+            setTimeout(function displayResultsWrapper(){
                 cmp.getDef().getHelper().displayResults(cmp, win);
             }, 50);
             return;

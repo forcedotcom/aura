@@ -276,7 +276,7 @@
     	carousel._updatePagesSize(cmp, carousel);
         indicator.get('c.changeActivePage').run({pageIndex: initialPage, initialRender: true});
 
-    	carousel.on('pageChange', function (page) {
+    	carousel.on('pageChange', function onPageChangeWrapper(page) {
     		self.onPageChange.call(self, cmp, page);
     	});
 
@@ -298,7 +298,7 @@
     		indicator    = cmp.get('v.pageIndicatorComponent')[0];
 
         if (!page.get('v.isContentLoaded')) {
-            $A.run(function () {
+            $A.run(function loadWrapper() {
                 page.get('c.load').run();
             });
         }

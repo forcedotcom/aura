@@ -46,7 +46,7 @@
 		// TODO cleanup components properly
 		concrete._cellTemplates = concrete._cellTemplates.slice(0, columns.length);
 		
-		$A.util.forEach(columns, function (c, i) {
+		$A.util.forEach(columns, function forEachColumn(c, i) {
 			var name = c.get('v.name'),
 				template = c.get('v.outputComponent');
 
@@ -141,7 +141,7 @@
 
 		if (columns && sort) {
 			// Reset all columns.
-			$A.util.forEach(columns, function (c) {
+			$A.util.forEach(columns, function forEachColumn(c) {
 				if(c.isInstanceOf("ui:dataGridColumn")) {
 					var name = c.get('v.name'),
 						direction = sort[name] || '';
@@ -213,12 +213,12 @@
 		// Handle force:recordLayout
 		// TODO: make adapter? 
 		if (columns && columns.length > 0) {
-			$A.util.forEach(columns, function (column) {
+			$A.util.forEach(columns, function forEachColumn(column) {
 				var recordLayoutBody; 
 
 				if (column.getDef().getDescriptor().getPrefix() === 'layout') {
 					recordLayoutBody = column.getSuper().get('v.body');
-					$A.util.forEach(recordLayoutBody, function (col) {
+					$A.util.forEach(recordLayoutBody, function addColumn(col) {
 						ret.push(col);
 					});
 				} else {
@@ -497,7 +497,7 @@
 
 		if (itemsLength > rowDataLength) {
 			diff = itemsLength - rowDataLength;
-			this.insertRowsAndUpdateData(concrete, 'last', diff, null, false, function () {
+			this.insertRowsAndUpdateData(concrete, 'last', diff, null, false, function updateValueProvidersFromItemsWrapper() {
 				self.updateValueProvidersFromItems(concrete);
 			});
 		} else {
@@ -566,7 +566,7 @@
 		var colData = rowData.columnData[colIndex];
 		
 		if (colData) {
-			$A.util.forEach(colData.components, function(cmp) {
+			$A.util.forEach(colData.components, function destroyComponent(cmp) {
 				cmp.destroy();
 			});
 			
@@ -630,7 +630,7 @@
 	 * @param {function (Component)} callback A callback. Not using promises due to high volume.
 	 */
 	createAndRenderCell: function (concrete, cdrs, vp, element, components, callback) {
-        callback = callback || function () {};
+        callback = callback || function noop() {};
 
         var defs = [];
 
@@ -638,7 +638,7 @@
             defs.push(cdrs[cdrIndex].componentDef["descriptor"]);
         }
 
-		$A.getDefinitions(defs, $A.getCallback(function () {
+		$A.getDefinitions(defs, $A.getCallback(function createComponents() {
             for (var i = 0; i < cdrs.length; i++) {
                 var cdr = cdrs[i];
                 var config = {
@@ -825,7 +825,7 @@
 	 */
 	destroyTemplates: function(concrete) {
 		var rowData = concrete._rowData;
-		var destroyCmp = function(cmp) {
+		var destroyCmp = function destroyCmp(cmp) {
 			cmp.destroy();
 		};
 		

@@ -43,7 +43,7 @@
 			},
 			/*
 			 * Override the computation of snap to avoid have "snap" when scrolling to the top
-			*/
+			 */
 			_computeSnap: function (start, end, velocity, current) {
 	            var destination = start === 0 ? 0 : start + (end / 2) * (velocity / 8);
 	            return {
@@ -87,7 +87,7 @@
 			"attributes": cmpDef.attributes
 		});
 
-        serverAction.setCallback(this, function(action) {
+        serverAction.setCallback(this, function getServerSideComponentCallback(action) {
         	isPreloaded = this.onLoadComponent(cmp, action, content.isCachable && isPreloaded);
         });
 
@@ -198,7 +198,7 @@
 			updateEventExists = !!$A.getEvt('markup://force:updateHighlights');
 
 			if (updateEventExists) {
-				scroller.on('scrollMove', function (action) {
+				scroller.on('scrollMove', function onScrollMove(action) {
 					var y = this.y;
 					var updateHighlightsEvt = $A.getEvt('markup://force:updateHighlights');
 					if (action === 'gestureMove' || action === 'scroll') {
@@ -209,7 +209,7 @@
 						}
 					}
 				});
-				scroller.on('scrollEnd', function () {
+				scroller.on('scrollEnd', function onScrollEnd() {
 					var updateHighlightsEvt = $A.getEvt('markup://force:updateHighlights');
 					if (scroller.y >= 0 && scroller.scrollerHeight > scroller.wrapperHeight) {
 						updateHighlightsEvt.setParams({action: 'show'}).fire();
@@ -230,7 +230,7 @@
 	addScrollLock: function(component) {
 		if (component) {
 			var dom = component.getElement();
-			dom.addEventListener("scroll", function(){
+			dom.addEventListener("scroll", function onScroll(){
 				this.scrollTop = 0;
 			});
 		}

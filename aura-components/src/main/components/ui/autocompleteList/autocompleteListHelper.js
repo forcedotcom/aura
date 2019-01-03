@@ -92,7 +92,7 @@
         if ($A.util.isUndefined(component._onClickEndFunc)) {
             var helper = this;
             var i;
-            var f = function (event) {
+            var f = function onClickEnd(event) {
                 // ignore gestures/swipes; only run the click handler if it's a click or tap
                 var listElems = component.getElements();
                 var ignoreElements = component.get("v.ignoredElements");
@@ -147,7 +147,7 @@
 
     getOnClickStartFunction: function (component) {
         if ($A.util.isUndefined(component._onClickStartFunc)) {
-            var f = function (event) {
+            var f = function onClickStart(event) {
                 component._onStartX = event.clientX;
                 component._onStartY = event.clientY;
             };

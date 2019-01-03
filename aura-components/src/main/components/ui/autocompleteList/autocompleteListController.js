@@ -43,7 +43,7 @@
             if (component._loadingTimer) {
                 clearTimeout(component._loadingTimer);
             }
-            component._loadingTimer = setTimeout($A.getCallback(function() {
+            component._loadingTimer = setTimeout($A.getCallback(function showLoadingIndicator() {
                 helper.showLoading(targetCmp, true);
             }), loadingIndicatorDelay);
         } else {

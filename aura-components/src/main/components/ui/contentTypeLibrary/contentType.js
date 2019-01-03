@@ -42,7 +42,7 @@ function contentTypeLibrary () {
 
     ContentType.prototype.accept = function (contentType) {
         var type = _isValidContentType(contentType) ? contentType : _isFile(contentType) ? contentType.type : false;
-        return type && this._contentTypes.some(function (contentType) {
+        return type && this._contentTypes.some(function isSubset(contentType) {
                 return _isSubset(type, contentType);
             })
     };
@@ -61,7 +61,7 @@ function contentTypeLibrary () {
     };
 
     function _parseValidContentTypes (contentTypesArr) {
-        return contentTypesArr.filter(function (contentType) {
+        return contentTypesArr.filter(function filterContentType(contentType) {
             return _isValidContentType(contentType);
         });
     }

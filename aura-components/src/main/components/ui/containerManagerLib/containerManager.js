@@ -94,7 +94,7 @@ function lib() { //eslint-disable-line no-unused-vars
 
                 if (config.visible) {
                     config.onBeforeShow && config.onBeforeShow(container);
-                    container.show(function () {
+                    container.show(function onShow() {
                         config.onAfterShow && config.onAfterShow(container);
                     });
                 }

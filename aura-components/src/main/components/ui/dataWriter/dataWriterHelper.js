@@ -56,7 +56,7 @@
 
 		// Delegate actual server action to concrete implementation.
 		// Run appropriate actions based on the response.
-		this.write(cmp.getConcreteComponent(), cfg, function (err, data) {
+		this.write(cmp.getConcreteComponent(), cfg, function responseHandler(err, data) {
 			if (err) {
 				cmp.get('e.onerror').setParams({ value: { error: err, items: items } });
 			}

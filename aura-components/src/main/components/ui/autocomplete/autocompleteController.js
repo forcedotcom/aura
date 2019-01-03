@@ -30,9 +30,9 @@
         helper.relayEvents(component);
 
         // This calls a function (callback) in a delayed manner and it can be cancelled.
-        component._delay = (function(){
+        component._delay = (function delayFunctionClojure(){
             var timer = 0;
-            return function(callback, ms){
+            return function delayFunction(callback, ms){
                 clearTimeout(timer);
                 timer = setTimeout(callback, ms);
             };
@@ -81,7 +81,7 @@
         inputHelper.doUpdate(component.find('input'), value);
 
         if (component._delay) {
-            component._delay(function() {
+            component._delay(function delayFireInputChangeEvent() {
                 if (component && component.isValid()) {
                     helper.fireInputChangeEvent(component, event);
                 }

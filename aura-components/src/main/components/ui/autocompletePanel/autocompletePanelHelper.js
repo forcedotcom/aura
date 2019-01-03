@@ -32,7 +32,7 @@
 		// so the only way to make sure all the items in the list are rendered by the time this is fired is to push
 		// this to the bottom of the callstack.
 		var self = this;
-		window.requestAnimationFrame($A.getCallback(function () {
+		window.requestAnimationFrame($A.getCallback(function onRequestAnimationFrame() {
 			self.addPositionConstraintAndReposition(component, listElement, referenceElement);
 		}));
 	},
@@ -65,7 +65,7 @@
 			padTop: 2
 		});
 
-		this.reposition(component, $A.getCallback(function () {
+		this.reposition(component, $A.getCallback(function setOpacity() {
 			listElement.style.opacity = 1;
 		}));
 	},

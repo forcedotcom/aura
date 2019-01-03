@@ -83,7 +83,7 @@
 	extractNumbers: function (items, column) {
 		var values = [];
 
-		items.each(function (item) {
+		items.each(function forEachItem(item) {
 			var value = parseFloat(item.get(column));
 			
 			if (value) {

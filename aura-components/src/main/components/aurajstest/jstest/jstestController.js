@@ -27,7 +27,7 @@
             params["test"] = testFilter;
         }
         a.setParams(params);
-        a.setCallback(this, function(action){
+        a.setCallback(this, function getTestCasesCallback(action){
             if (action.getState() === "SUCCESS") {
                 var mode = ($A.getContext().getMode().indexOf("DEBUG") > 0) ? "AUTOJSTESTDEBUG" : "AUTOJSTEST";
                 var tests = action.getReturnValue();
@@ -67,7 +67,7 @@
                 "descriptor" : cmp.get("v.descriptor"),
                 "defType" : cmp.get("v.defType") 
             });
-            a.setCallback(this, function(action){
+            a.setCallback(this, function setTestSuiteCode(action){
                 cmp.set("v.testSuiteCode", action.getReturnValue());
             });
             $A.enqueueAction(a);

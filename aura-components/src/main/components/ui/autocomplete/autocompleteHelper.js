@@ -38,7 +38,7 @@
                 helper.initPanelPositionHandlers(component);
     
                 // check for required fields if we're not using a custom autocomplete list
-                ["dataProvider", "optionVar", "listOption"].forEach(function(attribute) {
+                ["dataProvider", "optionVar", "listOption"].forEach(function checkRequiredAttribute(attribute) {
                     if (!component.get("v." + attribute)) {
                         throw new Error("Missing required attribute '" + attribute + "'");
                     }
@@ -162,7 +162,7 @@
 
     abortFetchData: function(component, event) {
         // Abort any pending input events if a data request is being canceled
-        component._delay(function() { }, 0);
+        component._delay(function noop() { }, 0);
         var listCmp = this.getListComponent(component);
         if (listCmp) {
             var options = event.getParam("parameters");

@@ -33,14 +33,14 @@ public class DesignDefTest extends AuraImplTestCase {
     public void testLoadFakeDesignDefinition() throws Exception {
         DesignDef c = definitionService.getDefinition("test:fakeComponent", DesignDef.class);
         assertNotNull("DesignDef not found!", c);
-        assertTrue("DesignDef not found!", c.getDescriptor().exists());
+        assertTrue("DesignDef not found!", definitionService.exists(c.getDescriptor()));
     }
 
     @Test
     public void testVerifyDesignDefLabel() throws Exception {
         DesignDef c = definitionService.getDefinition("test:fakeDesign", DesignDef.class);
         assertNotNull("DesignDef not found!", c);
-        assertTrue("DesignDef not found!", c.getDescriptor().exists());
+        assertTrue("DesignDef not found!", definitionService.exists(c.getDescriptor()));
         assertEquals("DesignDef label is incorrect.", "some label", c.getLabel());
     }
 
@@ -52,7 +52,7 @@ public class DesignDefTest extends AuraImplTestCase {
         } catch (DefinitionNotFoundException e) {
             DefDescriptor<DesignDef> desc = definitionService.getDefDescriptor("test:thisDesignDoesNotExist",
                     DesignDef.class);
-            assertFalse("DesignDef for 'test:thisDesignDoesNotExist' should not exist.", desc.exists());
+            assertFalse("DesignDef for 'test:thisDesignDoesNotExist' should not exist.", definitionService.exists(desc));
         }
     }
 
@@ -60,7 +60,7 @@ public class DesignDefTest extends AuraImplTestCase {
     public void testLoadFakeDesignWithAttributes() throws Exception {
         DesignDef c = definitionService.getDefinition("test:fakeDesign", DesignDef.class);
         assertNotNull("DesignDef not found!", c);
-        assertTrue("DesignDef not found!", c.getDescriptor().exists());
+        assertTrue("DesignDef not found!", definitionService.exists(c.getDescriptor()));
         Map<DefDescriptor<DesignAttributeDef>, DesignAttributeDef> attrs = c.getAttributeDesignDefs();
         assertFalse("Unable to parse AttributeDesignDefs on DesignDef!", attrs == null || attrs.size() == 0);
         DesignAttributeDef attr = c.getAttributeDesignDef("something");
@@ -71,7 +71,7 @@ public class DesignDefTest extends AuraImplTestCase {
     public void testAttributeDesignProperties() throws Exception {
         DesignDef c = definitionService.getDefinition("test:fakeDesign", DesignDef.class);
         assertNotNull("DesignDef not found!", c);
-        assertTrue("DesignDef not found!", c.getDescriptor().exists());
+        assertTrue("DesignDef not found!", definitionService.exists(c.getDescriptor()));
         Map<DefDescriptor<DesignAttributeDef>, DesignAttributeDef> attrs = c.getAttributeDesignDefs();
         assertFalse("Unable to parse AttributeDesignDefs on DesignDef!", attrs == null || attrs.size() == 0);
         DesignAttributeDef attr = c.getAttributeDesignDef("something");
@@ -96,7 +96,7 @@ public class DesignDefTest extends AuraImplTestCase {
     public void testAttributeDesignDataSource() throws Exception {
         DesignDef c = definitionService.getDefinition("test:fakeDesign", DesignDef.class);
         assertNotNull("DesignDef not found!", c);
-        assertTrue("DesignDef not found!", c.getDescriptor().exists());
+        assertTrue("DesignDef not found!", definitionService.exists(c.getDescriptor()));
         Map<DefDescriptor<DesignAttributeDef>, DesignAttributeDef> attrs = c.getAttributeDesignDefs();
         assertFalse("Unable to parse AttributeDesignDefs on DesignDef!", attrs == null || attrs.size() == 0);
         DesignAttributeDef attr = c.getAttributeDesignDef("else");
@@ -118,7 +118,7 @@ public class DesignDefTest extends AuraImplTestCase {
         assertTrue("DesignTemplateRegionDef regionOne should have one allowed interface.", regionOne
                 .getAllowedInterfaces().size() == 1);
         for (DefDescriptor<InterfaceDef> intf : regionOne.getAllowedInterfaces()) {
-            assertTrue("InterfaceDef not found!", intf.exists());
+            assertTrue("InterfaceDef not found!", definitionService.exists(intf));
         }
 
         DesignTemplateRegionDef regionTwo = template.getDesignTemplateRegionDef("regionTwo");
@@ -131,7 +131,7 @@ public class DesignDefTest extends AuraImplTestCase {
         assertTrue("DesignTemplateRegionDef regionThree should have two allowed interfaces.", regionThree
                 .getAllowedInterfaces().size() == 2);
         for (DefDescriptor<InterfaceDef> intf : regionThree.getAllowedInterfaces()) {
-            assertTrue("InterfaceDef not found!", intf.exists());
+            assertTrue("InterfaceDef not found!", definitionService.exists(intf));
         }
     }
 

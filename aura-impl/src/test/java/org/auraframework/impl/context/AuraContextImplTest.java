@@ -178,11 +178,6 @@ public class AuraContextImplTest extends AuraImplTestCase {
         public Definition getDef() {
             return null;
         }
-
-        @Override
-        public boolean exists() {
-            return false;
-        }
     }
 
     private static class FakeDefinition implements Definition {

@@ -116,11 +116,6 @@ public class StringSourceDescriptor<D extends Definition> implements DefDescript
     }
 
     @Override
-    public boolean exists() {
-        return true;
-    }
-
-    @Override
     public final int hashCode() {
         return hashCode;
     }

@@ -122,11 +122,11 @@ public class StyleServiceImpl implements StyleService {
 
             // add the client loaded style def itself, (purposely done after!)
             DefDescriptor<StyleDef> style = definitionService.getDefDescriptor(desc, DefDescriptor.CSS_PREFIX, StyleDef.class);
-            if (style.exists()) {
+            if (definitionService.exists(style)) {
                 clientLoaded.add(style);
             }
             DefDescriptor<FlavoredStyleDef> flavor = definitionService.getDefDescriptor(desc, DefDescriptor.CSS_PREFIX, FlavoredStyleDef.class);
-            if (flavor.exists()) {
+            if (definitionService.exists(flavor)) {
                 clientLoaded.add(flavor);
             }
         }

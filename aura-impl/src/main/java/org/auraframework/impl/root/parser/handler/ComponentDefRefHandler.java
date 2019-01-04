@@ -31,11 +31,12 @@ import org.auraframework.impl.root.component.DefRefDelegate;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.validation.ReferenceValidationContext;
 
 /**
  * Handles all references to other components. Note that while the reference to the other component is created here, it
- * is not validated until the {@link ComponentDefRefImpl#validateReferences(ReferenceValidationContext)} method is called by loading registry.
+ * is not validated until the
+ * {@link ComponentDefRefImpl#validateReferences(org.auraframework.validation.ReferenceValidationContext)} method is
+ * called by loading registry.
  */
 public class ComponentDefRefHandler<P extends Definition> extends BaseDefRefHandler<ComponentDefRef, P, ComponentDef, ComponentDefRefImpl.Builder> {
 

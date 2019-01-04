@@ -13,33 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.auraframework.def;
+
+import java.util.Collection;
+
+import javax.annotation.CheckForNull;
 
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonSerializable;
-import org.auraframework.validation.ReferenceValidationContext;
-
-import java.util.Collection;
-import java.util.Set;
-
-import javax.annotation.CheckForNull;
 
 /**
  * Define something.
  *
  * Notes to implementors.
  * 
- * Exceptions should not be thrown except where explicitly declared during the validation
- * process. This means that no exceptions should be thrown in a constructor or in
- * {@link BaseXmlElement#appendDependencies(Set)}. You can use {@link #validateDefinition()} and
- * {@link #validateReferences(ReferenceValidationContext)} to throw exceptions as a {@link QuickFixException}.
+ * Exceptions should not be thrown except where explicitly declared during the validation process. This means that no
+ * exceptions should be thrown in a constructor or in {@link BaseXmlElement#appendDependencies(java.util.Set)}. You can
+ * use {@link #validateDefinition()} and
+ * {@link #validateReferences(org.auraframework.validation.ReferenceValidationContext)} to throw exceptions as a
+ * {@link QuickFixException}.
  *
- * Also note that as part of the contract, you may not call any routine intended to get
- * a definition until {@link #validateReferences(ReferenceValidationContext)}. This includes the constructor,
- * {@link BaseXmlElement#appendDependencies(Set)} and {@link #validateDefinition()}.
+ * Also note that as part of the contract, you may not call any routine intended to get a definition until
+ * {@link #validateReferences(org.auraframework.validation.ReferenceValidationContext)}. This includes the constructor,
+ * {@link BaseXmlElement#appendDependencies(java.util.Set)} and {@link #validateDefinition()}.
  */
 public interface Definition extends JsonSerializable, BaseXmlElement {
 

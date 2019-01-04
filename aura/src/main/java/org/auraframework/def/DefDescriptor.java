@@ -104,7 +104,8 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
      *
      * @return the definition (compiles it if necessary)
      * @throws QuickFixException if the definition is not found
-     * @deprecated
+     * @deprecated use {@link org.auraframework.validation.ReferenceValidationContext#getAccessibleDefinition(DefDescriptor)} or
+     *     {@link org.auraframework.service.DefinitionService#getDefinition(DefDescriptor)} instead.
      */
     @Deprecated
     T getDef() throws QuickFixException;

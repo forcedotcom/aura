@@ -15,6 +15,9 @@
  */
 package org.auraframework.impl.java.renderer;
 
+import java.io.IOException;
+import java.util.List;
+
 import org.auraframework.def.Renderer;
 import org.auraframework.def.RendererDef;
 import org.auraframework.impl.system.DefinitionImpl;
@@ -22,9 +25,6 @@ import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
-
-import java.io.IOException;
-import java.util.List;
 
 public class JavaRendererDef extends DefinitionImpl<RendererDef> implements RendererDef {
     private static final long serialVersionUID = 5720687422250668587L;
@@ -89,10 +89,10 @@ public class JavaRendererDef extends DefinitionImpl<RendererDef> implements Rend
                 try {
                     rendererInstance = (Renderer) rendererClass.newInstance();
                 } catch (InstantiationException ie) {
-                    setParseError(new InvalidDefinitionException("Cannot instantiate " + getLocation(), getLocation()));
+                    setParseError(new InvalidDefinitionException("Cannot instantiate " + getLocation(), getLocation(), ie));
                 } catch (IllegalAccessException iae) {
                     setParseError(new InvalidDefinitionException("Constructor is inaccessible for " + getLocation(),
-                            getLocation()));
+                            getLocation(), iae));
                 } catch (RuntimeException e) {
                     setParseError(new InvalidDefinitionException("Cannot instantiate " + getLocation(), getLocation(),
                             e));

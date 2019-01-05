@@ -38,7 +38,7 @@ Test.Aura.Provider.GlobalValueProvidersTest = function() {
             "Aura": Aura,
             "$A": {
                 util: Stubs.GetObject({
-                    applyNotFromPrototype: function(base, members){}
+                    apply: function(to, from){}
                 })
             }
         })(during);
@@ -95,8 +95,8 @@ Test.Aura.Provider.GlobalValueProvidersTest = function() {
                 var target = new Aura.Provider.GlobalValueProviders({});
 
                 Assert.Equal({
-                    base: target.valueProviders, members: expected}, {
-                    base: $A.util.applyNotFromPrototype.Calls[0].Arguments.base, members: $A.util.applyNotFromPrototype.Calls[0].Arguments.members
+                    to: target.valueProviders, from: expected}, {
+                    to: $A.util.apply.Calls[0].Arguments.to, from: $A.util.apply.Calls[0].Arguments.from
                 });
             });
 

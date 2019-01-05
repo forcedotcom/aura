@@ -198,42 +198,24 @@ Aura.Utils.Util.prototype.isObject = function(obj){
 };
 
 /**
- * Checks whether the specified object is a plain object or literal.
- * A plain object is created using "{}" or "new Object()".
+ * Checks whether the specified value is a plain object.
+ * Plain objects are created using "{}" or "new Object()".
  *
- * @param {Object} o The object to check for.
- * @returns {Boolean} True if the object is a plain object, or false otherwise.
+ * NOTE: This will work for non-object values since their toString output is (e.g.) "[object Null]",
+ *       but callers should ideally perform typeof/null checks first in order to avoid the performance
+ *       cost of calling Object.prototype.toString() on non-object values.
+ *
+ * @param {Any} o The value to check.
+ * @returns {Boolean} True if the value is a plain object, or false otherwise.
  * @export
  */
 Aura.Utils.Util.prototype.isPlainObject = function(o){
-
-    function isObjectObject(x) {
-        return (typeof x === 'object' && x !== null)
-            && Object.prototype.toString.call(x) === '[object Object]';
-    }
-
-    if (isObjectObject(o) === false) { return false; }
-
-    // If has modified constructor
-    if (typeof o.constructor !== 'function') { return false; }
-
-
-    // @dval: Added temporal try/catch until we figure out a better way
-    // to guarantee proxification in intrinsic/primordials:
-    // https://git.soma.salesforce.com/raptor/raptor/issues/406
-    try {
-        // If has modified prototype
-        var p = o.constructor.prototype;
-        if (isObjectObject(p) === false) { return false; }
-
-        // If constructor does not have an Object-specific method
-        if (p.hasOwnProperty('isPrototypeOf') === false) {
-            return false;
-        }
-    } catch (e) { /* Assume is  object when throws */}
-
-    // Most likely a plain Object
-    return true;
+    // Check the object itself.
+    return Object.prototype.toString.call(o) === "[object Object]"
+        && typeof o.constructor === "function"
+        // Check its prototype, saving time and memory by repurposing the argument variable.
+        && Object.prototype.toString.call(o = o.constructor.prototype) === "[object Object]"
+        && o.hasOwnProperty("isPrototypeOf");
 };
 
 /**
@@ -500,25 +482,6 @@ Aura.Utils.Util.prototype.sanitizeStyle = Aura.Utils.SecureFilters.style;
  */
 Aura.Utils.Util.prototype.getElement = function(id){
     return document.getElementById(id);
-};
-
-/**
- * Gets a copy of an object. In the case of an Array or Object, returns a shallow copy. In the case of a literal,
- * returns the literal value.
- *
- * @param {Object} value The value for which to return a comparable copy.
- * @returns {Object} The comparable copy of the value supplied.
- */
-Aura.Utils.Util.prototype.copy = function(value){
-    if(this.isArray(value)){
-        return value.slice();
-    }
-    if(this.isObject(value)){
-        var copy={};
-        this.apply(copy,value,true);
-        return copy;
-    }
-    return value;
 };
 
 /**
@@ -1543,10 +1506,8 @@ Aura.Utils.Util.prototype.isSubDef = function(def, qname) {
 };
 
 /**
- *
- * @description Takes the methods, and properties from one object and assigns them to another.
- * Returns the base object with the members from the child object.
- * This is commonly used to apply a set of configurations to a default set, to get a single set of configuration properties.
+ * Copy properties & methods to one object from another, and return the object that was copied to.
+ * This is useful for applying defaults to a specific configuration.
  *
  * @example
  * $A.util.apply(Child.prototype, Parent); // Returns a new object inheriting all the methods and properties from Parent.
@@ -1560,77 +1521,191 @@ Aura.Utils.Util.prototype.isSubDef = function(def, qname) {
  * @example
  * $A.util.apply({ foo: 'bar', diameter: 10}, { diameter: 20, bat: 'man' }, false); //== {foo:'bar', diameter: 10, bat: 'man'}
  *
- * @param {Object|Function} baseObject The object that will receive the methods, and properties.
- * @param {Object|Function} members The methods and properties to assign to the baseObject.
- * @param {Boolean} [forceCopy] If the property already exists, should we still copy the member? false by default
- * @param {Boolean} [deepCopy] Should we continue to navigate child objects if we don't overwrite them? false by default
+ * @param {Object} to The destination object that properties are copied to.
+ * @param {Object} from The source object that properties are copied from.
+ * @param {Boolean} [forceCopy] Whether to overwrite existing properties. (default: false)
+ * @param {Boolean} [deepCopy] Whether to iterate over child objects. (default: false)
+ * @param {Boolean} [ownOnly] Whether to skip prototype properties. (default: false)
+ * @returns {Object} The object that properties were copied to.
  */
-Aura.Utils.Util.prototype.apply = function(/* Object|Function */ baseObject, /* Object|Function*/ members, /* bool */ forceCopy, /* bool */ deepCopy) {
-    if(members) {
-        var value=null;
-        for (var property in members) {
-            var setValue=forceCopy||!baseObject.hasOwnProperty(property);
-            if(setValue||deepCopy){
-                value=members[property];
-                if(deepCopy&&value!=undefined) {//eslint-disable-line eqeqeq
-                    var branchValue = null;
-                    if (this.isArray(value)) {
-                        branchValue = baseObject[property] || [];
-                    } else if (this.isPlainObject(value)) {
-                        branchValue = baseObject[property] || {};
-                    }
-                    if (branchValue) {
-                        baseObject[property] = this.apply(branchValue, value, forceCopy, deepCopy);
-                        continue;
+Aura.Utils.Util.prototype.apply = function (to, from, forceCopy, deepCopy, ownOnly) {
+    if (deepCopy) {
+        // If copying deeply, use a different method to avoid re-checking the "deep" argument.
+        return Array.isArray(from)
+            ? this.applyArray(to, from, forceCopy, ownOnly)
+            : this.applyObject(to, from, forceCopy, ownOnly);
+    }
+    // Save memory by using "key" as either an object property name or an array index.
+    var key;
+    // Shallow-copy properties.
+    if (Array.isArray(from)) {
+        // Start from zero if allowed to overwrite.
+        // Otherwise, start after the end (because it's the first position we're allowed to write).
+        for (key = forceCopy ? 0 : to.length; key < from.length; key++) {
+            to[key] = from[key];
+        }
+    } else {
+        // If allowed to overwrite, copy every property.
+        // Otherwise, check for existence.
+        if (forceCopy) {
+            if (ownOnly) {
+                Object.assign(to, from);
+            } else {
+                for (key in from) {
+                    to[key] = from[key];
+                }
+            }
+        } else {
+            if (ownOnly) {
+                for (key in from) {
+                    if (from.hasOwnProperty(key) && !to.hasOwnProperty(key)) {
+                        to[key] = from[key];
                     }
                 }
-                if(setValue) {
-                    baseObject[property] = value;
+            } else {
+                for (key in from) {
+                    if (!to.hasOwnProperty(key)) {
+                        to[key] = from[key];
+                    }
                 }
             }
         }
     }
-    return baseObject;
+    return to;
 };
 
 /**
- * apply() has a bug that it copies values from the prototype.
- * This was found in late 210 a week before FF. Thats to late for a change to apply(), so Kris Gray created
- * this method which does the right thing.
+ * Deeply copies properties & methods to one object from another, and returns the object that was copied to.
  *
- * We'll fix the bug by using this new method, and in 212, we'll switch apply() to behave like this method.
- * The API and functionality is the same except that it does not copy values from the prototype.
- * Please DO NOT EXPORT THIS METHOD. That makes it much harder to replace in 212.
+ * @param {Object} to The destination object that properties are copied to.
+ * @param {Object} from The source object that properties are copied from.
+ * @param {Boolean} [forceCopy] Whether to overwrite existing properties. (default: false)
+ * @param {Boolean} [ownOnly] Whether to skip prototype properties. (default: false)
+ * @returns {Object} The object that properties were copied to.
  */
-Aura.Utils.Util.prototype.applyNotFromPrototype = function(/* Object|Function */ baseObject, /* Object|Function*/ members, /* bool */ forceCopy, /* bool */ deepCopy) {
-    if(members) {
-        var value=null;
-        for (var property in members) {
-            if(!members.hasOwnProperty(property)) {continue;}
-            var setValue=forceCopy||!baseObject.hasOwnProperty(property);
-            if(setValue||deepCopy){
-                value=members[property];
-                if(deepCopy&&value!=undefined) {//eslint-disable-line eqeqeq
-                    var branchValue = null;
-                    if (this.isArray(value)) {
-                        branchValue = baseObject[property] || [];
-                    } else if (this.isPlainObject(value)) {
-                        branchValue = baseObject[property] || {};
-                    }
-                    if (branchValue) {
-                        baseObject[property] = this.applyNotFromPrototype(branchValue, value, forceCopy, deepCopy);
-                        continue;
-                    }
-                }
-                if(setValue) {
-                    baseObject[property] = value;
-                }
+Aura.Utils.Util.prototype.applyObject = function (to, from, forceCopy, ownOnly) {
+    var key, child;
+    for (key in from) {
+        if (ownOnly && !from.hasOwnProperty(key)) { continue; }
+        child = from[key];
+        if (typeof child === "object" && child !== null) {
+            if (Array.isArray(child)) {
+                to[key] = to[key]
+                    ? this.applyArray(to[key], child, forceCopy, ownOnly)
+                    : this.copyArray(child, ownOnly);
+                continue;
+            } else if (this.isPlainObject(child)) {
+                to[key] = to[key]
+                    ? this.applyObject(to[key], child, forceCopy, ownOnly)
+                    : this.copyObject(child, ownOnly);
+                continue;
             }
         }
+        if (forceCopy || !to.hasOwnProperty(key)) {
+            to[key] = child;
+        }
     }
-    return baseObject;
+    return to;
 };
 
+/**
+ * Deeply copies properties & methods to one array from another, and returns the array that was copied to.
+ *
+ * @param {Array} to The destination array that properties are copied to.
+ * @param {Array} from The source array that properties are copied from.
+ * @param {Boolean} [forceCopy] Whether to overwrite existing properties. (default: false)
+ * @param {Boolean} [ownOnly] Whether to skip prototype properties. (default: false)
+ * @returns {Array} The array that properties were copied to.
+ */
+Aura.Utils.Util.prototype.applyArray = function (to, from, forceCopy, ownOnly) {
+    var index, child;
+    for (index = 0; index < from.length; index++) {
+        child = from[index];
+        if (typeof child === "object" && child !== null) {
+            if (Array.isArray(child)) {
+                to[index] = to[index]
+                    ? this.applyArray(to[index], child, forceCopy, ownOnly)
+                    : this.copyArray(child, ownOnly);
+                continue;
+            } else if (this.isPlainObject(child)) {
+                to[index] = to[index]
+                    ? this.applyObject(to[index], child, forceCopy, ownOnly)
+                    : this.copyObject(child, ownOnly);
+                continue;
+            }
+        }
+        if (forceCopy || to.length <= index) {
+            to[index] = child;
+        }
+    }
+    return to;
+};
+
+/**
+ * Gets a shallow copy of an Array or Object.
+ *
+ * @param {Object} value The value for which to return a comparable copy.
+ * @returns {Object} The comparable copy of the value supplied.
+ */
+Aura.Utils.Util.prototype.copy = function (value) {
+    if (Array.isArray(value)) {
+        return value.slice();
+    } else if (typeof value === "object" && value !== null) {
+        return this.apply({}, value, true);
+    }
+    return value;
+};
+
+/**
+ * Deeply copies properties & methods from an object.
+ *
+ * @param {Object} object The object to deeply copy.
+ * @param {Boolean} [ownOnly] Whether to skip prototype properties. (default: false)
+ * @returns {Object} The object copy.
+ */
+Aura.Utils.Util.prototype.copyObject = function (object, ownOnly) {
+    var copy = {}, key, child;
+    for (key in object) {
+        if (ownOnly && !object.hasOwnProperty(key)) { continue; }
+        child = object[key];
+        if (typeof child === "object" && child !== null) {
+            if (Array.isArray(child)) {
+                copy[key] = this.copyArray(child, ownOnly);
+                continue;
+            } else if (this.isPlainObject(child)) {
+                copy[key] = this.copyObject(child, ownOnly);
+                continue;
+            }
+        }
+        copy[key] = child;
+    }
+    return copy;
+};
+
+/**
+ * Deeply copies properties & methods from an array.
+ *
+ * @param {Array} array The array to deeply copy.
+ * @param {Boolean} [ownOnly] Whether to skip prototype properties. (default: false)
+ * @returns {Array} The array copy.
+ */
+Aura.Utils.Util.prototype.copyArray = function (array, ownOnly) {
+    var copy = new Array(array.length), index, child;
+    for (index = 0; index < array.length; index++) {
+        child = array[index];
+        if (typeof child === "object" && child !== null) {
+            if (Array.isArray(child)) {
+                copy[index] = this.copyArray(child, ownOnly);
+                continue;
+            } else if (this.isPlainObject(child)) {
+                copy[index] = this.copyObject(child, ownOnly);
+                continue;
+            }
+        }
+        copy[index] = child;
+    }
+    return copy;
+};
 
 Aura.Utils.Util.prototype.CAMEL_CASE_TO_HYPHENS_REGEX = /([A-Z])/g;
 

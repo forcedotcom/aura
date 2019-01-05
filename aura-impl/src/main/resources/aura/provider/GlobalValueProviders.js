@@ -49,7 +49,7 @@ function GlobalValueProviders(gvp, initCallback) {
     }
 
     // Append external GVP providers.
-    $A.util.applyNotFromPrototype(this.valueProviders, $A.globalValueProviders);
+    $A.util.apply(this.valueProviders, $A.globalValueProviders, false, false, true);
 
     var bootstrapGVPData = [];
     for(type in gvp){
@@ -125,7 +125,7 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
                 // set values into its value provider
                 valueProvider.merge(newGvp["values"]);
             } else {
-                $A.util.applyNotFromPrototype(valueProvider,newGvp["values"],true);
+                $A.util.apply(valueProvider, newGvp["values"], true, false, true);
             }
             $A.expressionService.updateGlobalReferences(type,newGvp["values"]);
         } catch(e) {
@@ -208,7 +208,7 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
                                 map[type] = {};
                                 value.push({"type":type, "values":map[type]});
                             }
-                            $A.util.applyNotFromPrototype(map[type], toStore[j]["values"], true, true);
+                            $A.util.apply(map[type], toStore[j]["values"], true, true, true);
                         }
 
                         toStore = value;

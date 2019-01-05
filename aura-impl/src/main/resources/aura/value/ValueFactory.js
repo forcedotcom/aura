@@ -22,7 +22,7 @@ var valueFactory = {
         if(!valueConfig) {
             return valueConfig;
         }
-        if (aura.util.isPlainObject(valueConfig)) {
+        if (typeof valueConfig === "object" && aura.util.isPlainObject(valueConfig)) {
             if (valueConfig["exprType"] === "PROPERTY") {
                 var isGlobal=valueConfig["path"].charAt(0)==='$';
                 if(valueConfig["byValue"]){

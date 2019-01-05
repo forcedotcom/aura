@@ -25,7 +25,7 @@ Test.Aura.Context.AuraContextTest = function() {
     };
 
     Mocks.GetMocks(Object.Global(), {
-        Aura: Aura, 
+        Aura: Aura,
         window: {}
     })(function(){
         [Import("aura-impl/src/main/resources/aura/context/AuraContext.js")]
@@ -51,15 +51,9 @@ Test.Aura.Context.AuraContextTest = function() {
     var mock$A = function(events) {
         return Mocks.GetMocks(Object.Global(), {'$A': Stubs.GetObject({}, {
             util: {
-                apply: function(baseObject, members) {
-                    for (var key in members) {
-                        if (members.hasOwnProperty(key)) {
-                            baseObject[key] = members[key];
-                        }
-                    }
-                    return baseObject;
+                apply: function(to, from) {
+                    return Object.assign(to, from);
                 },
-                applyNotFromPrototype: function() {},
                 isArray: function(obj) { return obj instanceof Array; },
                 isString: function(obj) { return typeof obj === "string" },
                 json: {
@@ -70,7 +64,7 @@ Test.Aura.Context.AuraContextTest = function() {
                 isUndefinedOrNull: function (val) {
                     return val === undefined || val === null;
                 }
-            }, 
+            },
             services: {
                 component: {
                     getDynamicNamespaces: function() {
@@ -80,7 +74,7 @@ Test.Aura.Context.AuraContextTest = function() {
             }
         }),
         AuraError:function(msg){throw msg;}});
-    }; 
+    };
 
     var mockAura = function(events) {
         return Mocks.GetMock(Object.Global(), 'Aura', Stubs.GetObject({}, {
@@ -134,7 +128,7 @@ Test.Aura.Context.AuraContextTest = function() {
                     app: 'app',
                     loaded: { loadedOriginal: 'loadedOriginal' },
                     uad: true
-                }, 
+                },
                 actual;
 
             withMocks(mocks, function() {
@@ -142,7 +136,7 @@ Test.Aura.Context.AuraContextTest = function() {
             });
 
             Assert.Equal(expected, actual);
-        }        
+        }
 
         [Fact]
         function IncludesDynamic() {
@@ -162,7 +156,7 @@ Test.Aura.Context.AuraContextTest = function() {
                     dn: 'dn',
                     globals: '$Global',
                     uad: false
-                }, 
+                },
                 actual;
 
             withMocks(mocks, function() {
@@ -193,7 +187,7 @@ Test.Aura.Context.AuraContextTest = function() {
                     loaded: { loadedOriginal : 'loadedOriginal' },
                     apck: 'actionPublicCacheKey',
                     uad: false
-                }, 
+                },
                 actual;
 
             withMocks(mocks, function() {

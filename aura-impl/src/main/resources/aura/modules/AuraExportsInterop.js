@@ -35,25 +35,29 @@ Aura.ExportsModule = {
      * @return {Promise} promise that resolves when the action completes.
      */
     "executeGlobalController": function (endpoint, params, options) {
-        var hotspot = options && options.hotspot;
         var controller = 'aura://' + endpoint;
         var path = controller.split(".");
         var controllerName = path.shift();
         var actionName = path.shift();
-        
+
         var controllerDef = $A.componentService.controllerDefRegistry[controllerName];
         if (!controllerDef) {
             return Promise.reject(new Error('Controller for endpoint ' + endpoint + ' does not exist'));
         }
-        
+
         var action = controllerDef.getActionDef(actionName).newInstance();
         if (!action) {
             return Promise.reject(new Error('Action of endpoint ' + endpoint + ' is not registered'));
         }
         action.setParams(params);
 
+        var hotspot = options && options.hotspot;
+        var background = options && options.background;
+
         return new Promise(function (resolve, reject) {
-            action.setBackground();
+            if (background) {
+                action.setBackground();
+            }
             action.setCallback(null, function (response) {
                 if (response.getState() !== 'SUCCESS') {
                     var actionErrors = response.getError();

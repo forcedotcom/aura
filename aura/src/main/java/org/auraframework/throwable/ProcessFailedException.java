@@ -26,8 +26,21 @@ public abstract class ProcessFailedException extends QuickFixException {
     private static final long serialVersionUID = 1L;
     private List<ErrorMessageData> errors;
 
+    private static String makeLongMessage(String message, List<ErrorMessageData> errors) {
+        StringBuilder builder = new StringBuilder(message);
+        if (errors != null) {
+            for (ErrorMessageData error : errors) {
+                builder.append("\n\t");
+                builder.append(error.getLocation().toString());
+                builder.append(" : ");
+                builder.append(error.getMessage());
+            }
+        }
+        return builder.toString();
+    }
+
     public ProcessFailedException(String message, List<ErrorMessageData> errors) {
-        super(message, new Location("multiple", 0, 0, 0L));
+        super(makeLongMessage(message, errors), new Location("multiple", 0, 0, 0L));
         this.errors = ImmutableList.copyOf(errors);
     }
 

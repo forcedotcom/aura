@@ -20,8 +20,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.Lists;
-
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
 import org.auraframework.def.ApplicationDef;
@@ -34,6 +32,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventHandlerDef;
+import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.LibraryDef;
@@ -49,6 +48,8 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
+
+import com.google.common.collect.Lists;
 
 /**
  * @since 0.0.196
@@ -188,7 +189,8 @@ public class ComponentDefModel implements ModelInstance {
 
                         // Treat the included js files specially because they load source differently:
                         for (IncludeDefRef includeDef : libraryDef.getIncludes()) {
-                            includeDefs.add(new IncludeDefModel(includeDef.getDescriptor()));
+                            final DefDescriptor<IncludeDef> includeDefDescriptor = includeDef.getDescriptor();
+                            includeDefs.add(new IncludeDefModel(includeDefDescriptor, definitionService.getDefinition(includeDefDescriptor).getName()));
                         }
                     }
                 }
@@ -293,7 +295,6 @@ public class ComponentDefModel implements ModelInstance {
         return showSource;
     }
     
-    
     public class AttributeModel implements JsonSerializable {
 
         private final String name;
@@ -395,7 +396,6 @@ public class ComponentDefModel implements ModelInstance {
         public String getParentDefType() {
             return parentDefType;
         }
-
     }
 
     private DefDescriptor<ApplicationDef> getReferencingDescriptor() {

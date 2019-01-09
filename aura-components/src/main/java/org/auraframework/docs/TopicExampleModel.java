@@ -25,6 +25,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.LibraryDefRef;
@@ -51,7 +52,6 @@ public class TopicExampleModel implements ModelInstance {
     private final ConfigAdapter configAdapter;
     private String error;
 
-    @SuppressWarnings("unchecked")
     public TopicExampleModel(ContextService contextService, DefinitionService definitionService, ConfigAdapter configAdapter)
             throws QuickFixException {
         this.definitionService = definitionService;
@@ -63,6 +63,7 @@ public class TopicExampleModel implements ModelInstance {
         String desc = (String) component.getAttributes().getValue("descriptor");
 
         DefType defType = DefType.valueOf(((String) component.getAttributes().getValue("defType")).toUpperCase());
+        @SuppressWarnings("unchecked")
         DefDescriptor<? extends RootDefinition> descriptor = (DefDescriptor<? extends RootDefinition>) definitionService
                 .getDefDescriptor(desc, defType.getPrimaryInterface());
 
@@ -94,7 +95,8 @@ public class TopicExampleModel implements ModelInstance {
                     defs.add(new DefModel(libraryDef.getDescriptor()));
                     // Treat the included js files specially because they load source differently:
                     for (IncludeDefRef includeDef : libraryDef.getIncludes()) {
-                        includeDefs.add(new IncludeDefModel(includeDef.getDescriptor()));
+                        final DefDescriptor<IncludeDef> includeDefDescriptor = includeDef.getDescriptor();
+                        includeDefs.add(new IncludeDefModel(includeDefDescriptor, definitionService.getDefinition(includeDefDescriptor).getName()));
                     }
                 }
             }

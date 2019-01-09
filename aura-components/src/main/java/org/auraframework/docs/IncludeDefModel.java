@@ -19,29 +19,24 @@ import java.io.IOException;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
-import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-public class IncludeDefModel extends DefModel{
-	
-    IncludeDefModel(DefDescriptor<IncludeDef> descriptor) {
-		super(descriptor);
-	}
+public class IncludeDefModel extends DefModel {
 
-	public String getIncludeDefName() {
-        if (this.descriptor.getDefType() == DefType.INCLUDE) {
-        	@SuppressWarnings("unchecked")
-			DefDescriptor<IncludeDef> include = (DefDescriptor<IncludeDef>) descriptor;
-        	try {
-				return include.getDef().getName();
-			} catch (QuickFixException e) {
-				e.printStackTrace();
-			}
-        }
-        return null;
+    private final String includeDefName;
+    
+    IncludeDefModel(final DefDescriptor<IncludeDef> descriptor, final String includeDefName) {
+        super(descriptor);
+        this.includeDefName = includeDefName;
     }
-	
+
+    /**
+     * @return The name of the {@link IncludeDef}.
+     */
+    public String getIncludeDefName() {
+        return includeDefName;
+    }
+
     @Override
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();

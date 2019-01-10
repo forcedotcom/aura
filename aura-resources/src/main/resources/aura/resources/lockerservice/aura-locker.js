@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2019-01-09
- * Version: 0.6.17
+ * Generated: 2019-01-10
+ * Version: 0.6.18
  */
 
 (function (exports) {
@@ -5527,24 +5527,23 @@ function SecureMessageEventSource(raw, key) {
   }
 
   const st = create$1(null);
-  const objectProps = ObjectKeys(raw);
 
-  fastArrayForEach(objectProps, prop => {
-    switch (prop) {
-      case 'postMessage':
-        defineProperty(st, prop, createFilteredMethod(st, raw, prop, { rawArguments: true }));
-        break;
-      case 'close':
-      case 'start':
-        defineProperty(st, prop, createFilteredMethod(st, raw, prop));
-        break;
-      case 'onmessage':
-      case 'onmessageerror':
-        defineProperty(st, prop, createFilteredProperty(st, raw, prop));
-        break;
-      default:
-        break;
+  if (has(raw, 'postMessage')) {
+    defineProperty(
+      st,
+      'postMessage',
+      createFilteredMethod(st, raw, 'postMessage', { rawArguments: true })
+    );
+  }
+
+  fastArrayForEach(['close', 'start'], prop => {
+    if (has(raw, prop)) {
+      defineProperty(st, prop, createFilteredMethod(st, raw, prop));
     }
+  });
+
+  fastArrayForEach(['onmessage', 'onmessageerror'], prop => {
+    defineProperty(st, prop, createFilteredProperty(st, raw, prop));
   });
 
   setKey(st, key);

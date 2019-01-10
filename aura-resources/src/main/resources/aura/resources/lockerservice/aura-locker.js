@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-12-17
- * Version: 0.6.12
+ * Generated: 2019-01-09
+ * Version: 0.6.16
  */
 
 (function (exports) {
@@ -87,9 +87,42 @@ const ObjectToString = uncurryThis(Object.prototype.toString);
 const ObjectHasOwnProperty = uncurryThis(Object.prototype.hasOwnProperty);
 const FunctionBind = uncurryThis(Function.prototype.bind);
 
-const ArrayMap = uncurryThis(Array.prototype.map);
+
 const ArraySlice = uncurryThis(Array.prototype.slice);
 
+
+/**
+ * A fast uncurried Array.forEach() implementation for dense arrays.
+ * Avoid using with:
+ * - sparse arrays
+ * - arrays containing user data (which could be sparse)
+ *
+ * Note: The native forEach function, to optimize sparse arrays, must check whether
+ * each slot in the array has ever been assigned or not (a simple null or undefined
+ * check is not sufficient). However, sparse arrays are very rare in the real world,
+ * and removing the check improves performance by 50x.
+ */
+function fastArrayForEach(array, callback) {
+  for (let i = 0, n = array.length; i < n; i++) {
+    callback(array[i], i, array);
+  }
+}
+
+/**
+ * A fast uncurried Array.map() implementation for dense arrays.
+ * Avoid using with:
+ * - sparse arrays
+ * - arrays containing user data (which could be sparse)
+ *
+ * See the note in fastArrayForEach().
+ */
+function fastArrayMap(array, callback) {
+  const result = [];
+  for (let i = 0, n = array.length; i < n; i++) {
+    result[i] = callback(array[i], i, array);
+  }
+  return result;
+}
 
 function isObject(obj) {
   return typeof obj === 'object' && obj !== null && !isArray(obj);
@@ -1238,7 +1271,7 @@ function createShadowTarget(raw) {
 
 function lockShadow(shadow, raw, fromKey, toKey) {
   const props = ownKeys(shadow);
-  props.forEach(prop => {
+  fastArrayForEach(props, prop => {
     if (!has(shadow, prop)) {
       const desc = getOwnPropertyDescriptor(raw, prop);
       const wrapped = convertDescriptor(desc, fromKey, toKey);
@@ -2457,7 +2490,7 @@ const SecureIFrameElement = {
     // Standard list of iframe's properties from:
     // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement
     // Note: Ignoring 'contentDocument', 'sandbox' and 'srcdoc' from the list above.
-    ['height', 'width', 'name'].forEach(name =>
+    fastArrayForEach(['height', 'width', 'name'], name =>
       defineProperty(prototype, name, createFilteredPropertyStateless(name, prototype))
     );
   }
@@ -4410,7 +4443,7 @@ function SecureElement(el, key) {
     // Allow React to register spies on input nodes
     // See inputValueTracking.js
     // https://github.com/facebook/react/blob/master/packages/react-dom/src/client/inputValueTracking.js
-    ['checked', 'value'].forEach(prop => {
+    fastArrayForEach(['checked', 'value'], prop => {
       let elementProto = {};
       // TODO: W-5143278 bug on lwc, remove try catch after bug is fixed
       try {
@@ -5357,43 +5390,49 @@ function beMutableProperty(obj, prop) {
 function repairDataProperties(realmRec) {
   const { eagerFreezeIntrinsics: i } = realmRec;
 
-  [
-    i.ObjectPrototype,
-    i.ArrayPrototype,
-    i.BooleanPrototype,
-    i.DatePrototype,
-    i.NumberPrototype,
-    i.StringPrototype,
+  fastArrayForEach(
+    [
+      i.ObjectPrototype,
+      i.ArrayPrototype,
+      i.BooleanPrototype,
+      i.DatePrototype,
+      i.NumberPrototype,
+      i.StringPrototype,
 
-    i.FunctionPrototype,
-    i.GeneratorPrototype,
-    i.AsyncFunctionPrototype,
-    i.AsyncGeneratorPrototype,
+      i.FunctionPrototype,
+      i.GeneratorPrototype,
+      i.AsyncFunctionPrototype,
+      i.AsyncGeneratorPrototype,
 
-    i.IteratorPrototype,
-    i.ArrayIteratorPrototype,
+      i.IteratorPrototype,
+      i.ArrayIteratorPrototype,
 
-    i.PromisePrototype,
-    i.DataViewPrototype,
+      i.PromisePrototype,
+      i.DataViewPrototype,
 
-    i.TypedArray,
-    i.Int8ArrayPrototype,
-    i.Int16ArrayPrototype,
-    i.Int32ArrayPrototype,
-    i.Uint8Array,
-    i.Uint16Array,
-    i.Uint32Array
-  ].forEach(beMutableProperties);
+      i.TypedArray,
+      i.Int8ArrayPrototype,
+      i.Int16ArrayPrototype,
+      i.Int32ArrayPrototype,
+      i.Uint8Array,
+      i.Uint16Array,
+      i.Uint32Array
+    ],
+    beMutableProperties
+  );
 
-  [
-    i.ErrorPrototype,
-    i.EvalErrorPrototype,
-    i.RangeErrorPrototype,
-    i.ReferenceErrorPrototype,
-    i.SyntaxErrorPrototype,
-    i.TypeErrorPrototype,
-    i.URIErrorPrototype
-  ].forEach(proto => beMutableProperty(proto, 'message'));
+  fastArrayForEach(
+    [
+      i.ErrorPrototype,
+      i.EvalErrorPrototype,
+      i.RangeErrorPrototype,
+      i.ReferenceErrorPrototype,
+      i.SyntaxErrorPrototype,
+      i.TypeErrorPrototype,
+      i.URIErrorPrototype
+    ],
+    proto => beMutableProperty(proto, 'message')
+  );
 }
 
 const realmRec = {};
@@ -5486,7 +5525,7 @@ function SecureMessageEventSource(raw, key) {
   const st = create$1(null);
   const objectProps = ObjectKeys(raw);
 
-  objectProps.forEach(prop => {
+  fastArrayForEach(objectProps, prop => {
     switch (prop) {
       case 'postMessage':
         defineProperty(st, prop, createFilteredMethod(st, raw, prop, { rawArguments: true }));
@@ -5530,6 +5569,9 @@ function SecureDOMEvent(event, key) {
     target: createFilteredProperty(o, event, 'target', SKIP_OPAQUE_ASCENDING),
     currentTarget: createFilteredProperty(o, event, 'currentTarget'),
     initEvent: createFilteredMethod(o, event, 'initEvent'),
+    // Aliasing target as srcElement, which still meet specs and circumvent any potential
+    // discrepancy in the way prototypes are patched.
+    srcElement: createFilteredProperty(o, event, 'target', SKIP_OPAQUE_ASCENDING),
     // Touch Events are special on their own:
     // https://developer.mozilla.org/en-US/docs/Web/API/Touch
     touches: SecureDOMEvent.filterTouchesDescriptor(o, event, 'touches'),
@@ -5554,12 +5596,12 @@ function SecureDOMEvent(event, key) {
     }
   };
 
-  ['preventDefault', 'stopImmediatePropagation', 'stopPropagation'].forEach(method =>
+  fastArrayForEach(['preventDefault', 'stopImmediatePropagation', 'stopPropagation'], method =>
     addMethodIfSupported(o, event, method)
   );
 
   // non-standard properties and aliases
-  ['relatedTarget', 'srcElement', 'explicitOriginalTarget', 'originalTarget'].forEach(property =>
+  fastArrayForEach(['relatedTarget', 'explicitOriginalTarget', 'originalTarget'], property =>
     addPropertyIfSupported(o, event, property)
   );
 
@@ -5599,7 +5641,7 @@ SecureDOMEvent.filterTouchesDescriptor = function(se, event, propName) {
         return touches;
       }
       // touches, of type ToucheList does not implement "map"
-      return ArrayMap(touches, touch => {
+      return fastArrayMap(touches, touch => {
         // touches is normally a big big collection of touch objects,
         // we do not want to pre-process them all, just create the getters
         // and process the accessor on the spot. e.g.:
@@ -5612,17 +5654,17 @@ SecureDOMEvent.filterTouchesDescriptor = function(se, event, propName) {
         } while ((touchShape = getPrototypeOf(touchShape)) && touchShape !== Object.prototype);
 
         // Create a stub object with all the properties
-        return keys.reduce(
-          (o, p) =>
-            defineProperty(o, p, {
-              // all props in a touch object are readonly by spec:
-              // https://developer.mozilla.org/en-US/docs/Web/API/Touch
-              get: function() {
-                return filterEverything(se, touch[p]);
-              }
-            }),
-          {}
+        const obj = {};
+        fastArrayForEach(keys, prop =>
+          defineProperty(obj, prop, {
+            // all props in a touch object are readonly by spec:
+            // https://developer.mozilla.org/en-US/docs/Web/API/Touch
+            get: function() {
+              return filterEverything(se, touch[prop]);
+            }
+          })
         );
+        return obj;
       });
     },
     set: function(value) {
@@ -7307,7 +7349,7 @@ function addPrototypeMethodsAndProperties(metadata$$1, so, raw, key) {
   const supportedInterfaces = getSupportedInterfaces(raw);
 
   const prototypes = metadata$$1['prototypes'];
-  supportedInterfaces.forEach(name => {
+  fastArrayForEach(supportedInterfaces, name => {
     prototype = prototypes[name];
     ObjectKeys(prototype).forEach(worker);
   });
@@ -7421,7 +7463,7 @@ function addPrototypeMethodsAndPropertiesStateless(
   const supportedInterfaces = getSupportedInterfaces(rawPrototypicalInstance);
 
   const prototypes = metadata$$1['prototypes'];
-  supportedInterfaces.forEach(name => {
+  fastArrayForEach(supportedInterfaces, name => {
     prototype = prototypes[name];
     for (const property in prototype) {
       addPrototypeMethodsAndPropertiesStatelessHelper(
@@ -7456,7 +7498,7 @@ function getUnfilteredTypes() {
     'ArrayBuffer',
     'Blob'
   ];
-  unfilteredTypesMeta.forEach(unfilteredType => {
+  fastArrayForEach(unfilteredTypesMeta, unfilteredType => {
     if (typeof window[unfilteredType] !== 'undefined') {
       ret.push(window[unfilteredType]);
     }
@@ -7873,24 +7915,27 @@ function SecureDocument(doc, key) {
     }
   });
 
-  [
-    'getElementsByClassName',
-    'getElementsByName',
-    'getElementsByTagName',
-    'getElementsByTagNameNS',
-    'querySelectorAll'
-  ].forEach(method => {
-    if (method in doc) {
-      defineProperty(o, method, {
-        enumerable: true,
-        writable: true,
-        value() {
-          const raw = doc[method](...arguments);
-          return SecureNodeList(raw, key, nodeIsAccessible);
-        }
-      });
+  fastArrayForEach(
+    [
+      'getElementsByClassName',
+      'getElementsByName',
+      'getElementsByTagName',
+      'getElementsByTagNameNS',
+      'querySelectorAll'
+    ],
+    method => {
+      if (method in doc) {
+        defineProperty(o, method, {
+          enumerable: true,
+          writable: true,
+          value() {
+            const raw = doc[method](...arguments);
+            return SecureNodeList(raw, key, nodeIsAccessible);
+          }
+        });
+      }
     }
-  });
+  );
 
   addEventTargetMethods(o, doc, key);
 
@@ -8009,7 +8054,7 @@ function SecureLocation(loc, key) {
     }
   });
 
-  ['host', 'hostname'].forEach(property => {
+  fastArrayForEach(['host', 'hostname'], property => {
     defineProperty(o, property, {
       get: function() {
         return loc[property];
@@ -8024,11 +8069,12 @@ function SecureLocation(loc, key) {
     });
   });
 
-  ['pathname', 'search', 'hash', 'username', 'password', 'origin', 'port'].forEach(property =>
-    addPropertyIfSupported(o, loc, property)
+  fastArrayForEach(
+    ['pathname', 'search', 'hash', 'username', 'password', 'origin', 'port'],
+    property => addPropertyIfSupported(o, loc, property)
   );
 
-  ['replace', 'assign'].forEach(method => {
+  fastArrayForEach(['replace', 'assign'], method => {
     defineProperty(o, method, {
       writable: true,
       enumerable: true,
@@ -8074,18 +8120,21 @@ function SecureNavigator(navigator, key) {
     }
   });
 
-  [
-    'appCodeName',
-    'appName',
-    'appVersion',
-    'cookieEnabled',
-    'geolocation',
-    'language',
-    'onLine',
-    'platform',
-    'product',
-    'userAgent'
-  ].forEach(name => addPropertyIfSupported(o, navigator, name));
+  fastArrayForEach(
+    [
+      'appCodeName',
+      'appName',
+      'appVersion',
+      'cookieEnabled',
+      'geolocation',
+      'language',
+      'onLine',
+      'platform',
+      'product',
+      'userAgent'
+    ],
+    name => addPropertyIfSupported(o, navigator, name)
+  );
 
   if (addPropertiesHook$1) {
     addPropertiesHook$1(o, navigator, key);
@@ -8112,23 +8161,26 @@ function SecureXMLHttpRequest(key) {
     });
 
     // Properties
-    [
-      'readyState',
-      'status',
-      'statusText',
-      'response',
-      'responseType',
-      'responseText',
-      'responseURL',
-      'timeout',
-      'withCredentials',
-      'upload',
-      'UNSENT',
-      'OPENED',
-      'HEADERS_RECEIVED',
-      'LOADING',
-      'DONE'
-    ].forEach(name => addPropertyIfSupported(o, xhr, name));
+    fastArrayForEach(
+      [
+        'readyState',
+        'status',
+        'statusText',
+        'response',
+        'responseType',
+        'responseText',
+        'responseURL',
+        'timeout',
+        'withCredentials',
+        'upload',
+        'UNSENT',
+        'OPENED',
+        'HEADERS_RECEIVED',
+        'LOADING',
+        'DONE'
+      ],
+      name => addPropertyIfSupported(o, xhr, name)
+    );
 
     addPropertyIfSupported(o, xhr, 'responseXML', {
       afterGetCallback: function(value) {
@@ -8137,23 +8189,25 @@ function SecureXMLHttpRequest(key) {
     });
 
     // Event handlers
-    [
-      'onloadstart',
-      'onprogress',
-      'onabort',
-      'onerror',
-      'onload',
-      'ontimeout',
-      'onloadend',
-      'onreadystatechange'
-    ].forEach(name =>
-      defineProperty(o, name, {
-        set: function(callback) {
-          xhr[name] = function(e) {
-            callback.call(o, e && SecureDOMEvent(e, key));
-          };
-        }
-      })
+    fastArrayForEach(
+      [
+        'onloadstart',
+        'onprogress',
+        'onabort',
+        'onerror',
+        'onload',
+        'ontimeout',
+        'onloadend',
+        'onreadystatechange'
+      ],
+      name =>
+        defineProperty(o, name, {
+          set: function(callback) {
+            xhr[name] = function(e) {
+              callback.call(o, e && SecureDOMEvent(e, key));
+            };
+          }
+        })
     );
 
     defineProperties(o, {
@@ -8250,29 +8304,32 @@ function SecureNotification(key) {
     });
 
     // Properties
-    [
-      'actions',
-      'badge',
-      'body',
-      'data',
-      'dir',
-      'lang',
-      'tag',
-      'icon',
-      'image',
-      'requireInteraction',
-      'silent',
-      'timestamp',
-      'title',
-      'vibrate',
-      'noscreen',
-      'renotify',
-      'sound',
-      'sticky'
-    ].forEach(name => addPropertyIfSupported(o, notification, name));
+    fastArrayForEach(
+      [
+        'actions',
+        'badge',
+        'body',
+        'data',
+        'dir',
+        'lang',
+        'tag',
+        'icon',
+        'image',
+        'requireInteraction',
+        'silent',
+        'timestamp',
+        'title',
+        'vibrate',
+        'noscreen',
+        'renotify',
+        'sound',
+        'sticky'
+      ],
+      name => addPropertyIfSupported(o, notification, name)
+    );
 
     // Event handlers
-    ['onclick', 'onerror'].forEach(name =>
+    fastArrayForEach(['onclick', 'onerror'], name =>
       defineProperty(o, name, {
         set: function(callback) {
           notification[name] = function(e) {
@@ -9442,9 +9499,9 @@ function SecureWindow(sandbox, key) {
     rawArguments: true
   });
 
-  ['outerHeight', 'outerWidth'].forEach(name => addPropertyIfSupported(o, win, name));
+  fastArrayForEach(['outerHeight', 'outerWidth'], name => addPropertyIfSupported(o, win, name));
 
-  ['scroll', 'scrollBy', 'scrollTo'].forEach(name => addMethodIfSupported(o, win, name));
+  fastArrayForEach(['scroll', 'scrollBy', 'scrollTo'], name => addMethodIfSupported(o, win, name));
 
   defineProperty(o, 'open', {
     enumerable: true,
@@ -9584,7 +9641,8 @@ function SecureWindow(sandbox, key) {
   addEventTargetMethods(o, win, key);
 
   // Has to happen last because it depends on the secure getters defined above that require the object to be keyed
-  stdlib.forEach(
+  fastArrayForEach(
+    stdlib,
     // These are direct passthrough's and should never be wrapped in a SecureObject
     // They are non-writable to make them compatible with the evaluator.
     name =>
@@ -9788,7 +9846,7 @@ function getWrappedTemplatePrototype(template) {
   const config = {};
   const metadataPrototypes = metadata$7['prototypes'];
   const supportedInterfaces = ObjectKeys(metadataPrototypes);
-  supportedInterfaces.forEach(name => {
+  fastArrayForEach(supportedInterfaces, name => {
     const metadataPrototype = metadataPrototypes[name];
     for (const property in metadataPrototype) {
       addPrototypeMethodsAndPropertiesStatelessHelper(
@@ -10169,7 +10227,7 @@ function getFilteredValue(cmp, rawValue) {
 
 /**
  * This method accept a value from a lockerized component and provides system mode with raw access.
- * All public properties and methods of an LWC custom element get processed by this method.
+ * All public properties and methods of an LWC custom element get proccessed by this method.
  * 1. If the value returned is a data proxy(@api, @track) that is its own,
  *    we create an unfiltering proxy and return that
  * 2. if the value returned is a data proxy that it received from another component,
@@ -10464,7 +10522,7 @@ SecureLightningElementFactory.getWrappedLightningElement = function(LightningEle
     }
   });
 
-  lwcElementProtoPropNames.forEach(propName => {
+  fastArrayForEach(lwcElementProtoPropNames, propName => {
     if (
       !SecureLElementPrototype.hasOwnProperty(propName) &&
       LElementPrototype.hasOwnProperty(propName)
@@ -10684,11 +10742,12 @@ function SecureAura(AuraInstance, key) {
   });
 
   // SecureAura methods and properties
-  ['enqueueAction'].forEach(name =>
+  fastArrayForEach(['enqueueAction'], name =>
     defineProperty(o, name, createFilteredMethod(o, AuraInstance, name, { rawArguments: true }))
   );
 
-  ['get', 'getComponent', 'getReference', 'getRoot', 'log', 'reportError', 'warning'].forEach(
+  fastArrayForEach(
+    ['get', 'getComponent', 'getReference', 'getRoot', 'log', 'reportError', 'warning'],
     name => defineProperty(o, name, createFilteredMethod(o, AuraInstance, name))
   );
 
@@ -10696,11 +10755,12 @@ function SecureAura(AuraInstance, key) {
   seal(o);
 
   // SecureUtil: creating a proxy for $A.util
-  ['getBooleanValue', 'isArray', 'isObject', 'isUndefined', 'isUndefinedOrNull'].forEach(name =>
-    defineProperty(su, name, createFilteredMethod(su, AuraInstance['util'], name))
+  fastArrayForEach(
+    ['getBooleanValue', 'isArray', 'isObject', 'isUndefined', 'isUndefinedOrNull'],
+    name => defineProperty(su, name, createFilteredMethod(su, AuraInstance['util'], name))
   );
   // These methods in Util deal with raw objects like components, so mark them as such
-  ['addClass', 'hasClass', 'removeClass', 'toggleClass', 'isEmpty'].forEach(name =>
+  fastArrayForEach(['addClass', 'hasClass', 'removeClass', 'toggleClass', 'isEmpty'], name =>
     defineProperty(
       su,
       name,
@@ -10712,57 +10772,63 @@ function SecureAura(AuraInstance, key) {
   seal(su);
 
   // SecureLocalizationService: creating a proxy for $A.localizationService
-  [
-    'displayDuration',
-    'displayDurationInDays',
-    'displayDurationInHours',
-    'displayDurationInMilliseconds',
-    'displayDurationInMinutes',
-    'displayDurationInMonths',
-    'displayDurationInSeconds',
-    'duration',
-    'endOf',
-    'formatCurrency',
-    'formatDate',
-    'formatDateTime',
-    'formatDateTimeUTC',
-    'formatDateUTC',
-    'formatNumber',
-    'formatPercent',
-    'formatTime',
-    'formatTimeUTC',
-    'getDateStringBasedOnTimezone',
-    'getDaysInDuration',
-    'getDefaultCurrencyFormat',
-    'getDefaultNumberFormat',
-    'getDefaultPercentFormat',
-    'getHoursInDuration',
-    'getLocalizedDateTimeLabels',
-    'getMillisecondsInDuration',
-    'getMinutesInDuration',
-    'getMonthsInDuration',
-    'getNumberFormat',
-    'getSecondsInDuration',
-    'getToday',
-    'getYearsInDuration',
-    'isAfter',
-    'isBefore',
-    'isBetween',
-    'isPeriodTimeView',
-    'isSame',
-    'parseDateTime',
-    'parseDateTimeISO8601',
-    'parseDateTimeUTC',
-    'startOf',
-    'toISOString',
-    'translateFromLocalizedDigits',
-    'translateFromOtherCalendar',
-    'translateToLocalizedDigits',
-    'translateToOtherCalendar',
-    'UTCToWallTime',
-    'WallTimeToUTC'
-  ].forEach(name =>
-    defineProperty(sls, name, createFilteredMethod(sls, AuraInstance['localizationService'], name))
+  fastArrayForEach(
+    [
+      'displayDuration',
+      'displayDurationInDays',
+      'displayDurationInHours',
+      'displayDurationInMilliseconds',
+      'displayDurationInMinutes',
+      'displayDurationInMonths',
+      'displayDurationInSeconds',
+      'duration',
+      'endOf',
+      'formatCurrency',
+      'formatDate',
+      'formatDateTime',
+      'formatDateTimeUTC',
+      'formatDateUTC',
+      'formatNumber',
+      'formatPercent',
+      'formatTime',
+      'formatTimeUTC',
+      'getDateStringBasedOnTimezone',
+      'getDaysInDuration',
+      'getDefaultCurrencyFormat',
+      'getDefaultNumberFormat',
+      'getDefaultPercentFormat',
+      'getHoursInDuration',
+      'getLocalizedDateTimeLabels',
+      'getMillisecondsInDuration',
+      'getMinutesInDuration',
+      'getMonthsInDuration',
+      'getNumberFormat',
+      'getSecondsInDuration',
+      'getToday',
+      'getYearsInDuration',
+      'isAfter',
+      'isBefore',
+      'isBetween',
+      'isPeriodTimeView',
+      'isSame',
+      'parseDateTime',
+      'parseDateTimeISO8601',
+      'parseDateTimeUTC',
+      'startOf',
+      'toISOString',
+      'translateFromLocalizedDigits',
+      'translateFromOtherCalendar',
+      'translateToLocalizedDigits',
+      'translateToOtherCalendar',
+      'UTCToWallTime',
+      'WallTimeToUTC'
+    ],
+    name =>
+      defineProperty(
+        sls,
+        name,
+        createFilteredMethod(sls, AuraInstance['localizationService'], name)
+      )
   );
 
   setRef(sls, AuraInstance['localizationService'], key);
@@ -10877,21 +10943,24 @@ function SecureAuraEvent(event, key) {
     }
   });
 
-  [
-    'fire',
-    'getName',
-    'getParam',
-    'getParams',
-    'getPhase',
-    'getSource',
-    'getSourceEvent',
-    'pause',
-    'preventDefault',
-    'resume',
-    'stopPropagation',
-    'getType',
-    'getEventType'
-  ].forEach(name => defineProperty(o, name, createFilteredMethod(o, event, name)));
+  fastArrayForEach(
+    [
+      'fire',
+      'getName',
+      'getParam',
+      'getParams',
+      'getPhase',
+      'getSource',
+      'getSourceEvent',
+      'pause',
+      'preventDefault',
+      'resume',
+      'stopPropagation',
+      'getType',
+      'getEventType'
+    ],
+    name => defineProperty(o, name, createFilteredMethod(o, event, name))
+  );
 
   setRef(o, event, key);
   addToCache(event, o, key);
@@ -10997,7 +11066,7 @@ function SecureAuraComponent(component, key) {
   // The shape of the component depends on the methods exposed in the definitions:
   const methodsNames = getPublicMethodNames(component);
   if (methodsNames && methodsNames.length) {
-    methodsNames.forEach(methodName => addMethodIfSupported(o, component, methodName));
+    fastArrayForEach(methodsNames, methodName => addMethodIfSupported(o, component, methodName));
   }
 
   setRef(o, component, key);
@@ -11096,7 +11165,7 @@ function SecureAuraComponentRef(component, key) {
         : undefined
     };
 
-    methodsNames.forEach(methodName =>
+    fastArrayForEach(methodsNames, methodName =>
       addMethodIfSupported(o, component, methodName, methodOptions)
     );
   }
@@ -11204,6 +11273,35 @@ function SecureLib(lib, fromKey, toKey) {
   return seal(o);
 }
 
+/**
+ * @module LockerMetrics
+ * @description Locker telemetry implementation.
+ * @see Specification {@link https://salesforce.quip.com/z8Q9AakW7MOs}
+ */
+
+let usageMap = create$1(null);
+
+/**
+ * Tracks how many times a given method is being used.
+ * @param {String} name The method name
+ */
+
+
+/**
+ * Returns the method usage metrics map. Example: `{ foo: 1, bar: 2 }` means
+ * method `foo` was called once and method `bar` was called twice.
+ * @returns {Object}
+ */
+function getMethodUsageMetrics() {
+  return assign(create$1(null), usageMap); // return a clone
+}
+
+/**
+ * Resets the usage counter for a given method name or for all methods
+ * if name param is undefined.
+ * @param {String} [name] The method name
+ */
+
 // AuraLocker is a facade for Locker. Its role is to:
 // - implement methods not present on Locker (extends API).
 // - decouple the Locker API from the Aura API.
@@ -11284,12 +11382,12 @@ function windowAddPropertiesHook(st, raw, key) {
 
   // Salesforce API entry points (first phase) - W-3046191 is tracking adding a publish() API
   // enhancement where we will move these to their respective javascript/container architectures
-  ['Sfdc', 'sforce'].forEach(name => addPropertyIfSupported(st, raw, name));
+  fastArrayForEach(['Sfdc', 'sforce'], name => addPropertyIfSupported(st, raw, name));
 
   // Add RTC related api only to specific namespaces
   const namespace = key['namespace'];
   if (namespace === 'runtime_rtc_spark' || namespace === 'runtime_rtc') {
-    ['RTCPeerConnection', 'webkitRTCPeerConnection'].forEach(name => {
+    fastArrayForEach(['RTCPeerConnection', 'webkitRTCPeerConnection'], name => {
       if (name in raw) {
         defineProperty(st, name, {
           enumerable: true,
@@ -11307,7 +11405,7 @@ function windowAddPropertiesHook(st, raw, key) {
 function navigatorAddPropertiesHook(st, raw, key) {
   const namespace = key['namespace'];
   if (namespace === 'runtime_rtc_spark' || namespace === 'runtime_rtc') {
-    ['mediaDevices', 'mozGetUserMedia', 'webkitGetUserMedia'].forEach(name => {
+    fastArrayForEach(['mediaDevices', 'mozGetUserMedia', 'webkitGetUserMedia'], name => {
       addUnfilteredPropertyIfSupported(st, raw, name);
     });
   }
@@ -11573,5 +11671,6 @@ exports.sanitize = sanitize;
 exports.isAllowedSvgTag = isAllowedSvgTag;
 exports.sanitizeSvgElement = sanitizeSvgElement;
 exports.sanitizeElement = sanitizeElement;
+exports.getMethodUsageMetrics = getMethodUsageMetrics;
 
 }((this.AuraLocker = this.AuraLocker || {})));

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2018-12-17
- * Version: 0.6.12
+ * Generated: 2019-01-09
+ * Version: 0.6.16
  */
 
 (function (exports) {
@@ -530,6 +530,10 @@ function wrap(thing, metaFrom, metaTo) {
   return thing;
 }
 
+function getMethodUsageMetrics() {
+  /* nothing */
+}
+
 exports.create = create;
 exports.createForClass = createForClass;
 exports.createForDef = createForDef;
@@ -547,6 +551,7 @@ exports.unwrap = unwrap;
 exports.wrapComponent = wrapComponent;
 exports.wrapComponentEvent = wrapComponentEvent;
 exports.wrap = wrap;
+exports.getMethodUsageMetrics = getMethodUsageMetrics;
 exports.sanitize = sanitize;
 exports.isAllowedSvgTag = isAllowedSvgTag;
 exports.sanitizeSvgElement = sanitizeSvgElement;

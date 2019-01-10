@@ -72,8 +72,7 @@
                 child.dispatchComposedEventOnChildNode();
             },
             container, // currentTarget should be the child's host element
-            null // TODO: Bug in LWC where event is not retargeted in certain conditions: https://github.com/salesforce/lwc/pull/870
-            // container // target should be retargeted to child's host element
+            container // target should be retargeted to child's host element
         );
     }
 })

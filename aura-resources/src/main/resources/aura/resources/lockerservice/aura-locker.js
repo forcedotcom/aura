@@ -15,7 +15,7 @@
  *
  * Bundle from LockerService-Core
  * Generated: 2019-01-09
- * Version: 0.6.16
+ * Version: 0.6.17
  */
 
 (function (exports) {
@@ -674,7 +674,11 @@ const FUNCTION = { type: 'function' };
 const FUNCTION_TRUST_RETURN_VALUE = { type: 'function', trustReturnValue: true };
 const EVENT = { type: '@event' };
 const SKIP_OPAQUE = { skipOpaque: true };
-const SKIP_OPAQUE_ASCENDING = { skipOpaque: true, propertyName: 'parentNode' };
+const SKIP_OPAQUE_ASCENDING = {
+  skipOpaque: true,
+  traversing: 'parentNode',
+  traversingAlt: 'host'
+};
 const FUNCTION_RAW_ARGS = { type: 'function', rawArguments: true };
 
 const CTOR = { type: '@ctor' };
@@ -6922,14 +6926,15 @@ function createFilteredProperty(st, raw, propertyName, options) {
     // Continue from the current object until we find an accessible object.
     if (options && options.skipOpaque === true) {
       // skipping opaque elements and traversing up the dom tree, eg: event.target
-      const accesorProperty = options.propertyName || propertyName;
+      const traversing = options.traversing || propertyName;
+      const traversingAlt = options.traversingAlt;
       const key = getKey(st);
       while (value) {
-        const hasAccess$$1 = hasAccess(st, value);
-        if (hasAccess$$1 || isSharedElement(value) || isAccessibleLWCNode(key, value)) {
+        if (hasAccess(st, value) || isSharedElement(value) || isAccessibleLWCNode(key, value)) {
           break;
         }
-        value = value[accesorProperty];
+        const nextValue = value[traversing];
+        value = nextValue === null && traversingAlt ? value[traversingAlt] : nextValue;
       }
     }
 

@@ -15,6 +15,8 @@
  */
 package org.auraframework.impl.factory;
 
+import javax.xml.stream.XMLStreamReader;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
@@ -25,8 +27,6 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import javax.xml.stream.XMLStreamReader;
-
 @ServiceComponent
 public class FlavorsXMLParser extends XMLParser<FlavorsDef> {
     @Override
@@ -35,8 +35,8 @@ public class FlavorsXMLParser extends XMLParser<FlavorsDef> {
             boolean isInInternalNamespace, DefinitionService definitionService,
             ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter)
             throws QuickFixException {
-        return new FlavorsDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,
-                configAdapter, definitionParserAdapter);
+        return new FlavorsDefHandler(xmlReader, source, definitionService, isInInternalNamespace,
+                configAdapter, definitionParserAdapter, descriptor);
     }
 
     @Override

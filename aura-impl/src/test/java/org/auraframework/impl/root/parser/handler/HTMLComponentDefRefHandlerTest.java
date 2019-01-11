@@ -51,9 +51,9 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
                 desc, "<div class='MyClass'>Child Text<br/></div>", "myID", Format.XML);
         xmlReader = XMLParserBase.createXMLStreamReader(source.getReader());
         xmlReader.next();
-        ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader, true, definitionService,
-                configAdapter, definitionParserAdapter);
-        htmlHandler = new HTMLComponentDefRefHandler<>(cdh, "div", xmlReader, source, true, definitionService, configAdapter, definitionParserAdapter);
+        ComponentDefHandler cdh = new ComponentDefHandler(xmlReader, source, definitionService, true,
+                configAdapter, definitionParserAdapter, null);
+        htmlHandler = new HTMLComponentDefRefHandler<>(xmlReader, source, definitionService, true, configAdapter, definitionParserAdapter, cdh, "div");
         htmlHandler.readAttributes();
     }
 
@@ -90,10 +90,10 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
                 desc, "<div><aura:set attribute='header' value='false'/></div>", "myID", Format.XML);
         xmlReader = XMLParserBase.createXMLStreamReader(source.getReader());
         xmlReader.next();
-        ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader, true, definitionService,
-                configAdapter, definitionParserAdapter);
-        htmlHandler = new HTMLComponentDefRefHandler<>(cdh, "div", xmlReader, source, true, definitionService, configAdapter,
-                definitionParserAdapter);
+        ComponentDefHandler cdh = new ComponentDefHandler(xmlReader, source, definitionService, true,
+                configAdapter, definitionParserAdapter, null);
+        htmlHandler = new HTMLComponentDefRefHandler<>(xmlReader, source, definitionService, true, configAdapter,
+                definitionParserAdapter, cdh, "div");
         htmlHandler.readAttributes();
         xmlReader.next();
         htmlHandler.handleChildTag();
@@ -139,10 +139,10 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
         StringSource<ComponentDef> source = new StringSource<>(desc, "<div aura:flavorable='true'></div>", "myID", Format.XML);
         xmlReader = XMLParserBase.createXMLStreamReader(source.getReader());
         xmlReader.next();
-        ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader, true, definitionService,
-                configAdapter, definitionParserAdapter);
-        HTMLComponentDefRefHandler<?> h = new HTMLComponentDefRefHandler<>(cdh, "div", xmlReader, source, true,
-                definitionService, configAdapter, definitionParserAdapter);
+        ComponentDefHandler cdh = new ComponentDefHandler(xmlReader, source, definitionService, true,
+                configAdapter, definitionParserAdapter, null);
+        HTMLComponentDefRefHandler<?> h = new HTMLComponentDefRefHandler<>(xmlReader, source, definitionService, true,
+                configAdapter, definitionParserAdapter, cdh, "div");
         h.readAttributes();
         h.readSystemAttributes();
         ComponentDefRef cd = h.createDefinition();

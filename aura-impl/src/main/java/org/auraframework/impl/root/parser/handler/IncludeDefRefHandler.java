@@ -54,12 +54,8 @@ public class IncludeDefRefHandler extends XMLHandler<IncludeDefRefImpl> {
     protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
             ATTRIBUTE_NAME, ATTRIBUTE_IMPORTS, ATTRIBUTE_ALIASES, ATTRIBUTE_EXPORT, RootTagHandler.ATTRIBUTE_DESCRIPTION);
 
-    private RootTagHandler<? extends RootDefinition> parentHandler;
+    private final RootTagHandler<? extends RootDefinition> parentHandler;
     private final IncludeDefRefImpl.Builder builder = new IncludeDefRefImpl.Builder();
-
-    public IncludeDefRefHandler() {
-        super();
-    }
 
     public IncludeDefRefHandler(RootTagHandler<? extends RootDefinition> parentHandler, XMLStreamReader xmlReader,
                                 TextSource<?> source, DefinitionService definitionService) {

@@ -49,15 +49,10 @@ public class LibraryDefRefHandler extends XMLHandler<LibraryDefRef> {
     protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_LIBRARY, ATTRIBUTE_PROPERTY,
             RootTagHandler.ATTRIBUTE_DESCRIPTION);
 
-    private RootTagHandler<? extends RootDefinition> parentHandler;
+    private final RootTagHandler<? extends RootDefinition> parentHandler;
     private final LibraryDefRefImpl.Builder builder = new LibraryDefRefImpl.Builder();
 
-    public LibraryDefRefHandler() {
-        super();
-    }
-
-    public LibraryDefRefHandler(RootTagHandler<? extends RootDefinition> parentHandler, XMLStreamReader xmlReader,
-                            TextSource<?> source, DefinitionService definitionService) {
+    public LibraryDefRefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService, RootTagHandler<? extends RootDefinition> parentHandler) {
         super(xmlReader, source, definitionService);
         this.parentHandler = parentHandler;
     }

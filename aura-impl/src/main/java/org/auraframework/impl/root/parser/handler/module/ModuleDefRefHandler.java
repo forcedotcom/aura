@@ -22,25 +22,25 @@ import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDefRef;
-import org.auraframework.impl.root.parser.handler.BaseDefRefHandler;
-import org.auraframework.impl.root.parser.handler.RootTagHandler;
 import org.auraframework.impl.root.component.ModuleDefRefImpl;
 import org.auraframework.impl.root.component.ModuleDefRefImpl.Builder;
+import org.auraframework.impl.root.parser.handler.BaseDefRefHandler;
+import org.auraframework.impl.root.parser.handler.RootTagHandler;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 
 /**
  * Module definition reference handler.
- * Uses same base handler as ComponentDefRef
+ * Uses same base handler as {@link ComponentDefRef}
  */
 public class ModuleDefRefHandler<P extends RootDefinition> extends BaseDefRefHandler<ModuleDefRef, P, ModuleDef, Builder> {
 
     protected ModuleDefRefImpl.Builder builder = new ModuleDefRefImpl.Builder();
 
-    public ModuleDefRefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
-                               boolean isInInternalNamespace, DefinitionService definitionService,
-                               ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    public ModuleDefRefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
+                               boolean isInInternalNamespace, ConfigAdapter configAdapter,
+                               DefinitionParserAdapter definitionParserAdapter, RootTagHandler<P> parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
     }
 
     @Override

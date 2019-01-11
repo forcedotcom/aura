@@ -71,14 +71,10 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             .addAll(BaseComponentDefHandler.INTERNAL_ALLOWED_ATTRIBUTES)
             .build();
 
-    public ApplicationDefHandler() {
-        super();
-    }
-
-    public ApplicationDefHandler(DefDescriptor<ApplicationDef> applicationDefDescriptor, TextSource<ApplicationDef> source,
-                                 XMLStreamReader xmlReader, boolean isInInternalNamespace, DefinitionService definitionService,
-                                 ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(applicationDefDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter, new ApplicationDefImpl.Builder());
+    public ApplicationDefHandler(XMLStreamReader xmlReader, TextSource<ApplicationDef> source,
+                                 DefinitionService definitionService, boolean isInInternalNamespace,
+                                 ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter, DefDescriptor<ApplicationDef> applicationDefDescriptor) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, applicationDefDescriptor, new ApplicationDefImpl.Builder());
     }
 
     @Override

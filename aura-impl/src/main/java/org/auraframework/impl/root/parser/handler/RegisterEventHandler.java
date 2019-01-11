@@ -38,7 +38,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import com.google.common.collect.ImmutableSet;
 
 /**
- * handler for aura:registerEvent tag
+ * handler for {@code aura:registerEvent} tag
  */
 public class RegisterEventHandler<P extends RootDefinition> extends ParentedTagHandler<RegisterEventDefImpl, P> {
 
@@ -49,17 +49,13 @@ public class RegisterEventHandler<P extends RootDefinition> extends ParentedTagH
 
     private final Builder builder = new RegisterEventDefImpl.Builder();
 
-    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_ACCESS, ATTRIBUTE_TYPE,
+    protected static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_ACCESS, ATTRIBUTE_TYPE,
             ATTRIBUTE_NAME, RootTagHandler.ATTRIBUTE_DESCRIPTION);
 
-    public RegisterEventHandler() {
-        super();
-    }
-
-    public RegisterEventHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
-                                boolean isInInternalNamespace, DefinitionService definitionService,
-                                ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    public RegisterEventHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
+                                boolean isInInternalNamespace, ConfigAdapter configAdapter,
+                                DefinitionParserAdapter definitionParserAdapter, RootTagHandler<P> parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
         if (source != null) {
             builder.setOwnHash(source.getHash());
         }

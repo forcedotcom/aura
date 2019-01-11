@@ -40,7 +40,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import com.google.common.collect.ImmutableSet;
 
 /**
- * Handler for aura:tokens tags.
+ * Handler for {@code aura:tokens} tags.
  */
 public final class TokensDefHandler extends FileTagHandler<TokensDef> {
     public static final String TAG = "aura:tokens";
@@ -54,7 +54,7 @@ public final class TokensDefHandler extends FileTagHandler<TokensDef> {
             .addAll(RootTagHandler.ALLOWED_ATTRIBUTES)
             .build();
 
-    private final static Set<String> INTERNAL_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
+    private static final Set<String> INTERNAL_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
             .add(ATTRIBUTE_PROVIDER, ATTRIBUTE_MAP_PROVIDER)
             .addAll(ALLOWED_ATTRIBUTES)
             .addAll(RootTagHandler.INTERNAL_ALLOWED_ATTRIBUTES)
@@ -62,15 +62,11 @@ public final class TokensDefHandler extends FileTagHandler<TokensDef> {
 
     private final TokensDefImpl.Builder builder = new TokensDefImpl.Builder();
 
-    public TokensDefHandler() {
-        super();
-    }
-
-    public TokensDefHandler(DefDescriptor<TokensDef> defDescriptor, TextSource<TokensDef> source, XMLStreamReader xmlReader,
-                            boolean isInInternalNamespace, DefinitionService definitionService,
-                            ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter)
-            throws QuickFixException {
-        super(defDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    public TokensDefHandler(XMLStreamReader xmlReader, TextSource<TokensDef> source,
+                            DefinitionService definitionService, boolean isInInternalNamespace,
+                            ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter,
+                            DefDescriptor<TokensDef> defDescriptor) throws QuickFixException {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, defDescriptor);
         builder.setOwnHash(source.getHash());
         builder.setDescriptor(defDescriptor);
         builder.setLocation(startLocation);
@@ -132,8 +128,8 @@ public final class TokensDefHandler extends FileTagHandler<TokensDef> {
         String tag = getTagName();
 
         if (TokenDefHandler.TAG.equalsIgnoreCase(tag)) {
-            TokenDef def = new TokenDefHandler(this, xmlReader, source, isInInternalNamespace, definitionService,
-                    configAdapter, definitionParserAdapter).getElement();
+            TokenDef def = new TokenDefHandler(xmlReader, source, definitionService, isInInternalNamespace,
+                    configAdapter, definitionParserAdapter, this).getElement();
             if (builder.tokens().containsKey(def.getName())) {
                 error("Duplicate token %s", def.getName());
             }
@@ -146,8 +142,8 @@ public final class TokensDefHandler extends FileTagHandler<TokensDef> {
                 error("tag %s must come before all declared tokens", TokensImportDefHandler.TAG);
             }
 
-            TokensImportDef def = new TokensImportDefHandler(this, xmlReader, source, isInInternalNamespace,
-                    definitionService, configAdapter, definitionParserAdapter).getElement();
+            TokensImportDef def = new TokensImportDefHandler(xmlReader, source, definitionService,
+                    isInInternalNamespace, configAdapter, definitionParserAdapter, this).getElement();
             if (builder.imports().contains(def.getImportDescriptor())) {
                 error("Duplicate import %s", def.getName());
             }

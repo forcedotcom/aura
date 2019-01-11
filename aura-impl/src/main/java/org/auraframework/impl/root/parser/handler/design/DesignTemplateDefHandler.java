@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.auraframework.impl.root.parser.handler.design;
 
 import java.util.Set;
@@ -36,21 +35,18 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import com.google.common.collect.ImmutableSet;
 
 public class DesignTemplateDefHandler extends ParentedTagHandler<DesignTemplateDef, DesignDef> {
-    public static final String TAG = "design:template";
+    public final static String TAG = "design:template";
 
     private final static String ATTRIBUTE_NAME = "name";
     private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME);
 
     private final DesignTemplateDefImpl.Builder builder = new DesignTemplateDefImpl.Builder();
 
-    public DesignTemplateDefHandler() {
-        super();
-    }
-
-    public DesignTemplateDefHandler(DesignDefHandler parentHandler, XMLStreamReader xmlReader,
-                                    TextSource<?> source, boolean isInInternalNamespace, DefinitionService definitionService,
-                                    ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    public DesignTemplateDefHandler(XMLStreamReader xmlReader, TextSource<?> source,
+                                    DefinitionService definitionService, boolean isInInternalNamespace,
+                                    ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter,
+                                    DesignDefHandler parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
         builder.setAccess(getAccess(isInInternalNamespace));
     }
 
@@ -69,8 +65,8 @@ public class DesignTemplateDefHandler extends ParentedTagHandler<DesignTemplateD
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
         if (DesignTemplateRegionDefHandler.TAG.equalsIgnoreCase(tag)) {
-            DesignTemplateRegionDef templateRegion = new DesignTemplateRegionDefHandler((DesignDefHandler)getParentHandler(), xmlReader,
-                    source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter).getElement();
+            DesignTemplateRegionDef templateRegion = new DesignTemplateRegionDefHandler(xmlReader,
+                    source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, (DesignDefHandler)getParentHandler()).getElement();
             builder.addDesignTemplateRegion(
                     definitionService.getDefDescriptor(templateRegion.getName(), DesignTemplateRegionDef.class),
                     templateRegion);

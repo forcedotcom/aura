@@ -43,19 +43,15 @@ public class DesignTemplateRegionDefHandler extends ParentedTagHandler<DesignTem
     private static final String ATTRIBUTE_NAME = "name";
     private static final String ATTRIBUTE_INTERFACES = "allowedInterfaces";
 
-    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_INTERFACES);
+    private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_INTERFACES);
 
     private final DesignTemplateRegionDefImpl.Builder builder = new DesignTemplateRegionDefImpl.Builder();
 
-    public DesignTemplateRegionDefHandler() {
-        super();
-    }
-
-    public DesignTemplateRegionDefHandler(DesignDefHandler parentHandler, XMLStreamReader xmlReader,
-                                          TextSource<?> source, boolean isInInternalNamespace,
-                                          DefinitionService definitionService,
-                                          ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    public DesignTemplateRegionDefHandler(XMLStreamReader xmlReader, TextSource<?> source,
+                                          DefinitionService definitionService, boolean isInInternalNamespace,
+                                          ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter,
+                                          DesignDefHandler parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
         builder.setAccess(getAccess(isInInternalNamespace));
     }
 

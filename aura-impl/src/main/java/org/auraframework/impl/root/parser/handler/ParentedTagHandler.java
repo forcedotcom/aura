@@ -18,7 +18,6 @@ package org.auraframework.impl.root.parser.handler;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -28,34 +27,29 @@ import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.def.HtmlTag;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 
 /**
  * Tag handler has a parent
  */
 public abstract class ParentedTagHandler<T extends Definition, P extends Definition> extends ContainerTagHandler<T> {
 
-    private ContainerTagHandler<P> parentHandler;
+    private final ContainerTagHandler<P> parentHandler;
 
-    public ParentedTagHandler() {
-        super();
+    public ParentedTagHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
+                              boolean isInInternalNamespace, ConfigAdapter configAdapter,
+                              DefinitionParserAdapter definitionParserAdapter, ContainerTagHandler<P> parentHandler) {
+        this(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler, null);
     }
 
-    public ParentedTagHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
-                              boolean isInInternalNamespace, DefinitionService definitionService,
-                              ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        this(null, parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
-    }
-
-    public ParentedTagHandler(DefDescriptor<T> defDescriptor, ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
-                              boolean isInInternalNamespace, DefinitionService definitionService,
-                              ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(defDescriptor, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    public ParentedTagHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
+                              boolean isInInternalNamespace, ConfigAdapter configAdapter,
+                              DefinitionParserAdapter definitionParserAdapter, ContainerTagHandler<P> parentHandler,
+                              DefDescriptor<T> defDescriptor) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, defDescriptor);
         this.parentHandler = parentHandler;
     }
 

@@ -56,8 +56,8 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
                 "<%s><%s name=\"%s\"/></%1$s>",
                 LibraryDefHandler.TAG, IncludeDefRefHandler.TAG, filename), "myID", Format.XML);
         Mockito.doReturn(DefType.LIBRARY).when(descriptor).getDefType();
-        LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source), true, definitionService,
-                configAdapter, definitionParserAdapter);
+        LibraryDefHandler handler = new LibraryDefHandler(getReader(source), source, definitionService, true,
+                configAdapter, definitionParserAdapter, descriptor);
 
         LibraryDef actualDef = handler.getElement();
         assertSame(descriptor, actualDef.getDescriptor());
@@ -70,8 +70,8 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
     public void testGetElementWithEmptyTag() throws Exception {
         StringSource<LibraryDef> source = new StringSource<>(descriptor, String.format("<%s></%1$s>",
                 LibraryDefHandler.TAG), "myID", Format.XML);
-        LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source), true, definitionService,
-                configAdapter, definitionParserAdapter);
+        LibraryDefHandler handler = new LibraryDefHandler(getReader(source), source, definitionService, true,
+                configAdapter, definitionParserAdapter, descriptor);
 
         LibraryDef actualDef = handler.getElement();
         assertSame(descriptor, actualDef.getDescriptor());
@@ -82,8 +82,8 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
     public void testGetElementWithBodyText() throws Exception {
         StringSource<LibraryDef> source = new StringSource<>(descriptor, String.format("<%s>text</%1$s>",
                 LibraryDefHandler.TAG), "myID", Format.XML);
-        LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source), true, definitionService,
-                configAdapter, definitionParserAdapter);
+        LibraryDefHandler handler = new LibraryDefHandler(getReader(source), source, definitionService, true,
+                configAdapter, definitionParserAdapter, descriptor);
 
         try {
             handler.getElement();
@@ -98,8 +98,8 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
     public void testGetElementWithUnsupportedBodyTag() throws Exception {
         StringSource<LibraryDef> source = new StringSource<>(descriptor, String.format("<%s><br/></%1$s>",
                 LibraryDefHandler.TAG), "myID", Format.XML);
-        LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source), true, definitionService,
-                configAdapter, definitionParserAdapter);
+        LibraryDefHandler handler = new LibraryDefHandler(getReader(source), source, definitionService, true,
+                configAdapter, definitionParserAdapter, descriptor);
 
         try {
             handler.getElement();
@@ -114,8 +114,8 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
         String expectedDescription = "needs to be included";
         StringSource<LibraryDef> source = new StringSource<>(descriptor, String.format("<%s description='%s'></%1$s>",
                 LibraryDefHandler.TAG, expectedDescription), "myID", Format.XML);
-        LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source), true, definitionService,
-                configAdapter, definitionParserAdapter);
+        LibraryDefHandler handler = new LibraryDefHandler(getReader(source), source, definitionService, true,
+                configAdapter, definitionParserAdapter, descriptor);
 
         LibraryDef actualDef = handler.getElement();
         assertEquals(expectedDescription, actualDef.getDescription());
@@ -125,8 +125,8 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
     public void testGetElementWithUnexpectedAttribute() throws Exception {
         StringSource<LibraryDef> source = new StringSource<>(descriptor, String.format("<%s unexpected='me'></%1$s>",
                 LibraryDefHandler.TAG), "myID", Format.XML);
-        LibraryDefHandler handler = new LibraryDefHandler(descriptor, source, getReader(source), true, definitionService,
-                configAdapter, definitionParserAdapter);
+        LibraryDefHandler handler = new LibraryDefHandler(getReader(source), source, definitionService, true,
+                configAdapter, definitionParserAdapter, descriptor);
 
         try {
             handler.getElement();

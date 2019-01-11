@@ -47,10 +47,10 @@ public class RequiredVersionDefHandler<P extends RootDefinition> extends Parente
 
     private final RequiredVersionDefImpl.Builder builder = new RequiredVersionDefImpl.Builder();
 
-    public RequiredVersionDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
-                                     boolean isInInternalNamespace, DefinitionService definitionService,
-                                     ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    public RequiredVersionDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService, 
+                                     boolean isInInternalNamespace, ConfigAdapter configAdapter,
+                                     DefinitionParserAdapter definitionParserAdapter, RootTagHandler<P> parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
         builder.setAccess(getAccess(isInInternalNamespace));
     }
 

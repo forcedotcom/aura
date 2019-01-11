@@ -40,11 +40,10 @@ public class FlavorsDefHandler extends FileTagHandler<FlavorsDef> {
 
     private final FlavorsDefImpl.Builder builder = new FlavorsDefImpl.Builder();
 
-    public FlavorsDefHandler(DefDescriptor<FlavorsDef> defDescriptor, TextSource<FlavorsDef> source,
-                             XMLStreamReader xmlReader, boolean isInInternalNamespace,
-                             DefinitionService definitionService,
-                             ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) throws QuickFixException {
-        super(defDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    public FlavorsDefHandler(XMLStreamReader xmlReader, TextSource<FlavorsDef> source, DefinitionService definitionService,
+                             boolean isInInternalNamespace, ConfigAdapter configAdapter,
+                             DefinitionParserAdapter definitionParserAdapter, DefDescriptor<FlavorsDef> defDescriptor) throws QuickFixException {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, defDescriptor);
 
         builder.setDescriptor(getDefDescriptor());
         builder.setLocation(getLocation());
@@ -79,13 +78,13 @@ public class FlavorsDefHandler extends FileTagHandler<FlavorsDef> {
         String tag = getTagName();
 
         if (FlavorIncludeDefHandler.TAG.equalsIgnoreCase(tag)) {
-            FlavorIncludeDef def = new FlavorIncludeDefHandler(this, xmlReader, source, isInInternalNamespace,
-                    definitionService, configAdapter, definitionParserAdapter).getElement();
+            FlavorIncludeDef def = new FlavorIncludeDefHandler(xmlReader, source, definitionService,
+                    isInInternalNamespace, configAdapter, definitionParserAdapter, this).getElement();
             builder.addFlavorIncludeDef(def);
         }
         else if (FlavorDefaultDefHandler.TAG.equalsIgnoreCase(tag)) {
-            FlavorDefaultDef def = new FlavorDefaultDefHandler(this, xmlReader, source, isInInternalNamespace,
-                    definitionService, configAdapter, definitionParserAdapter).getElement();
+            FlavorDefaultDef def = new FlavorDefaultDefHandler(xmlReader, source, definitionService,
+                    isInInternalNamespace, configAdapter, definitionParserAdapter, this).getElement();
             builder.addFlavorDefaultDef(def);
         } else {
             error("Found unexpected tag %s", tag);

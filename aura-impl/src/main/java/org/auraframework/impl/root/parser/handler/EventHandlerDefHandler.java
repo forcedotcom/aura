@@ -49,19 +49,14 @@ public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
     private static final String ATTRIBUTE_PHASE = "phase";
     private static final String ATTRIBUTE_INCLUDE_FACETS = "includeFacets";
 
-    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_ACTION, ATTRIBUTE_EVENT,
+    protected static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_ACTION, ATTRIBUTE_EVENT,
             ATTRIBUTE_NAME, ATTRIBUTE_VALUE, ATTRIBUTE_PHASE, ATTRIBUTE_INCLUDE_FACETS,
             RootTagHandler.ATTRIBUTE_DESCRIPTION);
 
-    private RootTagHandler<? extends RootDefinition> parentHandler;
+    private final RootTagHandler<? extends RootDefinition> parentHandler;
     private final EventHandlerDefImpl.Builder builder = new EventHandlerDefImpl.Builder();
 
-    public EventHandlerDefHandler() {
-        super();
-    }
-
-    public EventHandlerDefHandler(RootTagHandler<? extends RootDefinition> parentHandler, XMLStreamReader xmlReader,
-                                  TextSource<?> source, DefinitionService definitionService) {
+    public EventHandlerDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService, RootTagHandler<? extends RootDefinition> parentHandler) {
         super(xmlReader, source, definitionService);
         this.parentHandler = parentHandler;
     }

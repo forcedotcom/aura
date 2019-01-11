@@ -35,23 +35,20 @@ import com.google.common.collect.ImmutableSet;
 
 public class LocatorContextDefHandler<P extends RootDefinition> extends ParentedTagHandler<LocatorContextDef, P> {
 
-    public static String TAG = "aura:locatorContext";
+    public static final String TAG = "aura:locatorContext";
 
-    private static String ATTRIBUTE_KEY = "key";
-    private static String ATTRIBUTE_VALUE = "value";
+    private static final String ATTRIBUTE_KEY = "key";
+    private static final String ATTRIBUTE_VALUE = "value";
     private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_KEY, ATTRIBUTE_VALUE);
 
     private final LocatorContextDefImpl.Builder builder = new LocatorContextDefImpl.Builder();
 
-    public LocatorContextDefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
-                                    boolean isInInternalNamespace, DefinitionService definitionService,
-                                    ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter,
-                definitionParserAdapter);
-    }
-
-    public LocatorContextDefHandler() {
-        super();
+    public LocatorContextDefHandler(XMLStreamReader xmlReader, TextSource<?> source,
+                                    DefinitionService definitionService, boolean isInInternalNamespace,
+                                    ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter,
+                                    ContainerTagHandler<P> parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter,
+                definitionParserAdapter, parentHandler);
     }
 
     @Override
@@ -105,5 +102,4 @@ public class LocatorContextDefHandler<P extends RootDefinition> extends Parented
     protected LocatorContextDef createDefinition() throws QuickFixException {
         return builder.build();
     }
-
 }

@@ -52,15 +52,11 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
 
     private final EventDefImpl.Builder builder = new EventDefImpl.Builder();
 
-    public EventDefHandler() {
-        super();
-    }
-
-    public EventDefHandler(DefDescriptor<EventDef> eventDefDescriptor, TextSource<?> source, XMLStreamReader xmlReader,
-                           boolean isInInternalNamespace, DefinitionService definitionService,
-                           ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(eventDefDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter,
-                definitionParserAdapter);
+    public EventDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
+                           boolean isInInternalNamespace, ConfigAdapter configAdapter,
+                           DefinitionParserAdapter definitionParserAdapter, DefDescriptor<EventDef> eventDefDescriptor) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter,
+                definitionParserAdapter, eventDefDescriptor);
         builder.setDescriptor(eventDefDescriptor);
     }
 
@@ -79,14 +75,14 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
         if (AttributeDefHandler.TAG.equalsIgnoreCase(tag)) {
-            AttributeDefImpl attributeDef = new AttributeDefHandler<>(this, xmlReader, source, isInInternalNamespace,
-                    definitionService, configAdapter, definitionParserAdapter).getElement();
+            AttributeDefImpl attributeDef = new AttributeDefHandler<>(xmlReader, source, definitionService,
+                    isInInternalNamespace, configAdapter, definitionParserAdapter, this).getElement();
             builder.getAttributeDefs().put(definitionService.getDefDescriptor(attributeDef.getName(), AttributeDef.class),
                     attributeDef);
         } else if (RequiredVersionDefHandler.TAG.equalsIgnoreCase(tag)) {
-            RequiredVersionDefImpl requiredVersionDef = new RequiredVersionDefHandler<>(this,
-                    xmlReader, source, isInInternalNamespace, definitionService, configAdapter,
-                    definitionParserAdapter).getElement();
+            RequiredVersionDefImpl requiredVersionDef = new RequiredVersionDefHandler<>(
+                    xmlReader, source, definitionService, isInInternalNamespace, configAdapter,
+                    definitionParserAdapter, this).getElement();
             DefDescriptor<RequiredVersionDef> requiredVersionDesc = requiredVersionDef
                     .getDescriptor();
             if (builder.getRequiredVersionDefs().containsKey(requiredVersionDesc)) {

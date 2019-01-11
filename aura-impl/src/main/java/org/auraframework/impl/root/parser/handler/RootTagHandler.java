@@ -53,14 +53,10 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
 
     private Map<DefDescriptor<?>, Definition> bundled = null;
 
-    protected RootTagHandler() {
-        super();
-    }
-
-    protected RootTagHandler(DefDescriptor<T> defDescriptor, TextSource<?> source, XMLStreamReader xmlReader,
-                             boolean isInInternalNamespace, DefinitionService definitionService,
-                             ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(defDescriptor, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    protected RootTagHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
+                             boolean isInInternalNamespace, ConfigAdapter configAdapter,
+                             DefinitionParserAdapter definitionParserAdapter, DefDescriptor<T> defDescriptor) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, defDescriptor);
     }
 
     public void setBundledDefs(Map<DefDescriptor<?>, Definition> bundled) {

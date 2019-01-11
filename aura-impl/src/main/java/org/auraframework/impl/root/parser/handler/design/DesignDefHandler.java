@@ -44,28 +44,20 @@ public class DesignDefHandler extends FileTagHandler<DesignDef> {
     public static final String TAG = "design:component";
     private static final String ATTRIBUTE_LABEL = "label";
 
-    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_LABEL);
+    protected static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_LABEL);
 
-    private final DesignDefImpl.Builder builder;
+    private final DesignDefImpl.Builder builder = new DesignDefImpl.Builder();
     private final GenericXmlElementHandlerProvider genericHandlerProvider;
 
     // counter used to index child defs without an explicit id
     private int idCounter = 0;
 
-    public DesignDefHandler() {
-        super();
-        builder = new DesignDefImpl.Builder();
-        //This is only called to fetch the getAllowedAttributes
-        genericHandlerProvider = null;
-    }
-
-    public DesignDefHandler(DefDescriptor<DesignDef> defDescriptor, TextSource<DesignDef> source, XMLStreamReader xmlReader,
-                            boolean isInInternalNamespace, DefinitionService definitionService,
+    public DesignDefHandler(XMLStreamReader xmlReader, TextSource<DesignDef> source,
+                            DefinitionService definitionService, boolean isInInternalNamespace,
                             ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter,
-                            GenericXmlElementHandlerProvider genericHandlerProvider) {
-        super(defDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+                            DefDescriptor<DesignDef> defDescriptor, GenericXmlElementHandlerProvider genericHandlerProvider) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, defDescriptor);
         this.genericHandlerProvider = genericHandlerProvider;
-        builder = new DesignDefImpl.Builder();
         builder.setDescriptor(getDefDescriptor());
         builder.setLocation(getLocation());
         builder.setAccess(getAccess(isInInternalNamespace));
@@ -101,8 +93,8 @@ public class DesignDefHandler extends FileTagHandler<DesignDef> {
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
         if (DesignAttributeDefHandler.TAG.equalsIgnoreCase(tag)) {
-            DesignAttributeDef attributeDesign = new DesignAttributeDefHandler(this, xmlReader, source,
-                    isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter).getElement();
+            DesignAttributeDef attributeDesign = new DesignAttributeDefHandler(xmlReader, source,
+                    definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, this).getElement();
             builder.addAttributeDesign(
                     definitionService.getDefDescriptor(attributeDesign.getName(), DesignAttributeDef.class), attributeDesign);
         } else if (DesignTemplateDefHandler.TAG.equalsIgnoreCase(tag)) {
@@ -110,8 +102,8 @@ public class DesignDefHandler extends FileTagHandler<DesignDef> {
                 throw new XMLStreamException(String.format("<%s> may only contain one %s definition", getHandledTag(),
                         tag));
             }
-            DesignTemplateDef template = new DesignTemplateDefHandler(this, xmlReader, source, isInInternalNamespace,
-                    definitionService, configAdapter, definitionParserAdapter).getElement();
+            DesignTemplateDef template = new DesignTemplateDefHandler(xmlReader, source, definitionService,
+                    isInInternalNamespace, configAdapter, definitionParserAdapter, this).getElement();
             builder.setDesignTemplateDef(template);
         } else if (genericHandlerProvider.handlesTag(DesignDef.class, tag, isInInternalNamespace)) {
             GenericXmlElement xmlDef = genericHandlerProvider.getHandler(
@@ -146,5 +138,4 @@ public class DesignDefHandler extends FileTagHandler<DesignDef> {
         idCounter++;
         return ret;
     }
-
 }

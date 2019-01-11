@@ -103,15 +103,15 @@ public class FlavorIncludeDefHandlerTest extends StyleTestCase {
         StringSource<FlavorsDef> parentSource = new StringSource<>(parentDesc, "<aura:flavors/>", "myID", Format.XML);
         XMLStreamReader parentReader = XMLParserBase.createXMLStreamReader(parentSource.getReader());
         parentReader.next();
-        FlavorsDefHandler parent = new FlavorsDefHandler(parentDesc, parentSource, parentReader, true, definitionService,
-                configAdapter, definitionParserAdapter);
+        FlavorsDefHandler parent = new FlavorsDefHandler(parentReader, parentSource, definitionService, true,
+                configAdapter, definitionParserAdapter, parentDesc);
 
         DefDescriptor<FlavorIncludeDef> desc = definitionService.getDefDescriptor("test", FlavorIncludeDef.class);
         StringSource<FlavorIncludeDef> ss = new StringSource<>(desc, src, "myID", Format.XML);
         XMLStreamReader xmlReader = XMLParserBase.createXMLStreamReader(ss.getReader());
         xmlReader.next();
-        FlavorIncludeDefHandler handler = new FlavorIncludeDefHandler(parent, xmlReader, ss, true,
-                definitionService, configAdapter, definitionParserAdapter);
+        FlavorIncludeDefHandler handler = new FlavorIncludeDefHandler(xmlReader, ss, definitionService,
+                true, configAdapter, definitionParserAdapter, parent);
         return handler.getElement();
     }
 }

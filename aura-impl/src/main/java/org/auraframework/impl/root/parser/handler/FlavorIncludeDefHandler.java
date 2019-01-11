@@ -37,16 +37,16 @@ import com.google.common.collect.ImmutableSet;
 
 public class FlavorIncludeDefHandler extends ParentedTagHandler<FlavorIncludeDef, FlavorsDef> {
     protected static final String TAG = "aura:include";
-    private static final String ATTRIBUTE_SOURCE = "source";
+    private final static String ATTRIBUTE_SOURCE = "source";
 
     private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_SOURCE, ATTRIBUTE_DESCRIPTION);
 
     private final FlavorIncludeDefImpl.Builder builder = new FlavorIncludeDefImpl.Builder();
 
-    public FlavorIncludeDefHandler(FlavorsDefHandler parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
-                                   boolean isInInternalNamespace, DefinitionService definitionService,
-                                   ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    public FlavorIncludeDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
+                                   boolean isInInternalNamespace, ConfigAdapter configAdapter,
+                                   DefinitionParserAdapter definitionParserAdapter, FlavorsDefHandler parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
         builder.setLocation(getLocation());
         builder.setAccess(getAccess(isInInternalNamespace));
     }

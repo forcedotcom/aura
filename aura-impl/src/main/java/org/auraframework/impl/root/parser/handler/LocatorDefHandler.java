@@ -34,26 +34,21 @@ import com.google.common.collect.ImmutableSet;
 
 public class LocatorDefHandler<P extends RootDefinition> extends ParentedTagHandler<LocatorDef, P> {
 
-    public static String TAG = "aura:locator";
+    public static final String TAG = "aura:locator";
 
-    private static String ATTRIBUTE_TARGET = "target";
-    private static String ATTRIBUTE_DESCRIPTION = "description";
-    private static String ATTRIBUTE_ALIAS = "alias";
-    private static String ATTRIBUTE_ISPRIMITIVE = "isPrimitive";
-    private static String ANY_TARGET_SELECTOR = "*";
+    private static final String ATTRIBUTE_TARGET = "target";
+    private static final String ATTRIBUTE_DESCRIPTION = "description";
+    private static final String ATTRIBUTE_ALIAS = "alias";
+    private static final String ATTRIBUTE_ISPRIMITIVE = "isPrimitive";
+    private static final String ANY_TARGET_SELECTOR = "*";
     private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_TARGET, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_ALIAS, ATTRIBUTE_ISPRIMITIVE);
 
     private final LocatorDefImpl.Builder builder = new LocatorDefImpl.Builder();
 
-    public LocatorDefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
-                             boolean isInInternalNamespace, DefinitionService definitionService,
-                             ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter,
-                definitionParserAdapter);
-    }
-
-    public LocatorDefHandler() {
-        super();
+    public LocatorDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
+                             boolean isInInternalNamespace, ConfigAdapter configAdapter,
+                             DefinitionParserAdapter definitionParserAdapter, ContainerTagHandler<P> parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
     }
 
     @Override
@@ -66,8 +61,8 @@ public class LocatorDefHandler<P extends RootDefinition> extends ParentedTagHand
         String tag = getTagName();
         if (LocatorContextDefHandler.TAG.equals(tag)) {
             // to resolve expressions in locator context definitions, we need to pass in the component as the parent
-            builder.addLocatorContext(new LocatorContextDefHandler<>(this.getParentHandler(), xmlReader, source,
-                    isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter).getElement());
+            builder.addLocatorContext(new LocatorContextDefHandler<>(xmlReader, source,
+                    definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, this.getParentHandler()).getElement());
         } else {
             error("Found unexpected tag inside aura:locator. %s", tag);
         }
@@ -109,7 +104,7 @@ public class LocatorDefHandler<P extends RootDefinition> extends ParentedTagHand
         }
         
         if (!StringUtils.isBlank(isPrimitive)) {
-            builder.setIsPrimitive(Boolean.parseBoolean(isPrimitive));
+            builder.setIsPrimitive(Boolean.valueOf(isPrimitive));
         }
     }
 
@@ -126,5 +121,4 @@ public class LocatorDefHandler<P extends RootDefinition> extends ParentedTagHand
     protected LocatorDef createDefinition() throws QuickFixException {
         return builder.build();
     }
-
 }

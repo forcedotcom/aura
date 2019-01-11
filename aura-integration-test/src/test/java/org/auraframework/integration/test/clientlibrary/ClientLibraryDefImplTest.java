@@ -190,14 +190,13 @@ public class ClientLibraryDefImplTest extends AuraImplTestCase {
     private ClientLibraryDefHandler<ComponentDef> getHandler(String clMarkup) throws Exception {
         StringSource<ClientLibraryDef> componentSource = new StringSource<>(null, "<aura:component/>", "myID", Format.XML);
         XMLStreamReader componentXmlReader = getXmlReader(componentSource);
-        ComponentDefHandler cdh = new ComponentDefHandler(null, componentSource, componentXmlReader, true,
-                definitionService, configAdapter, definitionParserAdapter);
+        ComponentDefHandler cdh = new ComponentDefHandler(componentXmlReader, componentSource, definitionService, true,
+                configAdapter, definitionParserAdapter, null);
 
         StringSource<ClientLibraryDef> clientLibrarySource = new StringSource<>(null, clMarkup,
                 "myID", Format.XML);
         XMLStreamReader xmlReader = getXmlReader(clientLibrarySource);
-        return new ClientLibraryDefHandler<>(cdh, xmlReader,
-                clientLibrarySource, false, definitionService, configAdapter, definitionParserAdapter);
+        return new ClientLibraryDefHandler<>(xmlReader, clientLibrarySource, definitionService, false, configAdapter, definitionParserAdapter, cdh);
     }
 
     private XMLStreamReader getXmlReader(StringSource<ClientLibraryDef> clSource) throws FactoryConfigurationError,

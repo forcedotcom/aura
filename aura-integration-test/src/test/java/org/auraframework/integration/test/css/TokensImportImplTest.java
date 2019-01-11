@@ -44,8 +44,8 @@ public class TokensImportImplTest extends StyleTestCase {
         StringSource<TokensImportDef> ss = new StringSource<>(desc, src, "myID", Format.XML);
         XMLStreamReader xmlReader = XMLParserBase.createXMLStreamReader(ss.getReader());
         xmlReader.next();
-        TokensImportDefHandler handler = new TokensImportDefHandler(null, xmlReader, ss, true,
-                definitionService, configAdapter, definitionParserAdapter);
+        TokensImportDefHandler handler = new TokensImportDefHandler(xmlReader, ss, definitionService, true,
+                configAdapter, definitionParserAdapter, null);
         return handler.getElement();
     }
 

@@ -34,8 +34,6 @@ import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
 
-/**
- */
 public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef, ComponentDefImpl.Builder> {
 
     public static final String TAG = "aura:component";
@@ -54,15 +52,11 @@ public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef, C
             .add(ATTRIBUTE_PROVIDER)
             .add(ATTRIBUTE_MINVERSION)
             .build();
-    
-    public ComponentDefHandler() {
-        super();
-    }
 
-    public ComponentDefHandler(DefDescriptor<ComponentDef> componentDefDescriptor, TextSource<?> source,
-                               XMLStreamReader xmlReader, boolean isInInternalNamespace, DefinitionService definitionService,
-                               ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(componentDefDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter, new ComponentDefImpl.Builder());
+    public ComponentDefHandler(XMLStreamReader xmlReader, TextSource<?> source , DefinitionService definitionService,
+            boolean isInInternalNamespace, ConfigAdapter configAdapter,
+                               DefinitionParserAdapter definitionParserAdapter, DefDescriptor<ComponentDef> componentDefDescriptor) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, componentDefDescriptor, new ComponentDefImpl.Builder());
     }
 
     @Override

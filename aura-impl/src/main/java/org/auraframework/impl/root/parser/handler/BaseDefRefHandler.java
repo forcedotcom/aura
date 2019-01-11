@@ -44,13 +44,13 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 public abstract class BaseDefRefHandler<T extends DefinitionReference, P extends Definition, C extends Definition,
         B extends Builder<T, C>> extends ParentedTagHandler<T, P> {
 
-    protected List<DefinitionReference> body;
+    protected final List<DefinitionReference> body;
     protected B builder;
 
-    public BaseDefRefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
-                                  boolean isInInternalNamespace, DefinitionService definitionService,
-                                  ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    public BaseDefRefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
+                             boolean isInInternalNamespace, ConfigAdapter configAdapter,
+                             DefinitionParserAdapter definitionParserAdapter, ContainerTagHandler<P> parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
         builder = createBuilder();
         builder.setLocation(getLocation());
         builder.setAccess(getAccess(isInInternalNamespace));
@@ -66,7 +66,6 @@ public abstract class BaseDefRefHandler<T extends DefinitionReference, P extends
         }
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     protected void readSystemAttributes() throws QuickFixException {
         super.readSystemAttributes();

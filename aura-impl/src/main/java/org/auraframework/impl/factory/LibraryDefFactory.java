@@ -50,6 +50,6 @@ public class LibraryDefFactory extends BundleBaseFactory<LibraryDef> {
                                            XMLStreamReader xmlReader, boolean isInInternalNamespace,
                                            DefinitionService definitionService,
                                            ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        return new LibraryDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+        return new LibraryDefHandler(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, descriptor);
     }
 }

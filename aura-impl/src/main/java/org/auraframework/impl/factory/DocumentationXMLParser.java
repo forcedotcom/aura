@@ -33,8 +33,8 @@ public class DocumentationXMLParser extends XMLParser<DocumentationDef> {
                                                  TextSource<DocumentationDef> source, XMLStreamReader xmlReader,
                                                  boolean isInInternalNamespace, DefinitionService definitionService,
                                                  ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        return new DocumentationDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,
-                configAdapter, definitionParserAdapter);
+        return new DocumentationDefHandler(xmlReader, source, definitionService, isInInternalNamespace,
+                configAdapter, definitionParserAdapter, descriptor);
     }
 
     @Override

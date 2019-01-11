@@ -57,8 +57,8 @@ public class ComponentDefFactory extends BaseComponentDefFactory<ComponentDef> {
                                              DefinitionService definitionService,
                                              ConfigAdapter configAdapter,
                                              DefinitionParserAdapter definitionParserAdapter) {
-        return new ComponentDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,
-                configAdapter, definitionParserAdapter);
+        return new ComponentDefHandler(xmlReader, source, definitionService, isInInternalNamespace,
+                configAdapter, definitionParserAdapter, descriptor);
     }
 
     private class TemplateCallbackImpl implements ComponentDefHandler.TemplateCallback {

@@ -22,22 +22,20 @@ import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.def.DocumentationDef;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
- * Class for a tag that is a top level tag for a file, but is not a "root" tag (SVG, DocumentationDef).
+ * Class for a tag that is a top level tag for a file, but is not a "root" tag (SVG, {@link DocumentationDef}).
  */
 public abstract class FileTagHandler<T extends Definition> extends ContainerTagHandler<T> {
-    protected FileTagHandler() {
-        super();
-    }
 
-    protected FileTagHandler(DefDescriptor<T> defDescriptor, TextSource<?> source, XMLStreamReader xmlReader,
-                             boolean isInInternalNamespace, DefinitionService definitionService,
-                             ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(defDescriptor, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    protected FileTagHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
+                             boolean isInInternalNamespace, ConfigAdapter configAdapter,
+                             DefinitionParserAdapter definitionParserAdapter, DefDescriptor<T> defDescriptor) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, defDescriptor);
     }
 
     public abstract DefBuilder<T,T> getBuilder();
@@ -58,6 +56,4 @@ public abstract class FileTagHandler<T extends Definition> extends ContainerTagH
             builder.setParseError(t);
         }
     }
-
 }
-

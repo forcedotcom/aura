@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -65,10 +66,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 
-/**
- */
 public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B extends Builder<T>> extends RootTagHandler<T> {
 
     private static final String ATTRIBUTE_RENDER = "render";
@@ -97,21 +95,16 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             .addAll(ALLOWED_ATTRIBUTES).addAll(RootTagHandler.INTERNAL_ALLOWED_ATTRIBUTES)
             .build();
 
+    private final List<DefinitionReference> body = new ArrayList<>();
+    protected final B builder;
+
     private int innerCount = 0;
-    private final List<DefinitionReference> body = Lists.newArrayList();
-    protected B builder;
-
-    public BaseComponentDefHandler() {
-        super();
-    }
-
-    public BaseComponentDefHandler(DefDescriptor<T> componentDefDescriptor, TextSource<?> source,
-                                   XMLStreamReader xmlReader,
-                                   boolean isInInternalNamespace, DefinitionService definitionService,
-                                   ConfigAdapter configAdapter,
+    
+    public BaseComponentDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
+                                   boolean isInInternalNamespace, ConfigAdapter configAdapter,
                                    DefinitionParserAdapter definitionParserAdapter,
-                                   B builder) {
-        super(componentDefDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+                                   DefDescriptor<T> componentDefDescriptor, B builder) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, componentDefDescriptor);
         this.builder = builder;
         builder.setLocation(getLocation());
         builder.setDescriptor(componentDefDescriptor);
@@ -129,8 +122,8 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
         if (AttributeDefHandler.TAG.equalsIgnoreCase(tag)) {
-            AttributeDefHandler<T> handler = new AttributeDefHandler<>(this, xmlReader, source, isInInternalNamespace,
-                    definitionService, configAdapter, definitionParserAdapter);
+            AttributeDefHandler<T> handler = new AttributeDefHandler<>(xmlReader, source, definitionService,
+                    isInInternalNamespace, configAdapter, definitionParserAdapter, this);
             AttributeDefImpl attributeDef = handler.getElement();
             DefDescriptor<AttributeDef> attributeDesc = attributeDef.getDescriptor();
             DefDescriptor<MethodDef> methodDef = definitionService.getDefDescriptor(attributeDesc.getName(), MethodDef.class);
@@ -152,8 +145,8 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             }
             builder.getAttributeDefs().put(attributeDef.getDescriptor(),attributeDef);
         } else if (isInInternalNamespace && RequiredVersionDefHandler.TAG.equalsIgnoreCase(tag)) {
-            RequiredVersionDefHandler<T> handler = new RequiredVersionDefHandler<>(this, xmlReader, source,
-                    isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+            RequiredVersionDefHandler<T> handler = new RequiredVersionDefHandler<>(xmlReader, source,
+                    definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, this);
             RequiredVersionDefImpl requiredVersionDef = handler.getElement();
             DefDescriptor<RequiredVersionDef> requiredVersionDesc = requiredVersionDef.getDescriptor();
             if (builder.getRequiredVersionDefs().containsKey(requiredVersionDesc)) {
@@ -166,8 +159,8 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             }
             builder.getRequiredVersionDefs().put(requiredVersionDesc, requiredVersionDef);
         } else if (RegisterEventHandler.TAG.equalsIgnoreCase(tag)) {
-            RegisterEventHandler<T> handler = new RegisterEventHandler<>(this, xmlReader, source,
-                    isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+            RegisterEventHandler<T> handler = new RegisterEventHandler<>(xmlReader, source,
+                    definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, this);
             RegisterEventDefImpl regDef = handler.getElement();
             DefDescriptor<MethodDef> methodDef = definitionService.getDefDescriptor(regDef.getDescriptor().getName(), MethodDef.class);
             if (builder.events.containsKey(regDef.getDescriptor().getName())) {
@@ -188,12 +181,12 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
 
             builder.events.put(regDef.getDescriptor().getName(), regDef);
         } else if (EventHandlerDefHandler.TAG.equalsIgnoreCase(tag)) {
-            builder.eventHandlers.add(new EventHandlerDefHandler(this, xmlReader, source, definitionService).getElement());
+            builder.eventHandlers.add(new EventHandlerDefHandler(xmlReader, source, definitionService, this).getElement());
         } else if (LibraryDefRefHandler.TAG.equalsIgnoreCase(tag)) {
-            builder.addLibraryImport(new LibraryDefRefHandler(this, xmlReader, source, definitionService).getElement());
+            builder.addLibraryImport(new LibraryDefRefHandler(xmlReader, source, definitionService, this).getElement());
         } else if (AttributeDefRefHandler.TAG.equalsIgnoreCase(tag)) {
-            builder.facets.add(new AttributeDefRefHandler<>(this, xmlReader, source, isInInternalNamespace,
-                    definitionService, configAdapter, definitionParserAdapter).getElement());
+            builder.facets.add(new AttributeDefRefHandler<>(xmlReader, source, definitionService,
+                    isInInternalNamespace, configAdapter, definitionParserAdapter, this).getElement());
         } else if (DependencyDefHandler.TAG.equalsIgnoreCase(tag)) {
             try {
                 builder.addDependency(new DependencyDefHandler(xmlReader, source).parse());
@@ -201,11 +194,11 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
                 setParseError(qfe);
             }
         } else if (ClientLibraryDefHandler.TAG.equalsIgnoreCase(tag)) {
-            builder.addClientLibrary(new ClientLibraryDefHandler<>(this, xmlReader, source, isInInternalNamespace,
-                    definitionService, configAdapter, definitionParserAdapter).getElement());
+            builder.addClientLibrary(new ClientLibraryDefHandler<>(xmlReader, source, definitionService,
+                    isInInternalNamespace, configAdapter, definitionParserAdapter, this).getElement());
         } else if (MethodDefHandler.TAG.equalsIgnoreCase(tag)) {
-            MethodDefHandler<T> handler = new MethodDefHandler<>(this, xmlReader, source, isInInternalNamespace,
-                    definitionService, configAdapter, definitionParserAdapter);
+            MethodDefHandler<T> handler = new MethodDefHandler<>(xmlReader, source, definitionService,
+                    isInInternalNamespace, configAdapter, definitionParserAdapter, this);
             MethodDef methodDef = handler.getElement();
             DefDescriptor<MethodDef> methodDesc = methodDef.getDescriptor();
             String methodName=methodDesc.getName();
@@ -232,8 +225,8 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             }
             builder.getMethodDefs().put(methodDef.getDescriptor(),methodDef);
         } else if (LocatorDefHandler.TAG.equalsIgnoreCase(tag)) {
-            LocatorDef locatorDef = new LocatorDefHandler<>(this, xmlReader, source, isInInternalNamespace,
-                    definitionService, configAdapter, definitionParserAdapter).getElement();
+            LocatorDef locatorDef = new LocatorDefHandler<>(xmlReader, source, definitionService,
+                    isInInternalNamespace, configAdapter, definitionParserAdapter, this).getElement();
             if (builder.locatorDefs != null &&
                     builder.locatorDefs.containsKey(locatorDef.getTarget())) {
                 tagError("There is already a locator with target named '%s' on %s '%s'.",

@@ -43,7 +43,7 @@ public class ApplicationDefFactory extends BaseComponentDefFactory<ApplicationDe
                                                TextSource<ApplicationDef> source, XMLStreamReader xmlReader,
                                                boolean isInInternalNamespace, DefinitionService definitionService,
                                                ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        return new ApplicationDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,
-                configAdapter, definitionParserAdapter);
+        return new ApplicationDefHandler(xmlReader, source, definitionService, isInInternalNamespace,
+                configAdapter, definitionParserAdapter, descriptor);
     }
 }

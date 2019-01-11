@@ -59,15 +59,11 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
 
     private final InterfaceDefImpl.Builder builder = new InterfaceDefImpl.Builder();
 
-    public InterfaceDefHandler() {
-        super();
-    }
-
-    public InterfaceDefHandler(DefDescriptor<InterfaceDef> descriptor, TextSource<?> source, XMLStreamReader xmlReader,
-                               boolean isInInternalNamespace, DefinitionService definitionService,
-                               ContextService contextService,
-                               ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(descriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    public InterfaceDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
+                               boolean isInInternalNamespace, ContextService contextService,
+                               ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter,
+                               DefDescriptor<InterfaceDef> descriptor) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, descriptor);
         builder.events = new HashMap<>();
         builder.methods = new HashMap<>();
         if (source != null) {
@@ -86,8 +82,8 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
         if (AttributeDefHandler.TAG.equalsIgnoreCase(tag)) {
-            AttributeDefHandler<InterfaceDef> handler = new AttributeDefHandler<>(this, xmlReader, source,
-                    isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+            AttributeDefHandler<InterfaceDef> handler = new AttributeDefHandler<>(xmlReader, source,
+                    definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, this);
             AttributeDefImpl attributeDef = handler.getElement();
             DefDescriptor<AttributeDef> attributeDesc = attributeDef.getDescriptor();
             //            if (builder.getAttributeDefs().containsKey(attributeDesc)) {
@@ -100,8 +96,8 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
             //            }
             builder.addAttributeDef(attributeDesc,attributeDef);
         } else if (RequiredVersionDefHandler.TAG.equalsIgnoreCase(tag)) {
-            RequiredVersionDefHandler<InterfaceDef> handler = new RequiredVersionDefHandler<>(this, xmlReader, source,
-                    isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+            RequiredVersionDefHandler<InterfaceDef> handler = new RequiredVersionDefHandler<>(xmlReader, source,
+                    definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, this);
             RequiredVersionDefImpl requiredVersionDef = handler.getElement();
             DefDescriptor<RequiredVersionDef> requiredVersionDesc = requiredVersionDef.getDescriptor();
             if (builder.getRequiredVersionDefs().containsKey(requiredVersionDesc)) {
@@ -114,12 +110,12 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
             }
             builder.getRequiredVersionDefs().put(requiredVersionDesc, requiredVersionDef);
         } else if (RegisterEventHandler.TAG.equalsIgnoreCase(tag)) {
-            RegisterEventDefImpl regDef = new RegisterEventHandler<>(this, xmlReader, source, isInInternalNamespace,
-                    definitionService, configAdapter, definitionParserAdapter).getElement();
+            RegisterEventDefImpl regDef = new RegisterEventHandler<>(xmlReader, source, definitionService,
+                    isInInternalNamespace, configAdapter, definitionParserAdapter, this).getElement();
             builder.events.put(regDef.getDescriptor().getName(), regDef);
         } else if (MethodDefHandler.TAG.equalsIgnoreCase(tag)) {
-            MethodDef methodDef = new MethodDefHandler<>(this, xmlReader, source, isInInternalNamespace,
-                    definitionService, configAdapter, definitionParserAdapter).getElement();
+            MethodDef methodDef = new MethodDefHandler<>(xmlReader, source, definitionService, isInInternalNamespace,
+                    configAdapter, definitionParserAdapter, this).getElement();
             builder.methods.put(methodDef.getDescriptor(), methodDef);
         } else {
             error("Found unexpected tag <%s>", tag);

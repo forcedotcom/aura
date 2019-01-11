@@ -38,8 +38,8 @@ public class DesignXMLParser extends XMLParser<DesignDef> {
                                           TextSource<DesignDef> source, XMLStreamReader xmlReader,
                                           boolean isInInternalNamespace, DefinitionService definitionService,
                                           ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        return new DesignDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,
-                configAdapter, definitionParserAdapter, genericHandlerProvider);
+        return new DesignDefHandler(xmlReader, source, definitionService, isInInternalNamespace, configAdapter,
+                definitionParserAdapter, descriptor, genericHandlerProvider);
     }
 
     @Override

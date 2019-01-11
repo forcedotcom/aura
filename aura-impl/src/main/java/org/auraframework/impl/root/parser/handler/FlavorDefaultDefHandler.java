@@ -46,10 +46,10 @@ public class FlavorDefaultDefHandler extends ParentedTagHandler<FlavorDefaultDef
 
     private final FlavorDefaultDefImpl.Builder builder = new FlavorDefaultDefImpl.Builder();
 
-    public FlavorDefaultDefHandler(FlavorsDefHandler parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
-                                   boolean isInInternalNamespace, DefinitionService definitionService,
-                                   ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    public FlavorDefaultDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
+                                   boolean isInInternalNamespace, ConfigAdapter configAdapter,
+                                   DefinitionParserAdapter definitionParserAdapter, FlavorsDefHandler parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
         builder.setLocation(getLocation());
         builder.setAccess(getAccess(isInInternalNamespace));
     }

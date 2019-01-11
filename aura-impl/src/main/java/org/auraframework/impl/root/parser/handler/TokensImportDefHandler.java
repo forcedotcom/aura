@@ -37,17 +37,13 @@ import com.google.common.collect.ImmutableSet;
 public class TokensImportDefHandler extends ParentedTagHandler<TokensImportDef, TokensDef> {
     protected static final String TAG = "aura:import";
     private static final String ATTRIBUTE_NAME = "name";
-    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_DESCRIPTION);
+    private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_DESCRIPTION);
     private final TokensImportDefImpl.Builder builder = new TokensImportDefImpl.Builder();
 
-    public TokensImportDefHandler() {
-        super();
-    }
-
-    public TokensImportDefHandler(TokensDefHandler parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
-                                  boolean isInInternalNamespace, DefinitionService definitionService,
-                                  ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    public TokensImportDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
+                                  boolean isInInternalNamespace, ConfigAdapter configAdapter,
+                                  DefinitionParserAdapter definitionParserAdapter, TokensDefHandler parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
         this.builder.setLocation(getLocation());
         this.builder.setAccess(getAccess(isInInternalNamespace));
     }

@@ -40,11 +40,12 @@ public class DesignAttributeDefaultDefHandler extends ParentedTagHandler<DesignA
     DesignAttributeDefaultDefImpl.Builder builder = new DesignAttributeDefaultDefImpl.Builder();
 
 
-    public DesignAttributeDefaultDefHandler(DesignDefHandler parentHandler, XMLStreamReader xmlReader,
-                                            TextSource<?> source, boolean isInInternalNamespace,
-                                            DefinitionService definitionService,
-                                            ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    public DesignAttributeDefaultDefHandler(XMLStreamReader xmlReader, TextSource<?> source,
+                                            DefinitionService definitionService, boolean isInInternalNamespace,
+                                            ConfigAdapter configAdapter,
+                                            DefinitionParserAdapter definitionParserAdapter,
+                                            DesignDefHandler parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
         builder.setAccess(getAccess(isInInternalNamespace));
     }
 

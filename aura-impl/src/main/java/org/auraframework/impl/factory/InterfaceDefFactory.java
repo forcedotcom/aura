@@ -44,7 +44,7 @@ public class InterfaceDefFactory extends BundleBaseFactory<InterfaceDef> {
                                              TextSource<InterfaceDef> source, XMLStreamReader xmlReader,
                                              boolean isInInternalNamespace, DefinitionService definitionService,
                                              ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        return new InterfaceDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,
-                contextService, configAdapter, definitionParserAdapter);
+        return new InterfaceDefHandler(xmlReader, source, definitionService, isInInternalNamespace,
+                contextService, configAdapter, definitionParserAdapter, descriptor);
     }
 }

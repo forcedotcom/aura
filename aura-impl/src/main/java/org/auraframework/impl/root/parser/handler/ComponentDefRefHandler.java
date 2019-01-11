@@ -40,10 +40,10 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  */
 public class ComponentDefRefHandler<P extends Definition> extends BaseDefRefHandler<ComponentDefRef, P, ComponentDef, ComponentDefRefImpl.Builder> {
 
-    public ComponentDefRefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
-                                  boolean isInInternalNamespace, DefinitionService definitionService,
-                                  ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    public ComponentDefRefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
+                                  boolean isInInternalNamespace, ConfigAdapter configAdapter,
+                                  DefinitionParserAdapter definitionParserAdapter, ContainerTagHandler<P> parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
     }
 
     @Override
@@ -61,8 +61,8 @@ public class ComponentDefRefHandler<P extends Definition> extends BaseDefRefHand
 
         String tag = getTagName();
         if (AttributeDefRefHandler.TAG.equalsIgnoreCase(tag)) {
-            AttributeDefRefImpl attributeDefRef = new AttributeDefRefHandler<>(getParentHandler(), xmlReader, source,
-                    isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter)
+            AttributeDefRefImpl attributeDefRef = new AttributeDefRefHandler<>(xmlReader, source,
+                    definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, getParentHandler())
                     .getElement();
             builder.setAttribute(attributeDefRef.getDescriptor(), attributeDefRef);
         } else {

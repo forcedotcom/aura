@@ -40,10 +40,11 @@ public class HTMLComponentDefRefHandler<P extends Definition> extends ComponentD
 
     protected HTMLDefRefBuilderImpl htmlBuilder = new HTMLDefRefBuilderImpl();
 
-    protected HTMLComponentDefRefHandler(ContainerTagHandler<P> parentHandler, String tag, XMLStreamReader xmlReader,
-                                         TextSource<?> source, boolean isInInternalNamespace, DefinitionService definitionService,
-                                         ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    protected HTMLComponentDefRefHandler(XMLStreamReader xmlReader, TextSource<?> source,
+                                         DefinitionService definitionService, boolean isInInternalNamespace, 
+                                         ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter,
+                                         ContainerTagHandler<P> parentHandler, String tag) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
         builder = htmlBuilder;
         builder.setLocation(getLocation());
         builder.setOwnHash(source.getHash());

@@ -49,7 +49,7 @@ public class EventDefFactory extends BundleBaseFactory<EventDef> {
                                          TextSource<EventDef> source, XMLStreamReader xmlReader,
                                          boolean isInInternalNamespace, DefinitionService definitionService,
                                          ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        return new EventDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,
-                configAdapter, definitionParserAdapter);
+        return new EventDefHandler(xmlReader, source, definitionService, isInInternalNamespace,
+                configAdapter, definitionParserAdapter, descriptor);
     }
 }

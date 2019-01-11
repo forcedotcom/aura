@@ -36,8 +36,6 @@ import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
 
-/**
- */
 public class MethodDefHandler<P extends RootDefinition> extends ParentedTagHandler<MethodDef, P> {
 
     /**
@@ -58,20 +56,19 @@ public class MethodDefHandler<P extends RootDefinition> extends ParentedTagHandl
     private final MethodDefImpl.Builder builder = new MethodDefImpl.Builder();
 
     /**
-     * For writing
+     * @param xmlReader The {@link XMLStreamReader} that the handler should read from. It is expected to be queued up to
+     *            the appropriate position before {@link #getElement()} is invoked.
+     * @param source
+     * @param definitionService
+     * @param isInInternalNamespace
+     * @param configAdapter
+     * @param definitionParserAdapter
+     * @param parentHandler
      */
-    public MethodDefHandler() {
-
-    }
-
-    /**
-     * @param xmlReader The XMLStreamReader that the handler should read from. It is expected to be queued up to the
-     *            appropriate position before getElement() is invoked.
-     */
-    public MethodDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
-                            boolean isInInternalNamespace, DefinitionService definitionService,
-                            ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    public MethodDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
+                            boolean isInInternalNamespace, ConfigAdapter configAdapter,
+                            DefinitionParserAdapter definitionParserAdapter, RootTagHandler<P> parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
         String name = getAttributeValue(ATTRIBUTE_NAME);
         if (StringUtils.isBlank(name)) {
             error("The attribute '%s' is required on '<%s>'.", ATTRIBUTE_NAME, TAG);
@@ -131,8 +128,8 @@ public class MethodDefHandler<P extends RootDefinition> extends ParentedTagHandl
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
         if (AttributeDefHandler.TAG.equalsIgnoreCase(tag)) {
-            AttributeDefImpl attributeDef = new AttributeDefHandler<>(this, xmlReader, source, isInInternalNamespace,
-                    definitionService, configAdapter, definitionParserAdapter).getElement();
+            AttributeDefImpl attributeDef = new AttributeDefHandler<>(xmlReader, source, definitionService,
+                    isInInternalNamespace, configAdapter, definitionParserAdapter, this).getElement();
             builder.getAttributeDefs().put(definitionService.getDefDescriptor(attributeDef.getName(), AttributeDef.class),
                     attributeDef);
         } else {

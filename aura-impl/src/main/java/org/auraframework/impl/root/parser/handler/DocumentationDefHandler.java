@@ -37,7 +37,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class DocumentationDefHandler extends FileTagHandler<DocumentationDef> {
 
-    public static final String TAG = "aura:documentation";
+    public final static String TAG = "aura:documentation";
 
     protected final static Set<String> ALLOWED_ATTRIBUTES = Collections.emptySet();
 
@@ -46,14 +46,11 @@ public class DocumentationDefHandler extends FileTagHandler<DocumentationDef> {
     // counter used to index DescriptionDefs with no explicit id
     private int idCounter = 0;
 
-    public DocumentationDefHandler() {
-        super();
-    }
-
-    public DocumentationDefHandler(DefDescriptor<DocumentationDef> defDescriptor, TextSource<DocumentationDef> source,
-                                   XMLStreamReader xmlReader, boolean isInInternalNamespace, DefinitionService definitionService,
-                                   ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(defDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    public DocumentationDefHandler(XMLStreamReader xmlReader, TextSource<DocumentationDef> source,
+                                   DefinitionService definitionService, boolean isInInternalNamespace,
+                                   ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter,
+                                   DefDescriptor<DocumentationDef> defDescriptor) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, defDescriptor);
         builder.setDescriptor(getDefDescriptor());
         builder.setLocation(getLocation());
         if (source != null) {

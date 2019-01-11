@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.auraframework.impl.root.parser.handler;
 
 import java.util.Set;
@@ -51,17 +50,13 @@ public abstract class XMLHandler<T extends Definition> extends BaseXMLElementHan
             DependencyDefHandler.TAG, TokensDefHandler.TAG, DesignDefHandler.TAG,
             DesignAttributeDefHandler.TAG, DesignTemplateDefHandler.TAG, DesignTemplateRegionDefHandler.TAG,
             LibraryDefHandler.TAG, IncludeDefRefHandler.TAG);
-    private static final String SYSTEM_TAG_PREFIX = "aura";
+    private final static String SYSTEM_TAG_PREFIX = "aura";
 
     protected final DefinitionService definitionService;
 
     protected XMLHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService) {
         super(xmlReader, source);
         this.definitionService = definitionService;
-    }
-
-    protected XMLHandler() {
-        this(null, null, null);
     }
 
     /**

@@ -57,8 +57,8 @@ public class AttributeDefHandlerTest extends AuraImplTestCase {
         desc = definitionService.getDefDescriptor("mystring", AttributeDef.class);
         componentSource = new StringSource<>(desc, "<aura:component/>", "myID", Format.XML);
         componentXmlReader = getXmlReader(componentSource);
-        cdh = new ComponentDefHandler(null, componentSource, componentXmlReader, true, definitionService,
-                configAdapter, definitionParserAdapter);
+        cdh = new ComponentDefHandler(componentXmlReader, componentSource, definitionService, true,
+                configAdapter, definitionParserAdapter, null);
     }
 
     @Test
@@ -239,8 +239,8 @@ public class AttributeDefHandlerTest extends AuraImplTestCase {
         StringSource<AttributeDef> attributeSource = new StringSource<>(desc, attrMarkup,
                 "myID", Format.XML);
         XMLStreamReader attributeXmlReader = getXmlReader(attributeSource);
-        return new AttributeDefHandler<>(cdh, attributeXmlReader, attributeSource, true, definitionService,
-                configAdapter, definitionParserAdapter);
+        return new AttributeDefHandler<>(attributeXmlReader, attributeSource, definitionService, true,
+                configAdapter, definitionParserAdapter, cdh);
     }
 
     private AttributeDefImpl getElement(String attrMarkup) throws Exception {

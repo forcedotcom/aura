@@ -38,7 +38,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import com.google.common.collect.ImmutableSet;
 
 /**
- * <aura:set> tags
+ * {@code <aura:set>} tags
  */
 public class AttributeDefRefHandler<P extends Definition> extends ParentedTagHandler<AttributeDefRefImpl, P> {
 
@@ -53,14 +53,10 @@ public class AttributeDefRefHandler<P extends Definition> extends ParentedTagHan
     private final List<DefinitionReference> children = new ArrayList<>();
     private String stringValue;
 
-    public AttributeDefRefHandler() {
-        super();
-    }
-
-    public AttributeDefRefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
-                                  boolean isInInternalNamespace, DefinitionService definitionService,
-                                  ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    public AttributeDefRefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
+                                  boolean isInInternalNamespace, ConfigAdapter configAdapter,
+                                  DefinitionParserAdapter definitionParserAdapter, ContainerTagHandler<P> parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
         builder.setLocation(getLocation());
         builder.setAccess(getAccess(isInInternalNamespace));
     }

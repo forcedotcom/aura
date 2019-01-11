@@ -47,21 +47,15 @@ public final class TokenDefHandler extends ParentedTagHandler<TokenDef, TokensDe
             .addAll(RootTagHandler.ALLOWED_ATTRIBUTES)
             .build();
 
-    private final static Set<String> INTERNAL_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
-            .addAll(ALLOWED_ATTRIBUTES)
-            .build();
+    private static final Set<String> INTERNAL_ALLOWED_ATTRIBUTES = ImmutableSet.copyOf(ALLOWED_ATTRIBUTES);
 
     private final TokenDefImpl.Builder builder = new TokenDefImpl.Builder();
     private String value;
 
-    public TokenDefHandler() {
-        super();
-    }
-
-    public TokenDefHandler(TokensDefHandler parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
-                           boolean isInInternalNamespace, DefinitionService definitionService,
-                           ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    public TokenDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
+                           boolean isInInternalNamespace, ConfigAdapter configAdapter,
+                           DefinitionParserAdapter definitionParserAdapter, TokensDefHandler parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
         this.builder.setLocation(getLocation());
         this.builder.setConfigAdapter(configAdapter);
     }

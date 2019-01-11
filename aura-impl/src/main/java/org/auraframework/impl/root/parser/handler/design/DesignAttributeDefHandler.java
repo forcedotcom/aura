@@ -58,11 +58,11 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
     private static final String ATTRIBUTE_TRANSLATABLE = "translatable";
     private static final String ATTRIBUTE_ACCESSCHECK = "accessCheck";
 
-    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_LABEL,
+    private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_LABEL,
             ATTRIBUTE_TYPE, ATTRIBUTE_REQUIRED, ATTRIBUTE_READONLY, ATTRIBUTE_DEPENDENCY, ATTRIBUTE_DATASOURCE,
             ATTRIBUTE_MIN, ATTRIBUTE_MAX, ATTRIBUTE_PLACEHOLDER, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_DEFAULT );
 
-    private final static Set<String> INTERNAL_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_LABEL,
+    private static final Set<String> INTERNAL_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_LABEL,
             ATTRIBUTE_TYPE, ATTRIBUTE_REQUIRED, ATTRIBUTE_READONLY, ATTRIBUTE_DEPENDENCY, ATTRIBUTE_DATASOURCE,
             ATTRIBUTE_MIN, ATTRIBUTE_MAX, ATTRIBUTE_PLACEHOLDER, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_DEFAULT,
             ATTRIBUTE_MAX_API, ATTRIBUTE_MIN_API, ATTRIBUTE_TRANSLATABLE, ATTRIBUTE_ALLOWED_INTERFACES,
@@ -70,15 +70,11 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
 
     private final DesignAttributeDefImpl.Builder builder = new DesignAttributeDefImpl.Builder();
 
-    public DesignAttributeDefHandler() {
-        super();
-    }
-
     // TODO implement tool specific properties
-    public DesignAttributeDefHandler(DesignDefHandler parentHandler, XMLStreamReader xmlReader,
-                                     TextSource<?> source, boolean isInInternalNamespace, DefinitionService definitionService,
-                                     ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    public DesignAttributeDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
+                                     boolean isInInternalNamespace, ConfigAdapter configAdapter,
+                                     DefinitionParserAdapter definitionParserAdapter, DesignDefHandler parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
         builder.setAccess(getAccess(isInInternalNamespace));
     }
 
@@ -142,8 +138,8 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
         if (isInInternalNamespace() && DesignAttributeDefaultDefHandler.TAG.equalsIgnoreCase(tag)) {
-            DesignAttributeDefaultDef def = new DesignAttributeDefaultDefHandler((DesignDefHandler)getParentHandler(), xmlReader, source,
-                    isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter).getElement();
+            DesignAttributeDefaultDef def = new DesignAttributeDefaultDefHandler(xmlReader, source,
+                    definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, (DesignDefHandler)getParentHandler()).getElement();
             builder.setDefault(def);
         } else {
             error("Found unexpected tag %s", getTagName());

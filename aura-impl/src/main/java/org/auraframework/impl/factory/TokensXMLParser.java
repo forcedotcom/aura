@@ -15,6 +15,8 @@
  */
 package org.auraframework.impl.factory;
 
+import javax.xml.stream.XMLStreamReader;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
@@ -25,8 +27,6 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import javax.xml.stream.XMLStreamReader;
-
 @ServiceComponent
 public class TokensXMLParser extends XMLParser<TokensDef> {
     @Override
@@ -34,8 +34,8 @@ public class TokensXMLParser extends XMLParser<TokensDef> {
                                           TextSource<TokensDef> source, XMLStreamReader xmlReader, boolean isInInternalNamespace,
                                           DefinitionService definitionService,
                                           ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) throws QuickFixException {
-        return new TokensDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,
-                configAdapter, definitionParserAdapter);
+        return new TokensDefHandler(xmlReader, source, definitionService, isInInternalNamespace,
+                configAdapter, definitionParserAdapter, descriptor);
     }
 
     @Override

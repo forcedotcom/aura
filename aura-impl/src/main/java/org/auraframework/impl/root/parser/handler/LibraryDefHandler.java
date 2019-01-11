@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -33,8 +34,8 @@ import org.auraframework.impl.root.library.LibraryDefImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 
 public class LibraryDefHandler extends RootTagHandler<LibraryDef> {
 
@@ -42,16 +43,12 @@ public class LibraryDefHandler extends RootTagHandler<LibraryDef> {
 
     private final LibraryDefImpl.Builder builder = new LibraryDefImpl.Builder();
 
-    private final List<IncludeDefRef> includes = Lists.newArrayList();
+    private final List<IncludeDefRef> includes = new ArrayList<>();
 
-    public LibraryDefHandler() {
-        super();
-    }
-
-    public LibraryDefHandler(DefDescriptor<LibraryDef> libraryDefDescriptor, TextSource<?> source, XMLStreamReader xmlReader,
-                             boolean isInInternalNamespace, DefinitionService definitionService,
-                             ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(libraryDefDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    public LibraryDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
+                             boolean isInInternalNamespace, ConfigAdapter configAdapter,
+                             DefinitionParserAdapter definitionParserAdapter, DefDescriptor<LibraryDef> libraryDefDescriptor) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, libraryDefDescriptor);
         builder.setDescriptor(libraryDefDescriptor);
     }
 

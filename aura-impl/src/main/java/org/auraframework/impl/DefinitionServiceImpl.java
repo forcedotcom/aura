@@ -527,7 +527,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                         // here.
                         //
                         int ns_overlap = Sets.intersection(reg.getNamespaces(), namespaces).size();
-                        if (ns_overlap == 0) {
+                        if (ns_overlap == 0 && !reg.getNamespaces().contains("*")) {
                             // No namespaces from the registry are included... bolt.
                             continue;
                         }

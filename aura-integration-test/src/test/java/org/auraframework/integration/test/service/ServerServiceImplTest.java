@@ -81,6 +81,7 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.validation.ReferenceValidationContext;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -91,6 +92,11 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+/**
+ * This test should probably be rewritten to be able to run in other environments, and it should have
+ * MockConfigAdapter removed
+ */
+@UnAdaptableTest
 public class ServerServiceImplTest extends IntegrationTestCase {
 
     @Inject

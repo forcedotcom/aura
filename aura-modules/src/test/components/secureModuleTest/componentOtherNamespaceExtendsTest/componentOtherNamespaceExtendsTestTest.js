@@ -1,5 +1,5 @@
 ({
-    browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPHONE", "-IPAD"],
+    browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
 
     testComponentLockerizedInOtherNamespaceExtendsComponentLockerizedPrimitives: {
         test: function(cmp) {

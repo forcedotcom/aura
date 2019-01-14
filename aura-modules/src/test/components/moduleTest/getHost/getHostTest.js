@@ -1,8 +1,7 @@
 ({
     // LockerService not supported on IE
-    // TODO(W-3674741): FF browser versions in autobuilds is too far behind
-    // TODO W-4363273: Bug in BrowserCompatibilityServiceImpl, serving compat version of aura fw js in Safari 11
-    browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPHONE", "-IPAD"],
+    browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
+    
     testHostOfElementInTemplate:{
         test: function(cmp) {
             const tester = cmp.find('tester');

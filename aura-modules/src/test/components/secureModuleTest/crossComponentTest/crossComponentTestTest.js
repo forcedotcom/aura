@@ -5,9 +5,7 @@
      */
 
     // LockerService not supported on IE
-    // TODO(W-3674741): FF browser versions in autobuilds is too far behind
-    // TODO W-4446969: LockerService disabled for iOS browser in 212
-    browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPHONE", "-IPAD"],
+    browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
 
     testGetElementByIDCrossComponentSameNamespace: {
         test: function(cmp) {

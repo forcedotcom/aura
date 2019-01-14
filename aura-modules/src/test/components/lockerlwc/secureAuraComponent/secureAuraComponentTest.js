@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 ({
-    // TODO(W-3674741): FF browser versions in autobuilds is too far behind
-    // TODO W-4363273: Bug in BrowserCompatibilityServiceImpl, serving compat version of aura fw js in Safari 11
-    browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPHONE", "-IPAD"],
+    browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
+    
     setUp: function (cmp) {
         cmp.set("v.testUtils", $A.test);
     },

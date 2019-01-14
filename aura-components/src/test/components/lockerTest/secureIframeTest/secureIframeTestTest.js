@@ -6,7 +6,7 @@
 
     // LockerService not supported on IE
     // TODO(W-3674741, W-4446969): FF and LockerService disabled for iOS browser in 212
-    browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-SAFARI", "-IPHONE", "-IPAD"],
+    browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
 
     // TODO(tbliss): make these lists on SecureIFrameElement accessible here for maintainability
     AttributesWhitelist: ['contentWindow', 'height', 'name', 'src', 'width'],

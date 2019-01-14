@@ -4,7 +4,7 @@
      */
     testFetchNewDefFromServer: {
         labels : ["UnAdaptableTest"],
-        browsers : [ 'GOOGLECHROME', 'FIREFOX' ],
+        browsers : [ 'GOOGLECHROME' ],
         test: [
             function (cmp) {
                 var actionComplete = false;
@@ -31,7 +31,7 @@
      */
     testFetchNewComposedDefFromServer: {
         labels : ["UnAdaptableTest"],
-        browsers : [ 'GOOGLECHROME', 'FIREFOX' ],
+        browsers : [ 'GOOGLECHROME' ],
         test: [
             function (cmp) {
                 var actionComplete = false;

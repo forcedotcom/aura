@@ -5,8 +5,7 @@
      */
 
     // LockerService not supported on IE
-    // TODO(W-3674741, W-4446969): FF and LockerService disabled for iOS browser in 212
-    browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-SAFARI", "-IPHONE", "-IPAD"],
+    browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
 
     setUp: function(cmp) {
         cmp.set("v.testUtils", $A.test);
@@ -89,7 +88,7 @@
 
     testDefineGetterExploit: {
         // This exploit not covered in IE11
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-SAFARI", "-IPHONE", "-IPAD"],
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
         // Remove UnAdaptableTest label when unsafe-eval and unsafe-inline are added back to CSP
         labels: ["UnAdaptableTest"],
         test: function(cmp) {
@@ -201,14 +200,12 @@
     },
 
     testInstanceOf: {
-        // TODO: Re-enable for Firefox and iOS when autobuilds use a version that supports all Proxy traps we implement
         test: function(cmp) {
             cmp.testInstanceOf(window);
         }
     },
 
     testInstanceOf_IdentityDiscontinuitySymptoms: {
-        // TODO: Re-enable for Firefox and iOS when autobuilds use a version that supports all Proxy traps we implement
         // TODO: Re-enable when strict CSP is on by default in core autobuilds
         labels: ["UnAdaptableTest"],
         test: function(cmp) {

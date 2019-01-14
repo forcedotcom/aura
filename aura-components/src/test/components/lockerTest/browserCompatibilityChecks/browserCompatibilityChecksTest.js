@@ -5,7 +5,7 @@
      */
 
     // TODO(W-3674741, W-4446969): FF version in autobuilds is too far behind, and LockerService disabled for iOS browser in 212
-    browsers: ["GOOGLECHROME", "-SAFARI", "-IPHONE", "-IPAD"],
+    browsers: ["GOOGLECHROME"],
 
     testProxyIsNative: {
         test: function(cmp) {

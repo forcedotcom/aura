@@ -5,7 +5,7 @@
         valueChangeButton: 'button.value-change-trigger-button'
     },
     testGetParam: {
-        browsers : [ 'GOOGLECHROME', 'FIREFOX' ],
+        browsers : [ 'GOOGLECHROME' ],
         test: [
             function (cmp) {
                 var element = cmp.getElement();
@@ -23,7 +23,7 @@
         ]
     },
     testGetParamInRegularEvents: {
-        browsers : [ 'GOOGLECHROME', 'FIREFOX' ],
+        browsers : [ 'GOOGLECHROME' ],
         test: [
             function (cmp) {
                 var element = cmp.getElement();
@@ -41,7 +41,7 @@
         ]
     },
     testProgramaticChangeHandler: {
-        browsers : [ 'GOOGLECHROME', 'FIREFOX' ],
+        browsers : [ 'GOOGLECHROME' ],
         test: [
             function(cmp) {
                 var target = cmp.find('targetCmp');

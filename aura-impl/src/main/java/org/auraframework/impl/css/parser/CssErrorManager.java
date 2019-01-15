@@ -40,7 +40,11 @@ final class CssErrorManager implements ErrorManager {
      */
     public CssErrorManager(String resourceName) {
         this.resourceName = resourceName;
-        this.mode = Aura.getContextService().getCurrentContext().getMode();
+        Mode calculatedMode = Mode.DEV;
+        if (Aura.getContextService().getCurrentContext() != null) {
+            calculatedMode = Aura.getContextService().getCurrentContext().getMode();
+        }
+        this.mode = calculatedMode;
     }
 
     @Override

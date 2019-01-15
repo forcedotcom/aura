@@ -74,6 +74,7 @@ import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.tools.node.api.NodeLambdaFactory;
+import org.auraframework.tools.node.impl.sidecar.NodeLambdaFactorySidecar;
 import org.auraframework.util.FileMonitor;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.javascript.JavascriptGroup;
@@ -201,7 +202,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             throw new AuraRuntimeException(e);
         }
 
-        contextService.registerGlobal("isVoiceOver", true, false);
+        contextService.registerGlobal("isVoiceOver", true, Boolean.FALSE);
         contextService.registerGlobal("dynamicTypeSize", true, "");
     }
 
@@ -882,7 +883,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public NodeLambdaFactory nodeServiceFactory() {
-        return NodeLambdaFactory.DEFAULT;
+        return NodeLambdaFactorySidecar.getInstance(6);
     }
 
     /**

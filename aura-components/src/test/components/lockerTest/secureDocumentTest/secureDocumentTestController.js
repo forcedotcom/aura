@@ -10,12 +10,12 @@
         var testUtils = cmp.get("v.testUtils");
         var documentFragment = document.createDocumentFragment();
         var nodeList = documentFragment.querySelectorAll("*");
-        testUtils.assertEquals("[object NodeList]", nodeList.toString() , "querySelectorAll() method"+
-            " expected to return a NodeList");
+        testUtils.assertEquals('SecureNodeList: [object NodeList]{ key: {"namespace":"lockerTest"} }', nodeList.toString() , "querySelectorAll() method"+
+            " expected to return a SecureNodeList: [object NodeList]");
         testUtils.assertEquals(0, nodeList.length);
         var children = documentFragment.children;
-        testUtils.assertEquals("[object HTMLCollection]", children.toString(), "documentFragment.children property"+
-            " expected to return a HTMLCollection");
+        testUtils.assertEquals('SecureNodeList: [object HTMLCollection]{ key: {"namespace":"lockerTest"} }', children.toString(), "documentFragment.children property"+
+            " expected to return a SecureNodeList: [object HTMLCollection]");
         testUtils.assertEquals(0, children.length);
     },
 

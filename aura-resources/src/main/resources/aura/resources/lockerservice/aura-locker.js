@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2019-01-10
- * Version: 0.6.18
+ * Generated: 2019-01-15
+ * Version: 0.6.20
  */
 
 (function (exports) {
@@ -740,20 +740,6 @@ function isValidURLScheme(url) {
   normalized.href = url;
   return normalized.protocol === 'https:' || normalized.protocol === 'http:';
 }
-
-/**
- * Displays a popup asking if the user wants to exit the current domain.
- * Returns a boolean of the result of that popup.
- * @return {Boolean}
- */
-
-
-/**
- * Determines if a link points to a third-party domain.
- * @param {Object} currentDomain
- * @param {Object} newDomain
- * @return {Boolean}
- */
 
 function isCustomElement(el) {
   return el.tagName && el.tagName.indexOf('-') > 0;
@@ -5516,6 +5502,14 @@ function evaluate(src, key, sourceURL) {
   }
 }
 
+function defensiveHas(object, prop) {
+  try {
+    return has(object, prop);
+  } catch (e) {
+    return false;
+  }
+}
+
 function SecureMessageEventSource(raw, key) {
   if (!raw) {
     return undefined;
@@ -5528,7 +5522,7 @@ function SecureMessageEventSource(raw, key) {
 
   const st = create$1(null);
 
-  if (has(raw, 'postMessage')) {
+  if (defensiveHas(raw, 'postMessage')) {
     defineProperty(
       st,
       'postMessage',
@@ -5537,13 +5531,15 @@ function SecureMessageEventSource(raw, key) {
   }
 
   fastArrayForEach(['close', 'start'], prop => {
-    if (has(raw, prop)) {
+    if (defensiveHas(raw, prop)) {
       defineProperty(st, prop, createFilteredMethod(st, raw, prop));
     }
   });
 
   fastArrayForEach(['onmessage', 'onmessageerror'], prop => {
-    defineProperty(st, prop, createFilteredProperty(st, raw, prop));
+    if (defensiveHas(raw, prop)) {
+      defineProperty(st, prop, createFilteredProperty(st, raw, prop));
+    }
   });
 
   setKey(st, key);
@@ -5725,6 +5721,13 @@ class SecureNodeListProxyHandler {
             return getFromFilteredByIndex(key, filtered, index);
           };
 
+        case 'forEach':
+          return (callback, thisArg) => {
+            const secureCallback = filter(key, callback);
+            const secureThisArg = filter(key, thisArg);
+            return filter(key, raw.forEach(secureCallback, secureThisArg));
+          };
+
         case 'namedItem':
           return name => {
             const value = raw.namedItem(name);
@@ -5732,7 +5735,7 @@ class SecureNodeListProxyHandler {
           };
 
         case 'toString':
-          return () => raw.toString();
+          return () => `SecureNodeList: ${raw.toString()}{ key: ${JSON.stringify(key)} }`;
 
         case 'toJSON':
           return () => {
@@ -6243,7 +6246,7 @@ function createFilteringProxy(raw, key) {
 }
 
 // We cache 1 array proxy per key
-const KEY_TO_ARRAY_HANLDER = typeof Map !== 'undefined' ? new Map() : undefined;
+const KEY_TO_ARRAY_HANDLER = new Map();
 
 function getFilteredArray(st, raw, key) {
   const filtered = [];
@@ -6286,7 +6289,7 @@ function getArrayProxyHandler(key) {
     });
     return ret;
   }
-  let handler = KEY_TO_ARRAY_HANLDER.get(key);
+  let handler = KEY_TO_ARRAY_HANDLER.get(key);
   if (!handler) {
     handler = {
       getPrototypeOf: function(target) {
@@ -6595,7 +6598,7 @@ function getArrayProxyHandler(key) {
 
     setKey(handler, key);
 
-    KEY_TO_ARRAY_HANLDER.set(key, handler);
+    KEY_TO_ARRAY_HANDLER.set(key, handler);
 
     freeze(handler);
   }
@@ -7911,7 +7914,7 @@ function SecureDocument(doc, key) {
       writable: true,
       value: function(id) {
         const raw = doc.getElementById(id);
-        if (nodeIsAccessible(raw, key)) {
+        if (raw && nodeIsAccessible(raw, key)) {
           return SecureElement(raw, key);
         }
         return null;
@@ -8006,11 +8009,12 @@ function confirmLocationChange(currentURL, targetURL) {
   const t = document.createElement('a');
   c.href = currentURL;
   t.href = targetURL;
-  const isSameLocation$$1 = c.protocol === t.protocol && c.hostname === t.hostname;
+  const isSameLocation = c.protocol === t.protocol && c.hostname === t.hostname;
 
-  if (!isSameLocation$$1) {
-    // eslint-disable-next-line
-    return confirm(`You are exiting ${c.hostname}. Continue?`);
+  if (!isSameLocation) {
+    // TODO: [W-5757872] Breaking customers. Redirection warning needs to respect OrgPreference.
+    // return continue(`You are exiting ${c.hostname}. Continue?`);
+    warn(`You are exiting ${c.hostname}.`);
   }
 
   return true;
@@ -9519,7 +9523,7 @@ function SecureWindow(sandbox, key) {
       if (confirmLocationChange(win.location.href, href)) {
         const filteredArgs = filterArguments(o, [href, ...args]);
         const res = win.open(...filteredArgs);
-        return SecureIFrameContentWindow(res, key);
+        return typeof res === 'object' ? SecureIFrameContentWindow(res, key) : res;
       }
       // window.open spec expects a null return value if the operation fails
       return null;
@@ -10231,7 +10235,7 @@ function getFilteredValue(cmp, rawValue) {
 
 /**
  * This method accept a value from a lockerized component and provides system mode with raw access.
- * All public properties and methods of an LWC custom element get proccessed by this method.
+ * All public properties and methods of an LWC custom element get processed by this method.
  * 1. If the value returned is a data proxy(@api, @track) that is its own,
  *    we create an unfiltering proxy and return that
  * 2. if the value returned is a data proxy that it received from another component,

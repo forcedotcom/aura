@@ -22,8 +22,6 @@ import java.util.Set;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-/**
- */
 public interface ApplicationDef extends BaseComponentDef {
     @Override
     DefDescriptor<ApplicationDef> getDescriptor();
@@ -34,10 +32,6 @@ public interface ApplicationDef extends BaseComponentDef {
     DefDescriptor<EventDef> getLocationChangeEventDescriptor() throws QuickFixException;
 
     Boolean isAppcacheEnabled() throws QuickFixException;
-
-    List<String> getAdditionalAppCacheURLs() throws QuickFixException;
-
-    Integer getBootstrapPublicCacheExpiration() throws QuickFixException;
 
     Map<String, String> getTokens();
 
@@ -67,4 +61,20 @@ public interface ApplicationDef extends BaseComponentDef {
      * @return {@link String}
      */
     Double getRequiredMinimumVersion();
+    
+    /**
+     * @return The bootstrapPublicCacheExpiration defined on the application.
+     */
+    String getBootstrapPublicCacheExpiration();
+    
+    /**
+     * @param name The name of the action to lookup
+     * @return The matching {@link ActionDef}
+     */
+    ActionDef getServerActionByName(final String name);
+    
+    /**
+     * @return The additionalAppCacheURLs defined on the application.
+     */
+    String getAdditionalAppCacheURLs();
 }

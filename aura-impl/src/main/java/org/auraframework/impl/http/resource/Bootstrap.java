@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.http.resource;
+package org.auraframework.impl.http.resource;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -27,15 +27,25 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.expression.Expression;
+import org.auraframework.expression.Literal;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.http.BootstrapUtil;
+import org.auraframework.http.resource.AuraResourceImpl;
+import org.auraframework.impl.expression.AuraExpressionBuilder;
+import org.auraframework.impl.util.TextTokenizer;
+import org.auraframework.instance.Action;
+import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.Instance;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.throwable.AuraJWTError;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
@@ -43,7 +53,7 @@ import org.auraframework.util.json.JsonSerializationContext;
 /**
  * Handles /l/{}/bootstrap.js requests to retrieve bootstrap.js.
  */
-@ServiceComponent
+@ServiceComponent("bootstrap")
 public class Bootstrap extends AuraResourceImpl {
     private BootstrapUtil bootstrapUtil;
 
@@ -55,6 +65,58 @@ public class Bootstrap extends AuraResourceImpl {
     public Bootstrap() {
         super("bootstrap.js", Format.JS);
     }
+    
+    /**
+     * Returns any configured public cache expiration (in seconds) for bootstrap.js, or null if not set.
+     * 
+     * @param appDef The application definition
+     * @return
+     */
+    private Integer getBootstrapPublicCacheExpiration(final ApplicationDef appDef) throws QuickFixException {
+        Integer expiration = null;
+        
+        if (appDef.getBootstrapPublicCacheExpiration() != null) {
+            Expression expression = AuraExpressionBuilder.INSTANCE.buildExpression(TextTokenizer.unwrap(appDef.getBootstrapPublicCacheExpiration()), null);
+            
+            Object value = null;
+            if (expression instanceof Literal) {
+                value = ((Literal) expression).getValue();
+            } else if (expression instanceof PropertyReference) {
+                PropertyReference ref = (PropertyReference) expression;
+                if (AuraValueProviderType.CONTROLLER.getPrefix().equals(ref.getRoot())) {
+                    ref = ref.getStem();
+
+                    ActionDef actionDef = appDef.getServerActionByName(ref.toString());
+                    Action action = instanceService.getInstance(actionDef);
+        
+                    AuraContext context = contextService.getCurrentContext();
+                    Action previous = context.setCurrentAction(action);
+                    try {
+                        action.setup();
+                        action.run();
+                        value = action.getReturnValue();
+                    } finally {
+                        action.cleanup();
+                        context.setCurrentAction(previous);
+                    }
+                }
+            }
+
+            int intValue;
+            if (value instanceof Integer) {
+                intValue = ((Integer) value).intValue();
+            } else if (value instanceof Long) {
+                intValue = ((Long) value).intValue();
+            } else {
+                throw new AuraRuntimeException(
+                        "Value of 'bootstrapPublicCacheExpiration' attribute must either be an integer or a reference to a server Action");
+            }
+            
+            expiration = intValue < 0 ? 0 : intValue;
+        }
+        
+        return expiration;
+    }
 
     @SuppressWarnings("boxing")
     protected void setCacheHeaders(HttpServletResponse response, DefDescriptor<? extends BaseComponentDef> appDesc)
@@ -64,7 +126,7 @@ public class Bootstrap extends AuraResourceImpl {
             // only app has bootstrap cache capability
             definitionService.updateLoaded(appDesc);
             ApplicationDef appDef = (ApplicationDef) definitionService.getDefinition(appDesc);
-            cacheExpiration = appDef.getBootstrapPublicCacheExpiration();
+            cacheExpiration = getBootstrapPublicCacheExpiration(appDef);
         }
         if ((cacheExpiration != null) && (cacheExpiration > 0)) {
             servletUtilAdapter.setCacheTimeout(response, cacheExpiration.longValue() * 1000, false);

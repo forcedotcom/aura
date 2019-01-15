@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.http.resource;
+package org.auraframework.impl.http.resource;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;

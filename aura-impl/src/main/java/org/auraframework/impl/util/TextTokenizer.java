@@ -205,11 +205,7 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
      */
     public static String unwrap(String value) {
         Matcher matcher = EXPRESSION_UNWRAPPING_PATTERN.matcher(value);
-        if (matcher.find()) {
-            return matcher.group(2);
-        } else {
-            return value;
-        }
+        return matcher.find() ? matcher.group(2) : value;
     }
 
     @Override

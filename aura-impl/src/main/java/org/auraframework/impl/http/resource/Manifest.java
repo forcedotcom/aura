@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package org.auraframework.http.resource;
+package org.auraframework.impl.http.resource;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -27,24 +29,32 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.expression.Expression;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.http.ManifestUtil;
+import org.auraframework.http.resource.AuraResourceImpl;
+import org.auraframework.impl.expression.AuraExpressionBuilder;
+import org.auraframework.impl.util.TextTokenizer;
+import org.auraframework.instance.Action;
 import org.auraframework.instance.Component;
 import org.auraframework.service.CSPInliningService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
 
 import com.google.common.collect.Maps;
 
-@ServiceComponent
+@ServiceComponent("manifest")
 public class Manifest extends AuraResourceImpl {
     // ui:manifest attribute names
     private static final String LAST_MOD = "lastMod";
@@ -64,6 +74,50 @@ public class Manifest extends AuraResourceImpl {
     @PostConstruct
     public void createManifestUtil() {
         this.manifestUtil = new ManifestUtil(definitionService, contextService, configAdapter);
+    }
+    
+    /**
+     * Returns any configured public cache expiration (in seconds) for bootstrap.js, or null if not set.
+     *
+     * @param appDef The application definition containing the app cache URLs {@link String}.
+     * @return The {@link List} of resolved URLs
+     */
+    private List<String> getAdditionalAppCacheURLs(final ApplicationDef appDef) throws QuickFixException {
+        List<String> urls = Collections.emptyList();
+
+        if (appDef.getAdditionalAppCacheURLs() != null) {
+            Expression expression = AuraExpressionBuilder.INSTANCE.buildExpression(
+                    TextTokenizer.unwrap(appDef.getAdditionalAppCacheURLs()), null);
+            if (!(expression instanceof PropertyReference)) {
+                throw new AuraRuntimeException(
+                        "Value of 'additionalAppCacheURLs' attribute must be a reference to a server Action");
+            }
+
+            PropertyReference ref = (PropertyReference) expression;
+            ref = ref.getStem();
+
+            ActionDef actionDef = appDef.getServerActionByName(ref.toString());
+            Action action = instanceService.getInstance(actionDef);
+
+            AuraContext context = contextService.getCurrentContext();
+            Action previous = context.setCurrentAction(action);
+            try {
+                action.setup();
+                action.run();
+
+                @SuppressWarnings("unchecked")
+                List<String> additionalURLs = (List<String>) action.getReturnValue();
+                if (additionalURLs != null) {
+                    urls = additionalURLs;
+                }
+            }
+            finally {
+                action.cleanup();
+                context.setCurrentAction(previous);
+            }
+        }
+
+        return urls;
     }
 
     /**
@@ -192,7 +246,7 @@ public class Manifest extends AuraResourceImpl {
             // Add in any application specific resources
             if (descr != null && descr.getDefType().equals(DefType.APPLICATION)) {
                 ApplicationDef def = (ApplicationDef) definitionService.getDefinition(descr);
-                for (String s : def.getAdditionalAppCacheURLs()) {
+                for (String s : getAdditionalAppCacheURLs(def)) {
                     if (s != null) {
                         sw.write(s);
                         sw.write('\n');

@@ -29,6 +29,8 @@ import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraResource;
 
+import com.google.common.collect.ImmutableMap;
+
 /**
  * The aura resource servlet.
  * 
@@ -46,16 +48,9 @@ public class AuraResourceServlet extends AuraBaseServlet {
     private static final long serialVersionUID = -3642790050433142397L;
     public static final String ORIG_REQUEST_URI = "aura.origRequestURI";
 
-    private final Map<String, AuraResource> nameToResource = new HashMap<>();
+    private Map<String, AuraResource> nameToResource;
 
     private ContextService contextService;
-    
-    private void addResource(AuraResource resource) {
-        String name = resource.getName();
-        if (name != null) {
-            this.nameToResource.put(name, resource);
-        }
-    }
 
     protected AuraResource findResource(String fullName) {
         if (fullName == null) {
@@ -79,7 +74,6 @@ public class AuraResourceServlet extends AuraBaseServlet {
         return null;
     }
 
-
     /**
      * Serves up CSS or JS resources for an app.
      *
@@ -102,15 +96,26 @@ public class AuraResourceServlet extends AuraBaseServlet {
 
         resource.write(request, response, context);
     }
-
+    
     @Inject
     public void setContextService(ContextService contextService) {
         this.contextService = contextService;
     }
 
+    private static Map<String, AuraResource> buildNameToResourceMap(final List<AuraResource> auraResources) {
+        final Map<String, AuraResource> nameToResource = new HashMap<>(auraResources.size());
+        auraResources.stream().filter(r -> r.getName() != null).forEach(r -> {
+            final String key = r.getName();
+            if (nameToResource.containsKey(key)) {
+                throw new IllegalStateException("AuraResource bean (" + r.getClass().getCanonicalName() + ") already registered with this name: '" + key + '\'' );
+            }
+            nameToResource.put(key, r);
+        });
+        return ImmutableMap.copyOf(nameToResource);
+    }
+    
     @Inject
     public void setAuraResources(List<AuraResource> auraResources) {
-        auraResources.forEach(this::addResource);
+        this.nameToResource = buildNameToResourceMap(auraResources);
     }
-
 }

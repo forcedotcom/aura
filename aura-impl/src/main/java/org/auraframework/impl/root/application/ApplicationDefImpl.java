@@ -36,18 +36,9 @@ import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.TokenDef;
 import org.auraframework.def.TokensDef;
 import org.auraframework.def.module.ModuleDef;
-import org.auraframework.expression.Expression;
-import org.auraframework.expression.Literal;
-import org.auraframework.expression.PropertyReference;
-import org.auraframework.impl.expression.AuraExpressionBuilder;
 import org.auraframework.impl.root.component.BaseComponentDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.impl.util.TextTokenizer;
-import org.auraframework.instance.Action;
-import org.auraframework.instance.AuraValueProviderType;
-import org.auraframework.system.AuraContext;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -284,107 +275,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         return Boolean.FALSE;
     }
 
-    /**
-     * Returns any configured public cache expiration (in seconds) for bootstrap.js, or null if not set.
-     *
-     * This is an anti-pattern. Kill it please.
-     */
-    @Override
-    public List<String> getAdditionalAppCacheURLs() throws QuickFixException {
-        List<String> urls = Collections.emptyList();
-
-        if (additionalAppCacheURLs != null) {
-            Expression expression = AuraExpressionBuilder.INSTANCE.buildExpression(
-                    TextTokenizer.unwrap(additionalAppCacheURLs), null);
-            if (!(expression instanceof PropertyReference)) {
-                throw new AuraRuntimeException(
-                        "Value of 'additionalAppCacheURLs' attribute must be a reference to a server Action");
-            }
-
-            PropertyReference ref = (PropertyReference) expression;
-            ref = ref.getStem();
-
-            ActionDef actionDef = getServerActionByName(ref.toString());
-            Action action = Aura.getInstanceService().getInstance(actionDef);
-
-            AuraContext context = Aura.getContextService().getCurrentContext();
-            Action previous = context.setCurrentAction(action);
-            try {
-                action.setup();
-                action.run();
-
-                @SuppressWarnings("unchecked")
-                List<String> additionalURLs = (List<String>) action.getReturnValue();
-                if (additionalURLs != null) {
-                    urls = additionalURLs;
-                }
-            }
-            finally {
-                action.cleanup();
-                context.setCurrentAction(previous);
-            }
-
-
-        }
-
-        return urls;
-    }
-
-    /**
-     * Returns any configured public cache expiration (in seconds) for bootstrap.js, or null if not set.
-     *
-     * This is an anti-pattern. Kill it please.
-     */
-    @Override
-    public Integer getBootstrapPublicCacheExpiration() throws QuickFixException {
-        Integer expiration = null;
-        
-        if (bootstrapPublicCacheExpiration != null) {
-            Expression expression = AuraExpressionBuilder.INSTANCE.buildExpression(
-                    TextTokenizer.unwrap(bootstrapPublicCacheExpiration), null);
-            
-            Object value = null;
-            if (expression instanceof Literal) {
-                value = ((Literal) expression).getValue();
-            } else if (expression instanceof PropertyReference) {
-                PropertyReference ref = (PropertyReference) expression;
-                if (AuraValueProviderType.CONTROLLER.getPrefix().equals(ref.getRoot())) {
-                    ref = ref.getStem();
-
-                    ActionDef actionDef = getServerActionByName(ref.toString());
-                    Action action = Aura.getInstanceService().getInstance(actionDef);
-        
-                    AuraContext context = Aura.getContextService().getCurrentContext();
-                    Action previous = context.setCurrentAction(action);
-                    try {
-                        action.setup();
-                        action.run();
-                        value = action.getReturnValue();
-                    } finally {
-                        action.cleanup();
-                        context.setCurrentAction(previous);
-                    }
-                    
-
-                }
-            }
-
-            int intValue;
-            if (value instanceof Integer) {
-                intValue = ((Integer) value).intValue();
-            } else if (value instanceof Long) {
-                intValue = ((Long) value).intValue();
-            } else {
-                throw new AuraRuntimeException(
-                        "Value of 'bootstrapPublicCacheExpiration' attribute must either be an integer or a reference to a server Action");
-            }
-            
-            expiration = intValue < 0 ? 0 : intValue;
-        }
-        
-        return expiration;
-    }
-
     @Override
     public void validateReferences(ReferenceValidationContext validationContext) throws QuickFixException {
         super.validateReferences(validationContext);
@@ -439,5 +329,20 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     @Override
     public Set<DefDescriptor<ModuleDef>> getModuleServices() throws QuickFixException{
         return moduleServices;
+    }
+    
+    @Override
+    public String getBootstrapPublicCacheExpiration() {
+        return bootstrapPublicCacheExpiration;
+    }
+    
+    @Override
+    public ActionDef getServerActionByName(final String name) {
+        return super.getServerActionByName(name);
+    }
+    
+    @Override
+    public String getAdditionalAppCacheURLs() {
+        return additionalAppCacheURLs;
     }
 }

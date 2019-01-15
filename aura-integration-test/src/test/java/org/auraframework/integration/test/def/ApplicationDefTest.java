@@ -194,7 +194,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 String.format(baseTag, "bootstrapPublicCacheExpiration='100'", ""));
         ApplicationDef appdef = definitionService.getDefinition(desc);
-        assertEquals(Integer.valueOf(100), appdef.getBootstrapPublicCacheExpiration());
+        assertEquals("100", appdef.getBootstrapPublicCacheExpiration());
     }
 
     /**
@@ -206,7 +206,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
                 String.format(baseTag, "bootstrapPublicCacheExpiration='{!c.getBootstrapPublicCacheExpiration}'"
                         + " controller='java://org.auraframework.components.test.java.controller.TestController'", ""));
         ApplicationDef appdef = definitionService.getDefinition(desc);
-        assertEquals(Integer.valueOf(60), appdef.getBootstrapPublicCacheExpiration());
+        assertEquals("{!c.getBootstrapPublicCacheExpiration}", appdef.getBootstrapPublicCacheExpiration());
     }
 
     /**

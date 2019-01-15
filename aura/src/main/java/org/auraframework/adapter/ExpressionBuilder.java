@@ -28,8 +28,10 @@ public interface ExpressionBuilder extends AuraAdapter {
     /**
      * parses the given string from the given location into Expressions
      * 
+     * @param s The {@link String} to parse.
+     * @param start Where is start parsing from
+     * @return The resulting {@code Expression}
      * @throws AuraValidationException when the expression is not valid
      */
     Expression buildExpression(String s, Location start) throws AuraValidationException;
-
 }

@@ -17,6 +17,7 @@ package org.auraframework.integration.test;
 
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -36,6 +37,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
     }
 
     @Test
+    @UnAdaptableTest
     public void testGlobalComponentAccessibleFromExternalNamespace() throws Exception {
         open("/testCustomNS1/accessExternalNamespace.cmp?cmpToCreate=auratest:accessGlobalComponent");
         clickCreateComponentButton();
@@ -49,6 +51,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
      * will try to the component on the client and fail.
      */
     @Test
+    @UnAdaptableTest
     public void testPublicComponentInaccessibleFromExternalNamespace() throws Exception {
         open("/testCustomNS1/accessExternalNamespace.cmp?cmpToCreate=auratest:accessPublicComponent");
         clickCreateComponentButton();
@@ -68,6 +71,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
      * accessExternalNamespace, this will attempt to get the component from the server.
      */
     @Test
+    @UnAdaptableTest
     public void testInternalComponentInaccessibleFromExternalNamespace() throws Exception {
         open("/testCustomNS1/accessExternalNamespace.cmp?cmpToCreate=auratest:accessInternalComponent");
         clickCreateComponentButton();
@@ -91,6 +95,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
      * Component in a External namespace can _not_ extend a Internal namespace component marked PUBLIC
      */
     @Test
+    @UnAdaptableTest
     public void testExternalComponentExtendsInternalComponent() throws Exception {
         open("/testCustomNS1/accessExternalNamespace.cmp?cmpToCreate=testCustomNS2:accessExtendsPublic");
 
@@ -103,6 +108,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
      * External component cannot access public attribute of Internal namespace
      */
     @Test
+    @UnAdaptableTest
     public void testAccessPublicMarkupOnInternalNamespaceFromExternal() throws Exception {
         open("/testCustomNS1/accessExternalNamespace.cmp?cmpToCreate=auratest:accessPublicAttribute");
         doAttributeAccessTest("undefined");
@@ -116,6 +122,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
     }
 
     @Test
+    @UnAdaptableTest
     public void testAccessGlobalMarkupOnInternalNamespaceFromExternal() throws Exception {
         open("/testCustomNS1/accessExternalNamespace.cmp?cmpToCreate=auratest:accessGlobalAttribute");
         doAttributeAccessTest("GLOBAL");
@@ -128,12 +135,14 @@ public class AccessChecksUITest extends WebDriverTestCase {
     }
 
     @Test
+    @UnAdaptableTest
     public void testAccessGlobalMarkupOnExternalNamespaceFromExternal() throws Exception {
         open("/testCustomNS1/accessExternalNamespace.cmp?cmpToCreate=testCustomNS2:accessGlobalAttribute");
         doAttributeAccessTest("GLOBAL");
     }
 
     @Test
+    @UnAdaptableTest
     public void testAccessPrivateMarkupOnInternalNamespaceFromExternal() throws Exception {
         open("/testCustomNS1/accessExternalNamespace.cmp?cmpToCreate=auratest:accessPrivateAttribute");
         doAttributeAccessTest("undefined");
@@ -146,6 +155,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
     }
 
     @Test
+    @UnAdaptableTest
     public void testAccessInternalMarkupOnInternalNamespaceFromExternal() throws Exception {
         open("/testCustomNS1/accessExternalNamespace.cmp?cmpToCreate=auratest:accessInternalAttribute");
         doAttributeAccessTest("undefined");
@@ -157,6 +167,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
      * External component.
      */
     @Test
+    @UnAdaptableTest
     public void testAccessGlobalProvidesInternalComponent() throws Exception {
         open("/testCustomNS1/accessGlobalProvidesInternal.cmp");
         getAuraUITestingUtil().waitForElementText(By.className("accessInternalComponent"),
@@ -164,6 +175,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
     }
 
     @Test
+    @UnAdaptableTest
     @Ignore("(W-2769151): Not sure if this should work, but if it shouldn't we need a better error message")
     public void testAccessExternalProvidesInternalComponent() throws Exception {
         //getMockConfigAdapter().setNonInternalNamespace("provider");
@@ -173,6 +185,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
     }
 
     @Test
+    @UnAdaptableTest
     @Ignore("(W-2769151): Not sure if this should work, but if it shouldn't we need a better error message")
     public void testAccessExternalProvidesPublicComponent() throws Exception {
         //getMockConfigAdapter().setNonInternalNamespace("provider");

@@ -1265,7 +1265,50 @@ TestInstance.prototype.contains = function(testString, targetString) {
  * @function Test#compareValues
  */
 TestInstance.prototype.compareValues = function(expected, actual) {
-    return $A.util.compareValues(expected, actual);
+    var result={
+        "match":true,
+        "reasons":[]
+    };
+    if($A.util.isArray(expected)){
+        if(!$A.util.isArray(actual)){
+            result["reasons"].push({index:-1,reason:"Actual was not an Array."});
+            result["match"]=false;
+        }else {
+            var length = Math.max(expected.length, actual.length);
+            for (var i = 0; i < length; i++) {
+                if (expected[i] !== actual[i]) {
+                    result["reasons"].push({index: i, reason: "Mismatch at position " + i + "."});
+                    result["match"] = false;
+                }
+            }
+        }
+    }else if($A.util.isObject(expected)){
+        if(!$A.util.isObject(actual)){
+            result["reasons"].push({index:-1,reason:"Actual was not an Object."});
+            result["match"]=false;
+        }
+        var keyMap={};
+        for(var expectedKey in expected){
+            keyMap[expectedKey]=true;
+            if(expected[expectedKey]!==actual[expectedKey]){
+                result["reasons"].push({index: expectedKey, reason: "Mismatch at key " + expectedKey + "."});
+                result["match"] = false;
+            }
+        }
+        for(var actualKey in actual){
+            if(keyMap[actualKey]){
+                continue;
+            }
+            result["reasons"].push({index: actualKey, reason: "Found new key " + actualKey + "."});
+            result["match"] = false;
+        }
+    }else{
+        if(expected!==actual){
+            result["reasons"].push({index:-1,reason:"Literal value mismatch."});
+            result["match"] = false;
+        }
+    }
+    return result;
 };
 
 /**

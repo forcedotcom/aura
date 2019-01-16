@@ -163,7 +163,6 @@ BaseComponent.prototype.setupValueProviders = function(customValueProviders) {
     vp["this"]=this;
     vp["globalid"]=this.concreteComponentId;
     vp["def"]=this.componentDef;
-    vp["super"]=this.superComponent;
     vp["null"]=null;
     vp["version"] = this.version ? this.version : this.getVersionInternal();
 

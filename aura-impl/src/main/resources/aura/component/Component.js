@@ -1682,7 +1682,7 @@ Component.prototype.addValueProvider = function(key, valueProvider) {
     }
 
     $A.assert($A.util.isString(key), "Component.addValueProvider(): 'key' must be a valid String.");
-    $A.assert(",v,m,c,e,this,globalid,def,super,null,version,".indexOf("," + key.toLowerCase() + ",") === -1, "Component.addValueProvider(): '" + key + "' is a reserved valueProvider.");
+    $A.assert(",v,m,c,e,this,globalid,def,null,version,".indexOf("," + key.toLowerCase() + ",") === -1, "Component.addValueProvider(): '" + key + "' is a reserved valueProvider.");
     $A.assert(!$A.util.isUndefinedOrNull(valueProvider), "Component.addValueProvider(): 'valueProvider' is required.");
 
     if (this.valueProviders[key] !== undefined) {
@@ -1704,7 +1704,7 @@ Component.prototype.removeValueProvider = function(key) {
     }
 
     $A.assert($A.util.isString(key), "Component.removeValueProvider(): 'key' must be a valid String.");
-    $A.assert(",v,m,c,e,this,globalid,def,super,null,version,".indexOf("," + key.toLowerCase() + ",") === -1, "Component.removeValueProvider(): '" + key + "' is a reserved valueProvider and can not be removed.");
+    $A.assert(",v,m,c,e,this,globalid,def,null,version,".indexOf("," + key.toLowerCase() + ",") === -1, "Component.removeValueProvider(): '" + key + "' is a reserved valueProvider and can not be removed.");
 
     if (this.valueProviders.hasOwnProperty(key)) {
         this.valueProviders[key] = undefined;
@@ -2136,7 +2136,6 @@ Component.prototype.setupValueProviders = function(customValueProviders) {
     vp["globalid"]=this.getGlobalId();
     vp["def"]=this.componentDef;
     vp["style"]=this.createStyleValueProvider();
-    vp["super"]=this.superComponent;
     vp["null"]=null;
     vp["version"] = this.version ? this.version : this.getVersionInternal();
 

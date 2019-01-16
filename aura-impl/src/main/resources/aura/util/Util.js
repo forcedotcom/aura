@@ -532,63 +532,6 @@ Aura.Utils.Util.prototype.equals = function(expected,actual){
 };
 
 /**
- * Compares values. In the case of an Array or Object, compares first level references only.
- * In the case of a literal, directly compares value and type equality.
- * USE IN TESTS ONLY. HAS NON-TRIVIAL PERFORMANCE IMPLICATIONS.
- *
- * @param {Object} expected The source value to compare.
- * @param {Object} actual The target value to compare.
- * @returns {Object} The result of the comparison, with reasons.
- */
-Aura.Utils.Util.prototype.compareValues = function(expected, actual){
-    var result={
-        "match":true,
-        "reasons":[]
-    };
-    if(this.isArray(expected)){
-        if(!this.isArray(actual)){
-            result["reasons"].push({index:-1,reason:"Actual was not an Array."});
-            result["match"]=false;
-        }else {
-            var length = Math.max(expected.length, actual.length);
-            for (var i = 0; i < length; i++) {
-                if (expected[i] !== actual[i]) {
-                    result["reasons"].push({index: i, reason: "Mismatch at position " + i + "."});
-                    result["match"] = false;
-                }
-            }
-        }
-    }else if(this.isObject(expected)){
-        if(!this.isObject(actual)){
-            result["reasons"].push({index:-1,reason:"Actual was not an Object."});
-            result["match"]=false;
-        }
-        var keyMap={};
-        for(var expectedKey in expected){
-            keyMap[expectedKey]=true;
-            if(expected[expectedKey]!==actual[expectedKey]){
-                result["reasons"].push({index: expectedKey, reason: "Mismatch at key " + expectedKey + "."});
-                result["match"] = false;
-            }
-        }
-        for(var actualKey in actual){
-            if(keyMap[actualKey]){
-                continue;
-            }
-            result["reasons"].push({index: actualKey, reason: "Found new key " + actualKey + "."});
-            result["match"] = false;
-        }
-    }else{
-        if(expected!==actual){
-            result["reasons"].push({index:-1,reason:"Literal value mismatch."});
-            result["match"] = false;
-        }
-    }
-    return result;
-};
-
-
-/**
  * Checks whether the component has the specified CSS class.
  *
  * @example

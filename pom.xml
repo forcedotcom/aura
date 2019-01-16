@@ -37,6 +37,7 @@
         <aura.home>${basedir}</aura.home>
         <debug>true</debug>
         <skipUnitTests>false</skipUnitTests>
+        <ehoffman.testing.version>1.2.3</ehoffman.testing.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <selenium.version>3.6.0</selenium.version>
         <!-- xUnit properties:
@@ -483,6 +484,26 @@
                 <groupId>com.salesforce.sld4j</groupId>
                 <artifactId>sld4j</artifactId>
                 <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.e-hoffman.testing</groupId>
+                <artifactId>AdviseContext</artifactId>
+                <version>${ehoffman.testing.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.e-hoffman.testing</groupId>
+                <artifactId>AdvisedJunit4</artifactId>
+                <version>1.2.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.e-hoffman.testing</groupId>
+                <artifactId>AdviseLogback</artifactId>
+                <version>${ehoffman.testing.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.e-hoffman.testing</groupId>
+                <artifactId>AdviseStaticEvictingClassloader</artifactId>
+                <version>${ehoffman.testing.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -102,6 +102,26 @@
             <artifactId>java-hamcrest</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.e-hoffman.testing</groupId>
+            <artifactId>AdviseContext</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.e-hoffman.testing</groupId>
+            <artifactId>AdvisedJunit4</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.e-hoffman.testing</groupId>
+            <artifactId>AdviseLogback</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.e-hoffman.testing</groupId>
+            <artifactId>AdviseStaticEvictingClassloader</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <properties>
         <aura.home>${basedir}/..</aura.home>

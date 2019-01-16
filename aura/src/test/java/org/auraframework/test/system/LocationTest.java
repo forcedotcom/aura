@@ -22,17 +22,22 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import org.auraframework.system.Location;
+import org.ehoffman.classloader.RestrictiveClassloader;
+import org.ehoffman.junit.aop.Junit4AopClassRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Test class for (@link Location}.
  */
+@RunWith(Junit4AopClassRunner.class)
 public class LocationTest {
-    private static final Location testLocationFileOnly = new Location("filenameonly", 10);
-    private static final Location testLocation = new Location("filename", 5, 5, 10);
+    private final Location testLocationFileOnly = new Location("filenameonly", 10);
+    private final Location testLocation = new Location("filename", 5, 5, 10);
 
     @SuppressWarnings("static-method")
     @Test
+    @RestrictiveClassloader
     public void testLocationStringIntInt() {
         Location testLocationLocal = new Location("filename", 5, 5, 10);
         assertThat(testLocationLocal, notNullValue());

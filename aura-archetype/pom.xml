@@ -1,25 +1,18 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.auraframework</groupId>
+        <artifactId>aura-framework</artifactId>
+        <version>0.6000-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
     <artifactId>simple-aura-archetype</artifactId>
     <packaging>maven-archetype</packaging>
     <name>archetype for Aura-based "hello, world"</name>
 
-  <parent>
-    <groupId>org.auraframework</groupId>
-    <artifactId>aura-framework</artifactId>
-    <version>0.6000-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
-  </parent>
-
     <build>
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.archetype</groupId>
-                <artifactId>archetype-packaging</artifactId>
-                <version>3.0.1</version>
-            </extension>
-        </extensions>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -43,14 +36,12 @@
                 <executions>
                     <execution>
                         <id>copy-resources</id>
-                        <phase>generate-sources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
+                        <phase>generate-sources</phase>
                         <configuration>
-                            <outputDirectory>
-                                ${basedir}/target/classes/archetype-resources
-                            </outputDirectory>
+                            <outputDirectory>${basedir}/target/classes/archetype-resources</outputDirectory>
                             <escapeString>\</escapeString>
                             <resources>
                                 <resource>
@@ -66,6 +57,13 @@
                 </executions>
             </plugin>
         </plugins>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.archetype</groupId>
+                <artifactId>archetype-packaging</artifactId>
+                <version>3.0.1</version>
+            </extension>
+        </extensions>
     </build>
 
     <profiles>

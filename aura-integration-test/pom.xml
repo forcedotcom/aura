@@ -1,16 +1,59 @@
+<?xml version="1.0" encoding="UTF8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>aura-integration-test</artifactId>
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
         <version>0.6000-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+    <artifactId>aura-integration-test</artifactId>
+    <properties>
+        <aura.build.id></aura.build.id>
+        <aura.home>${basedir}/..</aura.home>
+        <chromedriver.version>2.37</chromedriver.version>
+        <jetty.resources>${basedir}/../aura/src/main/webapp</jetty.resources>
+        <jetty.spawn>true</jetty.spawn>
+        <sauce.record.screenshots>false</sauce.record.screenshots>
+        <sauce.record.video>false</sauce.record.video>
+        <screenshots.baseurl>file://${screenshots.directory}</screenshots.baseurl>
+        <screenshots.directory>${project.build.directory}/screenshots</screenshots.directory>
+        <skipIntTests>org.auraframework.system.AuraSystemUITest.testSystemChecks</skipIntTests>
+        <testClasses>**/*IntegrationTests.java</testClasses>
+        <testNameContains></testNameContains>
+        <!-- case insensitive -->
+        <testPhase>disabled</testPhase>
+        <testSetupPhase>disabled</testSetupPhase>
+        <testTeardownPhase>disabled</testTeardownPhase>
+        <user.timezone>GMT</user.timezone>
+        <!-- refer to org.auraframework.test.WebDriverUtil.BrowserType enums for valid values -->
+        <webdriver.browser.runheadless>true</webdriver.browser.runheadless>
+        <webdriver.browser.type>GOOGLECHROME</webdriver.browser.type>
+        <webdriver.chrome.driver>/bin/chromedriver</webdriver.chrome.driver>
+        <webdriver.remote.server></webdriver.remote.server>
+        <!-- http://localhost:4444/wd/hub/ -->
+        <webdriver.reusebrowser>true</webdriver.reusebrowser>
+        <webdriver.timeout>90</webdriver.timeout>
+        <xdisplay.exec>Xvfb</xdisplay.exec>
+        <xdisplay.options>-ac -screen 0 ${xdisplay.size}</xdisplay.options>
+        <xdisplay.size>960x640x16</xdisplay.size>
+    </properties>
     <dependencies>
         <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.pjl-comp-filter</groupId>
+            <artifactId>pjl-comp-filter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.auraframework</groupId>
-            <artifactId>aura-resources</artifactId>
+            <artifactId>aura</artifactId>
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
@@ -22,80 +65,19 @@
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
-            <artifactId>aura-impl</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
+            <artifactId>aura-resources</artifactId>
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
             <artifactId>aura-util</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.auraframework</groupId>
-            <artifactId>aura-util</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.auraframework</groupId>
-            <artifactId>aura</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.auraframework</groupId>
-            <artifactId>aura</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.auraframework</groupId>
-            <artifactId>aura-components</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.auraframework</groupId>
-            <artifactId>aura-modules</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.auraframework</groupId>
-            <artifactId>aura-components</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.auraframework</groupId>
-            <artifactId>aura-modules</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.auraframework</groupId>
-            <artifactId>aura-impl-expression</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-support</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-api</artifactId>
-            <scope>runtime</scope>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-webapp</artifactId>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-remote-driver</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-chrome-driver</artifactId>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
@@ -112,20 +94,64 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-api</artifactId>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>net.sourceforge.pjl-comp-filter</groupId>
-            <artifactId>pjl-comp-filter</artifactId>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-chrome-driver</artifactId>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-webapp</artifactId>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-support</artifactId>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>org.uiautomation</groupId>
-            <artifactId>ios-client</artifactId>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-components</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-components</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-impl</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-impl-expression</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-modules</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-modules</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-util</artifactId>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -133,92 +159,18 @@
             <artifactId>java-hamcrest</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.uiautomation</groupId>
+            <artifactId>ios-client</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-    <properties>
-        <chromedriver.version>2.37</chromedriver.version>
-        <jetty.spawn>true</jetty.spawn>
-        <jetty.resources>${basedir}/../aura/src/main/webapp</jetty.resources>
-        <aura.build.id />
-        <aura.home>${basedir}/..</aura.home>
-        <screenshots.baseurl>file://${screenshots.directory}</screenshots.baseurl>
-        <screenshots.directory>${project.build.directory}/screenshots</screenshots.directory>
-        <testClasses>**/*IntegrationTests.java</testClasses>
-        <testNameContains /> <!-- case insensitive -->
-        <testPhase>disabled</testPhase>
-        <testSetupPhase>disabled</testSetupPhase>
-        <testTeardownPhase>disabled</testTeardownPhase>
-        <user.timezone>GMT</user.timezone>
-        <webdriver.chrome.driver>/bin/chromedriver</webdriver.chrome.driver>
-        <webdriver.remote.server /> <!-- http://localhost:4444/wd/hub/ -->
-        <webdriver.reusebrowser>true</webdriver.reusebrowser>
-        <webdriver.browser.type>GOOGLECHROME</webdriver.browser.type> <!-- refer to org.auraframework.test.WebDriverUtil.BrowserType enums for valid values -->
-        <webdriver.browser.runheadless>true</webdriver.browser.runheadless>
-        <webdriver.timeout>90</webdriver.timeout>
-        <sauce.record.video>false</sauce.record.video>
-        <sauce.record.screenshots>false</sauce.record.screenshots>
-        <xdisplay.exec>Xvfb</xdisplay.exec>
-        <xdisplay.size>960x640x16</xdisplay.size>
-        <xdisplay.options>-ac -screen 0 ${xdisplay.size}</xdisplay.options>
-        <skipIntTests>org.auraframework.system.AuraSystemUITest.testSystemChecks</skipIntTests>
-    </properties>
     <build>
         <pluginManagement>
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>build-helper-maven-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>reserve-ports</id>
-                            <goals>
-                                <goal>reserve-network-port</goal>
-                            </goals>
-                            <phase>${testSetupPhase}</phase>
-                            <configuration>
-                                <portNames>
-                                    <portName>jetty.port</portName>
-                                </portNames>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>x-start</id>
-                            <phase>${testSetupPhase}</phase>
-                            <goals>
-                                <goal>exec</goal>
-                            </goals>
-                            <configuration>
-                                <skip>${xdisplay.skip}</skip>
-                                <executable>${aura.home}/bin/daemonize</executable>
-                                <arguments>
-                                    <argument>${xdisplay.exec} :${jetty.port} ${xdisplay.options}</argument>
-                                </arguments>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>x-stop</id>
-                            <phase>${testTeardownPhase}</phase>
-                            <goals>
-                                <goal>exec</goal>
-                            </goals>
-                            <configuration>
-                                <skip>${xdisplay.skip}</skip>
-                                <executable>${aura.home}/bin/pskill</executable>
-                                <arguments>
-                                    <argument>${xdisplay.exec}* :${jetty.port} ${xdisplay.options}</argument>
-                                </arguments>
-                            </configuration>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -231,10 +183,10 @@
                     <executions>
                         <execution>
                             <id>integration-test</id>
-                            <phase>${testPhase}</phase>
                             <goals>
                                 <goal>integration-test</goal>
                             </goals>
+                            <phase>${testPhase}</phase>
                             <configuration>
                                 <includes>
                                     <include>${testClasses}</include>
@@ -275,16 +227,60 @@
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>xml-maven-plugin</artifactId>
-                    <version>1.0</version>
+                    <artifactId>build-helper-maven-plugin</artifactId>
                     <executions>
                         <execution>
-                            <phase>post-integration-test</phase>
+                            <id>reserve-ports</id>
                             <goals>
-                                <goal>transform</goal>
+                                <goal>reserve-network-port</goal>
                             </goals>
+                            <phase>${testSetupPhase}</phase>
+                            <configuration>
+                                <portNames>
+                                    <portName>jetty.port</portName>
+                                </portNames>
+                            </configuration>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>x-start</id>
+                            <goals>
+                                <goal>exec</goal>
+                            </goals>
+                            <phase>${testSetupPhase}</phase>
+                            <configuration>
+                                <skip>${xdisplay.skip}</skip>
+                                <executable>${aura.home}/bin/daemonize</executable>
+                                <arguments>
+                                    <argument>${xdisplay.exec} :${jetty.port} ${xdisplay.options}</argument>
+                                </arguments>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>x-stop</id>
+                            <goals>
+                                <goal>exec</goal>
+                            </goals>
+                            <phase>${testTeardownPhase}</phase>
+                            <configuration>
+                                <skip>${xdisplay.skip}</skip>
+                                <executable>${aura.home}/bin/pskill</executable>
+                                <arguments>
+                                    <argument>${xdisplay.exec}* :${jetty.port} ${xdisplay.options}</argument>
+                                </arguments>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>xml-maven-plugin</artifactId>
+                    <version>1.0</version>
                     <configuration>
                         <transformationSets>
                             <transformationSet>
@@ -297,6 +293,14 @@
                             </transformationSet>
                         </transformationSets>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>transform</goal>
+                            </goals>
+                            <phase>post-integration-test</phase>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <!--This plugin's configuration is used to store Eclipse m2e settings
@@ -317,7 +321,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <execute />
+                                        <execute></execute>
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
@@ -330,7 +334,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore />
+                                        <ignore></ignore>
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>
@@ -356,10 +360,6 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>build-helper-maven-plugin</artifactId>
-                    </plugin>
-                    <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
                     </plugin>
@@ -372,6 +372,10 @@
                                 <phase>generate-test-resources</phase>
                             </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
                     </plugin>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
@@ -506,9 +510,9 @@
                 </os>
             </activation>
             <properties>
-                <xdisplay.skip>true</xdisplay.skip>
                 <platform.chromedriver>win32</platform.chromedriver>
                 <webdriver.chrome.driver>/bin/chromedriver.exe</webdriver.chrome.driver>
+                <xdisplay.skip>true</xdisplay.skip>
             </properties>
         </profile>
         <profile>
@@ -526,6 +530,10 @@
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <inherited>true</inherited>
                         <configuration>
@@ -533,7 +541,7 @@
                                 <include>**/*UnitTestSuite.java</include>
                                 <include>**/*IntegrationCoverageTests.java</include>
                             </includes>
-                            <parallel />
+                            <parallel></parallel>
                             <failIfNoTests>false</failIfNoTests>
                             <forkCount>1</forkCount>
                             <forkMode>once</forkMode>
@@ -578,10 +586,10 @@
                         <executions>
                             <execution>
                                 <id>add-sources</id>
-                                <phase>generate-sources</phase>
                                 <goals>
                                     <goal>add-source</goal>
                                 </goals>
+                                <phase>generate-sources</phase>
                                 <configuration>
                                     <sources>
                                         <source>${aura.home}/aura-util/src/main/java</source>
@@ -596,10 +604,6 @@
                                 </configuration>
                             </execution>
                         </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
                     </plugin>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
@@ -624,7 +628,7 @@
                             <systemProperties>
                                 <systemProperty>
                                     <name>aura.home</name>
-                                    <value />
+                                    <value></value>
                                 </systemProperty>
                             </systemProperties>
                         </configuration>
@@ -637,28 +641,42 @@
             <id>xunit.js.coverage.framework</id>
             <properties>
                 <module.name>aura-impl</module.name>
-                <xunit.js.testPath>${project.build.directory}/js-coverage/${module.name}/src/test/javascript</xunit.js.testPath>
-                <xunit.js.currentModule>${module.name}</xunit.js.currentModule>
-                <xunit.js.isStrict>false</xunit.js.isStrict>
-                <xunit.js.format>jscover</xunit.js.format>
                 <xunit.js.coverage>true</xunit.js.coverage>
+                <xunit.js.currentModule>${module.name}</xunit.js.currentModule>
+                <xunit.js.format>jscover</xunit.js.format>
+                <xunit.js.isStrict>false</xunit.js.isStrict>
+                <xunit.js.testPath>${project.build.directory}/js-coverage/${module.name}/src/test/javascript</xunit.js.testPath>
             </properties>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>com.github.tntim96</groupId>
                         <artifactId>jscover-file-maven-plugin</artifactId>
+                        <configuration>
+                            <srcDir>${project.parent.basedir}/${module.name}</srcDir>
+                            <reportDir>${project.build.directory}/js-coverage/${module.name}</reportDir>
+                            <testDirectory>${project.parent.basedir}/${module.name}/src/test</testDirectory>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>instrument-javascript-resources</id>
                                 <phase>process-test-classes</phase>
                             </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.tntim96</groupId>
+                        <artifactId>jscover-report-maven-plugin</artifactId>
                         <configuration>
                             <srcDir>${project.parent.basedir}/${module.name}</srcDir>
                             <reportDir>${project.build.directory}/js-coverage/${module.name}</reportDir>
-                            <testDirectory>${project.parent.basedir}/${module.name}/src/test</testDirectory>
                         </configuration>
+                        <executions>
+                            <execution>
+                                <id>generate-cobertura-xml</id>
+                                <phase>verify</phase>
+                            </execution>
+                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
@@ -704,20 +722,6 @@
                                 </configuration>
                             </execution>
                         </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>com.github.tntim96</groupId>
-                        <artifactId>jscover-report-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>generate-cobertura-xml</id>
-                                <phase>verify</phase>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <srcDir>${project.parent.basedir}/${module.name}</srcDir>
-                            <reportDir>${project.build.directory}/js-coverage/${module.name}</reportDir>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>

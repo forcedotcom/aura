@@ -1,17 +1,39 @@
+<?xml version="1.0" encoding="UTF8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>aura-jetty</artifactId>
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
         <version>0.6000-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+    <artifactId>aura-jetty</artifactId>
+    <properties>
+        <additionalClasspaths>${aura.home}/aura-util/target/test-classes/;${aura.home}/aura/target/test-classes/;${aura.home}/aura-impl-expression/target/test-classes/;${aura.home}/aura-integration-test/target/test-classes/;${aura.home}/aura-impl/target/test-classes/;${aura.home}/aura-components/target/test-classes/;${aura.home}/aura/src/test/components/;${aura.home}/aura-impl/src/test/components/</additionalClasspaths>
+        <aura.home>${basedir}/..</aura.home>
+        <jetty.idleWait>60000</jetty.idleWait>
+        <jetty.port>9090</jetty.port>
+        <jetty.port.stop>19090</jetty.port.stop>
+        <jetty.scanInterval>0</jetty.scanInterval>
+        <sauce.record.screenshots>false</sauce.record.screenshots>
+        <sauce.record.video>false</sauce.record.video>
+        <screenshots.baseurl>file://${screenshots.directory}</screenshots.baseurl>
+        <screenshots.directory>${project.build.directory}/screenshots</screenshots.directory>
+        <user.timezone>GMT</user.timezone>
+        <webdriver.browser.type>GOOGLECHROME</webdriver.browser.type>
+        <webdriver.chrome.driver>${aura.home}/aura-integration-test/bin/chromedriverlauncher</webdriver.chrome.driver>
+        <webdriver.reusebrowser>true</webdriver.reusebrowser>
+        <!-- refer to org.auraframework.test.WebDriverUtil.BrowserType enums for valid values -->
+        <webdriver.timeout>60</webdriver.timeout>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.auraframework</groupId>
-            <artifactId>aura-util</artifactId>
-            <type>test-jar</type>
+            <artifactId>aura-modules</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.pjl-comp-filter</groupId>
+            <artifactId>pjl-comp-filter</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -22,17 +44,18 @@
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
-            <artifactId>aura-impl</artifactId>
+            <artifactId>aura-components</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-components</artifactId>
             <type>test-jar</type>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
-            <artifactId>aura-modules</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.auraframework</groupId>
-            <artifactId>aura-modules</artifactId>
+            <artifactId>aura-impl</artifactId>
             <type>test-jar</type>
             <scope>runtime</scope>
         </dependency>
@@ -50,28 +73,34 @@
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
+            <artifactId>aura-modules</artifactId>
+            <type>test-jar</type>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
             <artifactId>aura-resources</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
-            <artifactId>aura-components</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.auraframework</groupId>
-            <artifactId>aura-components</artifactId>
+            <artifactId>aura-util</artifactId>
             <type>test-jar</type>
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>net.sourceforge.pjl-comp-filter</groupId>
-            <artifactId>pjl-comp-filter</artifactId>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-api</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-nop</artifactId>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-chrome-driver</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-remote-driver</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -91,18 +120,8 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-api</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-remote-driver</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-chrome-driver</artifactId>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -111,28 +130,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-             <groupId>org.uiautomation</groupId>
-             <artifactId>ios-client</artifactId>
-             <scope>test</scope>
+            <groupId>org.uiautomation</groupId>
+            <artifactId>ios-client</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
-    <properties>
-        <user.timezone>GMT</user.timezone>
-        <aura.home>${basedir}/..</aura.home>
-        <jetty.port>9090</jetty.port>
-        <jetty.port.stop>19090</jetty.port.stop>
-        <jetty.idleWait>60000</jetty.idleWait>
-        <jetty.scanInterval>0</jetty.scanInterval>
-        <webdriver.chrome.driver>${aura.home}/aura-integration-test/bin/chromedriverlauncher</webdriver.chrome.driver>
-        <webdriver.reusebrowser>true</webdriver.reusebrowser>
-        <webdriver.browser.type>GOOGLECHROME</webdriver.browser.type> <!-- refer to org.auraframework.test.WebDriverUtil.BrowserType enums for valid values -->
-        <webdriver.timeout>60</webdriver.timeout>
-        <sauce.record.video>false</sauce.record.video>
-        <sauce.record.screenshots>false</sauce.record.screenshots>
-        <screenshots.directory>${project.build.directory}/screenshots</screenshots.directory>
-        <screenshots.baseurl>file://${screenshots.directory}</screenshots.baseurl>
-        <additionalClasspaths>${aura.home}/aura-util/target/test-classes/;${aura.home}/aura/target/test-classes/;${aura.home}/aura-impl-expression/target/test-classes/;${aura.home}/aura-integration-test/target/test-classes/;${aura.home}/aura-impl/target/test-classes/;${aura.home}/aura-components/target/test-classes/;${aura.home}/aura/src/test/components/;${aura.home}/aura-impl/src/test/components/</additionalClasspaths>
-    </properties>
     <build>
         <plugins>
             <plugin>
@@ -225,7 +227,7 @@
                 </property>
             </activation>
             <properties>
-                <additionalClasspaths />
+                <additionalClasspaths></additionalClasspaths>
             </properties>
             <build>
                 <plugins>
@@ -237,7 +239,7 @@
                             <systemProperties>
                                 <systemProperty>
                                     <name>aura.home</name>
-                                    <value />
+                                    <value></value>
                                 </systemProperty>
                             </systemProperties>
                         </configuration>

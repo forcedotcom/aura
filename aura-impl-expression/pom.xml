@@ -1,20 +1,24 @@
+<?xml version="1.0" encoding="UTF8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>aura-impl-expression</artifactId>
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
         <version>0.6000-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+    <artifactId>aura-impl-expression</artifactId>
+    <properties>
+        <aura.home>${basedir}/..</aura.home>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr</artifactId>
             <exclusions>
                 <exclusion>
-                    <artifactId>stringtemplate</artifactId>
                     <groupId>org.antlr</groupId>
+                    <artifactId>stringtemplate</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -40,40 +44,18 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <properties>
-        <aura.home>${basedir}/..</aura.home>
-    </properties>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <?m2e execute onConfiguration?>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>src/main/java</source>
-                                <source>target/src-gen/main/java</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr3-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <?m2e execute?>
-                        <phase>generate-sources</phase>
                         <goals>
                             <goal>antlr</goal>
                         </goals>
+                        <?m2e execute?>
+                        <phase>generate-sources</phase>
                         <configuration>
                             <conversionTimeout>10000</conversionTimeout>
                             <debug>false</debug>
@@ -87,6 +69,25 @@
                             <sourceDirectory>src/main/config/grammar</sourceDirectory>
                             <trace>false</trace>
                             <verbose>true</verbose>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <?m2e execute onConfiguration?>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <sources>
+                                <source>src/main/java</source>
+                                <source>target/src-gen/main/java</source>
+                            </sources>
                         </configuration>
                     </execution>
                 </executions>

@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokensDef;
 import org.auraframework.def.TokensImportDef;
@@ -37,6 +38,9 @@ public class TokensImportDefHandlerTest extends StyleTestCase {
 
     @Inject
     private DefinitionParserAdapter definitionParserAdapter;
+
+    @Inject
+    private ExpressionBuilder expressionBuilder;
     
     private TokensImportDef source(String src) throws Exception {
         DefDescriptor<TokensImportDef> desc = definitionService.getDefDescriptor("test", TokensImportDef.class);
@@ -44,7 +48,7 @@ public class TokensImportDefHandlerTest extends StyleTestCase {
         XMLStreamReader xmlReader = XMLParserBase.createXMLStreamReader(ss.getReader());
         xmlReader.next();
         TokensImportDefHandler handler = new TokensImportDefHandler(xmlReader, ss, definitionService, true,
-                configAdapter, definitionParserAdapter, null);
+                configAdapter, definitionParserAdapter, expressionBuilder, null);
         return handler.getElement();
     }
 

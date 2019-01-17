@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.RootDefinition;
@@ -76,12 +77,13 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
      * @param configAdapter
      * @param definitionParserAdapter
      * @param parentHandler
-     * @see #AttributeDefHandler(XMLStreamReader, TextSource, DefinitionService, boolean, ConfigAdapter, DefinitionParserAdapter, ContainerTagHandler, String)
+     * @see #AttributeDefHandler(XMLStreamReader, TextSource, DefinitionService, boolean, ConfigAdapter, DefinitionParserAdapter, ContainerTagHandler, ExpressionBuilder, String)
      */
     public AttributeDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                                boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                               DefinitionParserAdapter definitionParserAdapter, ContainerTagHandler<P> parentHandler) {
-        this(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler, null);
+                               DefinitionParserAdapter definitionParserAdapter, ContainerTagHandler<P> parentHandler,
+                               ExpressionBuilder expressionBuilder) {
+        this(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler, expressionBuilder, null);
     }
 
     /**
@@ -93,13 +95,13 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
      * @param definitionParserAdapter
      * @param parentHandler
      * @param defaultType
-     * @see #AttributeDefHandler(XMLStreamReader, TextSource, boolean, DefinitionService, ConfigAdapter, DefinitionParserAdapter, ContainerTagHandler)
+     * @see #AttributeDefHandler(XMLStreamReader, TextSource, boolean, DefinitionService, ConfigAdapter, DefinitionParserAdapter, ContainerTagHandler, ExpressionBuilder)
      */
     public AttributeDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                                boolean isInInternalNamespace, ConfigAdapter configAdapter,
                                DefinitionParserAdapter definitionParserAdapter, ContainerTagHandler<P> parentHandler,
-                               String defaultType) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
+                               ExpressionBuilder expressionBuilder, String defaultType) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, parentHandler);
         this.defaultType = Optional.ofNullable(defaultType);
     }
 
@@ -154,7 +156,7 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
             // we should still set it in order to
             // distinguish from the case the default
             // value is not set at all.
-            TextTokenizer tt = TextTokenizer.tokenize(defaultValue, getLocation());
+            TextTokenizer tt = TextTokenizer.tokenize(expressionBuilder, defaultValue, getLocation());
             defaultObj = tt.asValue(getParentHandler());
         } else if (!body.isEmpty()) {
             defaultObj = body;

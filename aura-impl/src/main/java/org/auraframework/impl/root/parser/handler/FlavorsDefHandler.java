@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorDefaultDef;
@@ -42,8 +43,9 @@ public class FlavorsDefHandler extends FileTagHandler<FlavorsDef> {
 
     public FlavorsDefHandler(XMLStreamReader xmlReader, TextSource<FlavorsDef> source, DefinitionService definitionService,
                              boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                             DefinitionParserAdapter definitionParserAdapter, DefDescriptor<FlavorsDef> defDescriptor) throws QuickFixException {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, defDescriptor);
+                             DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder,
+                             DefDescriptor<FlavorsDef> defDescriptor) throws QuickFixException {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, defDescriptor);
 
         builder.setDescriptor(getDefDescriptor());
         builder.setLocation(getLocation());
@@ -79,12 +81,12 @@ public class FlavorsDefHandler extends FileTagHandler<FlavorsDef> {
 
         if (FlavorIncludeDefHandler.TAG.equalsIgnoreCase(tag)) {
             FlavorIncludeDef def = new FlavorIncludeDefHandler(xmlReader, source, definitionService,
-                    isInInternalNamespace, configAdapter, definitionParserAdapter, this).getElement();
+                    isInInternalNamespace, configAdapter, definitionParserAdapter, this, expressionBuilder).getElement();
             builder.addFlavorIncludeDef(def);
         }
         else if (FlavorDefaultDefHandler.TAG.equalsIgnoreCase(tag)) {
             FlavorDefaultDef def = new FlavorDefaultDefHandler(xmlReader, source, definitionService,
-                    isInInternalNamespace, configAdapter, definitionParserAdapter, this).getElement();
+                    isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, this).getElement();
             builder.addFlavorDefaultDef(def);
         } else {
             error("Found unexpected tag %s", tag);

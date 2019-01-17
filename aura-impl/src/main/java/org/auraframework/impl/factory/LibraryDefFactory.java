@@ -19,6 +19,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.LibraryDef;
@@ -49,7 +50,8 @@ public class LibraryDefFactory extends BundleBaseFactory<LibraryDef> {
     protected LibraryDefHandler getHandler(DefDescriptor<LibraryDef> descriptor, TextSource<LibraryDef> source,
                                            XMLStreamReader xmlReader, boolean isInInternalNamespace,
                                            DefinitionService definitionService,
-                                           ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        return new LibraryDefHandler(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, descriptor);
+                                           ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter,
+                                           ExpressionBuilder expressionBuilder) {
+        return new LibraryDefHandler(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, descriptor);
     }
 }

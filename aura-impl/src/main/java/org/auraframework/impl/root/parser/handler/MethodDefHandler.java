@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.MethodDef;
 import org.auraframework.def.RootDefinition;
@@ -67,8 +68,9 @@ public class MethodDefHandler<P extends RootDefinition> extends ParentedTagHandl
      */
     public MethodDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                             boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                            DefinitionParserAdapter definitionParserAdapter, RootTagHandler<P> parentHandler) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
+                            DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder,
+                            RootTagHandler<P> parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, parentHandler);
         String name = getAttributeValue(ATTRIBUTE_NAME);
         if (StringUtils.isBlank(name)) {
             error("The attribute '%s' is required on '<%s>'.", ATTRIBUTE_NAME, TAG);
@@ -129,7 +131,7 @@ public class MethodDefHandler<P extends RootDefinition> extends ParentedTagHandl
         String tag = getTagName();
         if (AttributeDefHandler.TAG.equalsIgnoreCase(tag)) {
             AttributeDefImpl attributeDef = new AttributeDefHandler<>(xmlReader, source, definitionService,
-                    isInInternalNamespace, configAdapter, definitionParserAdapter, this).getElement();
+                    isInInternalNamespace, configAdapter, definitionParserAdapter, this, expressionBuilder).getElement();
             builder.getAttributeDefs().put(definitionService.getDefDescriptor(attributeDef.getName(), AttributeDef.class),
                     attributeDef);
         } else {

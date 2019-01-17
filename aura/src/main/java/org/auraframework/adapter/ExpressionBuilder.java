@@ -20,18 +20,18 @@ import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.AuraValidationException;
 
 /**
- * Takes in strings and returns {@link Expression} objects
- * default implementation is in the aura-impl-expression module
+ * Takes in strings and returns {@link Expression} objects default implementation is in the aura-impl-expression module.
  */
 public interface ExpressionBuilder extends AuraAdapter {
 
     /**
-     * parses the given string from the given location into Expressions
+     * parses the given string from the given location into {@link Expression}s
      * 
      * @param s The {@link String} to parse.
      * @param start Where is start parsing from
      * @return The resulting {@code Expression}
      * @throws AuraValidationException when the expression is not valid
+     * @see #buildExpression(String, Location, boolean)
      */
-    Expression buildExpression(String s, Location start) throws AuraValidationException;
+    Expression buildExpression(final String s, final Location start) throws AuraValidationException;
 }

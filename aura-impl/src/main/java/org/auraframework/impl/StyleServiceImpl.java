@@ -28,6 +28,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.css.StyleContext;
@@ -49,6 +50,7 @@ import org.auraframework.service.StyleService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
+import org.springframework.context.annotation.Lazy;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -71,6 +73,10 @@ public class StyleServiceImpl implements StyleService {
 
     @Inject
     private DefinitionService definitionService;
+    
+    @Lazy
+    @Inject
+    private ExpressionBuilder expressionBuilder;
 
     @Override
     public String applyTokens(DefDescriptor<TokensDef> tokens) throws QuickFixException {
@@ -193,7 +199,7 @@ public class StyleServiceImpl implements StyleService {
             BaseStyleDef def = definitionService.getDefinition(style);
 
             if (strictFilter) {
-                Set<String> defTokenNames = def.getTokenNames();
+                Set<String> defTokenNames = def.getTokenNames(expressionBuilder);
                 if (!defTokenNames.isEmpty() && defTokenNames.stream().anyMatch(tokenNames::contains)) {
                     filtered.add(def);
                 }

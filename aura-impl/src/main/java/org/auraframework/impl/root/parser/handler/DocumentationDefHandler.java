@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.builder.DocumentationDefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
@@ -49,8 +50,8 @@ public class DocumentationDefHandler extends FileTagHandler<DocumentationDef> {
     public DocumentationDefHandler(XMLStreamReader xmlReader, TextSource<DocumentationDef> source,
                                    DefinitionService definitionService, boolean isInInternalNamespace,
                                    ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter,
-                                   DefDescriptor<DocumentationDef> defDescriptor) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, defDescriptor);
+                                   ExpressionBuilder expressionBuilder, DefDescriptor<DocumentationDef> defDescriptor) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, defDescriptor);
         builder.setDescriptor(getDefDescriptor());
         builder.setLocation(getLocation());
         if (source != null) {

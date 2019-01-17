@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.TokenDef;
 import org.auraframework.def.TokensDef;
 import org.auraframework.impl.css.token.TokenDefImpl;
@@ -54,8 +55,9 @@ public final class TokenDefHandler extends ParentedTagHandler<TokenDef, TokensDe
 
     public TokenDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                            boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                           DefinitionParserAdapter definitionParserAdapter, TokensDefHandler parentHandler) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
+                           DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder,
+                           TokensDefHandler parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, parentHandler);
         this.builder.setLocation(getLocation());
         this.builder.setConfigAdapter(configAdapter);
     }
@@ -99,7 +101,7 @@ public final class TokenDefHandler extends ParentedTagHandler<TokenDef, TokensDe
 
     @Override
     protected void finishDefinition() throws QuickFixException {
-        TextTokenizer tt = TextTokenizer.tokenize(value, getLocation());
+        TextTokenizer tt = TextTokenizer.tokenize(expressionBuilder, value, getLocation());
         builder.setValue(tt.asValue(getParentHandler()));
     }
 

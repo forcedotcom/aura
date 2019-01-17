@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.FlavorIncludeDef;
 import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.css.flavor.FlavorIncludeDefImpl;
@@ -36,7 +37,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import com.google.common.collect.ImmutableSet;
 
 public class FlavorIncludeDefHandler extends ParentedTagHandler<FlavorIncludeDef, FlavorsDef> {
-    protected static final String TAG = "aura:include";
+    protected final static String TAG = "aura:include";
     private final static String ATTRIBUTE_SOURCE = "source";
 
     private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_SOURCE, ATTRIBUTE_DESCRIPTION);
@@ -45,8 +46,9 @@ public class FlavorIncludeDefHandler extends ParentedTagHandler<FlavorIncludeDef
 
     public FlavorIncludeDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                                    boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                                   DefinitionParserAdapter definitionParserAdapter, FlavorsDefHandler parentHandler) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
+                                   DefinitionParserAdapter definitionParserAdapter, FlavorsDefHandler parentHandler,
+                                   ExpressionBuilder expressionBuilder) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, parentHandler);
         builder.setLocation(getLocation());
         builder.setAccess(getAccess(isInInternalNamespace));
     }

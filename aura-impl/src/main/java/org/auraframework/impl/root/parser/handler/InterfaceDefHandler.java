@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
@@ -62,8 +63,8 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
     public InterfaceDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                                boolean isInInternalNamespace, ContextService contextService,
                                ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter,
-                               DefDescriptor<InterfaceDef> descriptor) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, descriptor);
+                               ExpressionBuilder expressionBuilder, DefDescriptor<InterfaceDef> descriptor) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, descriptor);
         builder.events = new HashMap<>();
         builder.methods = new HashMap<>();
         if (source != null) {
@@ -83,7 +84,7 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
         String tag = getTagName();
         if (AttributeDefHandler.TAG.equalsIgnoreCase(tag)) {
             AttributeDefHandler<InterfaceDef> handler = new AttributeDefHandler<>(xmlReader, source,
-                    definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, this);
+                    definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, this, expressionBuilder);
             AttributeDefImpl attributeDef = handler.getElement();
             DefDescriptor<AttributeDef> attributeDesc = attributeDef.getDescriptor();
             //            if (builder.getAttributeDefs().containsKey(attributeDesc)) {
@@ -97,7 +98,7 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
             builder.addAttributeDef(attributeDesc,attributeDef);
         } else if (RequiredVersionDefHandler.TAG.equalsIgnoreCase(tag)) {
             RequiredVersionDefHandler<InterfaceDef> handler = new RequiredVersionDefHandler<>(xmlReader, source,
-                    definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, this);
+                    definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, this);
             RequiredVersionDefImpl requiredVersionDef = handler.getElement();
             DefDescriptor<RequiredVersionDef> requiredVersionDesc = requiredVersionDef.getDescriptor();
             if (builder.getRequiredVersionDefs().containsKey(requiredVersionDesc)) {
@@ -111,11 +112,11 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
             builder.getRequiredVersionDefs().put(requiredVersionDesc, requiredVersionDef);
         } else if (RegisterEventHandler.TAG.equalsIgnoreCase(tag)) {
             RegisterEventDefImpl regDef = new RegisterEventHandler<>(xmlReader, source, definitionService,
-                    isInInternalNamespace, configAdapter, definitionParserAdapter, this).getElement();
+                    isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, this).getElement();
             builder.events.put(regDef.getDescriptor().getName(), regDef);
         } else if (MethodDefHandler.TAG.equalsIgnoreCase(tag)) {
             MethodDef methodDef = new MethodDefHandler<>(xmlReader, source, definitionService, isInInternalNamespace,
-                    configAdapter, definitionParserAdapter, this).getElement();
+                    configAdapter, definitionParserAdapter, expressionBuilder, this).getElement();
             builder.methods.put(methodDef.getDescriptor(), methodDef);
         } else {
             error("Found unexpected tag <%s>", tag);

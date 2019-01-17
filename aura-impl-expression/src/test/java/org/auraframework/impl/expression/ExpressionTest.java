@@ -27,9 +27,13 @@ import org.auraframework.expression.Expression;
 import org.auraframework.expression.ExpressionType;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.instance.ValueProvider;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Location;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 
 import com.google.common.collect.ImmutableList;
 
@@ -46,6 +50,12 @@ public class ExpressionTest extends UnitTestCase {
     private static final PropertyReference i235325 = new PropertyReferenceImpl("i235325", l);
     private static final PropertyReference bTrue = new PropertyReferenceImpl("bTrue", l);
     private static final PropertyReference bFalse = new PropertyReferenceImpl("bFalse", l);
+    
+    @Mock
+    ContextService contextService;
+    
+    @Mock
+    DefinitionService definitionService;
 
     private static ValueProvider values = new ValueProvider() {
         @Override
@@ -172,9 +182,10 @@ public class ExpressionTest extends UnitTestCase {
 
     private void verifyEvaluateResult(String expression, ExpressionType type, ValueProvider vp, Object result)
             throws Exception {
-        Expression e = AuraExpressionBuilder.INSTANCE.buildExpression(expression, null);
+        Expression e = new AuraExpressionBuilder(new ExpressionFunctions(contextService, definitionService)).buildExpression(expression, null);
         assertEquals("Unexpected expression type when parsing <" + expression + ">", type, e.getExpressionType());
         assertEquals("Unexpected evaluation of <" + expression + ">", result, e.evaluate(vp));
+        Mockito.verifyZeroInteractions(contextService, definitionService);
     }
 
     // private void verifyEvaluateException(String expression, String

@@ -33,11 +33,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.http.ManifestUtil;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.http.resource.Manifest;
 import org.auraframework.service.CSPInliningService;
@@ -83,27 +83,32 @@ public class ManifestTest extends AuraImplTestCase {
     @Inject
     @Lazy
     private ServletUtilAdapter servletUtilAdapter;
+    
+    @Inject
+    private ExpressionBuilder expressionBuilder;
 
     @Inject
     private ServerService serverService;
 
-    private Manifest getManifest() {
-        Manifest manifest = new Manifest();
-        manifest.setServletUtilAdapter(servletUtilAdapter);
-        manifest.setConfigAdapter(configAdapter);
-        manifest.setDefinitionService(definitionService);
-        manifest.setInstanceService(instanceService);
-        manifest.setContextService(contextService);
-        manifest.setServerService(serverService);
-        manifest.setRenderingService(renderingService);
-        manifest.setCspInliningService(cspInliningService);
-        manifest.setExceptionAdapter(exceptionAdapter);
-        manifest.setManifestUtil(new ManifestUtil(definitionService, contextService, configAdapter));
+    private Manifest getManifest(final RenderingService renderingService, final CSPInliningService cspInliningService, final ExpressionBuilder expressionBuilder) {
+        final Manifest manifest = new Manifest(renderingService, cspInliningService, expressionBuilder);
+        manifest.setServletUtilAdapter(this.servletUtilAdapter);
+        manifest.setConfigAdapter(this.configAdapter);
+        manifest.setDefinitionService(this.definitionService);
+        manifest.setInstanceService(this.instanceService);
+        manifest.setContextService(this.contextService);
+        manifest.setServerService(this.serverService);
+        manifest.setExceptionAdapter(this.exceptionAdapter);
+        manifest.createManifestUtil();
         return manifest;
+    }
+    
+    private Manifest getManifest() {
+        return getManifest(this.renderingService, this.cspInliningService, this.expressionBuilder);
     }
 
     /**
-     * Verify response status is SC_NOT_FOUND when writing manifest throws Exception.
+     * Verify response status is {@value HttpServletResponse#SC_NOT_FOUND} when writing manifest throws Exception.
      */
     @Test
     public void testResponseSourceNotFoundWhenWritingManifestThrowsException() throws Exception {
@@ -292,7 +297,6 @@ public class ManifestTest extends AuraImplTestCase {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testManifestIncludesClientLibraries() throws Exception {
         // Arrange
@@ -337,11 +341,10 @@ public class ManifestTest extends AuraImplTestCase {
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 
-        CSPInliningService spyCSPInliningService = Mockito.mock(CSPInliningService.class);
-        doReturn(CSPInliningService.InlineScriptMode.UNSUPPORTED).when(spyCSPInliningService).getInlineMode();
+        CSPInliningService mockCSPInliningService = Mockito.mock(CSPInliningService.class);
+        doReturn(CSPInliningService.InlineScriptMode.UNSUPPORTED).when(mockCSPInliningService).getInlineMode();
 
-        Manifest manifest = getManifest();
-        manifest.setCspInliningService(spyCSPInliningService);
+        Manifest manifest = getManifest(this.renderingService, mockCSPInliningService, this.expressionBuilder);
 
         // Act
         manifest.write(mockRequest, mockResponse, context);
@@ -365,11 +368,10 @@ public class ManifestTest extends AuraImplTestCase {
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 
-        CSPInliningService spyCSPInliningService = Mockito.mock(CSPInliningService.class);
-        doReturn(CSPInliningService.InlineScriptMode.NONCE).when(spyCSPInliningService).getInlineMode();
+        CSPInliningService mockCSPInliningService = Mockito.mock(CSPInliningService.class);
+        doReturn(CSPInliningService.InlineScriptMode.NONCE).when(mockCSPInliningService).getInlineMode();
 
-        Manifest manifest = getManifest();
-        manifest.setCspInliningService(spyCSPInliningService);
+        Manifest manifest = getManifest(this.renderingService, mockCSPInliningService, this.expressionBuilder);
 
         // Act
         manifest.write(mockRequest, mockResponse, context);

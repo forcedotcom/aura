@@ -29,7 +29,7 @@ import org.auraframework.util.json.Json;
 
 public class StyleDefImpl extends AbstractStyleDef<StyleDef> implements StyleDef {
     private static final long serialVersionUID = 7140896215068458158L;
-    private String className;
+    private final String className;
 
     protected StyleDefImpl(Builder builder) {
         super(builder);
@@ -72,7 +72,7 @@ public class StyleDefImpl extends AbstractStyleDef<StyleDef> implements StyleDef
 
     public static class Builder extends AbstractStyleDef.Builder<StyleDef> implements StyleDefBuilder {
         private String className;
-
+        
         public Builder() {
             super(StyleDef.class);
         }

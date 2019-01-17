@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
@@ -37,6 +38,9 @@ import org.junit.Test;
 public class ComponentDefRefHandlerTest extends AuraImplTestCase {
     @Inject
     private DefinitionParserAdapter definitionParserAdapter;
+
+    @Inject
+    private ExpressionBuilder expressionBuilder;
     
     XMLStreamReader xmlReader;
     ComponentDefRefHandler<?> cdrHandler;
@@ -52,8 +56,8 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
         xmlReader = XMLParserBase.createXMLStreamReader(source.getReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(xmlReader, source, definitionService, true,
-                configAdapter, definitionParserAdapter, null);
-        cdrHandler = new ComponentDefRefHandler<>(xmlReader, source, definitionService, true, configAdapter, definitionParserAdapter, cdh);
+                configAdapter, definitionParserAdapter, expressionBuilder, null);
+        cdrHandler = new ComponentDefRefHandler<>(xmlReader, source, definitionService, true, configAdapter, definitionParserAdapter, expressionBuilder, cdh);
         cdrHandler.readAttributes();
     }
 
@@ -124,7 +128,7 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
         xmlReader = XMLParserBase.createXMLStreamReader(source.getReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(xmlReader, source, definitionService, true,
-                configAdapter, definitionParserAdapter, null);
-        return new ComponentDefRefHandler<>(xmlReader, source, definitionService, true, configAdapter, definitionParserAdapter, cdh);
+                configAdapter, definitionParserAdapter, expressionBuilder, null);
+        return new ComponentDefRefHandler<>(xmlReader, source, definitionService, true, configAdapter, definitionParserAdapter, expressionBuilder, cdh);
     }
 }

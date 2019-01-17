@@ -19,6 +19,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -34,8 +35,8 @@ public abstract class FileTagHandler<T extends Definition> extends ContainerTagH
 
     protected FileTagHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                              boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                             DefinitionParserAdapter definitionParserAdapter, DefDescriptor<T> defDescriptor) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, defDescriptor);
+                             DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder, DefDescriptor<T> defDescriptor) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, defDescriptor);
     }
 
     public abstract DefBuilder<T,T> getBuilder();

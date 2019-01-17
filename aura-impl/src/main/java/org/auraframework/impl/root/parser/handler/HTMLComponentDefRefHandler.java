@@ -22,6 +22,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.HtmlTag;
@@ -43,8 +44,8 @@ public class HTMLComponentDefRefHandler<P extends Definition> extends ComponentD
     protected HTMLComponentDefRefHandler(XMLStreamReader xmlReader, TextSource<?> source,
                                          DefinitionService definitionService, boolean isInInternalNamespace, 
                                          ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter,
-                                         ContainerTagHandler<P> parentHandler, String tag) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
+                                         ContainerTagHandler<P> parentHandler, ExpressionBuilder expressionBuilder, String tag) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, parentHandler);
         builder = htmlBuilder;
         builder.setLocation(getLocation());
         builder.setOwnHash(source.getHash());

@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.LocatorContextDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.locator.LocatorContextDefImpl;
@@ -46,9 +47,9 @@ public class LocatorContextDefHandler<P extends RootDefinition> extends Parented
     public LocatorContextDefHandler(XMLStreamReader xmlReader, TextSource<?> source,
                                     DefinitionService definitionService, boolean isInInternalNamespace,
                                     ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter,
-                                    ContainerTagHandler<P> parentHandler) {
+                                    ExpressionBuilder expressionBuilder, ContainerTagHandler<P> parentHandler) {
         super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter,
-                definitionParserAdapter, parentHandler);
+                definitionParserAdapter, expressionBuilder, parentHandler);
     }
 
     @Override
@@ -86,7 +87,7 @@ public class LocatorContextDefHandler<P extends RootDefinition> extends Parented
             error("The attribute '%s' is required on '<%s>'.", ATTRIBUTE_VALUE, TAG);
         }
 
-        TextTokenizer tt = TextTokenizer.tokenize(valueString, getLocation());
+        TextTokenizer tt = TextTokenizer.tokenize(expressionBuilder, valueString, getLocation());
         Object value = tt.asValue(getParentHandler());
         
         builder.setLocation(getLocation());

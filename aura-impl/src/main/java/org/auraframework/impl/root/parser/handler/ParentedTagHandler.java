@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -41,15 +42,16 @@ public abstract class ParentedTagHandler<T extends Definition, P extends Definit
 
     public ParentedTagHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                               boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                              DefinitionParserAdapter definitionParserAdapter, ContainerTagHandler<P> parentHandler) {
-        this(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler, null);
+                              DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder,
+                              ContainerTagHandler<P> parentHandler) {
+        this(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, parentHandler, null);
     }
 
     public ParentedTagHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                               boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                              DefinitionParserAdapter definitionParserAdapter, ContainerTagHandler<P> parentHandler,
-                              DefDescriptor<T> defDescriptor) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, defDescriptor);
+                              DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder,
+                              ContainerTagHandler<P> parentHandler, DefDescriptor<T> defDescriptor) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, defDescriptor);
         this.parentHandler = parentHandler;
     }
 
@@ -72,7 +74,7 @@ public abstract class ParentedTagHandler<T extends Definition, P extends Definit
         boolean skip = StringUtils.isBlank(text);
 
         if (!skip) {
-            TextTokenizer tokenizer = TextTokenizer.tokenize(text, getLocation());
+            TextTokenizer tokenizer = TextTokenizer.tokenize(expressionBuilder, text, getLocation());
             return tokenizer.asComponentDefRefs(parentHandler);
         }
         return Collections.emptyList();

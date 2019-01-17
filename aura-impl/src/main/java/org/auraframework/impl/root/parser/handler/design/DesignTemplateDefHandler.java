@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.design.DesignTemplateDef;
 import org.auraframework.def.design.DesignTemplateRegionDef;
@@ -45,8 +46,8 @@ public class DesignTemplateDefHandler extends ParentedTagHandler<DesignTemplateD
     public DesignTemplateDefHandler(XMLStreamReader xmlReader, TextSource<?> source,
                                     DefinitionService definitionService, boolean isInInternalNamespace,
                                     ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter,
-                                    DesignDefHandler parentHandler) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
+                                    ExpressionBuilder expressionBuilder, DesignDefHandler parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, parentHandler);
         builder.setAccess(getAccess(isInInternalNamespace));
     }
 
@@ -66,7 +67,8 @@ public class DesignTemplateDefHandler extends ParentedTagHandler<DesignTemplateD
         String tag = getTagName();
         if (DesignTemplateRegionDefHandler.TAG.equalsIgnoreCase(tag)) {
             DesignTemplateRegionDef templateRegion = new DesignTemplateRegionDefHandler(xmlReader,
-                    source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, (DesignDefHandler)getParentHandler()).getElement();
+                    source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter,
+                    expressionBuilder, (DesignDefHandler)getParentHandler()).getElement();
             builder.addDesignTemplateRegion(
                     definitionService.getDefDescriptor(templateRegion.getName(), DesignTemplateRegionDef.class),
                     templateRegion);

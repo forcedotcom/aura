@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -55,6 +56,7 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
 
     protected final ConfigAdapter configAdapter;
     protected final DefinitionParserAdapter definitionParserAdapter;
+    protected final ExpressionBuilder expressionBuilder;
 
     protected DefDescriptor<T> defDescriptor;
     
@@ -65,12 +67,13 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
      * @param isInInternalNamespace
      * @param configAdapter
      * @param definitionParserAdapter
-     * @see #ContainerTagHandler(XMLStreamReader, TextSource, DefinitionService, boolean, ConfigAdapter, DefinitionParserAdapter, DefDescriptor)
+     * @param expressionBuilder
+     * @see #ContainerTagHandler(XMLStreamReader, TextSource, DefinitionService, boolean, ConfigAdapter, DefinitionParserAdapter, ExpressionBuilder, DefDescriptor)
      */
     public ContainerTagHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                                boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                               DefinitionParserAdapter definitionParserAdapter) {
-        this(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, null);
+                               DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder) {
+        this(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, null);
     }
 
     /**
@@ -80,17 +83,20 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
      * @param isInInternalNamespace
      * @param configAdapter
      * @param definitionParserAdapter
+     * @param expressionBuilder
      * @param defDescriptor
-     * @see #ContainerTagHandler(XMLStreamReader, TextSource, DefinitionService, boolean, ConfigAdapter, DefinitionParserAdapter)
+     * @see #ContainerTagHandler(XMLStreamReader, TextSource, DefinitionService, boolean, ConfigAdapter, ExpressionBuilder, DefinitionParserAdapter)
      */
     public ContainerTagHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                                boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                               DefinitionParserAdapter definitionParserAdapter, DefDescriptor<T> defDescriptor) {
+                               DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder,
+                               DefDescriptor<T> defDescriptor) {
         super(xmlReader, source, definitionService);
         this.defDescriptor = defDescriptor;
         this.isInInternalNamespace = isInInternalNamespace;
         this.configAdapter = configAdapter;
         this.definitionParserAdapter = definitionParserAdapter;
+        this.expressionBuilder = expressionBuilder;
     }
 
     public boolean isInInternalNamespace() {
@@ -174,10 +180,10 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
                 throw new AuraRuntimeException("import attribute is not allowed in link tags", getLocation());
             }
             return new HTMLComponentDefRefHandler<>(xmlReader, source, definitionService, isInInternalNamespace,
-                    configAdapter, definitionParserAdapter, parentHandler, tag);
+                    configAdapter, definitionParserAdapter, parentHandler, expressionBuilder, tag);
         } else {
-            return new ComponentDefRefHandler<>(xmlReader, source, definitionService,
-                    isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
+            return new ComponentDefRefHandler<>(xmlReader, source, definitionService, isInInternalNamespace,
+                    configAdapter, definitionParserAdapter, expressionBuilder, parentHandler);
         }
     }
 

@@ -22,13 +22,13 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.DefinitionAccessImpl;
-import org.auraframework.impl.expression.AuraExpressionBuilder;
 import org.auraframework.impl.root.event.EventHandlerDefImpl;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.service.DefinitionService;
@@ -55,10 +55,12 @@ public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
 
     private final RootTagHandler<? extends RootDefinition> parentHandler;
     private final EventHandlerDefImpl.Builder builder = new EventHandlerDefImpl.Builder();
+    private final ExpressionBuilder expressionBuilder;
 
-    public EventHandlerDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService, RootTagHandler<? extends RootDefinition> parentHandler) {
+    public EventHandlerDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService, RootTagHandler<? extends RootDefinition> parentHandler, final ExpressionBuilder expressionBuilder) {
         super(xmlReader, source, definitionService);
         this.parentHandler = parentHandler;
+        this.expressionBuilder = expressionBuilder;
     }
 
     @Override
@@ -82,7 +84,7 @@ public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
 
         String action = getAttributeValue(ATTRIBUTE_ACTION);
         if (action != null) {
-            Expression e = AuraExpressionBuilder.INSTANCE.buildExpression(
+            Expression e = expressionBuilder.buildExpression(
                     TextTokenizer.unwrap(getAttributeValue(ATTRIBUTE_ACTION)), getLocation());
             if (!(e instanceof PropertyReference)) {
                 error("value of 'action' attribute must be a reference to an Action");
@@ -91,8 +93,7 @@ public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
         }
         String value = getAttributeValue(ATTRIBUTE_VALUE);
         if (value != null) {
-            Expression valueExpression = AuraExpressionBuilder.INSTANCE.buildExpression(TextTokenizer.unwrap(value),
-                    getLocation());
+            Expression valueExpression = expressionBuilder.buildExpression(TextTokenizer.unwrap(value), getLocation());
             if (!(valueExpression instanceof PropertyReference)) {
                 error("value of 'value' attribute must be a reference to a Value");
             }

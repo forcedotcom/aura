@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.RegisterEventDef;
@@ -54,8 +55,8 @@ public class RegisterEventHandler<P extends RootDefinition> extends ParentedTagH
 
     public RegisterEventHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                                 boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                                DefinitionParserAdapter definitionParserAdapter, RootTagHandler<P> parentHandler) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
+                                DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder, RootTagHandler<P> parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, parentHandler);
         if (source != null) {
             builder.setOwnHash(source.getHash());
         }

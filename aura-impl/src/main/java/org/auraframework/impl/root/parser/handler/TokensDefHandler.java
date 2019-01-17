@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokenDef;
@@ -65,8 +66,8 @@ public final class TokensDefHandler extends FileTagHandler<TokensDef> {
     public TokensDefHandler(XMLStreamReader xmlReader, TextSource<TokensDef> source,
                             DefinitionService definitionService, boolean isInInternalNamespace,
                             ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter,
-                            DefDescriptor<TokensDef> defDescriptor) throws QuickFixException {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, defDescriptor);
+                            ExpressionBuilder expressionBuilder, DefDescriptor<TokensDef> defDescriptor) throws QuickFixException {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, defDescriptor);
         builder.setOwnHash(source.getHash());
         builder.setDescriptor(defDescriptor);
         builder.setLocation(startLocation);
@@ -129,7 +130,7 @@ public final class TokensDefHandler extends FileTagHandler<TokensDef> {
 
         if (TokenDefHandler.TAG.equalsIgnoreCase(tag)) {
             TokenDef def = new TokenDefHandler(xmlReader, source, definitionService, isInInternalNamespace,
-                    configAdapter, definitionParserAdapter, this).getElement();
+                    configAdapter, definitionParserAdapter, expressionBuilder, this).getElement();
             if (builder.tokens().containsKey(def.getName())) {
                 error("Duplicate token %s", def.getName());
             }
@@ -143,7 +144,7 @@ public final class TokensDefHandler extends FileTagHandler<TokensDef> {
             }
 
             TokensImportDef def = new TokensImportDefHandler(xmlReader, source, definitionService,
-                    isInInternalNamespace, configAdapter, definitionParserAdapter, this).getElement();
+                    isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, this).getElement();
             if (builder.imports().contains(def.getImportDescriptor())) {
                 error("Duplicate import %s", def.getName());
             }

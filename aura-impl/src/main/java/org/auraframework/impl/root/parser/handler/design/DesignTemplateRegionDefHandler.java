@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.design.DesignTemplateRegionDef;
@@ -50,8 +51,8 @@ public class DesignTemplateRegionDefHandler extends ParentedTagHandler<DesignTem
     public DesignTemplateRegionDefHandler(XMLStreamReader xmlReader, TextSource<?> source,
                                           DefinitionService definitionService, boolean isInInternalNamespace,
                                           ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter,
-                                          DesignDefHandler parentHandler) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
+                                          ExpressionBuilder expressionBuilder, DesignDefHandler parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, parentHandler);
         builder.setAccess(getAccess(isInInternalNamespace));
     }
 

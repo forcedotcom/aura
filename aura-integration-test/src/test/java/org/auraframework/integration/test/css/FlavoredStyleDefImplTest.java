@@ -19,6 +19,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
@@ -41,6 +42,9 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
 
     @Inject
     DefinitionService definitionService;
+
+    @Inject
+    ExpressionBuilder expressionBuilder;
 
     /** basic loading of a standard flavor within the component bundle */
     @Test
@@ -142,7 +146,7 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
         DefDescriptor<FlavoredStyleDef> flavor = addStandardFlavor(cmp,
                 ".THIS--test {color: token(color); font-weight: bold; margin: t(margin1); }");
 
-        Set<String> tokenNames = definitionService.getDefinition(flavor).getTokenNames();
+        Set<String> tokenNames = definitionService.getDefinition(flavor).getTokenNames(expressionBuilder);
         assertEquals("didn't have expected size", 2, tokenNames.size());
         assertTrue(tokenNames.contains("color"));
         assertTrue(tokenNames.contains("margin1"));

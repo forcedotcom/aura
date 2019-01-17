@@ -19,6 +19,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokensDef;
@@ -33,9 +34,9 @@ public class TokensXMLParser extends XMLParser<TokensDef> {
     protected TokensDefHandler getHandler(DefDescriptor<TokensDef> descriptor,
                                           TextSource<TokensDef> source, XMLStreamReader xmlReader, boolean isInInternalNamespace,
                                           DefinitionService definitionService,
-                                          ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) throws QuickFixException {
+                                          ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder) throws QuickFixException {
         return new TokensDefHandler(xmlReader, source, definitionService, isInInternalNamespace,
-                configAdapter, definitionParserAdapter, descriptor);
+                configAdapter, definitionParserAdapter, expressionBuilder, descriptor);
     }
 
     @Override

@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ClientLibraryDef.Type;
 import org.auraframework.def.ComponentDef;
@@ -47,6 +48,9 @@ import org.junit.Test;
 public class ClientLibraryDefImplTest extends AuraImplTestCase {
     @Inject
     private DefinitionParserAdapter definitionParserAdapter;
+
+    @Inject
+    private ExpressionBuilder expressionBuilder;
     
     @Override
     public void setUp() throws Exception {
@@ -191,12 +195,12 @@ public class ClientLibraryDefImplTest extends AuraImplTestCase {
         StringSource<ClientLibraryDef> componentSource = new StringSource<>(null, "<aura:component/>", "myID", Format.XML);
         XMLStreamReader componentXmlReader = getXmlReader(componentSource);
         ComponentDefHandler cdh = new ComponentDefHandler(componentXmlReader, componentSource, definitionService, true,
-                configAdapter, definitionParserAdapter, null);
+                configAdapter, definitionParserAdapter, expressionBuilder, null);
 
         StringSource<ClientLibraryDef> clientLibrarySource = new StringSource<>(null, clMarkup,
                 "myID", Format.XML);
         XMLStreamReader xmlReader = getXmlReader(clientLibrarySource);
-        return new ClientLibraryDefHandler<>(xmlReader, clientLibrarySource, definitionService, false, configAdapter, definitionParserAdapter, cdh);
+        return new ClientLibraryDefHandler<>(xmlReader, clientLibrarySource, definitionService, false, configAdapter, definitionParserAdapter, expressionBuilder, cdh);
     }
 
     private XMLStreamReader getXmlReader(StringSource<ClientLibraryDef> clSource) throws FactoryConfigurationError,

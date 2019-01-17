@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorDefaultDef;
 import org.auraframework.def.FlavorIncludeDef;
@@ -35,10 +36,13 @@ import org.junit.Test;
 
 public class FlavorDefaultDefHandlerTest extends StyleTestCase {
     @Inject
-    DefinitionService definitionService;
+    private DefinitionService definitionService;
 
     @Inject
     private DefinitionParserAdapter definitionParserAdapter;
+
+    @Inject
+    private ExpressionBuilder expressionBuilder;
 
     @Test
     public void testDescription() throws Exception {
@@ -74,13 +78,13 @@ public class FlavorDefaultDefHandlerTest extends StyleTestCase {
         XMLStreamReader parentReader = XMLParserBase.createXMLStreamReader(parentSource.getReader());
         parentReader.next();
         FlavorsDefHandler parent = new FlavorsDefHandler(parentReader, parentSource, definitionService, true,
-                configAdapter, definitionParserAdapter, parentDesc);
+                configAdapter, definitionParserAdapter, expressionBuilder, parentDesc);
 
         DefDescriptor<FlavorIncludeDef> desc = definitionService.getDefDescriptor("test", FlavorIncludeDef.class);
         StringSource<FlavorIncludeDef> ss = new StringSource<>(desc, src, "myID", Format.XML);
         XMLStreamReader xmlReader = XMLParserBase.createXMLStreamReader(ss.getReader());
         xmlReader.next();
-        FlavorDefaultDefHandler handler = new FlavorDefaultDefHandler(xmlReader, ss, definitionService, true, configAdapter, definitionParserAdapter, parent);
+        FlavorDefaultDefHandler handler = new FlavorDefaultDefHandler(xmlReader, ss, definitionService, true, configAdapter, definitionParserAdapter, expressionBuilder, parent);
         return handler.getElement();
     }
 }

@@ -19,6 +19,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDefRef;
@@ -39,8 +40,9 @@ public class ModuleDefRefHandler<P extends RootDefinition> extends BaseDefRefHan
 
     public ModuleDefRefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                                boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                               DefinitionParserAdapter definitionParserAdapter, RootTagHandler<P> parentHandler) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
+                               DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder,
+                               RootTagHandler<P> parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, parentHandler);
     }
 
     @Override

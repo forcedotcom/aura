@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.LocatorDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.locator.LocatorDefImpl;
@@ -47,8 +48,9 @@ public class LocatorDefHandler<P extends RootDefinition> extends ParentedTagHand
 
     public LocatorDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                              boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                             DefinitionParserAdapter definitionParserAdapter, ContainerTagHandler<P> parentHandler) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
+                             DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder,
+                             ContainerTagHandler<P> parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, parentHandler);
     }
 
     @Override
@@ -62,7 +64,7 @@ public class LocatorDefHandler<P extends RootDefinition> extends ParentedTagHand
         if (LocatorContextDefHandler.TAG.equals(tag)) {
             // to resolve expressions in locator context definitions, we need to pass in the component as the parent
             builder.addLocatorContext(new LocatorContextDefHandler<>(xmlReader, source,
-                    definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, this.getParentHandler()).getElement());
+                    definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, this.getParentHandler()).getElement());
         } else {
             error("Found unexpected tag inside aura:locator. %s", tag);
         }

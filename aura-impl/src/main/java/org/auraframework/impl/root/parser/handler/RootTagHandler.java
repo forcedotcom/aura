@@ -22,6 +22,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -55,8 +56,8 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
 
     protected RootTagHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                              boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                             DefinitionParserAdapter definitionParserAdapter, DefDescriptor<T> defDescriptor) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, defDescriptor);
+                             DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder, DefDescriptor<T> defDescriptor) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, defDescriptor);
     }
 
     public void setBundledDefs(Map<DefDescriptor<?>, Definition> bundled) {

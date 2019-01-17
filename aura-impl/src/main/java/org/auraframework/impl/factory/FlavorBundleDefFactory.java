@@ -19,6 +19,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorBundleDef;
@@ -50,12 +51,10 @@ public class FlavorBundleDefFactory extends BundleBaseFactory<FlavorBundleDef> {
     }
 
     @Override
-    protected RootTagHandler<FlavorBundleDef> getHandler(
-            DefDescriptor<FlavorBundleDef> defDescriptor,
-            TextSource<FlavorBundleDef> source, XMLStreamReader xmlReader,
-            boolean isInInternalNamespace, DefinitionService definitionService,
-            ConfigAdapter configAdapter,
-            DefinitionParserAdapter definitionParserAdapter)
+    protected RootTagHandler<FlavorBundleDef> getHandler(DefDescriptor<FlavorBundleDef> defDescriptor,
+            TextSource<FlavorBundleDef> source, XMLStreamReader xmlReader, boolean isInInternalNamespace,
+            DefinitionService definitionService, ConfigAdapter configAdapter,
+            DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder)
             throws QuickFixException {
         return null;
     }

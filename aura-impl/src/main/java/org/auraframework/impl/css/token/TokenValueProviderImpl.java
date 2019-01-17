@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.css.ResolveStrategy;
 import org.auraframework.css.TokenCache;
 import org.auraframework.css.TokenValueProvider;
@@ -32,7 +33,6 @@ import org.auraframework.def.TokenDef;
 import org.auraframework.def.TokensDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
-import org.auraframework.impl.expression.AuraExpressionBuilder;
 import org.auraframework.impl.expression.functions.CssVariableHelper;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -54,8 +54,19 @@ public final class TokenValueProviderImpl implements TokenValueProvider {
     private final DefDescriptor<TokensDef> namespaceDefault;
     private final ResolveStrategy strategy;
     private final ConfigAdapter configAdapter;
+    private final ExpressionBuilder expressionBuilder;
     private boolean isCssVarTransformEnabled;
 
+    private TokenValueProviderImpl(final DefDescriptor<TokensDef> namespaceDefault, final TokenCache overrides, final ResolveStrategy strategy, final ExpressionBuilder expressionBuilder, final ConfigAdapter configAdapter, final boolean isCssVarTransformEnabled) {
+        checkNotNull(namespaceDefault, "namespaceDefault cannot be null");
+        this.overrides = overrides;
+        this.namespaceDefault = namespaceDefault;
+        this.strategy = strategy;
+        this.expressionBuilder = expressionBuilder;
+        this.configAdapter = configAdapter;
+        this.isCssVarTransformEnabled = isCssVarTransformEnabled;
+    }
+    
     /**
      * Creates a new {@link TokenValueProvider}.
      *
@@ -63,14 +74,12 @@ public final class TokenValueProviderImpl implements TokenValueProvider {
      * @param overrides The tokens that override the default token values. Null is ok.
      * @param strategy The indication of how token resolution is being handled (if in doubt about this, use
      *            {@link ResolveStrategy#RESOLVE_NORMAL}).
+     * @param expressionBuilder The builder for expressions
      * @param configAdapter Used to determine if the app allows CSS variable transformation mode.
+     * @see #TokenValueProviderImpl(DefDescriptor, TokenCache, ResolveStrategy, ExpressionBuilder, boolean)
      */
-    public TokenValueProviderImpl(DefDescriptor<TokensDef> namespaceDefault, TokenCache overrides, ResolveStrategy strategy, ConfigAdapter configAdapter) {
-        checkNotNull(namespaceDefault, "namespaceDefault cannot be null");
-        this.overrides = overrides;
-        this.namespaceDefault = namespaceDefault;
-        this.strategy = strategy;
-        this.configAdapter = configAdapter;
+    public TokenValueProviderImpl(final DefDescriptor<TokensDef> namespaceDefault, final TokenCache overrides, final ResolveStrategy strategy, final ExpressionBuilder expressionBuilder, final ConfigAdapter configAdapter) {
+        this(namespaceDefault, overrides, strategy, expressionBuilder, configAdapter, false);
     }
 
     /**
@@ -80,15 +89,12 @@ public final class TokenValueProviderImpl implements TokenValueProvider {
      * @param overrides The tokens that override the default token values. Null is ok.
      * @param strategy The indication of how token resolution is being handled (if in doubt about this, use
      *            {@link ResolveStrategy#RESOLVE_NORMAL}).
+     * @param expressionBuilder The builder for expressions
      * @param isCssVarTransformEnabled Puts the token value provider into token to CSS variable transformation mode.
+     * @see #TokenValueProviderImpl(DefDescriptor, TokenCache, ResolveStrategy, ExpressionBuilder, ConfigAdapter)
      */
-    public TokenValueProviderImpl(DefDescriptor<TokensDef> namespaceDefault, TokenCache overrides, ResolveStrategy strategy, boolean isCssVarTransformEnabled) {
-        checkNotNull(namespaceDefault, "namespaceDefault cannot be null");
-        this.overrides = overrides;
-        this.namespaceDefault = namespaceDefault;
-        this.strategy = strategy;
-        this.isCssVarTransformEnabled = isCssVarTransformEnabled;
-        this.configAdapter = null;
+    public TokenValueProviderImpl(final DefDescriptor<TokensDef> namespaceDefault, final TokenCache overrides, final ResolveStrategy strategy, final ExpressionBuilder expressionBuilder, final boolean isCssVarTransformEnabled) {
+        this(namespaceDefault, overrides, strategy, expressionBuilder, null, isCssVarTransformEnabled);
     }
 
     /**
@@ -102,8 +108,8 @@ public final class TokenValueProviderImpl implements TokenValueProvider {
      *
      * @throws AuraValidationException
      */
-    private static Expression getExpression(String expression, Location location) throws AuraValidationException {
-        return AuraExpressionBuilder.INSTANCE.buildExpression(expression, location);
+    private Expression getExpression(String expression, Location location) throws AuraValidationException {
+        return expressionBuilder.buildExpression(expression, location);
     }
 
     /**

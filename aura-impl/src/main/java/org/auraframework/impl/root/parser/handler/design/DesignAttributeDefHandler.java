@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.design.DesignAttributeDef;
 import org.auraframework.def.design.DesignAttributeDefaultDef;
@@ -73,8 +74,9 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
     // TODO implement tool specific properties
     public DesignAttributeDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                                      boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                                     DefinitionParserAdapter definitionParserAdapter, DesignDefHandler parentHandler) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
+                                     DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder,
+                                     DesignDefHandler parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, parentHandler);
         builder.setAccess(getAccess(isInInternalNamespace));
     }
 
@@ -139,7 +141,7 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
         String tag = getTagName();
         if (isInInternalNamespace() && DesignAttributeDefaultDefHandler.TAG.equalsIgnoreCase(tag)) {
             DesignAttributeDefaultDef def = new DesignAttributeDefaultDefHandler(xmlReader, source,
-                    definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, (DesignDefHandler)getParentHandler()).getElement();
+                    definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, (DesignDefHandler)getParentHandler()).getElement();
             builder.setDefault(def);
         } else {
             error("Found unexpected tag %s", getTagName());

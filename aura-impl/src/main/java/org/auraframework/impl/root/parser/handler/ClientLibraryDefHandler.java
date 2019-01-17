@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.RootDefinition;
@@ -58,8 +59,9 @@ public class ClientLibraryDefHandler<P extends RootDefinition> extends ParentedT
 
     public ClientLibraryDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                                    boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                                   DefinitionParserAdapter definitionParserAdapter, RootTagHandler<P> parentHandler) throws DefinitionNotFoundException {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
+                                   DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder,
+                                   RootTagHandler<P> parentHandler) throws DefinitionNotFoundException {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, parentHandler);
 
         if (!isInInternalNamespace()) {
             throw new DefinitionNotFoundException(definitionService.getDefDescriptor(TAG, ComponentDef.class));

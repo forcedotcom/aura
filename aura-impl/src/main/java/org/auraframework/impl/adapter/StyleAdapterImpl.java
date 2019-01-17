@@ -15,10 +15,14 @@
  */
 package org.auraframework.impl.adapter;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.salesforce.omakase.plugin.Plugin;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.css.ResolveStrategy;
@@ -31,11 +35,11 @@ import org.auraframework.impl.css.parser.plugin.DuplicateFontFacePlugin;
 import org.auraframework.impl.css.token.TokenValueProviderImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
+import org.springframework.context.annotation.Lazy;
 
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.salesforce.omakase.plugin.Plugin;
 
 @ServiceComponent
 public class StyleAdapterImpl implements StyleAdapter {
@@ -48,6 +52,10 @@ public class StyleAdapterImpl implements StyleAdapter {
 
     @Inject
     private DefinitionService definitionService;
+    
+    @Lazy
+    @Inject
+    private ExpressionBuilder expressionBuilder;
     
     private boolean skipCssTransform = false;
 
@@ -74,9 +82,9 @@ public class StyleAdapterImpl implements StyleAdapter {
     public TokenValueProvider getTokenValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy,
             TokenCache overrides) {
         if(skipCssTransform) {
-            return new TokenValueProviderImpl(getNamespaceDefaultDescriptor(style), overrides, strategy, false);
+            return new TokenValueProviderImpl(getNamespaceDefaultDescriptor(style), overrides, strategy, expressionBuilder, false);
         }
-        return new TokenValueProviderImpl(getNamespaceDefaultDescriptor(style), overrides, strategy, configAdapter);
+        return new TokenValueProviderImpl(getNamespaceDefaultDescriptor(style), overrides, strategy, expressionBuilder, configAdapter);
     }
 
     @Override

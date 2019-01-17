@@ -18,6 +18,7 @@ package org.auraframework.def;
 import java.util.List;
 import java.util.Set;
 
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.throwable.quickfix.AuraValidationException;
 
 import com.salesforce.omakase.plugin.Plugin;
@@ -74,8 +75,9 @@ public interface BaseStyleDef extends Definition {
      * Gets the set of token names referenced from expressions within this {@link StyleDef}. This performs a
      * calculation so cache the result if needed more than once.
      *
+     * @param expressionBuilder The builder bean for processing expressions.
      * @return The set of token names.
      * @throws AuraValidationException If there is a problem evaluating an expression.
      */
-    Set<String> getTokenNames() throws AuraValidationException;
+    Set<String> getTokenNames(ExpressionBuilder expressionBuilder) throws AuraValidationException;
 }

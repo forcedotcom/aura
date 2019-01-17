@@ -15,9 +15,13 @@
  */
 package org.auraframework.impl.css.style;
 
-import com.google.common.collect.ImmutableList;
-import com.salesforce.omakase.plugin.Plugin;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.auraframework.Aura;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.builder.BaseStyleDefBuilder;
 import org.auraframework.css.ResolveStrategy;
@@ -29,7 +33,6 @@ import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.css.parser.CssPreprocessor;
-import org.auraframework.impl.expression.AuraExpressionBuilder;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.service.DefinitionService;
@@ -40,10 +43,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.StyleParserException;
 import org.auraframework.validation.ReferenceValidationContext;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.ImmutableList;
+import com.salesforce.omakase.plugin.Plugin;
 
 /**
  * Base class for concrete {@link BaseStyleDef} implementations.
@@ -56,7 +57,7 @@ public abstract class AbstractStyleDef<D extends BaseStyleDef> extends Definitio
     private final Set<String> expressions;
     private final Map<String, Set<String>> tokensInCssProperties;
 
-    protected AbstractStyleDef(Builder<D> builder) {
+    protected AbstractStyleDef(final Builder<D> builder) {
         super(builder);
         this.content = builder.content;
         this.expressions = AuraUtil.immutableSet(builder.expressions);
@@ -98,13 +99,13 @@ public abstract class AbstractStyleDef<D extends BaseStyleDef> extends Definitio
     }
 
     @Override
-    public Set<String> getTokenNames() throws AuraValidationException {
+    public Set<String> getTokenNames(ExpressionBuilder expressionBuilder) throws AuraValidationException {
         Set<String> set = new HashSet<>();
 
         if (!expressions.isEmpty()) {
             Set<PropertyReference> tmp = new HashSet<>();
             for (String rawExpression : expressions) {
-                Expression expression = AuraExpressionBuilder.INSTANCE.buildExpression(rawExpression, null);
+                Expression expression = expressionBuilder.buildExpression(rawExpression, null);
                 expression.gatherPropertyReferences(tmp);
             }
 
@@ -163,7 +164,7 @@ public abstract class AbstractStyleDef<D extends BaseStyleDef> extends Definitio
         private Set<String> expressions;
         private Map<String, Set<String>> tokensInCssProperties;
 
-        public Builder(Class<D> defClass) {
+        public Builder(final Class<D> defClass) {
             super(defClass);
             setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
         }

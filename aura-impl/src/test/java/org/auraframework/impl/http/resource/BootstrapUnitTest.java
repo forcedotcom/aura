@@ -20,9 +20,11 @@ import static java.lang.Boolean.TRUE;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -34,40 +36,56 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.http.BootstrapUtil;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.instance.Instance;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.Location;
 import org.auraframework.util.json.DefaultJsonSerializationContext;
+import org.auraframework.util.json.JsonEncoder;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * Unit test for the {@link Bootstrap} class.
  */
+@RunWith(MockitoJUnitRunner.class)
 public class BootstrapUnitTest {
 
+    @Mock
+    BootstrapUtil bootstrapUtil;
+    @Mock
+    ExpressionBuilder expressionBuilder;
+    
     @Test
     public void testName() {
-        Assert.assertEquals("bootstrap.js", new Bootstrap().getName());
+        Assert.assertEquals("bootstrap.js", new Bootstrap(bootstrapUtil, expressionBuilder).getName());
+        verifyZeroInteractions(bootstrapUtil, expressionBuilder);
     }
 
     @Test
     public void testFormat() {
-        Assert.assertEquals(Format.JS, new Bootstrap().getFormat());
+        Assert.assertEquals(Format.JS, new Bootstrap(bootstrapUtil, expressionBuilder).getFormat());
+        verifyZeroInteractions(bootstrapUtil, expressionBuilder);
     }
 
     @Test
@@ -89,15 +107,15 @@ public class BootstrapUnitTest {
     public void testWriteCsrfTokenIfManifestEnabled() throws Exception {
         String jwtToken = "jwtToken";
         String csrfToken = "specialCsrfToken";
-        Bootstrap bootstrap = new Bootstrap() {
+        
+        final BootstrapUtil bootstrapUtil = spy(new BootstrapUtil());
+        
+        Bootstrap bootstrap = new Bootstrap(bootstrapUtil, expressionBuilder) {
             @Override
             protected Map<String, Object> getComponentAttributes(HttpServletRequest request) {
                 return new HashMap<>();
             }
-
         };
-
-        bootstrap.setBootstrapUtil(new BootstrapUtil());
 
         HttpServletResponse response = mock(HttpServletResponse.class);
         StringWriter writer = new StringWriter();
@@ -146,12 +164,18 @@ public class BootstrapUnitTest {
         if (!writer.toString().contains("\"token\":\"" + csrfToken + "\"")) {
             Assert.fail("Missing CSRF token in payload: " + writer.toString());
         }
-        verify(configAdapter, times(1)).getCSRFToken();
+        verify(configAdapter).getCSRFToken();
+        verify(bootstrapUtil).loadLabelsToContext(Matchers.same(context), Matchers.same(definitionService));
+        verify(bootstrapUtil).getPrependScript();
+        verify(bootstrapUtil).serializeApplication(Matchers.isNull(Instance.class), Matchers.isNull(Map.class), Matchers.same(context), Matchers.any(JsonEncoder.class));
+        verify(bootstrapUtil).getAppendScript();
+        verifyNoMoreInteractions(bootstrapUtil);
+        verifyZeroInteractions(expressionBuilder);
     }
 
     @Test
     public void testWriteNoCsrfTokenIfManifestDisabled() throws Exception {
-        Bootstrap bootstrap = new Bootstrap() {
+        Bootstrap bootstrap = new Bootstrap(bootstrapUtil, expressionBuilder) {
             @Override
             protected Map<String, Object> getComponentAttributes(HttpServletRequest request) {
                 return Collections.emptyMap();
@@ -194,12 +218,13 @@ public class BootstrapUnitTest {
             Assert.fail("CSRF token should not be in payload: " + writer.toString());
         }
         verify(configAdapter, never()).getCSRFToken();
+        verifyZeroInteractions(bootstrapUtil, expressionBuilder);
     }
 
     @Test
     public void testWriteReturns404IfRequestHasInvalidJwtToken() throws Exception {
         String jwtToken = "jwtToken";
-        Bootstrap bootstrap = new Bootstrap() {
+        Bootstrap bootstrap = new Bootstrap(bootstrapUtil, expressionBuilder) {
             @Override
             protected Map<String, Object> getComponentAttributes(HttpServletRequest request) {
                 return Collections.emptyMap();
@@ -239,8 +264,8 @@ public class BootstrapUnitTest {
 
         bootstrap.write(request, response, context);
 
-        verify(servletUtilAdapter, times(1)).send404(Matchers.any(), Matchers.eq(request),
-                Matchers.eq(response));
+        verify(servletUtilAdapter, times(1)).send404(Matchers.any(), Matchers.eq(request), Matchers.eq(response));
+        verifyZeroInteractions(bootstrapUtil, expressionBuilder);
     }
 
     /**
@@ -253,7 +278,7 @@ public class BootstrapUnitTest {
      *            means there should be no cache.
      * @throws Exception
      */
-    private static void verifyCacheHeaders(Integer expirationSetting, boolean shouldCache) throws Exception {
+    private void verifyCacheHeaders(Integer expirationSetting, boolean shouldCache) throws Exception {
         final DefDescriptor<ApplicationDef> appDefDesc = mock(DefDescriptor.class);
         final ServletUtilAdapter servletUtilAdapter = mock(ServletUtilAdapter.class);
         final HttpServletResponse response = mock(HttpServletResponse.class);
@@ -262,7 +287,7 @@ public class BootstrapUnitTest {
         final InstanceService instanceService = mock(InstanceService.class);
         final ContextService contextService = mock(ContextService.class);
 
-        final Bootstrap bootstrap = new Bootstrap();
+        final Bootstrap bootstrap = new Bootstrap(bootstrapUtil, expressionBuilder);
         bootstrap.setServletUtilAdapter(servletUtilAdapter);
         bootstrap.setDefinitionService(definitionService);
         bootstrap.setInstanceService(instanceService);
@@ -276,19 +301,27 @@ public class BootstrapUnitTest {
         // Public cache expiration not set, should be no cache
         if (shouldCache) {
             doReturn("{!c.getBootstrapCacheExpiration}").when(appDef).getBootstrapPublicCacheExpiration();
+            doReturn(mock(ActionDef.class)).when(appDef).getServerActionByName(Matchers.anyString());
             
             final Action action = mock(Action.class);
             doReturn(expirationSetting).when(action).getReturnValue();
             doReturn(action).when(instanceService).getInstance(Matchers.any(ActionDef.class));
+            
+            final PropertyReference propertyReference = mock(PropertyReference.class);
+            doReturn(AuraValueProviderType.CONTROLLER.getPrefix()).when(propertyReference).getRoot();
+            doReturn(propertyReference).when(propertyReference).getStem();
+            doReturn("c.getBootstrapCacheExpiration").when(propertyReference).toString();
+            doReturn(propertyReference).when(expressionBuilder).buildExpression(Matchers.anyString(), Matchers.any(Location.class));
         }
         bootstrap.setCacheHeaders(response, appDefDesc);
 
         if (shouldCache) {
-            verify(servletUtilAdapter).setCacheTimeout(Matchers.any(HttpServletResponse.class),
-                    Matchers.eq(expirationSetting.longValue() * 1000), Matchers.eq(false));
+            verify(expressionBuilder).buildExpression(Matchers.eq("c.getBootstrapCacheExpiration"), Matchers.isNull(Location.class));
+            verify(servletUtilAdapter).setCacheTimeout(Matchers.same(response), Matchers.eq(expirationSetting.longValue() * 1000), Matchers.eq(false));
         } else {
             verify(servletUtilAdapter).setNoCache(Matchers.any(HttpServletResponse.class));
         }
-        verifyNoMoreInteractions(servletUtilAdapter);
+        verifyNoMoreInteractions(expressionBuilder, servletUtilAdapter);
+        verifyZeroInteractions(bootstrapUtil);
     }
 }

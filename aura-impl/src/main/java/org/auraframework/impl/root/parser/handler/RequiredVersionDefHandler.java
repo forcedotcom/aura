@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.RequiredVersionDefImpl;
@@ -49,8 +50,9 @@ public class RequiredVersionDefHandler<P extends RootDefinition> extends Parente
 
     public RequiredVersionDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService, 
                                      boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                                     DefinitionParserAdapter definitionParserAdapter, RootTagHandler<P> parentHandler) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
+                                     DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder,
+                                     RootTagHandler<P> parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, parentHandler);
         builder.setAccess(getAccess(isInInternalNamespace));
     }
 

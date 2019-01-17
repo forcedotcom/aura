@@ -32,8 +32,6 @@ import static org.auraframework.impl.expression.functions.MultiFunctions.GREATER
 import static org.auraframework.impl.expression.functions.MultiFunctions.LESS_THAN;
 import static org.auraframework.impl.expression.functions.MultiFunctions.LESS_THAN_OR_EQUAL;
 import static org.auraframework.impl.expression.functions.MultiFunctions.NOTEQUALS;
-import static org.auraframework.impl.expression.functions.UtilFunctions.EMPTY;
-import static org.auraframework.impl.expression.functions.UtilFunctions.FORMAT;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
@@ -47,9 +45,12 @@ import com.google.common.collect.Maps;
 
 /**
  * Basic tests of functions
- *
  */
 public class FunctionsTest {
+    
+    private static final Empty  EMPTY  = Empty.getInstance();
+    private static final Format FORMAT = Format.getInstance();
+    
     private Object evaluate(Function f, Object... args) {
         return f.evaluate(Lists.newArrayList(args));
     }

@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDef.SerializeToType;
 import org.auraframework.def.AttributeDefRef;
@@ -45,6 +46,9 @@ import org.junit.Test;
 public class AttributeDefHandlerTest extends AuraImplTestCase {
     @Inject
     private DefinitionParserAdapter definitionParserAdapter;
+
+    @Inject
+    private ExpressionBuilder expressionBuilder;
     
     DefDescriptor<AttributeDef> desc = null;
     StringSource<AttributeDef> componentSource = null;
@@ -58,7 +62,7 @@ public class AttributeDefHandlerTest extends AuraImplTestCase {
         componentSource = new StringSource<>(desc, "<aura:component/>", "myID", Format.XML);
         componentXmlReader = getXmlReader(componentSource);
         cdh = new ComponentDefHandler(componentXmlReader, componentSource, definitionService, true,
-                configAdapter, definitionParserAdapter, null);
+                configAdapter, definitionParserAdapter, expressionBuilder, null);
     }
 
     @Test
@@ -240,7 +244,7 @@ public class AttributeDefHandlerTest extends AuraImplTestCase {
                 "myID", Format.XML);
         XMLStreamReader attributeXmlReader = getXmlReader(attributeSource);
         return new AttributeDefHandler<>(attributeXmlReader, attributeSource, definitionService, true,
-                configAdapter, definitionParserAdapter, cdh);
+                configAdapter, definitionParserAdapter, cdh, expressionBuilder);
     }
 
     private AttributeDefImpl getElement(String attrMarkup) throws Exception {

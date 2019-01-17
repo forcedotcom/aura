@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionReference;
@@ -51,14 +52,17 @@ public class AttributeDefRefHandler<P extends Definition> extends ParentedTagHan
 
     private final AttributeDefRefImpl.Builder builder = new AttributeDefRefImpl.Builder();
     private final List<DefinitionReference> children = new ArrayList<>();
+    private final ExpressionBuilder expressionBuilder;
     private String stringValue;
 
     public AttributeDefRefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                                   boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                                  DefinitionParserAdapter definitionParserAdapter, ContainerTagHandler<P> parentHandler) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
+                                  DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder,
+                                  ContainerTagHandler<P> parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, parentHandler);
         builder.setLocation(getLocation());
         builder.setAccess(getAccess(isInInternalNamespace));
+        this.expressionBuilder = expressionBuilder;
     }
 
     @Override
@@ -81,7 +85,7 @@ public class AttributeDefRefHandler<P extends Definition> extends ParentedTagHan
                 builder.setValue("");
             }
         } else {
-            TextTokenizer tt = TextTokenizer.tokenize(stringValue, getLocation());
+            TextTokenizer tt = TextTokenizer.tokenize(expressionBuilder, stringValue, getLocation());
             builder.setValue(tt.asValue(getParentHandler()));
         }
     }

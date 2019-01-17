@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.design.DesignAttributeDef;
@@ -55,8 +56,9 @@ public class DesignDefHandler extends FileTagHandler<DesignDef> {
     public DesignDefHandler(XMLStreamReader xmlReader, TextSource<DesignDef> source,
                             DefinitionService definitionService, boolean isInInternalNamespace,
                             ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter,
-                            DefDescriptor<DesignDef> defDescriptor, GenericXmlElementHandlerProvider genericHandlerProvider) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, defDescriptor);
+                            ExpressionBuilder expressionBuilder, DefDescriptor<DesignDef> defDescriptor,
+                            GenericXmlElementHandlerProvider genericHandlerProvider) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, defDescriptor);
         this.genericHandlerProvider = genericHandlerProvider;
         builder.setDescriptor(getDefDescriptor());
         builder.setLocation(getLocation());
@@ -94,7 +96,7 @@ public class DesignDefHandler extends FileTagHandler<DesignDef> {
         String tag = getTagName();
         if (DesignAttributeDefHandler.TAG.equalsIgnoreCase(tag)) {
             DesignAttributeDef attributeDesign = new DesignAttributeDefHandler(xmlReader, source,
-                    definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, this).getElement();
+                    definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, this).getElement();
             builder.addAttributeDesign(
                     definitionService.getDefDescriptor(attributeDesign.getName(), DesignAttributeDef.class), attributeDesign);
         } else if (DesignTemplateDefHandler.TAG.equalsIgnoreCase(tag)) {
@@ -103,7 +105,7 @@ public class DesignDefHandler extends FileTagHandler<DesignDef> {
                         tag));
             }
             DesignTemplateDef template = new DesignTemplateDefHandler(xmlReader, source, definitionService,
-                    isInInternalNamespace, configAdapter, definitionParserAdapter, this).getElement();
+                    isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, this).getElement();
             builder.setDesignTemplateDef(template);
         } else if (genericHandlerProvider.handlesTag(DesignDef.class, tag, isInInternalNamespace)) {
             GenericXmlElement xmlDef = genericHandlerProvider.getHandler(

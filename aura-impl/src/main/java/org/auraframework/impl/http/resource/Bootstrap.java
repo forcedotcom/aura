@@ -21,11 +21,11 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
@@ -37,7 +37,6 @@ import org.auraframework.expression.Literal;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.http.BootstrapUtil;
 import org.auraframework.http.resource.AuraResourceImpl;
-import org.auraframework.impl.expression.AuraExpressionBuilder;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.AuraValueProviderType;
@@ -49,21 +48,23 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * Handles /l/{}/bootstrap.js requests to retrieve bootstrap.js.
  */
 @ServiceComponent("bootstrap")
 public class Bootstrap extends AuraResourceImpl {
-    private BootstrapUtil bootstrapUtil;
+    private final BootstrapUtil bootstrapUtil;
+    private final ExpressionBuilder expressionBuilder;
 
-    @Inject
-    protected void setBootstrapUtil(BootstrapUtil bootstrapUtil) {
-        this.bootstrapUtil = bootstrapUtil;
-    }
-
-    public Bootstrap() {
+    @Lazy
+    @Autowired
+    public Bootstrap(final BootstrapUtil bootstrapUtil, final ExpressionBuilder expressionBuilder) {
         super("bootstrap.js", Format.JS);
+        this.bootstrapUtil = bootstrapUtil;
+        this.expressionBuilder = expressionBuilder;
     }
     
     /**
@@ -76,7 +77,7 @@ public class Bootstrap extends AuraResourceImpl {
         Integer expiration = null;
         
         if (appDef.getBootstrapPublicCacheExpiration() != null) {
-            Expression expression = AuraExpressionBuilder.INSTANCE.buildExpression(TextTokenizer.unwrap(appDef.getBootstrapPublicCacheExpiration()), null);
+            Expression expression = expressionBuilder.buildExpression(TextTokenizer.unwrap(appDef.getBootstrapPublicCacheExpiration()), null);
             
             Object value = null;
             if (expression instanceof Literal) {
@@ -109,7 +110,7 @@ public class Bootstrap extends AuraResourceImpl {
                 intValue = ((Long) value).intValue();
             } else {
                 throw new AuraRuntimeException(
-                        "Value of 'bootstrapPublicCacheExpiration' attribute must either be an integer or a reference to a server Action");
+                        "Value of 'bootstrapPublicCacheExpiration' attribute must either be an integer or a reference to a server Action. The value is of type \"" + ((value == null) ? null : value.getClass().getCanonicalName()) + '"');
             }
             
             expiration = intValue < 0 ? 0 : intValue;

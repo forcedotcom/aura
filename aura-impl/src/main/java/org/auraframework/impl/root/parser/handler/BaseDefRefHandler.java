@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.DefDescriptor;
@@ -49,8 +50,8 @@ public abstract class BaseDefRefHandler<T extends DefinitionReference, P extends
 
     public BaseDefRefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                              boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                             DefinitionParserAdapter definitionParserAdapter, ContainerTagHandler<P> parentHandler) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
+                             DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder, ContainerTagHandler<P> parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, parentHandler);
         builder = createBuilder();
         builder.setLocation(getLocation());
         builder.setAccess(getAccess(isInInternalNamespace));
@@ -72,7 +73,7 @@ public abstract class BaseDefRefHandler<T extends DefinitionReference, P extends
         builder.setLocalId(getSystemAttributeValue("id"));
         String flavor = getSystemAttributeValue("flavor");
         if (!StringUtils.isBlank(flavor)) {
-            TextTokenizer tt = TextTokenizer.tokenize(flavor, getLocation());
+            TextTokenizer tt = TextTokenizer.tokenize(expressionBuilder, flavor, getLocation());
             builder.setFlavor(tt.asValue(getParentHandler()));
         }
     }
@@ -98,7 +99,7 @@ public abstract class BaseDefRefHandler<T extends DefinitionReference, P extends
                 if (attributes.containsKey(att)) {
                     error("Duplicate values for attribute %s on tag %s", att, getTagName());
                 }
-                TextTokenizer tt = TextTokenizer.tokenize(attValue, getLocation());
+                TextTokenizer tt = TextTokenizer.tokenize(expressionBuilder, attValue, getLocation());
                 Object value = tt.asValue(getParentHandler());
 
                 AttributeDefRefImpl.Builder atBuilder = new AttributeDefRefImpl.Builder();

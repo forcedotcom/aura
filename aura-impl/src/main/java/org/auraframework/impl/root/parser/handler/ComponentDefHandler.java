@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
@@ -54,9 +55,10 @@ public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef, C
             .build();
 
     public ComponentDefHandler(XMLStreamReader xmlReader, TextSource<?> source , DefinitionService definitionService,
-            boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                               DefinitionParserAdapter definitionParserAdapter, DefDescriptor<ComponentDef> componentDefDescriptor) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, componentDefDescriptor, new ComponentDefImpl.Builder());
+                               boolean isInInternalNamespace, ConfigAdapter configAdapter,
+                               DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder,
+                               DefDescriptor<ComponentDef> componentDefDescriptor) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, componentDefDescriptor, expressionBuilder, new ComponentDefImpl.Builder());
     }
 
     @Override

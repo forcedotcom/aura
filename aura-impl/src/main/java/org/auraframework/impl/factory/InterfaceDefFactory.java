@@ -19,6 +19,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
@@ -43,8 +44,9 @@ public class InterfaceDefFactory extends BundleBaseFactory<InterfaceDef> {
     protected InterfaceDefHandler getHandler(DefDescriptor<InterfaceDef> descriptor,
                                              TextSource<InterfaceDef> source, XMLStreamReader xmlReader,
                                              boolean isInInternalNamespace, DefinitionService definitionService,
-                                             ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+                                             ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter,
+                                             ExpressionBuilder expressionBuilder) {
         return new InterfaceDefHandler(xmlReader, source, definitionService, isInInternalNamespace,
-                contextService, configAdapter, definitionParserAdapter, descriptor);
+                contextService, configAdapter, definitionParserAdapter, expressionBuilder, descriptor);
     }
 }

@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
@@ -47,8 +48,9 @@ public class LibraryDefHandler extends RootTagHandler<LibraryDef> {
 
     public LibraryDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                              boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                             DefinitionParserAdapter definitionParserAdapter, DefDescriptor<LibraryDef> libraryDefDescriptor) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, libraryDefDescriptor);
+                             DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder,
+                             DefDescriptor<LibraryDef> libraryDefDescriptor) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, libraryDefDescriptor);
         builder.setDescriptor(libraryDefDescriptor);
     }
 

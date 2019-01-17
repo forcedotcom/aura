@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import javax.inject.Inject;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
@@ -34,27 +36,51 @@ import org.auraframework.impl.root.component.ComponentDefRefImpl;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.springframework.context.annotation.Lazy;
 
+/**
+ * Tests for the {@link HTMLComponentDefRefHandler} class.
+ */
 public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
     @Inject
     private DefinitionParserAdapter definitionParserAdapter;
+
+    @Inject
+    private ExpressionBuilder expressionBuilderBean;
     
+    private ExpressionBuilder expressionBuilderSpy;
+    
+    private Reader internalXmlReader;
     private XMLStreamReader xmlReader;
     private HTMLComponentDefRefHandler<?> htmlHandler;
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        expressionBuilderSpy = Mockito.spy(expressionBuilderBean);
         DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("fake:component",
                 ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(
                 desc, "<div class='MyClass'>Child Text<br/></div>", "myID", Format.XML);
-        xmlReader = XMLParserBase.createXMLStreamReader(source.getReader());
+        internalXmlReader = source.getReader();
+        xmlReader = XMLParserBase.createXMLStreamReader(internalXmlReader);
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(xmlReader, source, definitionService, true,
-                configAdapter, definitionParserAdapter, null);
-        htmlHandler = new HTMLComponentDefRefHandler<>(xmlReader, source, definitionService, true, configAdapter, definitionParserAdapter, cdh, "div");
+                configAdapter, definitionParserAdapter, expressionBuilderSpy, null);
+        htmlHandler = new HTMLComponentDefRefHandler<>(xmlReader, source, definitionService, true, configAdapter, definitionParserAdapter, cdh, expressionBuilderSpy, "div");
         htmlHandler.readAttributes();
+    }
+    
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
+        if (xmlReader != null) {
+            xmlReader.close();
+        }
+        if (internalXmlReader != null) {
+            internalXmlReader.close();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -67,6 +93,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
                 .getAttributeDefRef("body").getValue();
         AttributeDefRef attDef = compDefs.get(0).getAttributeDefRef("value");
         assertEquals("Child Text", attDef.getValue());
+        Mockito.verifyZeroInteractions(expressionBuilderSpy);
     }
 
     @SuppressWarnings("unchecked")
@@ -80,6 +107,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
                 .getAttributeDefRef("body").getValue();
         assertEquals(1, cd.size());
         assertEquals("br", cd.get(0).getAttributeDefRef("tag").getValue());
+        Mockito.verifyZeroInteractions(expressionBuilderSpy);
     }
 
     @Test
@@ -91,9 +119,9 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
         xmlReader = XMLParserBase.createXMLStreamReader(source.getReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(xmlReader, source, definitionService, true,
-                configAdapter, definitionParserAdapter, null);
+                configAdapter, definitionParserAdapter, expressionBuilderSpy, null);
         htmlHandler = new HTMLComponentDefRefHandler<>(xmlReader, source, definitionService, true, configAdapter,
-                definitionParserAdapter, cdh, "div");
+                definitionParserAdapter, cdh, expressionBuilderSpy, "div");
         htmlHandler.readAttributes();
         xmlReader.next();
         htmlHandler.handleChildTag();
@@ -102,6 +130,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
                 .getAttributeDefRef("HTMLAttributes").getValue()).get(definitionService.getDefDescriptor(
                 "header", AttributeDef.class));
         assertEquals("false", value);
+        Mockito.verifyZeroInteractions(expressionBuilderSpy);
     }
 
     @SuppressWarnings("unchecked")
@@ -112,6 +141,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
         Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributes = (Map<DefDescriptor<AttributeDef>, AttributeDefRef>) cd
                 .getAttributeDefRef("HTMLAttributes").getValue();
         assertEquals("MyClass", attributes.get(definitionService.getDefDescriptor("class", AttributeDef.class)));
+        Mockito.verifyZeroInteractions(expressionBuilderSpy);
     }
 
     @Test
@@ -123,6 +153,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
     public void testHandlesTag() {
         assertTrue("HTMLComponentDefRefHandler should handle the div tag", htmlHandler.handlesTag("div"));
         assertFalse("HTMLComponentDefRefHandler should not handle a fakeHTMLTag", htmlHandler.handlesTag("fakeHTMLTag"));
+        Mockito.verifyZeroInteractions(expressionBuilderSpy);
     }
 
     @Test
@@ -131,6 +162,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
         assertEquals("html", cd.getDescriptor().getName());
         assertEquals(2, cd. getAttributeValues().size());
         assertEquals("div", cd.getAttributeDefRef("tag").getValue());
+        Mockito.verifyZeroInteractions(expressionBuilderSpy);
     }
 
     @Test
@@ -140,12 +172,13 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
         xmlReader = XMLParserBase.createXMLStreamReader(source.getReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(xmlReader, source, definitionService, true,
-                configAdapter, definitionParserAdapter, null);
+                configAdapter, definitionParserAdapter, expressionBuilderSpy, null);
         HTMLComponentDefRefHandler<?> h = new HTMLComponentDefRefHandler<>(xmlReader, source, definitionService, true,
-                configAdapter, definitionParserAdapter, cdh, "div");
+                configAdapter, definitionParserAdapter, cdh, expressionBuilderSpy, "div");
         h.readAttributes();
         h.readSystemAttributes();
         ComponentDefRef cd = h.createDefinition();
         assertTrue(cd.isFlavorable());
+        Mockito.verifyZeroInteractions(expressionBuilderSpy);
     }
 }

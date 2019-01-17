@@ -29,6 +29,7 @@ import org.antlr.runtime.NoViableAltException;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
 import org.auraframework.adapter.ExpressionBuilder;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.expression.Expression;
 import org.auraframework.impl.expression.parser.ExpressionLexer;
 import org.auraframework.impl.expression.parser.ExpressionParser;
@@ -36,15 +37,21 @@ import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * adapter that calls our expression factory
  */
+@ServiceComponent("auraExpressionBuilder")
 public class AuraExpressionBuilder implements ExpressionBuilder {
 
-    public static final AuraExpressionBuilder INSTANCE = new AuraExpressionBuilder();
-
-    private AuraExpressionBuilder() {
+    private final ExpressionFunctions functions;
+    
+    @Lazy
+    @Autowired
+    public AuraExpressionBuilder(final ExpressionFunctions functions) {
+        this.functions = functions;
     }
 
     @Override
@@ -56,7 +63,7 @@ public class AuraExpressionBuilder implements ExpressionBuilder {
             throw new AuraRuntimeException(x);
         }
         CommonTokenStream cts = new CommonTokenStream(lexer);
-        ExpressionFactory ef = new ExpressionFactory(l);
+        ExpressionFactory ef = new ExpressionFactory(functions, l);
         ExpressionParser parser = new ExpressionParser(cts);
         parser.setExpressionFactory(ef);
         try {

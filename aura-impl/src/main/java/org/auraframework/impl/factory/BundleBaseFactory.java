@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.RootDefinition;
@@ -41,6 +42,7 @@ import org.auraframework.throwable.AuraExceptionInfo;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.springframework.context.annotation.Lazy;
 
 import com.google.common.collect.Maps;
 
@@ -51,6 +53,10 @@ public abstract class BundleBaseFactory<D extends RootDefinition> extends XMLPar
 
     @Inject
     protected ContextService contextService;
+    
+    @Lazy
+    @Inject
+    protected ExpressionBuilder expressionBuilder;
 
     @Override
     public Class<?> getSourceInterface() {
@@ -109,7 +115,8 @@ public abstract class BundleBaseFactory<D extends RootDefinition> extends XMLPar
                                                     XMLStreamReader xmlReader, boolean isInInternalNamespace,
                                                     DefinitionService definitionService,
                                                     ConfigAdapter configAdapter,
-                                                    DefinitionParserAdapter definitionParserAdapter) throws QuickFixException ;
+                                                    DefinitionParserAdapter definitionParserAdapter,
+                                                    ExpressionBuilder expressionBuilder) throws QuickFixException;
 
     protected RootTagHandler<D> makeHandler(DefDescriptor<D> descriptor, TextSource<D> source) throws QuickFixException {
         Reader reader = null;
@@ -131,7 +138,7 @@ public abstract class BundleBaseFactory<D extends RootDefinition> extends XMLPar
             throw new AuraUnhandledException(e.getLocalizedMessage(), getLocation(xmlReader, source), e);
         }
         return getHandler(descriptor, source, xmlReader, isInInternalNamespace(descriptor),
-                definitionService, configAdapter, definitionParserAdapter);
+                definitionService, configAdapter, definitionParserAdapter, expressionBuilder);
     }
 
     protected RootTagHandler<D> getDefinitionBuilder(DefDescriptor<D> descriptor, TextSource<D> source,

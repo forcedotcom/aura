@@ -15,31 +15,9 @@
  */
 package org.auraframework.impl.expression;
 
-import static org.auraframework.impl.expression.functions.BooleanFunctions.AND;
-import static org.auraframework.impl.expression.functions.BooleanFunctions.NOT;
-import static org.auraframework.impl.expression.functions.BooleanFunctions.OR;
 import static org.auraframework.impl.expression.functions.BooleanFunctions.TERNARY;
-import static org.auraframework.impl.expression.functions.MathFunctions.ABSOLUTE;
-import static org.auraframework.impl.expression.functions.MathFunctions.DIVIDE;
-import static org.auraframework.impl.expression.functions.MathFunctions.MODULUS;
-import static org.auraframework.impl.expression.functions.MathFunctions.MULTIPLY;
-import static org.auraframework.impl.expression.functions.MathFunctions.NEGATE;
-import static org.auraframework.impl.expression.functions.MathFunctions.SUBTRACT;
-import static org.auraframework.impl.expression.functions.MultiFunctions.ADD;
-import static org.auraframework.impl.expression.functions.MultiFunctions.EQUALS;
-import static org.auraframework.impl.expression.functions.MultiFunctions.GREATER_THAN;
-import static org.auraframework.impl.expression.functions.MultiFunctions.GREATER_THAN_OR_EQUAL;
-import static org.auraframework.impl.expression.functions.MultiFunctions.LESS_THAN;
-import static org.auraframework.impl.expression.functions.MultiFunctions.LESS_THAN_OR_EQUAL;
-import static org.auraframework.impl.expression.functions.MultiFunctions.NOTEQUALS;
-import static org.auraframework.impl.expression.functions.UtilFunctions.EMPTY;
-import static org.auraframework.impl.expression.functions.UtilFunctions.FORMAT;
-import static org.auraframework.impl.expression.functions.UtilFunctions.TOKEN;
-import static org.auraframework.impl.expression.functions.UtilFunctions.JOIN;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
@@ -48,58 +26,20 @@ import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
 
 /**
  * factory used by the parser to create the expression objects
  */
 public class ExpressionFactory {
 
-    private static final Map<String, Function> functionsByName;
-
-    static {
-        List<Function> l = new LinkedList<>();
-        l.add(ADD);
-        l.add(SUBTRACT);
-        l.add(MULTIPLY);
-        l.add(DIVIDE);
-        l.add(MODULUS);
-        l.add(GREATER_THAN);
-        l.add(GREATER_THAN_OR_EQUAL);
-        l.add(LESS_THAN);
-        l.add(LESS_THAN_OR_EQUAL);
-        l.add(AND);
-        l.add(OR);
-        l.add(NOT);
-        l.add(NEGATE);
-        l.add(ABSOLUTE);
-        l.add(EQUALS);
-        l.add(NOTEQUALS);
-        l.add(TERNARY);
-        l.add(EMPTY);
-        l.add(FORMAT);
-        l.add(TOKEN);
-        l.add(JOIN);
-        Builder<String, Function> b = ImmutableMap.builder();
-        for (Function f : l) {
-            for (String k : f.getKeys()) {
-                b.put(k, f);
-            }
-        }
-        functionsByName = b.build();
-    }
-
-    private static Function lookup(String name) {
-        return functionsByName.get(name);
-    }
-
+    private final ExpressionFunctions functions;
     private final Location l;
 
     // TODO: advance locations based on token positions
 
-    public ExpressionFactory(Location l) {
+    public ExpressionFactory(final ExpressionFunctions functions, final Location l) {
         this.l = l;
+        this.functions = functions;
     }
 
     public Expression createBool(String s) {
@@ -107,11 +47,11 @@ public class ExpressionFactory {
     }
 
     public Expression createInteger(String s) {
-        return new LiteralImpl(Long.parseLong(s), l);
+        return new LiteralImpl(Long.valueOf(s), l);
     }
 
     public Expression createFloat(String s) {
-        return new LiteralImpl(Double.parseDouble(s), l);
+        return new LiteralImpl(Double.valueOf(s), l);
     }
 
     public Expression createNull() {
@@ -151,12 +91,11 @@ public class ExpressionFactory {
      * for calling a function by name()
      */
     public Expression createFunction(String name, List<Expression> args) {
-        Function f = lookup(name);
+        Function f = functions.lookup(name);
         if (f == null) {
             // TODO: typed exception
             throw new AuraRuntimeException("No function found for key: " + name, l);
         }
-        return new FunctionCallImpl(f, args == null ? ImmutableList.<Expression> of() : ImmutableList.copyOf(args), l);
+        return new FunctionCallImpl(f, (args == null) ? ImmutableList.<Expression> of() : ImmutableList.copyOf(args), l);
     }
-
 }

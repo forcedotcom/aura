@@ -15,8 +15,13 @@
  */
 package org.auraframework.integration.test.css;
 
-import com.google.common.collect.ImmutableList;
+import java.util.List;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.auraframework.Aura;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.css.ResolveStrategy;
 import org.auraframework.css.TokenValueProvider;
@@ -36,9 +41,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.TokenValueNotFoundException;
 import org.junit.Test;
 
-import javax.inject.Inject;
-import java.util.List;
-import java.util.Set;
+import com.google.common.collect.ImmutableList;
 
 /**
  * Unit tests for {@link TokenValueProviderImpl}.
@@ -51,6 +54,9 @@ public class TokenValueProviderImplTest extends StyleTestCase {
 
     @Inject
     StyleAdapter styleAdapter;
+
+    @Inject
+    ExpressionBuilder expressionBuilder;
 
     @Override
     public void setUp() throws Exception {
@@ -286,7 +292,7 @@ public class TokenValueProviderImplTest extends StyleTestCase {
     private TokenValueProvider setup(DefDescriptor<StyleDef> def) throws QuickFixException {
         MockConfigAdapter configAdapter = getMockConfigAdapter();
         configAdapter.setIsCssVarTransformEnabled(false);
-        return new TokenValueProviderImpl(styleAdapter.getNamespaceDefaultDescriptor(def), null, ResolveStrategy.RESOLVE_NORMAL, configAdapter);
+        return new TokenValueProviderImpl(styleAdapter.getNamespaceDefaultDescriptor(def), null, ResolveStrategy.RESOLVE_NORMAL, expressionBuilder, configAdapter);
     }
 
     private TokenValueProvider setupOverride(DefDescriptor<TokensDef> override) throws QuickFixException {
@@ -306,6 +312,6 @@ public class TokenValueProviderImplTest extends StyleTestCase {
             throws QuickFixException {
         MockConfigAdapter configAdapter = getMockConfigAdapter();
         configAdapter.setIsCssVarTransformEnabled(false);
-        return new TokenValueProviderImpl(namespace, new TokenCacheImpl(definitionService, overrides), ResolveStrategy.RESOLVE_NORMAL, configAdapter);
+        return new TokenValueProviderImpl(namespace, new TokenCacheImpl(definitionService, overrides), ResolveStrategy.RESOLVE_NORMAL, expressionBuilder, configAdapter);
     }
 }

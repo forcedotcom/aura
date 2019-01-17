@@ -20,6 +20,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
@@ -45,11 +46,12 @@ public class EventDefFactory extends BundleBaseFactory<EventDef> {
     }
 
     @Override
-    protected EventDefHandler getHandler(DefDescriptor<EventDef> descriptor,
-                                         TextSource<EventDef> source, XMLStreamReader xmlReader,
-                                         boolean isInInternalNamespace, DefinitionService definitionService,
-                                         ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+    protected EventDefHandler getHandler(DefDescriptor<EventDef> descriptor, TextSource<EventDef> source,
+                                         XMLStreamReader xmlReader, boolean isInInternalNamespace,
+                                         DefinitionService definitionService, ConfigAdapter configAdapter,
+                                         DefinitionParserAdapter definitionParserAdapter,
+                                         ExpressionBuilder expressionBuilder) {
         return new EventDefHandler(xmlReader, source, definitionService, isInInternalNamespace,
-                configAdapter, definitionParserAdapter, descriptor);
+                configAdapter, definitionParserAdapter, expressionBuilder, descriptor);
     }
 }

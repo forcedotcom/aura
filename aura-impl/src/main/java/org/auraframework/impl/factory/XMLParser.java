@@ -18,12 +18,14 @@ package org.auraframework.impl.factory;
 import java.io.Reader;
 import java.io.StringReader;
 
+import javax.inject.Inject;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -36,6 +38,7 @@ import org.auraframework.throwable.AuraExceptionInfo;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * Implementation of Parser. Parses XML Formatted Source to produce
@@ -46,6 +49,10 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 @ServiceComponent
 public abstract class XMLParser<D extends Definition> extends XMLParserBase
         implements DefinitionFactory<TextSource<D>,D> {
+    
+    @Lazy
+    @Inject
+    protected ExpressionBuilder expressionBuilder;
 
     @Override
     public Class<?> getSourceInterface() {
@@ -64,9 +71,9 @@ public abstract class XMLParser<D extends Definition> extends XMLParserBase
 
     protected abstract FileTagHandler<D> getHandler(DefDescriptor<D>defDescriptor, TextSource<D> source,
                                                     XMLStreamReader xmlReader, boolean isInInternalNamespace,
-                                                    DefinitionService definitionService,
-                                                    ConfigAdapter configAdapter,
-                                                    DefinitionParserAdapter definitionParserAdapter) throws QuickFixException ;
+                                                    DefinitionService definitionService, ConfigAdapter configAdapter,
+                                                    DefinitionParserAdapter definitionParserAdapter,
+                                                    ExpressionBuilder expressionBuilder) throws QuickFixException;
 
     protected FileTagHandler<D> makeHandler(DefDescriptor<D> descriptor, TextSource<D> source) throws QuickFixException {
         Reader reader = null;
@@ -88,7 +95,7 @@ public abstract class XMLParser<D extends Definition> extends XMLParserBase
             throw new AuraUnhandledException(e.getLocalizedMessage(), getLocation(xmlReader, source), e);
         }
         return getHandler(descriptor, source, xmlReader, isInInternalNamespace(descriptor),
-                definitionService, configAdapter, definitionParserAdapter);
+                definitionService, configAdapter, definitionParserAdapter, expressionBuilder);
     }
 
     protected FileTagHandler<D> getDefinitionBuilder(DefDescriptor<D> descriptor, TextSource<D> source)
@@ -163,5 +170,4 @@ public abstract class XMLParser<D extends Definition> extends XMLParserBase
         }
         return handler;
     }
-
 }

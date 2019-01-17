@@ -15,8 +15,10 @@
  */
 package org.auraframework.impl.factory;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
@@ -36,8 +38,8 @@ import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import javax.inject.Inject;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 
 /**
  * Basic CSS style parser.

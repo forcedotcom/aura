@@ -20,6 +20,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.Definition;
@@ -42,8 +43,9 @@ public class ComponentDefRefHandler<P extends Definition> extends BaseDefRefHand
 
     public ComponentDefRefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                                   boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                                  DefinitionParserAdapter definitionParserAdapter, ContainerTagHandler<P> parentHandler) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
+                                  DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder,
+                                  ContainerTagHandler<P> parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, parentHandler);
     }
 
     @Override
@@ -61,8 +63,8 @@ public class ComponentDefRefHandler<P extends Definition> extends BaseDefRefHand
 
         String tag = getTagName();
         if (AttributeDefRefHandler.TAG.equalsIgnoreCase(tag)) {
-            AttributeDefRefImpl attributeDefRef = new AttributeDefRefHandler<>(xmlReader, source,
-                    definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, getParentHandler())
+            AttributeDefRefImpl attributeDefRef = new AttributeDefRefHandler<>(xmlReader, source, definitionService,
+                    isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, getParentHandler())
                     .getElement();
             builder.setAttribute(attributeDefRef.getDescriptor(), attributeDefRef);
         } else {

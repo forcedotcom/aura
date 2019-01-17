@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.FlavorDefaultDef;
 import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.css.flavor.FlavorDefaultDefImpl;
@@ -48,8 +49,8 @@ public class FlavorDefaultDefHandler extends ParentedTagHandler<FlavorDefaultDef
 
     public FlavorDefaultDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                                    boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                                   DefinitionParserAdapter definitionParserAdapter, FlavorsDefHandler parentHandler) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
+                                   DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder, FlavorsDefHandler parentHandler) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, parentHandler);
         builder.setLocation(getLocation());
         builder.setAccess(getAccess(isInInternalNamespace));
     }

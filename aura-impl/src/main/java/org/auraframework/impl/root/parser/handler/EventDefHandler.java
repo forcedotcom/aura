@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
@@ -56,9 +57,8 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
 
     public EventDefHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService,
                            boolean isInInternalNamespace, ConfigAdapter configAdapter,
-                           DefinitionParserAdapter definitionParserAdapter, DefDescriptor<EventDef> eventDefDescriptor) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter,
-                definitionParserAdapter, eventDefDescriptor);
+                           DefinitionParserAdapter definitionParserAdapter, ExpressionBuilder expressionBuilder, DefDescriptor<EventDef> eventDefDescriptor) {
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, eventDefDescriptor);
         builder.setDescriptor(eventDefDescriptor);
     }
 
@@ -78,13 +78,11 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
         String tag = getTagName();
         if (AttributeDefHandler.TAG.equalsIgnoreCase(tag)) {
             AttributeDefImpl attributeDef = new AttributeDefHandler<>(xmlReader, source, definitionService,
-                    isInInternalNamespace, configAdapter, definitionParserAdapter, this).getElement();
-            builder.getAttributeDefs().put(new DefDescriptorImpl<>(null, null, attributeDef.getName(),
-                        AttributeDef.class), attributeDef);
+                    isInInternalNamespace, configAdapter, definitionParserAdapter, this, expressionBuilder).getElement();
+            builder.getAttributeDefs().put(new DefDescriptorImpl<>(null, null, attributeDef.getName(), AttributeDef.class), attributeDef);
         } else if (RequiredVersionDefHandler.TAG.equalsIgnoreCase(tag)) {
-            RequiredVersionDefImpl requiredVersionDef = new RequiredVersionDefHandler<>(
-                    xmlReader, source, definitionService, isInInternalNamespace, configAdapter,
-                    definitionParserAdapter, this).getElement();
+            RequiredVersionDefImpl requiredVersionDef = new RequiredVersionDefHandler<>(xmlReader, source,
+                    definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, this).getElement();
             DefDescriptor<RequiredVersionDef> requiredVersionDesc = requiredVersionDef
                     .getDescriptor();
             if (builder.getRequiredVersionDefs().containsKey(requiredVersionDesc)) {
@@ -139,5 +137,4 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
     protected boolean allowPrivateAttribute() {
         return true;
     }
-
 }

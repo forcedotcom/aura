@@ -19,23 +19,29 @@ import javax.inject.Inject;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.factory.XMLParserBase;
+import org.auraframework.impl.root.parser.handler.BaseDefRefHandler;
 import org.auraframework.impl.root.parser.handler.ComponentDefHandler;
+import org.auraframework.impl.root.parser.handler.ComponentDefRefHandlerTest;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
 import org.junit.Test;
 
 /**
- * ModuleDefRefHandler tests.
- * All functionality in BaseDefRefHandler is exhausted in ComponentDefRefHandlerTest
+ * {@link ModuleDefRefHandler} tests.
+ * All functionality in {@link BaseDefRefHandler} is exhausted in {@link ComponentDefRefHandlerTest}
  */
 public class ModuleDefRefHandlerTest extends AuraImplTestCase {
 
     @Inject
     private DefinitionParserAdapter definitionParserAdapter;
+
+    @Inject
+    private ExpressionBuilder expressionBuilder;
 
     @Test
     public void getHandledTag() throws Exception {
@@ -46,8 +52,8 @@ public class ModuleDefRefHandlerTest extends AuraImplTestCase {
         XMLStreamReader xmlReader = XMLParserBase.createXMLStreamReader(source.getReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(xmlReader, source, definitionService, true,
-                configAdapter, definitionParserAdapter, null);
-        ModuleDefRefHandler<?> handler = new ModuleDefRefHandler<>(xmlReader, source, definitionService, true, configAdapter, definitionParserAdapter, cdh);
+                configAdapter, definitionParserAdapter, expressionBuilder, null);
+        ModuleDefRefHandler<?> handler = new ModuleDefRefHandler<>(xmlReader, source, definitionService, true, configAdapter, definitionParserAdapter, expressionBuilder, cdh);
         assertEquals("module reference", handler.getHandledTag());
     }
 }

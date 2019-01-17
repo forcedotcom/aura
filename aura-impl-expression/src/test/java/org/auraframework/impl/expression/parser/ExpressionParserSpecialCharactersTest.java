@@ -15,10 +15,15 @@
  */
 package org.auraframework.impl.expression.parser;
 
+import static org.mockito.Mockito.mock;
+
 import java.util.Collection;
 import java.util.List;
 
 import org.auraframework.impl.expression.AuraExpressionBuilder;
+import org.auraframework.impl.expression.ExpressionFunctions;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.UnitTestCase;
@@ -26,6 +31,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
 
@@ -122,12 +128,18 @@ public class ExpressionParserSpecialCharactersTest extends UnitTestCase {
 
     @Test
     public void test() throws Exception {
+        
+        final ContextService contextService = mock(ContextService.class);
+        final DefinitionService definitionService = mock(DefinitionService.class);
+        
         try {
-            AuraExpressionBuilder.INSTANCE.buildExpression(expression, null);
+            new AuraExpressionBuilder(new ExpressionFunctions(contextService, definitionService)).buildExpression(expression, null);
             fail("No exception thrown for <" + expression + ">. Expected InvalidExpressionException");
         } catch (InvalidExpressionException e) {
             assertTrue("Unexpected error message trying to parse <" + expression + ">. Expected to start with: "
                     + msgStartsWith + ". But got: " + e.getMessage(), e.getMessage().startsWith(msgStartsWith));
         }
+        
+        Mockito.verifyZeroInteractions(contextService, definitionService);
     }
 }

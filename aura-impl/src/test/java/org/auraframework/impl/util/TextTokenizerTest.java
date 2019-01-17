@@ -24,20 +24,47 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.expression.PropertyReference;
+import org.auraframework.impl.expression.AuraExpressionBuilder;
+import org.auraframework.impl.expression.ExpressionFunctions;
 import org.auraframework.impl.expression.LiteralImpl;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.root.parser.handler.ExpressionContainerHandler;
 import org.auraframework.impl.util.TextTokenizer.Token;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 
+/**
+ * Unit tests for the {@link TextTokenizer} class.
+ */
+@RunWith(MockitoJUnitRunner.class)
 public class TextTokenizerTest {
+
+    @Mock
+    ContextService contextService;
+    
+    @Mock
+    DefinitionService definitionService;
+    
+    private ExpressionBuilder expressionBuilder;
+    
+    @Before
+    public void setup() {
+        expressionBuilder = new AuraExpressionBuilder(new ExpressionFunctions(contextService, definitionService));
+    }
+    
     @Test
     public void testUnwrap() {
         assertEquals("ab.cab", TextTokenizer.unwrap("{!ab.cab}"));
@@ -52,11 +79,12 @@ public class TextTokenizerTest {
     @Test
     public void testTextTokenizerString() throws AuraValidationException {
         String theText = "some text";
-        TextTokenizer tokenizer = TextTokenizer.tokenize(theText, null);
+        TextTokenizer tokenizer = TextTokenizer.tokenize(expressionBuilder, theText, null);
         assertEquals("Wrong number of TextTokenizer tokens returned", 1, tokenizer.size());
         Token token = tokenizer.iterator().next();
         assertEquals(TextTokenizer.TokenType.PLAINTEXT, token.getType());
         assertEquals(theText, token.getRawValue());
+        Mockito.verifyZeroInteractions(contextService, definitionService);
     }
 
     /**
@@ -65,18 +93,19 @@ public class TextTokenizerTest {
     @Test
     public void testTextTokenizerExpr() throws AuraValidationException {
         String theText = "{!an.expression}";
-        TextTokenizer tokenizer = TextTokenizer.tokenize(theText, null);
+        TextTokenizer tokenizer = TextTokenizer.tokenize(expressionBuilder, theText, null);
         assertEquals("Wrong number of TextTokenizer tokens returned", 1, tokenizer.size());
         Token token = tokenizer.iterator().next();
         assertEquals(TextTokenizer.TokenType.EXPRESSION, token.getType());
         assertEquals(theText, token.getRawValue());
+        Mockito.verifyZeroInteractions(contextService, definitionService);
     }
 
     @Test
     public void testTextTokenizerStringExpr() throws AuraValidationException {
         String text1 = "some text";
         String text2 = "{!an.expression}";
-        TextTokenizer tokenizer = TextTokenizer.tokenize(text1+text2, null);
+        TextTokenizer tokenizer = TextTokenizer.tokenize(expressionBuilder, text1+text2, null);
         assertEquals("Wrong number of TextTokenizer tokens returned", 2, tokenizer.size());
         Iterator<Token> iter = tokenizer.iterator();
         Token token1 = iter.next();
@@ -85,11 +114,12 @@ public class TextTokenizerTest {
         assertEquals(text1, token1.getRawValue());
         assertEquals(TextTokenizer.TokenType.EXPRESSION, token2.getType());
         assertEquals(text2, token2.getRawValue());
+        Mockito.verifyZeroInteractions(contextService, definitionService);
     }
 
     @Test
     public void testAsValueFailsWithTwo() throws Exception {
-        TextTokenizer tokenizer = TextTokenizer.tokenize("text{!an.expression}", null);
+        TextTokenizer tokenizer = TextTokenizer.tokenize(expressionBuilder, "text{!an.expression}", null);
         InvalidExpressionException expected = null;
 
         try {
@@ -105,11 +135,11 @@ public class TextTokenizerTest {
     public void testTextAsValue() throws Exception {
         ExpressionContainerHandler valueHolder = Mockito.mock(ExpressionContainerHandler.class);
         String input = "some text";
-        TextTokenizer tokenizer = TextTokenizer.tokenize(input, null);
+        TextTokenizer tokenizer = TextTokenizer.tokenize(expressionBuilder, input, null);
         Object o = tokenizer.asValue(valueHolder);
         assertTrue("Token value is of wrong type", o instanceof String);
         assertEquals("Incorrect value returned from asValue()", input, o.toString());
-        Mockito.verifyNoMoreInteractions(valueHolder);
+        Mockito.verifyZeroInteractions(contextService, definitionService, valueHolder);
     }
 
     @Test
@@ -118,7 +148,7 @@ public class TextTokenizerTest {
         ExpressionContainerHandler valueHolder = Mockito.mock(ExpressionContainerHandler.class);
         String reference = "an.expr";
         String input = "{!"+reference+"}";
-        TextTokenizer tokenizer = TextTokenizer.tokenize(input, null);
+        TextTokenizer tokenizer = TextTokenizer.tokenize(expressionBuilder, input, null);
         Object o = tokenizer.asValue(valueHolder);
         assertTrue("Token value is of wrong type", o instanceof PropertyReference);
         assertEquals("Incorrect value returned from asValue()", reference, o.toString());
@@ -129,6 +159,7 @@ public class TextTokenizerTest {
         Set arg = captor.getValue();
         assertEquals(1, arg.size());
         assertTrue(arg.contains(pr));
+        Mockito.verifyZeroInteractions(contextService, definitionService);
     }
 
     @Test
@@ -137,7 +168,7 @@ public class TextTokenizerTest {
         ExpressionContainerHandler valueHolder = Mockito.mock(ExpressionContainerHandler.class);
         String reference = "an.expr";
         String input = "{#"+reference+"}";
-        TextTokenizer tokenizer = TextTokenizer.tokenize(input, null);
+        TextTokenizer tokenizer = TextTokenizer.tokenize(expressionBuilder, input, null);
         Object o = tokenizer.asValue(valueHolder);
         assertTrue("Token value is of wrong type", o instanceof PropertyReference);
         assertEquals("Incorrect value returned from asValue()", reference, o.toString());
@@ -148,6 +179,7 @@ public class TextTokenizerTest {
         Set arg = captor.getValue();
         assertEquals(1, arg.size());
         assertTrue(arg.contains(pr));
+        Mockito.verifyZeroInteractions(contextService, definitionService);
     }
 
     @Test
@@ -158,7 +190,7 @@ public class TextTokenizerTest {
         String second = "{!"+secondReference+"}";
         String third = " more text";
 
-        TextTokenizer tokenizer = TextTokenizer.tokenize(first+second+third, null);
+        TextTokenizer tokenizer = TextTokenizer.tokenize(expressionBuilder, first+second+third, null);
         List<ComponentDefRef> l = tokenizer.asComponentDefRefs(valueHolder);
 
         assertEquals("Wrong number of ComponentDefRefs returned", 3, l.size());
@@ -176,6 +208,7 @@ public class TextTokenizerTest {
         c = l.get(2);
         assertEquals("Incorrect ComponentDefRef type", "text", c.getDescriptor().getName());
         assertEquals("Incorrect ComponentDefRef value", third, c.getAttributeDefRef("value").getValue());
+        Mockito.verifyZeroInteractions(contextService, definitionService);
     }
 
     @Test
@@ -183,7 +216,7 @@ public class TextTokenizerTest {
         ExpressionContainerHandler valueHolder = Mockito.mock(ExpressionContainerHandler.class);
         String testWhitespace = "     {!true}     {!false}     five spaces";
 
-        List<ComponentDefRef> compList = TextTokenizer.tokenize(testWhitespace, null).asComponentDefRefs(valueHolder);
+        List<ComponentDefRef> compList = TextTokenizer.tokenize(expressionBuilder, testWhitespace, null).asComponentDefRefs(valueHolder);
         assertEquals("Wrong number of ComponentDefRefs returned", 3, compList.size());
 
         ComponentDefRef c = compList.get(0);
@@ -201,6 +234,7 @@ public class TextTokenizerTest {
         assertEquals("Incorrect ComponentDefRef value",
                 "     five spaces",
                 c.getAttributeDefRef("value").getValue());
+        Mockito.verifyZeroInteractions(contextService, definitionService);
     }
 
     @Test
@@ -208,12 +242,13 @@ public class TextTokenizerTest {
         InvalidExpressionException expected = null;
 
         try {
-            TextTokenizer.tokenize("{!incompleteExpression", null);
+            TextTokenizer.tokenize(expressionBuilder, "{!incompleteExpression", null);
         } catch (InvalidExpressionException e) {
             expected = e;
         }
         assertNotNull("Expected InvalidExpressionException", expected);
         assertEquals("Unexpected message", "Unterminated expression", expected.getMessage());
+        Mockito.verifyZeroInteractions(contextService, definitionService);
     }
 
     @Test
@@ -221,12 +256,13 @@ public class TextTokenizerTest {
         InvalidExpressionException expected = null;
 
         try {
-            TextTokenizer.tokenize("!{malformed}", null);
+            TextTokenizer.tokenize(expressionBuilder, "!{malformed}", null);
         } catch (InvalidExpressionException e) {
             expected = e;
         }
         assertNotNull("Expected InvalidExpressionException", expected);
         assertEquals("Unexpected message",
                 "Found an expression starting with '!{' but it should be '{!'", expected.getMessage());
+        Mockito.verifyZeroInteractions(contextService, definitionService);
     }
 }

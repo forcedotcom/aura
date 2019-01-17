@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
@@ -36,6 +37,9 @@ import org.junit.Test;
 public class AttributeDefRefHandlerTest extends AuraImplTestCase {
     @Inject
     private DefinitionParserAdapter definitionParserAdapter;
+
+    @Inject
+    private ExpressionBuilder expressionBuilder;
 
 //    @Test
 //    public void testAttributeDefRefParsing() throws Exception {
@@ -65,7 +69,7 @@ public class AttributeDefRefHandlerTest extends AuraImplTestCase {
         XMLStreamReader xmlReader = XMLParserBase.createXMLStreamReader(source.getReader());
         xmlReader.next();
         AttributeDefRefHandler<ComponentDef> adrHandler = new AttributeDefRefHandler<>(xmlReader,
-                source, definitionService, true, configAdapter, definitionParserAdapter, null);
+                source, definitionService, true, configAdapter, definitionParserAdapter, expressionBuilder, null);
         AttributeDefRefImpl adr = adrHandler.getElement();
         assertEquals("mystring", adr.getName());
         Object o = adr.getValue();
@@ -80,7 +84,7 @@ public class AttributeDefRefHandlerTest extends AuraImplTestCase {
         XMLStreamReader xmlReader = XMLParserBase.createXMLStreamReader(source.getReader());
         xmlReader.next();
         AttributeDefRefHandler<ComponentDef> adrHandler = new AttributeDefRefHandler<>(xmlReader,
-                source, definitionService, true, configAdapter, definitionParserAdapter, null);
+                source, definitionService, true, configAdapter, definitionParserAdapter, expressionBuilder, null);
         AttributeDefRefImpl adr = adrHandler.getElement();
         DefinitionReference value = (DefinitionReference) ((List<?>) adr.getValue()).get(0);
         assertEquals("foo", value.getName());
@@ -94,7 +98,7 @@ public class AttributeDefRefHandlerTest extends AuraImplTestCase {
         XMLStreamReader xmlReader = XMLParserBase.createXMLStreamReader(source.getReader());
         xmlReader.next();
         AttributeDefRefHandler<ComponentDef> adrHandler = new AttributeDefRefHandler<>(xmlReader,
-                source, definitionService, true, configAdapter, definitionParserAdapter, null);
+                source, definitionService, true, configAdapter, definitionParserAdapter, expressionBuilder, null);
         AttributeDefRefImpl adr = adrHandler.getElement();
         ComponentDefRef value = (ComponentDefRef) ((List<?>) adr.getValue()).get(0);
         assertEquals("Child Text", value.getAttributeDefRef("value").getValue());

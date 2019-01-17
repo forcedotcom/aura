@@ -21,6 +21,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.design.DesignAttributeDefaultDef;
@@ -45,8 +46,9 @@ public class DesignAttributeDefaultDefHandler extends ParentedTagHandler<DesignA
                                             DefinitionService definitionService, boolean isInInternalNamespace,
                                             ConfigAdapter configAdapter,
                                             DefinitionParserAdapter definitionParserAdapter,
+                                            ExpressionBuilder expressionBuilder,
                                             DesignDefHandler parentHandler) {
-        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, parentHandler);
+        super(xmlReader, source, definitionService, isInInternalNamespace, configAdapter, definitionParserAdapter, expressionBuilder, parentHandler);
         builder.setAccess(getAccess(isInInternalNamespace));
     }
 

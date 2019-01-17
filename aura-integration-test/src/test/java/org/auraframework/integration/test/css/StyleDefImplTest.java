@@ -20,6 +20,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TokensDef;
@@ -51,6 +52,9 @@ public class StyleDefImplTest extends StyleTestCase {
 
     @Inject
     DefinitionService definitionService;
+
+    @Inject
+    ExpressionBuilder expressionBuilder;
 
     @Test
     public void testDependenciesIncludesNsDefault() throws QuickFixException {
@@ -121,7 +125,7 @@ public class StyleDefImplTest extends StyleTestCase {
 
         DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: token(color); font-weight: bold; margin: t(margin1 + ' 5px ' + margin2); }");
 
-        Set<String> tokenNames = definitionService.getDefinition(style).getTokenNames();
+        Set<String> tokenNames = definitionService.getDefinition(style).getTokenNames(expressionBuilder);
         assertEquals("didn't have expected size", 3, tokenNames.size());
         assertTrue(tokenNames.contains("color"));
         assertTrue(tokenNames.contains("margin1"));

@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
@@ -39,7 +39,6 @@ import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.http.resource.AuraResourceImpl;
-import org.auraframework.impl.expression.AuraExpressionBuilder;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Component;
@@ -52,41 +51,55 @@ import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 
 @ServiceComponent("manifest")
 public class Manifest extends AuraResourceImpl {
     // ui:manifest attribute names
-    private static final String LAST_MOD = "lastMod";
-    private static final String UID = "uid";
-    private static final String RESOURCE_URLS = "resourceURLs";
-    private static final String FALLBACK_URLS = "fallbackURLs";
+    static final String LAST_MOD = "lastMod";
+    static final String UID = "uid";
+    static final String RESOURCE_URLS = "resourceURLs";
+    static final String FALLBACK_URLS = "fallbackURLs";
 
     // FIXME: this is horrendous we actually render the manifest as a component.
-    private RenderingService renderingService;
-    private CSPInliningService cspInliningService;
+    private final RenderingService renderingService;
+    private final CSPInliningService cspInliningService;
+    private final ExpressionBuilder expressionBuilder;
     private ManifestUtil manifestUtil;
 
-    public Manifest() {
+    public Manifest(final RenderingService renderingService, final CSPInliningService cspInliningService, final ExpressionBuilder expressionBuilder) {
         super("app.manifest", Format.MANIFEST);
+        this.renderingService = renderingService;
+        this.cspInliningService = cspInliningService;
+        this.expressionBuilder = expressionBuilder;
     }
 
+    /**
+     * @param manifestUtil The util for interacting with the manifest
+     */
+    @VisibleForTesting
+    void setManifestUtil(final ManifestUtil manifestUtil) {
+        this.manifestUtil = manifestUtil;
+    }
+    
     @PostConstruct
     public void createManifestUtil() {
-        this.manifestUtil = new ManifestUtil(definitionService, contextService, configAdapter);
+        setManifestUtil(new ManifestUtil(definitionService, contextService, configAdapter));
     }
     
     /**
      * Returns any configured public cache expiration (in seconds) for bootstrap.js, or null if not set.
      *
      * @param appDef The application definition containing the app cache URLs {@link String}.
+     * @param context The current Aura context.
      * @return The {@link List} of resolved URLs
      */
-    private List<String> getAdditionalAppCacheURLs(final ApplicationDef appDef) throws QuickFixException {
+    private List<String> getAdditionalAppCacheURLs(final ApplicationDef appDef, final AuraContext context) throws QuickFixException {
         List<String> urls = Collections.emptyList();
 
         if (appDef.getAdditionalAppCacheURLs() != null) {
-            Expression expression = AuraExpressionBuilder.INSTANCE.buildExpression(
+            Expression expression = expressionBuilder.buildExpression(
                     TextTokenizer.unwrap(appDef.getAdditionalAppCacheURLs()), null);
             if (!(expression instanceof PropertyReference)) {
                 throw new AuraRuntimeException(
@@ -99,7 +112,6 @@ public class Manifest extends AuraResourceImpl {
             ActionDef actionDef = appDef.getServerActionByName(ref.toString());
             Action action = instanceService.getInstance(actionDef);
 
-            AuraContext context = contextService.getCurrentContext();
             Action previous = context.setCurrentAction(action);
             try {
                 action.setup();
@@ -246,7 +258,7 @@ public class Manifest extends AuraResourceImpl {
             // Add in any application specific resources
             if (descr != null && descr.getDefType().equals(DefType.APPLICATION)) {
                 ApplicationDef def = (ApplicationDef) definitionService.getDefinition(descr);
-                for (String s : getAdditionalAppCacheURLs(def)) {
+                for (String s : getAdditionalAppCacheURLs(def, context)) {
                     if (s != null) {
                         sw.write(s);
                         sw.write('\n');
@@ -272,8 +284,7 @@ public class Manifest extends AuraResourceImpl {
             }
             attribs.put(FALLBACK_URLS, sw.toString());
 
-            DefDescriptor<ComponentDef> tmplDesc = definitionService
-                    .getDefDescriptor("ui:manifest", ComponentDef.class);
+            DefDescriptor<ComponentDef> tmplDesc = definitionService.getDefDescriptor("ui:manifest", ComponentDef.class);
             Component tmpl = instanceService.getInstance(tmplDesc, attribs);
             renderingService.render(tmpl, response.getWriter());
         } catch (Exception e) {
@@ -300,22 +311,5 @@ public class Manifest extends AuraResourceImpl {
             }
         }
         return null;
-    }
-
-    /**
-     * @param renderingService the renderingService to set
-     */
-    @Inject
-    public void setRenderingService(RenderingService renderingService) {
-        this.renderingService = renderingService;
-    }
-
-    @Inject
-    public void setCspInliningService(CSPInliningService service) {
-        this.cspInliningService = service;
-    }
-
-    public void setManifestUtil(ManifestUtil manifestUtil) {
-        this.manifestUtil = manifestUtil;
     }
 }

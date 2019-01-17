@@ -21,6 +21,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.adapter.ExpressionBuilder;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -51,14 +52,17 @@ public class ComponentDefFactory extends BaseComponentDefFactory<ComponentDef> {
         return "";
     }
 
+    /**
+     * @see org.auraframework.impl.factory.BundleBaseFactory#getHandler(org.auraframework.def.DefDescriptor, org.auraframework.system.TextSource, javax.xml.stream.XMLStreamReader, boolean, org.auraframework.service.DefinitionService, org.auraframework.adapter.ConfigAdapter, org.auraframework.adapter.DefinitionParserAdapter, org.auraframework.adapter.ExpressionBuilder)
+     */
     @Override
     protected ComponentDefHandler getHandler(DefDescriptor<ComponentDef> descriptor, TextSource<ComponentDef> source,
                                              XMLStreamReader xmlReader, boolean isInInternalNamespace,
-                                             DefinitionService definitionService,
-                                             ConfigAdapter configAdapter,
-                                             DefinitionParserAdapter definitionParserAdapter) {
+                                             DefinitionService definitionService, ConfigAdapter configAdapter,
+                                             DefinitionParserAdapter definitionParserAdapter,
+                                             ExpressionBuilder expressionBuilder) {
         return new ComponentDefHandler(xmlReader, source, definitionService, isInInternalNamespace,
-                configAdapter, definitionParserAdapter, descriptor);
+                configAdapter, definitionParserAdapter, expressionBuilder, descriptor);
     }
 
     private class TemplateCallbackImpl implements ComponentDefHandler.TemplateCallback {

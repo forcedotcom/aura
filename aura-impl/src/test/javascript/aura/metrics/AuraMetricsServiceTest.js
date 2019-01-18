@@ -16,11 +16,13 @@
 Function.RegisterNamespace("Test.Aura.Metrics");
 [Fixture]
 Test.Aura.Metrics.AuraMetricsServiceTest=function(){
-    var Aura = {Services: {}};
+    var Aura = {Services: {MetricsService : {DEFAULT : "default"}}};
+    var $A = {clientService: {currentAccess : {type : "test"}}};
 
     var globalMock = Mocks.GetMocks(Object.Global(), {
         "window" : {},
-        Aura: Aura
+        Aura: Aura,
+        $A : $A
     });
 
     globalMock(function () {
@@ -137,6 +139,29 @@ Test.Aura.Metrics.AuraMetricsServiceTest=function(){
                 "initiatorType": expected
             }).initiatorType;
 
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fixture]
+    function MarkTracking() {
+
+        [Fact]
+        function OnAdditionalMarks() {
+            var actual = 0;
+            var expected = 1;
+
+            var target;
+            globalMock(function() {
+                target = new Aura.Services.MetricsService();
+                // could be simpler with one, but this is good to make sure it only runs when the limit is reached
+                target.onAdditionalMarks(2,function(){
+                    actual++;
+                })
+    
+                target.createMarkNode();
+                target.createMarkNode();
+            });
             Assert.Equal(expected, actual);
         }
     }

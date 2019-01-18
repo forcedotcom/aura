@@ -32,7 +32,10 @@ Aura.Services.MetricsService = function MetricsService() {
     this.doneBootstrap             = false;
     this.pluginsInitialized        = false;
     this.clearCompleteTransactions = true; // In PTEST Mode this is set to false (see initialize method)
-    this.shouldLogBootstrap         = true;
+    this.shouldLogBootstrap        = true;
+    this.markThreshold             = -1;
+    this.onAdditionalMarksCallback = undefined;
+    this.markCount                 = 0;
 
     this.configurePerformanceAPILogging();
     
@@ -63,7 +66,7 @@ Aura.Services.MetricsService.COLD_ESTIMATE = 'COLD_ESTIMATE';
 Aura.Services.MetricsService.UNKNOWN       = 'UNKNOWN';
 Aura.Services.MetricsService.WARM_SIZE     = 3000;
 Aura.Services.MetricsService.HITS          = 'hits';
-Aura.Services.MetricsService.MISSES          = 'misses';
+Aura.Services.MetricsService.MISSES        = 'misses';
 
 /**
  * Initialize function
@@ -517,8 +520,8 @@ Aura.Services.MetricsService.prototype.killLongRunningTransactions = function ()
 
     for (var i in this.transactions) {
         var transaction = this.transactions[i];
-        var isPageTransaction = transaction["config"]["pageTransaction"];
-        if (!isPageTransaction && now - transaction["ts"] > Aura.Services.MetricsService.MAXTIME) {
+        var dontKill = transaction["config"]["pageTransaction"] || transaction["config"]["dontKill"];
+        if (!dontKill && now - transaction["ts"] > Aura.Services.MetricsService.MAXTIME) {
             transactionsKilled.push(transaction);
             delete this.transactions[i];
         }
@@ -719,6 +722,18 @@ Aura.Services.MetricsService.prototype.markStart = function (ns, name, context) 
 };
 
 /**
+ * Set the callback and mark limit for periodically flushing data
+ * @export
+ * @param {number} delta Flush transaction after creating this number of marks
+ * @param {function} callback After the mark limit is hit, call this function to flush transactions
+ * @public
+ */
+Aura.Services.MetricsService.prototype.onAdditionalMarks = function (delta, callback) {
+    this.markThreshold = this.markCount + delta;
+    this.onAdditionalMarksCallback = callback;
+};
+
+/**
  * Creates a end mark for a give namespace and key action
  * @param {string} ns Namespace of the mark
  * @param {string} name of the mark
@@ -765,6 +780,12 @@ Aura.Services.MetricsService.prototype.createMarkNode = function (ns, name, even
        mark["owner"] = $A.clientService.currentAccess.type;
     }
 
+    this.markCount++;
+    if (this.markThreshold > 0 && this.markCount >= this.markThreshold) {
+        this.markThreshold = -1;
+        this.onAdditionalMarksCallback && this.onAdditionalMarksCallback();
+        this.onAdditionalMarksCallback = undefined;
+    }
     return mark;
 };
 

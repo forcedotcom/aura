@@ -40,7 +40,7 @@
 	pointer-events: none;
 	position: absolute;
 	top:0;
-	left: 0;
+	/* @noflip@ */left: 0;
 }
 
 .THIS.advanced-wrapper.tooltip,
@@ -62,7 +62,7 @@
 	display: block;
 	position: absolute;
 	top:0;
-	left: 0;
+	/* @noflip@ */left: 0;
 	pointer-events: none;
 	opacity: 0;
 }

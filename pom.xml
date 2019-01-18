@@ -34,6 +34,11 @@
         <jetty.version>9.4.5.v20170502</jetty.version>
         <lwc.version>0.35.1</lwc.version>
         <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
+        <parameter.distribution.autorelease>false</parameter.distribution.autorelease>
+        <parameter.distribution.nexus>${serverId}</parameter.distribution.nexus>
+        <parameter.distribution.releases>${serverUrl}</parameter.distribution.releases>
+        <parameter.distribution.skipstaging>false</parameter.distribution.skipstaging>
+        <parameter.distribution.snapshots>${serverUrl}</parameter.distribution.snapshots>
         <parameter.checkstyle.xml>${aura.home}/checkstyle.xml</parameter.checkstyle.xml>
         <parameter.pmd.fail>false</parameter.pmd.fail>
         <pmd.skip>true</pmd.skip>

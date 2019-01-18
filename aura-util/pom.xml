@@ -99,24 +99,13 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>test-jar</id>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
+                <groupId>io.takari.maven.plugins</groupId>
+                <artifactId>takari-lifecycle-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>copy-test-resources</id>
                         <goals>
-                            <goal>copy-resources</goal>
+                            <goal>process-test-resources</goal>
                         </goals>
                         <phase>process-test-resources</phase>
                         <configuration>

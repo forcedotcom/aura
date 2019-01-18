@@ -104,35 +104,13 @@
         </pluginManagement>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-clean-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>clean-registries</id>
-                        <goals>
-                            <goal>clean</goal>
-                        </goals>
-                        <phase>clean</phase>
-                        <configuration>
-                            <filesets>
-                                <fileset>
-                                    <directory>src/main/components</directory>
-                                    <includes>
-                                        <include>.registries</include>
-                                    </includes>
-                                </fileset>
-                            </filesets>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
+                <groupId>io.takari.maven.plugins</groupId>
+                <artifactId>takari-lifecycle-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>copy-components</id>
                         <goals>
-                            <goal>copy-resources</goal>
+                            <goal>process-resources</goal>
                         </goals>
                         <phase>process-resources</phase>
                         <configuration>
@@ -153,7 +131,7 @@
                     <execution>
                         <id>copy-test-components</id>
                         <goals>
-                            <goal>copy-resources</goal>
+                            <goal>process-test-resources</goal>
                         </goals>
                         <phase>process-test-resources</phase>
                         <configuration>
@@ -174,7 +152,7 @@
                     <execution>
                         <id>copy-test-negative-components</id>
                         <goals>
-                            <goal>copy-resources</goal>
+                            <goal>process-test-resources</goal>
                         </goals>
                         <phase>process-test-resources</phase>
                         <configuration>
@@ -190,6 +168,29 @@
                                 </resource>
                             </resources>
                             <outputDirectory>${project.build.testOutputDirectory}/${component.negativetest.dir}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>clean-registries</id>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <phase>clean</phase>
+                        <configuration>
+                            <filesets>
+                                <fileset>
+                                    <directory>src/main/components</directory>
+                                    <includes>
+                                        <include>.registries</include>
+                                    </includes>
+                                </fileset>
+                            </filesets>
                         </configuration>
                     </execution>
                 </executions>

@@ -113,6 +113,55 @@
         </pluginManagement>
         <plugins>
             <plugin>
+                <!-- copies aura modules from src/main/modules to target/classes/aura_modules -->
+                <groupId>io.takari.maven.plugins</groupId>
+                <artifactId>takari-lifecycle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-test-modules</id>
+                        <goals>
+                            <goal>process-test-resources</goal>
+                        </goals>
+                        <phase>process-test-resources</phase>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/test/modules</directory>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
+                                    <excludes>
+                                        <exclude>**/.gitignore</exclude>
+                                    </excludes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${project.build.testOutputDirectory}/${module.test.dir}</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-test-components</id>
+                        <goals>
+                            <goal>process-test-resources</goal>
+                        </goals>
+                        <phase>process-test-resources</phase>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/test/components</directory>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
+                                    <excludes>
+                                        <exclude>**/.gitignore</exclude>
+                                    </excludes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${project.build.testOutputDirectory}/${component.test.dir}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
                 <executions>
@@ -149,54 +198,6 @@
                                     </includes>
                                 </fileset>
                             </filesets>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <!-- copies aura modules from src/main/modules to target/classes/aura_modules -->
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-test-modules</id>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <phase>process-test-resources</phase>
-                        <configuration>
-                            <resources>
-                                <resource>
-                                    <directory>src/test/modules</directory>
-                                    <includes>
-                                        <include>**/*</include>
-                                    </includes>
-                                    <excludes>
-                                        <exclude>**/.gitignore</exclude>
-                                    </excludes>
-                                </resource>
-                            </resources>
-                            <outputDirectory>${project.build.testOutputDirectory}/${module.test.dir}</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-test-components</id>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <phase>process-test-resources</phase>
-                        <configuration>
-                            <resources>
-                                <resource>
-                                    <directory>src/test/components</directory>
-                                    <includes>
-                                        <include>**/*</include>
-                                    </includes>
-                                    <excludes>
-                                        <exclude>**/.gitignore</exclude>
-                                    </excludes>
-                                </resource>
-                            </resources>
-                            <outputDirectory>${project.build.testOutputDirectory}/${component.test.dir}</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>

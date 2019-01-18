@@ -132,17 +132,14 @@
         </resources>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
+                <groupId>io.takari.maven.plugins</groupId>
+                <artifactId>takari-lifecycle-plugin</artifactId>
+                <!-- artifactId>maven-resources-plugin</artifactId -->
                 <executions>
                     <execution>
                         <id>copy-js-for-test</id>
                         <goals>
-                            <goal>copy-resources</goal>
+                            <goal>process-resources</goal>
                         </goals>
                         <phase>process-resources</phase>
                         <configuration>
@@ -209,6 +206,9 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
+                        <configuration>
+                            <workingDirectory>${aura.home}/</workingDirectory>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>npm install (initialize)</id>
@@ -232,7 +232,7 @@
                                 <configuration>
                                     <executable>npm</executable>
                                     <arguments>
-                                        <argument>--project ${aura.home}</argument>
+                                        <argument>--project ${aura.home}/</argument>
                                         <argument>run</argument>
                                         <argument>--color=false</argument>
                                         <argument>test</argument>

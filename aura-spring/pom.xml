@@ -15,6 +15,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.salesforce.aptspring</groupId>
+            <artifactId>AptSpringAPI</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.auraframework</groupId>
             <artifactId>aura-interfaces</artifactId>
         </dependency>
@@ -30,6 +34,12 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.salesforce.aptspring</groupId>
+            <artifactId>AptSpringProcessor</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
 </project>

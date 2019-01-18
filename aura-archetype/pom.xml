@@ -11,7 +11,9 @@
     <artifactId>simple-aura-archetype</artifactId>
     <packaging>maven-archetype</packaging>
     <name>archetype for Aura-based "hello, world"</name>
-
+    <properties>
+       <checkstyle.skip>true</checkstyle.skip>
+    </properties>
     <build>
         <pluginManagement>
             <plugins>
@@ -31,13 +33,13 @@
             <plugin>
                 <!-- We use the resources plugin to make the archetype-project's pom.xml depend
                      on the current Aura framework ${project.version} -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
+                <groupId>io.takari.maven.plugins</groupId>
+                <artifactId>takari-lifecycle-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>copy-resources</id>
                         <goals>
-                            <goal>copy-resources</goal>
+                            <goal>process-resources</goal>
                         </goals>
                         <phase>generate-sources</phase>
                         <configuration>

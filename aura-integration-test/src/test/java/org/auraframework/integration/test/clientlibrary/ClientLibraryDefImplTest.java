@@ -147,7 +147,8 @@ public class ClientLibraryDefImplTest extends AuraImplTestCase {
     }
 
 
-    @Test
+    @SuppressWarnings("unlikely-arg-type")
+	@Test
     public void testComparingLibraryDefsIdentical() throws Exception{
         ClientLibraryDef cdf1 = getElement("<aura:clientLibrary name='HTML5Shiv' type='JS'/>");
         assertFalse(cdf1.equals(null));

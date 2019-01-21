@@ -15,19 +15,18 @@
  */
 package org.auraframework.impl.linker;
 
+import java.util.Map;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
-import org.auraframework.def.LibraryDefRef;
 import org.auraframework.def.ParentedDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-
-import java.util.Map;
 
 public class AccessChecker {
     private final ConfigAdapter configAdapter;

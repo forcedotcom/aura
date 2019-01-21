@@ -281,7 +281,8 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
         assertFalse("Equals should have returned false because locations are different", cdr1.equals(cdr2));
     }
 
-    @Test
+    @SuppressWarnings("unlikely-arg-type")
+	@Test
     public void testEqualsWithDifferentObjects() {
         assertFalse("Equals should have been false due to different object types",
                 vendor.makeComponentDefRef().equals(vendor.makeEventDef()));

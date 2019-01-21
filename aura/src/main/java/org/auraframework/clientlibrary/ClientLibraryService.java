@@ -36,30 +36,10 @@ public interface ClientLibraryService extends AuraServiceProvider {
     String getResolvedUrl(ClientLibraryDef clientLibrary);
 
     /**
-     * Gets urls based on client library type
+     * Resolves url for a client library name.
      *
-     * @param context aura context
-     * @param type CSS or JS
-     * @return list of urls
-     * @throws QuickFixException
+     * @param name the name of the library
+     * @return resolved url
      */
-    Set<String> getUrls(AuraContext context, ClientLibraryDef.Type type) throws QuickFixException;
-    
-
-    /**
-     * Gets urls that support prefetching filtered by Type (JS, CSS)
-     * libraries can toggle prefetching based on setting prefetch="false" in their component
-     *
-     * @param context aura context
-     * @param type CSS or JS
-     * @return list of urls
-     * @throws QuickFixException
-     */
-    Set<String> getPrefetchUrls(AuraContext context, ClientLibraryDef.Type type) throws QuickFixException;
-
-    /**
-     * Gets resolver registry
-     * @return resolver registry
-     */
-    ClientLibraryResolverRegistry getResolverRegistry();
+    String getResolvedUrlByName(String name);
 }

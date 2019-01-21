@@ -18,12 +18,12 @@ package org.auraframework.impl.adapter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,6 +39,7 @@ import org.auraframework.instance.InstanceStack;
 import org.auraframework.service.CSPInliningService;
 import org.auraframework.service.CSPInliningService.InlineScriptMode;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.service.SerializationService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
@@ -46,12 +47,13 @@ import org.auraframework.system.AuraContext.Mode;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Matchers;
+import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 public class ServletUtilAdapterImplUnitTest {
     @Test
@@ -269,13 +271,8 @@ public class ServletUtilAdapterImplUnitTest {
     public void testGetClientLibraryUrls() throws Exception {
         ServletUtilAdapterImpl sua = new ServletUtilAdapterImpl();
         AuraContext context = Mockito.mock(AuraContext.class);
-        ClientLibraryService clientLibraryService = Mockito.mock(ClientLibraryService.class);
-        List<String> expected = Lists.newArrayList("cl1", "cl2");
-        Set<String> returned = Sets.newLinkedHashSet(expected);
+        List<String> expected = Lists.newArrayList();
         List<String> actual;
-        sua.setClientLibraryService(clientLibraryService);
-
-        Mockito.doReturn(returned).when(clientLibraryService).getUrls(context, ClientLibraryDef.Type.CSS);
 
         actual = sua.getCssClientLibraryUrls(context);
         Assert.assertEquals(expected, actual);
@@ -410,12 +407,78 @@ public class ServletUtilAdapterImplUnitTest {
         ServletUtilAdapterImpl sua = new ServletUtilAdapterImpl();
         ClientLibraryService clientLibraryService = Mockito.mock(ClientLibraryService.class);
         AuraContext context = Mockito.mock(AuraContext.class);
+        DefinitionService definitionService = Mockito.mock(DefinitionService.class);
+        ClientLibraryDef def1 = Mockito.mock(ClientLibraryDef.class);
+        ClientLibraryDef def2 = Mockito.mock(ClientLibraryDef.class);
+        Mockito.doReturn(Boolean.TRUE).when(def1).shouldInclude(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Boolean.TRUE).when(def2).shouldInclude(Mockito.any(), Mockito.any());
+        List<ClientLibraryDef> clientLibraries = new ArrayList<>();
+        clientLibraries.add(def1);
+        clientLibraries.add(def2);
+        Mockito.doReturn(clientLibraries).when(definitionService).getClientLibraries(Mockito.any());
+        Mockito.doReturn("a").when(clientLibraryService).getResolvedUrl(def1);
+        Mockito.doReturn("b").when(clientLibraryService).getResolvedUrl(def2);
+
         sua.setClientLibraryService(clientLibraryService);
+        sua.setDefinitionService(definitionService);
+
         List<String> expected = Lists.newArrayList("a", "b");
-        Set<String> returned = Sets.newLinkedHashSet(expected);
         List<String> actual;
 
-        Mockito.doReturn(returned).when(clientLibraryService).getUrls(context, ClientLibraryDef.Type.JS);
+        actual = sua.getJsClientLibraryUrls(context);
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testGetJsClientLibraryPrefetchUrls() throws Exception {
+        ServletUtilAdapterImpl sua = new ServletUtilAdapterImpl();
+        ClientLibraryService clientLibraryService = Mockito.mock(ClientLibraryService.class);
+        AuraContext context = Mockito.mock(AuraContext.class);
+        DefinitionService definitionService = Mockito.mock(DefinitionService.class);
+        ClientLibraryDef def1 = Mockito.mock(ClientLibraryDef.class);
+        ClientLibraryDef def2 = Mockito.mock(ClientLibraryDef.class);
+        Mockito.doReturn(Boolean.TRUE).when(def1).shouldPrefetch();
+        Mockito.doReturn(Boolean.FALSE).when(def2).shouldPrefetch();
+        List<ClientLibraryDef> clientLibraries = new ArrayList<>();
+        clientLibraries.add(def1);
+        clientLibraries.add(def2);
+        Mockito.doReturn(clientLibraries).when(definitionService).getClientLibraries(Mockito.any());
+        Mockito.doReturn("").when(context).getUid(Mockito.any());
+        Mockito.doReturn("a").when(clientLibraryService).getResolvedUrl(def1);
+        Mockito.doReturn("b").when(clientLibraryService).getResolvedUrl(def2);
+
+        sua.setClientLibraryService(clientLibraryService);
+        sua.setDefinitionService(definitionService);
+
+        List<String> expected = Lists.newArrayList("a");
+        List<String> actual;
+
+        actual = sua.getJsPrefetchUrls(context);
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testGetJsClientLibraryUrlsDup() throws Exception {
+        ServletUtilAdapterImpl sua = new ServletUtilAdapterImpl();
+        ClientLibraryService clientLibraryService = Mockito.mock(ClientLibraryService.class);
+        AuraContext context = Mockito.mock(AuraContext.class);
+        DefinitionService definitionService = Mockito.mock(DefinitionService.class);
+        ClientLibraryDef def1 = Mockito.mock(ClientLibraryDef.class);
+        ClientLibraryDef def2 = Mockito.mock(ClientLibraryDef.class);
+        Mockito.doReturn(Boolean.TRUE).when(def1).shouldInclude(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Boolean.TRUE).when(def2).shouldInclude(Mockito.any(), Mockito.any());
+        List<ClientLibraryDef> clientLibraries = new ArrayList<>();
+        clientLibraries.add(def1);
+        clientLibraries.add(def2);
+        Mockito.doReturn(clientLibraries).when(definitionService).getClientLibraries(Mockito.any());
+        Mockito.doReturn("a").when(clientLibraryService).getResolvedUrl(def1);
+        Mockito.doReturn("a").when(clientLibraryService).getResolvedUrl(def2);
+
+        sua.setClientLibraryService(clientLibraryService);
+        sua.setDefinitionService(definitionService);
+
+        List<String> expected = Lists.newArrayList("a");
+        List<String> actual;
 
         actual = sua.getJsClientLibraryUrls(context);
         Assert.assertEquals(expected, actual);
@@ -432,11 +495,8 @@ public class ServletUtilAdapterImplUnitTest {
         ClientLibraryService clientLibraryService = Mockito.mock(ClientLibraryService.class);
         AuraContext context = Mockito.mock(AuraContext.class);
         sua.setClientLibraryService(clientLibraryService);
-        List<String> expected = Lists.newArrayList("a", "b");
-        Set<String> returned = Sets.newLinkedHashSet(expected);
+        List<String> expected = Lists.newArrayList();
         List<String> actual;
-
-        Mockito.doReturn(returned).when(clientLibraryService).getUrls(context, ClientLibraryDef.Type.CSS);
 
         actual = sua.getCssClientLibraryUrls(context);
         Assert.assertEquals(expected, actual);

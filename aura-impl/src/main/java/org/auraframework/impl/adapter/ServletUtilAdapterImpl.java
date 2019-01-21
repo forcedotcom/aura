@@ -21,6 +21,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,6 +33,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.auraframework.adapter.ConfigAdapter;
@@ -42,7 +44,6 @@ import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ClientLibraryDef;
-import org.auraframework.def.ClientLibraryDef.Type;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
@@ -360,34 +361,6 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     /**
-     * Gets all client libraries specified. Uses client library service to resolve any urls that weren't specified.
-     * Returns list of non empty client library urls.
-     *
-     *
-     * @param context aura context
-     * @param type CSS or JS
-     * @return list of urls for client libraries
-     */
-    private List<String> getClientLibraryUrls(AuraContext context, ClientLibraryDef.Type type)
-            throws QuickFixException {
-        return new ArrayList<>(clientLibraryService.getUrls(context, type));
-    }
-
-    /**
-     * Gets all client libraries specified. Uses client library service to resolve any urls that weren't specified.
-     * Returns list of non empty client library urls.
-     *
-     *
-     * @param context aura context
-     * @param type CSS or JS
-     * @return list of urls for client libraries
-     */
-    private List<String> getClientLibraryJSPrefetchUrls(AuraContext context)
-            throws QuickFixException {
-        return new ArrayList<>(clientLibraryService.getPrefetchUrls(context, ClientLibraryDef.Type.JS));
-    }
-
-    /**
      * Get the set of base scripts for a context.
      */
     @Override
@@ -432,35 +405,66 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
 
     @Override
     public List <String> getJsClientLibraryUrls(AuraContext context) throws QuickFixException {
-        return getClientLibraryUrls(context, ClientLibraryDef.Type.JS);
+        AuraContext.Mode mode = context.getMode();
+        String uid = context.getUid(context.getApplicationDescriptor());
+        // get all client libraries specified for current app (cmp).
+        List<ClientLibraryDef> clientLibs = definitionService.getClientLibraries(uid);
+        List<String> ret = Lists.newArrayList();
+        if (clientLibs != null) {
+            for (ClientLibraryDef clientLib : clientLibs) {
+                // check if client library should be added based on type and current mode
+                String resolved = clientLibraryService.getResolvedUrl(clientLib);
+                if (clientLib.shouldInclude(mode, ClientLibraryDef.Type.JS) && !ret.contains(resolved)) {
+                    ret.add(resolved);
+                }
+            }
+        }
+        return ret;
     }
 
     @Override
     public List <String> getJsPrefetchUrls(AuraContext context) throws QuickFixException {
-        return getClientLibraryJSPrefetchUrls(context);
+        Set<String> urls = new LinkedHashSet<>();
+        String uid = context.getUid(context.getApplicationDescriptor());
+        if (uid == null) {
+            return new ArrayList<>();
+        }
+        List<ClientLibraryDef> clientLibs = definitionService.getClientLibraries(uid);
+
+        if (clientLibs != null) {
+            for (ClientLibraryDef clientLib : clientLibs) {
+                if (clientLib.shouldPrefetch()) {
+                    String url = clientLibraryService.getResolvedUrl(clientLib);
+                    if (StringUtils.isNotBlank(url)) {
+                        urls.add(url);
+                    }
+                }
+            }
+        }
+        return new ArrayList<>(urls);
     }
 
-	@Override
-	public List<String> getCssPreloadUrls(AuraContext context) throws QuickFixException {
-		return Arrays.asList(this.getAppCssUrl(context));
-	}
+    @Override
+    public List<String> getCssPreloadUrls(AuraContext context) throws QuickFixException {
+        return Arrays.asList(this.getAppCssUrl(context));
+    }
 
-	@Override
-	public List<String> getJsPreloadUrls(AuraContext context) throws QuickFixException {
-		final List<String> urls = Lists.newArrayList();
-		if(context.isAppJsSplitEnabled()) {
-			urls.add(this.getAppJsUrl(context, null));
-			urls.add(this.getAppCoreJsUrl(context, null));
-		} else {
-			urls.add(this.getAppJsUrl(context, null));
-		}
-		return urls;
-	}
+    @Override
+    public List<String> getJsPreloadUrls(AuraContext context) throws QuickFixException {
+        final List<String> urls = Lists.newArrayList();
+        if(context.isAppJsSplitEnabled()) {
+            urls.add(this.getAppJsUrl(context, null));
+            urls.add(this.getAppCoreJsUrl(context, null));
+        } else {
+            urls.add(this.getAppJsUrl(context, null));
+        }
+        return urls;
+    }
 
     @Override
     @Deprecated
     public void writeScriptUrls(AuraContext context, Map<String, Object> componentAttributes, StringBuilder sb) throws QuickFixException, IOException {
-            writeScriptUrls(context, null, componentAttributes, sb);
+        writeScriptUrls(context, null, componentAttributes, sb);
     }
 
     @Override
@@ -485,12 +489,12 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     public String getInteropEngineUrl(AuraContext context) {
-        return clientLibraryService.getResolverRegistry().get("engine", Type.JS).getUrl();
+        return clientLibraryService.getResolvedUrlByName("engine");
     }
 
     @Override
-    public List <String> getCssClientLibraryUrls (AuraContext context) throws QuickFixException {
-        return new ArrayList<>(getClientLibraryUrls(context, ClientLibraryDef.Type.CSS));
+    public List<String> getCssClientLibraryUrls (AuraContext context) throws QuickFixException {
+        return new ArrayList<>();
     }
 
     @Override

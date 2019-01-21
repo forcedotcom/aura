@@ -175,7 +175,8 @@ public class InterfaceDefTest extends AuraImplTestCase {
         assertTrue("Two interfaceDefs with the same attributes failed equality", intDef2.equals(intDef3));
     }
 
-    @Test
+    @SuppressWarnings("unlikely-arg-type")
+	@Test
     public void testEqualsWithDifferentTypes() {
         DefDescriptor<EventDef> eventTestDescriptor = definitionService.getDefDescriptor("aura:testevent", EventDef.class);
         DefDescriptor<InterfaceDef> ifcDescriptor = vendor.makeInterfaceDefDescriptor("aura:testinterfacechild");

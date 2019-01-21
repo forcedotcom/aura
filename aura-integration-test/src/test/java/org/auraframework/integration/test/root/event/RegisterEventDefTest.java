@@ -99,7 +99,8 @@ public class RegisterEventDefTest extends AuraImplTestCase {
                         vendor.makeLocation("filename1", 5, 5, 0)).getName());
     }
 
-    @Test
+    @SuppressWarnings("unlikely-arg-type")
+	@Test
     public void testEqualsWithDifferentObjects() {
         assertFalse("Equals should have been false due to different object types", vendor.makeRegisterEventDef()
                 .equals(vendor.makeEventDef()));

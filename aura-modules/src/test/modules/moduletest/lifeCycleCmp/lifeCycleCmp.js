@@ -1,14 +1,14 @@
-import { LightningElement, api, dangerousObjectMutation } from "lwc";
+import { LightningElement, api, unwrap } from "lwc";
 
 export default class LifeCycleCmp extends LightningElement {
     @api lifeCycleLog = [];
 
     connectedCallback() {
-        dangerousObjectMutation(this.lifeCycleLog).push('module connected');
+        unwrap(this.lifeCycleLog).push('module connected');
     }
 
     renderedCallback() {
-        dangerousObjectMutation(this.lifeCycleLog).push('module rendered');
+        unwrap(this.lifeCycleLog).push('module rendered');
     }
 }
 

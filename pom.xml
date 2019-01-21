@@ -32,7 +32,7 @@
         <eslint.extra.arg>--no-color</eslint.extra.arg>
         <java.hamcrest.version>2.0.0.0</java.hamcrest.version>
         <jetty.version>9.4.5.v20170502</jetty.version>
-        <lwc.version>0.35.1</lwc.version>
+        <lwc.version>0.35.4</lwc.version>
         <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
         <parameter.checkstyle.xml>${aura.home}/checkstyle.xml</parameter.checkstyle.xml>
         <parameter.pmd.fail>false</parameter.pmd.fail>
@@ -314,6 +314,16 @@
                 <groupId>org.e-hoffman.testing</groupId>
                 <artifactId>AdviseStaticEvictingClassloader</artifactId>
                 <version>${ehoffman.testing.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.ow2.asm</groupId>
+                        <artifactId>asm</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.ow2.asm</groupId>
+                        <artifactId>asm-tree</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>

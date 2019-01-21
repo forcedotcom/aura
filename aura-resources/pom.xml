@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -21,7 +21,6 @@
     </dependencies>
     <build>
         <resources>
-            <!-- nope, breaks takari-resource processing in eclipse and creates an infinite loop. -->
             <resource>
                 <!-- We generate resources into a separate directory from
                      target/classes, so Eclipse can look for it with C-S-r if
@@ -92,59 +91,6 @@
         </pluginManagement>
         <plugins>
             <plugin>
-                <groupId>io.takari.maven.plugins</groupId>
-                <artifactId>takari-lifecycle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-jsdoc3</id>
-                        <goals>
-                            <goal>process-resources</goal>
-                        </goals>
-                        <phase>validate</phase>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/jsdoc3/jsdoc</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${basedir}/config/jsdoc3/jsdoc</directory>
-                                    <filtering>true</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>aura-version</id>
-                        <goals>
-                            <goal>process-resources</goal>
-                        </goals>
-                        <phase>process-resources</phase>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/classes/aura/resources/version</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${basedir}/src/main/resources/aura/resources/version</directory>
-                                    <filtering>true</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>aura-framework</id>
-                        <goals>
-                            <goal>process-resources</goal>
-                        </goals>
-                        <phase>process-classes</phase>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/classes/aura/javascript</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${basedir}/target/src-gen/main/resources/aura/javascript</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
@@ -159,6 +105,58 @@
                                     <jvmarg value="-Daura.home=${basedir}/.."></jvmarg>
                                 </java>
                             </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-jsdoc3</id>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/jsdoc3/jsdoc</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>config/jsdoc3/jsdoc</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>aura-version</id>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <phase>process-resources</phase>
+                        <configuration>
+                            <outputDirectory>target/classes/aura/resources/version</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources/aura/resources/version</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>aura-framework</id>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <phase>process-classes</phase>
+                        <configuration>
+                            <outputDirectory>target/classes/aura/javascript</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>target/src-gen/main/resources/aura/javascript</directory>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
                 </executions>

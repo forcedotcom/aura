@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -132,14 +132,17 @@
         </resources>
         <plugins>
             <plugin>
-                <groupId>io.takari.maven.plugins</groupId>
-                <artifactId>takari-lifecycle-plugin</artifactId>
-                <!-- artifactId>maven-resources-plugin</artifactId -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>copy-js-for-test</id>
                         <goals>
-                            <goal>process-resources</goal>
+                            <goal>copy-resources</goal>
                         </goals>
                         <phase>process-resources</phase>
                         <configuration>
@@ -206,9 +209,6 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
-                        <configuration>
-                            <workingDirectory>${aura.home}/</workingDirectory>
-                        </configuration>
                         <executions>
                             <execution>
                                 <id>npm install (initialize)</id>
@@ -232,7 +232,7 @@
                                 <configuration>
                                     <executable>npm</executable>
                                     <arguments>
-                                        <argument>--project ${aura.home}/</argument>
+                                        <argument>--project ${aura.home}</argument>
                                         <argument>run</argument>
                                         <argument>--color=false</argument>
                                         <argument>test</argument>

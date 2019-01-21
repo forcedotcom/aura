@@ -460,7 +460,7 @@ public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
 
         assertTrue(logLine.contains("entry=modules/moduletest/moduletest.js"));
         assertTrue(logLine.contains("elapsedMs=100"));
-        assertTrue(logLine.contains("nodeServiceType=NodeLambdaFactorySidecar[poolSize=2]"));
+        assertTrue(logLine.contains("nodeServiceType=NodeLambdaFactorySidecar[]"));
         assertTrue(logLine.contains("bundleType=internal"));
         assertTrue(logLine.contains("sizeByte=95"));
         assertTrue(logLine.contains("configs=[{\"minify\":false,\"env\":{\"NODE_ENV\":\"development\"},\"compat\":false},{\"minify\":true,\"env\":{\"NODE_ENV\":\"production\"},\"compat\":false}]"));

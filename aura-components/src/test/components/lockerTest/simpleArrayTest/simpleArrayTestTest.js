@@ -19,6 +19,8 @@
     },
 
     testArrayProperties: {
+        // SAFARI BUG: For... In... Array includes the "length" property.
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-SAFARI", "-IPHONE", "-IPAD"],
         test:function(cmp) {
             cmp.testArrayProperties();
         }
@@ -74,6 +76,8 @@
         }
     },
     testArrayForIn : {
+        // SAFARI BUG: For... In... Array includes the "length" property.
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-SAFARI", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testArrayForIn();
         }

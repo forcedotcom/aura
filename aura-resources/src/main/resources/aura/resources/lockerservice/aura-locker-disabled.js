@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2019-01-15
- * Version: 0.6.20
+ * Generated: 2019-01-21
+ * Version: 0.6.21
  */
 
 (function (exports) {
@@ -197,6 +197,7 @@ var htmlTags = Object.keys(htmlTagsMap);
 // ATTRIBUTES
 var attrs = ['aria-activedescendant', 'aria-atomic', 'aria-autocomplete', 'aria-busy', 'aria-checked', 'aria-controls', 'aria-describedby', 'aria-disabled', 'aria-readonly', 'aria-dropeffect', 'aria-expanded', 'aria-flowto', 'aria-grabbed', 'aria-haspopup', 'aria-hidden', 'aria-disabled', 'aria-invalid', 'aria-label', 'aria-labelledby', 'aria-level', 'aria-live', 'aria-multiline', 'aria-multiselectable', 'aria-orientation', 'aria-owns', 'aria-posinset', 'aria-pressed', 'aria-readonly', 'aria-relevant', 'aria-required', 'aria-selected', 'aria-setsize', 'aria-sort', 'aria-valuemax', 'aria-valuemin', 'aria-valuenow', 'aria-valuetext', 'role', 'target'];
 
+var queue = new Set();
 // use a floating element for attribute sanitization
 var floating$1 = document.createElement('a');
 
@@ -217,23 +218,53 @@ function sanitizeHrefAttribute(str) {
   floating$1.href = str;
   var urlParam = floating$1.href.split('#');
   var url = ('' + urlParam[0]).replace(/[\\/,\\:]/g, '');
-  if (!document.getElementById(url)) {
-    var container = document.createElement('div');
+  var internalId = url + '_' + urlParam[1];
+
+  var container = document.getElementById(url);
+  if (!container) {
+    container = document.createElement('div');
     container.setAttribute('style', 'display:none');
     container.setAttribute('id', url);
     document.body.appendChild(container);
 
+    queue.add(url);
     var xhr = new XMLHttpRequest();
     xhr.open('GET', urlParam[0]);
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4 && xhr.status === 200) {
-        container.innerHTML = sanitizeSvgText(xhr.responseText);
+        var content = sanitizeSvgText(xhr.responseText);
+        if (urlParam[1]) {
+          content = content.replace('"' + urlParam[1] + '"', '"' + internalId + '"');
+        }
+        container.innerHTML = content;
+        queue.delete(url);
       }
     };
     xhr.send();
+  } else if (container && internalId) {
+    var updater = function updater() {
+      // if we use the same href multiple times we should check we parsed the ids
+      var el = container.querySelector('#' + internalId);
+      if (!el && container.innerHTML) {
+        var content = container.innerHTML.replace('"' + urlParam[1] + '"', '"' + internalId + '"');
+        container.innerHTML = content;
+      }
+    };
+
+    if (queue.has(url)) {
+      // wait for request to finish, then update content
+      var interval = setInterval(function () {
+        if (!queue.has(url)) {
+          updater();
+          clearInterval(interval);
+        }
+      }, 50);
+    } else {
+      updater();
+    }
   }
 
-  return urlParam[1] ? '#' + urlParam[1] : '#' + url;
+  return urlParam[1] ? '#' + internalId : '#' + url;
 }
 
 function uponSanitizeAttribute(node, data) {

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2019-01-15
- * Version: 0.6.20
+ * Generated: 2019-01-21
+ * Version: 0.6.21
  */
 
 (function (exports) {
@@ -384,6 +384,7 @@ const attrs = [
   'target'
 ];
 
+const queue = new Set();
 // use a floating element for attribute sanitization
 const floating$1 = document.createElement('a');
 
@@ -404,23 +405,53 @@ function sanitizeHrefAttribute(str) {
   floating$1.href = str;
   const urlParam = floating$1.href.split('#');
   const url = `${urlParam[0]}`.replace(/[\\/,\\:]/g, '');
-  if (!document.getElementById(url)) {
-    const container = document.createElement('div');
+  const internalId = `${url}_${urlParam[1]}`;
+
+  let container = document.getElementById(url);
+  if (!container) {
+    container = document.createElement('div');
     container.setAttribute('style', 'display:none');
     container.setAttribute('id', url);
     document.body.appendChild(container);
 
+    queue.add(url);
     const xhr = new XMLHttpRequest();
     xhr.open('GET', urlParam[0]);
     xhr.onreadystatechange = function() {
       if (xhr.readyState === 4 && xhr.status === 200) {
-        container.innerHTML = sanitizeSvgText(xhr.responseText);
+        let content = sanitizeSvgText(xhr.responseText);
+        if (urlParam[1]) {
+          content = content.replace(`"${urlParam[1]}"`, `"${internalId}"`);
+        }
+        container.innerHTML = content;
+        queue.delete(url);
       }
     };
     xhr.send();
+  } else if (container && internalId) {
+    const updater = () => {
+      // if we use the same href multiple times we should check we parsed the ids
+      const el = container.querySelector(`#${internalId}`);
+      if (!el && container.innerHTML) {
+        const content = container.innerHTML.replace(`"${urlParam[1]}"`, `"${internalId}"`);
+        container.innerHTML = content;
+      }
+    };
+
+    if (queue.has(url)) {
+      // wait for request to finish, then update content
+      const interval = setInterval(() => {
+        if (!queue.has(url)) {
+          updater();
+          clearInterval(interval);
+        }
+      }, 50);
+    } else {
+      updater();
+    }
   }
 
-  return urlParam[1] ? `#${urlParam[1]}` : `#${url}`;
+  return urlParam[1] ? `#${internalId}` : `#${url}`;
 }
 
 function uponSanitizeAttribute(node, data) {
@@ -739,6 +770,15 @@ function isValidURLScheme(url) {
   const normalized = document.createElement('a');
   normalized.href = url;
   return normalized.protocol === 'https:' || normalized.protocol === 'http:';
+}
+
+function isWindowLikeObject(obj) {
+  return (
+    !!obj &&
+    typeof obj === 'object' &&
+    typeof obj['Window'] === 'function' &&
+    obj instanceof obj['Window']
+  );
 }
 
 function isCustomElement(el) {
@@ -5712,6 +5752,9 @@ class SecureNodeListProxyHandler {
     property = convertSymbol(property);
     if (Number.isNaN(Number(property))) {
       switch (property) {
+        case 'hasOwnProperty':
+          return prop => filter(key, raw.hasOwnProperty(prop));
+
         case 'length':
           return getFilteredCount(raw, key, nodeIsAccessible);
 
@@ -9523,7 +9566,7 @@ function SecureWindow(sandbox, key) {
       if (confirmLocationChange(win.location.href, href)) {
         const filteredArgs = filterArguments(o, [href, ...args]);
         const res = win.open(...filteredArgs);
-        return typeof res === 'object' ? SecureIFrameContentWindow(res, key) : res;
+        return isWindowLikeObject(res) ? SecureIFrameContentWindow(res, key) : res;
       }
       // window.open spec expects a null return value if the operation fails
       return null;

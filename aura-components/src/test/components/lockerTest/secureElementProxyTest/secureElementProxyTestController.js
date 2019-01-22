@@ -103,11 +103,8 @@
             delete div.expando;
             testUtils.fail("Expected error trying to delete non-configurable property");
         } catch (e) {
-            if ($A.get("$Browser.isFIREFOX")) {
-                testUtils.assertEquals("property \"expando\" is non-configurable and can't be deleted", e.message);
-            } else {
-                testUtils.assertEquals("Cannot delete property 'expando' of [object Object]", e.message);
-            }
+            // TypeError: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/Cant_delete
+            testUtils.assertTrue(e instanceof TypeError);
         }
     },
 

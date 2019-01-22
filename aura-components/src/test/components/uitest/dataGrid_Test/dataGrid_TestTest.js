@@ -22,7 +22,7 @@
     testGridWithUndefinedItems : {
         attributes : {"pageSize" : 10},
         test : [function(cmp) {
-        	cmp.find("grid").set("v.items", undefined);
+        	cmp.find("grid").set("v.items", []);
         }, function(cmp) {
         	$A.test.assertEquals(0, cmp.find("grid").get("v.items").length, "There should be zero items");
         	this.verifyNumberOfTrs(0, cmp.find("grid").getElement());
@@ -330,7 +330,6 @@
      */ 
     verifySelectedElements : function(cmp, expectedItemsSelected, trs){
     	//setup
-
         var selected = this.getGridAttribute(cmp, "selectedItems"),
             expectedLen = expectedItemsSelected.length;
         //Verify that v.selected is the length that we expect

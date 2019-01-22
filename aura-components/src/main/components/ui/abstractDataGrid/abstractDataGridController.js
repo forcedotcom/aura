@@ -14,35 +14,35 @@
  * limitations under the License.
  */
 ({
-	init: function (cmp, evt, helper) {
+    init: function (cmp, evt, helper) {
         helper.initialize(cmp);
-	},
+    },
 
-	handleDataChange: function (cmp, evt, helper) {
+    handleDataChange: function (cmp, evt, helper) {
         helper.secureCallHandler(cmp, "handleDataChange", evt.getParam('data'));
-	},
+    },
 
-	handleModeChange: function (cmp, evt, helper) {
-		var mode = cmp.get('v.mode'),
-			isViewOnly = cmp.get('v.viewOnly');
+    handleModeChange: function (cmp, evt, helper) {
+        var mode = cmp.get('v.mode'),
+            isViewOnly = cmp.get('v.viewOnly');
 
-		if (mode === 'EDIT' && isViewOnly) {
-			$A.log('Can not put view only grid into EDIT mode.');
-			return;
-		}
+        if (mode === 'EDIT' && isViewOnly) {
+            $A.log('Can not put view only grid into EDIT mode.');
+            return;
+        }
 
         helper.secureCallHandler(cmp, "handleModeChange");
-	},
+    },
 
-	handleSortByChange: function (cmp, evt, helper) {
-		helper.secureCallHandler(cmp, "handleSortByChange");
-	},
+    handleSortByChange: function (cmp, evt, helper) {
+        helper.secureCallHandler(cmp, "handleSortByChange");
+    },
 
-	handleRefresh: function (cmp, evt, helper) {
-		helper.secureCallHandler(cmp, "handleRefresh");
-	},
+    handleRefresh: function (cmp, evt, helper) {
+        helper.secureCallHandler(cmp, "handleRefresh");
+    },
 
-	handleAddRemove: function (cmp, evt, helper) {
+    handleAddRemove: function (cmp, evt, helper) {
         helper.secureCallHandler(cmp, "handleAddRemove", evt.getParams());
-	}
+    }
 })// eslint-disable-line semi

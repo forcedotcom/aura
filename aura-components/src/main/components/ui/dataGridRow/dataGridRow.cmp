@@ -1,0 +1,46 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extensible="false" description="A single row of a dataGrid table">
+    <aura:attribute name="rowData" type="Object" description="A row of data"/>
+    <aura:attribute name="createdRowData" type="List" description="A row of data" access="PRIVATE"/>
+    <aura:attribute name="selected" type="Boolean" description="Is the row selected" default="false"/>
+    <aura:attribute name="disabled" type="Boolean" description="Is the row disabled" default="false"/>
+    <aura:attribute name="classes" type="List" description="List of custom classes for the row"  default="[]"/>
+    <aura:attribute name="index" type="Integer" description="The index of the row"/>
+    <aura:attribute name="columns" type="List" description="List of columns in the table"/>
+    <aura:attribute name="vp" type="Object" description="valueProvider used to manage properties with dynamic child components" access="PRIVATE"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:handler name="change" value="{!v.classes}" action="{!c.toggleClasses}"/>
+    <aura:handler name="change" value="{!v.disabled}" action="{!c.toggleDisabled}"/>
+    <aura:handler name="change" value="{!v.columns}" action="{!c.updateRowData}"/>
+    <aura:handler name="change" value="{!v.selected}" action="{!c.toggleSelected}"/>
+
+
+    <tr aura:id="rowClasses">
+        <aura:iteration items="{!v.createdRowData}" var="cellValue">
+            <ui:dataGridItem>
+                <aura:set attribute="td">
+                    <td>
+                        {!cellValue}
+                    </td>
+                </aura:set>
+            </ui:dataGridItem>
+        </aura:iteration>
+    </tr>
+</aura:component>

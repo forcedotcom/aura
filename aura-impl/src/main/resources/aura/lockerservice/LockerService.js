@@ -69,8 +69,9 @@ function LockerService() {
         service["runScript"]             = service.runScript;
         service["trust"]                 = service.trust;
         service["wrapComponent"]         = service.wrapComponent;
+        service["getMethodUsageMetrics"] = service.getMethodUsageMetrics;
     }
-    
+
     function getPublicMethodNames(component) {
         var methodsNames = [];
         if (component instanceof Aura.Component.InteropComponent) {

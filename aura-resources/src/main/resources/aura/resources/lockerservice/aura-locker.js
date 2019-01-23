@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  * Bundle from LockerService-Core
- * Generated: 2019-01-21
- * Version: 0.6.21
+ * Generated: 2019-01-23
+ * Version: 0.6.22
  */
 
 (function (exports) {
@@ -773,12 +773,7 @@ function isValidURLScheme(url) {
 }
 
 function isWindowLikeObject(obj) {
-  return (
-    !!obj &&
-    typeof obj === 'object' &&
-    typeof obj['Window'] === 'function' &&
-    obj instanceof obj['Window']
-  );
+  return !!obj && typeof obj === 'object' && obj === obj['window'];
 }
 
 function isCustomElement(el) {
